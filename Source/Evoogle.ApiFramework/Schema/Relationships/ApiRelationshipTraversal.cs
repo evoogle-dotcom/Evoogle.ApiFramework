@@ -11,6 +11,7 @@ using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.ApiFramework.Schema.Types;
+using Evoogle.ApiFramework.Schema.Types.Internal;
 
 namespace Evoogle.ApiFramework.Schema.Relationships;
 
@@ -24,17 +25,13 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///     the member's value alone does not establish whether the relationship was loaded.
 /// </remarks>
 /// <param name="apiName">The API name exposed on the source object type.</param>
-/// <param name="clrMemberName">The optional CLR navigation member name.</param>
-/// <param name="clrMemberKind">The kind of CLR navigation member.</param>
+/// <param name="clrMemberReference">The optional CLR navigation member reference.</param>
 [JsonConverter(typeof(ApiRelationshipTraversalJsonConverter))]
-public sealed class ApiRelationshipTraversal
-(
-    string apiName,
-    string? clrMemberName = null,
-    ClrMemberKind clrMemberKind = ClrMemberKind.Property
-) : ApiSchemaElement
+public sealed class ApiRelationshipTraversal(string apiName, ApiClrMemberReference? clrMemberReference = null)
+    : ApiSchemaElement
 {
     #region ApiRelationshipTraversal Fields
+    private readonly ApiClrMemberBinding _clrMemberBinding = new(clrMemberReference);
     private ApiRelationshipEnd? _targetEnd;
     #endregion
 
@@ -50,11 +47,8 @@ public sealed class ApiRelationshipTraversal
     /// <summary>Gets the API name of this traversal on its source object type.</summary>
     public string ApiName { get; } = apiName;
 
-    /// <summary>Gets the optional CLR navigation member name.</summary>
-    public string? ClrMemberName { get; } = clrMemberName;
-
-    /// <summary>Gets the optional kind of CLR navigation member when one is configured.</summary>
-    public ClrMemberKind ClrMemberKind { get; } = clrMemberKind;
+    /// <summary>Gets the optional CLR navigation member reference.</summary>
+    public ApiClrMemberReference? ClrMemberReference => _clrMemberBinding.ClrMemberReference;
 
     /// <summary>Gets the relationship end from which this traversal begins.</summary>
     public ApiRelationshipEnd SourceEnd => this.Parent as ApiRelationshipEnd
@@ -72,15 +66,14 @@ public sealed class ApiRelationshipTraversal
 
     #region ApiRelationshipTraversal Computed Properties
     /// <summary>Gets whether this traversal has a CLR navigation member binding.</summary>
-    public bool HasClrMember => this.ClrMemberName is not null;
+    public bool HasClrMember => _clrMemberBinding.HasReference;
 
     /// <summary>
     ///     Gets whether one source can reach multiple targets through this traversal.
     /// </summary>
     public bool IsToMany => this.SourceEnd.ApiRelationship switch
     {
-        ApiRelationshipOneToMany oneToMany =>
-            ReferenceEquals(this.SourceEnd, oneToMany.ApiPrincipalEnd),
+        ApiRelationshipOneToMany oneToMany => ReferenceEquals(this.SourceEnd, oneToMany.ApiPrincipalEnd),
         ApiRelationshipManyToMany => true,
         _ => false
     };
@@ -106,20 +99,6 @@ public sealed class ApiRelationshipTraversal
             context.AddIssue(severity, code, description, remediation);
         }
 
-        if (this.ClrMemberName is null)
-        {
-            return;
-        }
-
-        if (ApiSchemaNameValidation.IsNameInvalid(this.ClrMemberName))
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember;
-            var description = "A configured CLR navigation member name must not be empty";
-            var remediation = "Specify a CLR member name or omit the binding";
-
-            context.AddIssue(severity, code, description, remediation);
-        }
     }
     #endregion
 
@@ -130,31 +109,35 @@ public sealed class ApiRelationshipTraversal
         this.ThrowIfFrozen();
         _targetEnd = targetEnd;
 
-        if (this.ClrMemberName is null ||
-            ApiSchemaNameValidation.IsNameInvalid(this.ClrMemberName) ||
+        if (!this.HasClrMember ||
             this.SourceEnd.ApiResolvedObjectType is not { } sourceType ||
             targetEnd.ApiResolvedObjectType is not { } targetType)
         {
             return;
         }
 
-        var memberFlags = BindingFlags.Public | BindingFlags.Instance;
-        var property = this.ClrMemberKind == ClrMemberKind.Property
-            ? sourceType.ClrType.GetProperty(this.ClrMemberName, memberFlags)
-            : null;
-        var field = this.ClrMemberKind == ClrMemberKind.Field
-            ? sourceType.ClrType.GetField(this.ClrMemberName, memberFlags)
-            : null;
-        var memberType = this.ClrMemberKind switch
+        if (!_clrMemberBinding.TryResolveReference
+        (
+            sourceType.ClrType,
+            context,
+            ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember,
+            "Traversal CLR member reference"
+        ))
         {
-            ClrMemberKind.Property => property?.PropertyType,
-            ClrMemberKind.Field => field?.FieldType,
-            _ => null
+            return;
+        }
+
+        var clrMemberInfo = _clrMemberBinding.ClrMemberInfo;
+        var memberType = _clrMemberBinding.ClrMemberType;
+        var isReadableAndWritable = clrMemberInfo switch
+        {
+            PropertyInfo propertyInfo =>
+                propertyInfo.GetMethod?.IsPublic == true &&
+                propertyInfo.SetMethod?.IsPublic == true &&
+                propertyInfo.GetIndexParameters().Length == 0,
+            FieldInfo fieldInfo => !fieldInfo.IsInitOnly,
+            _ => false
         };
-        var isReadableAndWritable = property is not null
-            ? property.GetMethod?.IsPublic == true && property.SetMethod?.IsPublic == true &&
-                property.GetIndexParameters().Length == 0
-            : field is not null && !field.IsInitOnly;
         var isCompatibleType = this.IsToMany
             ? memberType is not null &&
                 (memberType.IsGenericType &&
@@ -173,7 +156,8 @@ public sealed class ApiRelationshipTraversal
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember;
-        var description = $"CLR navigation member '{this.ClrMemberName}' is missing or incompatible with '{targetType.ClrType}'";
+        var description = $"CLR navigation member '{this.ClrMemberReference!.ClrMemberName}' is "
+            + $"incompatible with '{targetType.ClrType}'";
         var remediation = "Bind a readable and writable member with the traversal's target and cardinality";
 
         context.AddIssue(apiPath, severity, code, description, remediation);

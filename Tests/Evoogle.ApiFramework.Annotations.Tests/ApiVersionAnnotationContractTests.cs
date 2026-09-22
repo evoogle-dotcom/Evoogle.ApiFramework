@@ -74,9 +74,9 @@ public sealed class ApiVersionAnnotationContractTests(ITestOutputHelper output)
         protected override void Assert()
         {
             this.MemberAttribute.Should().NotBeNull();
-            this.MemberAttribute!.ClrType.Should().BeNull();
+            this.MemberAttribute.ClrType.Should().BeNull();
             this.TypeAttribute.Should().NotBeNull();
-            this.TypeAttribute!.ClrType.Should().Be(typeof(string));
+            this.TypeAttribute.ClrType.Should().Be<string>();
         }
         #endregion
     }

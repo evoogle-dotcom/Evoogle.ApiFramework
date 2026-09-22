@@ -27,10 +27,7 @@ public enum StopLight
 #region Object Types
 public sealed class Empty()
 {
-    public override string ToString()
-    {
-        return "Empty {}";
-    }
+    public override string ToString() => "Empty {}";
 }
 
 public struct Point

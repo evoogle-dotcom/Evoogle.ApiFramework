@@ -26,10 +26,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.WriteLine($"AnnotationType: {this.AnnotationType}");
-        }
+        protected override void Arrange() => this.WriteLine($"AnnotationType: {this.AnnotationType}");
 
         protected override void Act()
         {
@@ -67,10 +64,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.WriteLine($"PropertyName: {this.PropertyName}");
         }
 
-        protected override void Act()
-        {
-            this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
-        }
+        protected override void Act() => this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
 
         protected override void Assert()
         {
@@ -105,10 +99,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.WriteLine($"PropertyName: {this.PropertyName}");
         }
 
-        protected override void Act()
-        {
-            this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
-        }
+        protected override void Act() => this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
 
         protected override void Assert()
         {
@@ -139,10 +130,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.WriteLine($"PropertyName: {this.PropertyName}");
         }
 
-        protected override void Act()
-        {
-            this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
-        }
+        protected override void Act() => this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
 
         protected override void Assert()
         {
@@ -227,10 +215,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             }
         }
 
-        protected override void Assert()
-        {
-            this.ActualException.Should().BeOfType<ArgumentNullException>();
-        }
+        protected override void Assert() => this.ActualException.Should().BeOfType<ArgumentNullException>();
         #endregion
     }
     #endregion

@@ -34,10 +34,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddObjectTypeExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiObjectTypeBuilder AddObjectTypeExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddKey Methods
@@ -120,6 +117,27 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         this.ConfigureVersion
         (
             new ApiVersionDefinitionBuilder(clrMemberName),
+            this.Context.CurrentConfigurationSource,
+            configure
+        );
+        return this;
+    }
+
+    /// <summary>Configures a property-backed version using a property reference.</summary>
+    /// <param name="apiPropertyReference">The property that supplies the version.</param>
+    /// <param name="configure">Optional version metadata configuration.</param>
+    /// <returns>The current builder.</returns>
+    public ApiObjectTypeBuilder WithVersion
+    (
+        ApiPropertyReference apiPropertyReference,
+        Action<ApiVersionDefinitionBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPropertyReference);
+
+        this.ConfigureVersion
+        (
+            new ApiVersionDefinitionBuilder(apiPropertyReference),
             this.Context.CurrentConfigurationSource,
             configure
         );
@@ -300,7 +318,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         this.ConfigureVersion
         (
             version.ClrMemberName is not null
-                ? new ApiVersionDefinitionBuilder(version.ClrMemberName)
+                ? new ApiVersionDefinitionBuilder
+                    (ApiPropertyReference.ClrRef(version.ClrMemberName))
                 : new ApiVersionDefinitionBuilder(version.ClrType!),
             ApiConfigurationSource.DataAnnotation,
             configure: null

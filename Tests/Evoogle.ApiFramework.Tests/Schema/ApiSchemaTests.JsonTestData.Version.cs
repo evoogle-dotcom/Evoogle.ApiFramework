@@ -43,7 +43,7 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiVersion: new ApiVersionDef(nameof(Person.Id))
+                        ApiVersion: new ApiVersionDefinitionDef(new ApiPropertyReferenceDef(ApiName: null, ClrName: nameof(Person.Id)))
                     )
                 ]
             ),
@@ -80,7 +80,7 @@ public partial class ApiSchemaTests
                         ],
                         ""ApiKeys"": [],
                         ""ApiVersion"": {
-                            ""ClrMemberName"": ""Id""
+                            ""ApiPropertyReference"": { ""ClrName"": ""Id"" }
                         },
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests""
                     }
@@ -106,7 +106,7 @@ public partial class ApiSchemaTests
                     (
                         ApiName: nameof(Empty),
                         ClrType: typeof(Empty),
-                        ApiVersion: new ApiVersionDef(typeof(int))
+                        ApiVersion: new ApiVersionDefinitionDef(typeof(int))
                     )
                 ]
             ),

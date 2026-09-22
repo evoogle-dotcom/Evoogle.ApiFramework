@@ -645,10 +645,7 @@ public readonly struct ApiKey
     ///     Gets the compatible scalar CLR types for <see cref="ApiKey"/> conversion.
     /// </summary>
     /// <returns>The compatible scalar CLR types for <see cref="ApiKey"/> conversion.</returns>
-    public static Type[] GetCompatibleScalarTypes()
-    {
-        return [.. _scalarTypeKinds.Keys];
-    }
+    public static Type[] GetCompatibleScalarTypes() => [.. _scalarTypeKinds.Keys];
 
     /// <summary>
     ///     Gets the compatible scalar CLR type for <see cref="ApiKey"/> conversion.

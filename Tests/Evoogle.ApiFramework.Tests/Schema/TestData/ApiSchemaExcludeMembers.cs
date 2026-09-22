@@ -31,9 +31,11 @@ public static class ApiSchemaExcludeMembers
         // ApiKeyPath — cycle: ApiRootObjectType → ApiObjectType → ApiKeys[].ApiKeyPaths[].ApiRootObjectType → ...
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrRootType)),
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrPath)),
 
         // ApiKeyPathSegment — cycle: ApiProperty → ApiType → ApiObjectType → ApiKeys[].ApiKeyPaths[].ApiRootObjectType → ...
         new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
+        new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ClrMemberName)),
 
         // ApiProperty — cycle: ApiType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
@@ -79,9 +81,11 @@ public static class ApiSchemaExcludeMembers
         // ApiKeyPath
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrRootType)),
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrPath)),
 
         // ApiKeyPathSegment
         new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
+        new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ClrMemberName)),
 
         // ApiProperty
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
@@ -132,7 +136,9 @@ public static class ApiSchemaExcludeMembers
         // Key path nodes — property and object type references resolved during compilation
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrRootType)),
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrPath)),
         new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
+        new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ClrMemberName)),
 
         // ApiSchemaElement
         new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.ApiPath)),

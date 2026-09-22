@@ -210,7 +210,11 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         }
 
         var parseResult = ApiKeyPathClrPathParser.Parse(clrPath);
-        return [.. parseResult.ClrMemberNames.Select(static name => new ApiKeyPathSegment(name))];
+        return
+        [
+            .. parseResult.ClrMemberNames.Select(static name =>
+                new ApiKeyPathSegment(ApiPropertyReference.ClrRef(name)))
+        ];
     }
     #endregion
 
@@ -219,7 +223,10 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     {
         return apiKeyPath.ApiSegments.IsEmpty || apiKeyPath.ApiSegments.Any
         (
-            static segment => segment.ExtensionCount > 0 || segment.ClrMemberName.Contains('.')
+            static segment =>
+                segment.ExtensionCount > 0 ||
+                !segment.ApiPropertyReference.IsClrNamedReference ||
+                segment.ApiPropertyReference.ClrName!.Contains('.')
         );
     }
 
@@ -288,6 +295,19 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     }
 
     private static void WriteApiKeyPathClrPath(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiKeyPath.ClrPath, value: apiKeyPath.ClrPath, options: writeContext.Options);
+    {
+        var clrPath = string.Join
+        (
+            '.',
+            apiKeyPath.ApiSegments.Select(static segment =>
+                segment.ApiPropertyReference.ClrName)
+        );
+        writer.TryWritePropertyAsString
+        (
+            propertyName: writeContext.PropertyNames.ApiKeyPath.ClrPath,
+            value: clrPath,
+            options: writeContext.Options
+        );
+    }
     #endregion
 }

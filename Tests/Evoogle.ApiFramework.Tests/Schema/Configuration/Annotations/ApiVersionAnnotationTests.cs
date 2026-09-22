@@ -86,7 +86,8 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         {
             this.VersionDefinition.Should().NotBeNull();
             this.VersionDefinition!.ClrType.Should().Be(this.ClrTypeExpected);
-            this.VersionDefinition.ClrMemberName.Should().Be(this.ClrMemberNameExpected);
+            this.VersionDefinition.ApiPropertyReference?.ClrName.Should()
+                .Be(this.ClrMemberNameExpected);
             this.MaterializedVersion.HasValue.Should().BeTrue();
             this.MaterializedVersion.ClrType.Should().Be(this.ClrTypeExpected);
         }
@@ -176,7 +177,8 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         {
             this.VersionDefinition.Should().NotBeNull();
             this.VersionDefinition!.ClrType.Should().Be(this.ClrTypeExpected);
-            this.VersionDefinition.ClrMemberName.Should().Be(this.ClrMemberNameExpected);
+            this.VersionDefinition.ApiPropertyReference?.ClrName.Should()
+                .Be(this.ClrMemberNameExpected);
         }
         #endregion
     }

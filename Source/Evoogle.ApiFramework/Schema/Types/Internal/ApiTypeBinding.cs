@@ -13,12 +13,6 @@ namespace Evoogle.ApiFramework.Schema.Types.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
 ///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
-/// <remarks>
-///     Establishes a one-shot binding to an API type of the required kind. A binding can either
-///     resolve a configured <see cref="ApiTypeReference"/> or directly bind an API type when no
-///     reference is configured. A failed reference resolution still consumes the binding attempt.
-/// </remarks>
-/// <typeparam name="TApiType">The required bound API type.</typeparam>
 internal sealed class ApiTypeBinding<TApiType>(ApiTypeReference? apiTypeReference)
     where TApiType : ApiType
 {
@@ -28,21 +22,16 @@ internal sealed class ApiTypeBinding<TApiType>(ApiTypeReference? apiTypeReferenc
     #endregion
 
     #region Properties
-    /// <summary>Gets the configured API type reference, or null for direct binding.</summary>
     public ApiTypeReference? ApiTypeReference { get; } = apiTypeReference;
 
-    /// <summary>Gets the bound API type.</summary>
     public TApiType ApiType => this.RequireValue(_boundApiType);
 
-    /// <summary>Gets the bound API type, or null when binding did not succeed.</summary>
     public TApiType? BoundApiType => _boundApiType;
     #endregion
 
     #region Computed Properties
-    /// <summary>Gets a value indicating whether an API type reference is configured.</summary>
     public bool HasReference => this.ApiTypeReference is not null;
 
-    /// <summary>Gets a value indicating whether an API type has been bound successfully.</summary>
     public bool IsBound => _boundApiType is not null;
     #endregion
 
@@ -66,13 +55,11 @@ internal sealed class ApiTypeBinding<TApiType>(ApiTypeReference? apiTypeReferenc
     (
         ApiSchemaCompilationContext context,
         ApiSchemaCompilationCode unresolvedCode,
-        string apiTypeReferenceName,
-        string apiTypeName
+        string referenceName
     )
     {
         ArgumentNullException.ThrowIfNull(context);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiTypeReferenceName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiTypeName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(referenceName);
 
         if (!this.HasReference)
         {
@@ -81,7 +68,13 @@ internal sealed class ApiTypeBinding<TApiType>(ApiTypeReference? apiTypeReferenc
 
         this.BeginBinding();
 
-        var apiType = this.ApiTypeReference!.Resolve(context, unresolvedCode, apiTypeName);
+        var apiType = this.ApiTypeReference!.Resolve
+        (
+            context,
+            unresolvedCode,
+            referenceName
+        );
+
         if (apiType is null)
         {
             return false;
@@ -95,7 +88,7 @@ internal sealed class ApiTypeBinding<TApiType>(ApiTypeReference? apiTypeReferenc
 
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = unresolvedCode;
-        var description = $"{apiTypeReferenceName} resolved to {apiType.GetType().Name}, not {typeof(TApiType).Name}";
+        var description = $"{referenceName} resolved to {apiType.GetType().Name}, not {typeof(TApiType).Name}";
         var remediation = $"Reference a declared {typeof(TApiType).Name}";
 
         context.AddIssue(severity, code, description, remediation);

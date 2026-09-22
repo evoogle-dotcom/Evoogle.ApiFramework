@@ -141,7 +141,8 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     #region Factory Methods
     /// <summary>
     ///     Creates a builder for a path that starts from the specified root CLR type, using CLR member paths.
-    ///     Use <see cref="AddSegment"/> or <see cref="For(Type, ApiKeyPathSegmentBuilder[])"/> when individual
+    ///     Use <see cref="AddSegment(string, Action{ApiKeyPathSegmentBuilder}?)"/> or
+    ///     <see cref="For(Type, ApiKeyPathSegmentBuilder[])"/> when individual
     ///     segments require extensions.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
@@ -211,10 +212,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyPathBuilder AddKeyPathExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiKeyPathBuilder AddKeyPathExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddSegment Methods
@@ -230,6 +228,24 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         ArgumentException.ThrowIfNullOrWhiteSpace(clrMemberName);
 
         var segmentBuilder = new ApiKeyPathSegmentBuilder(clrMemberName);
+        configure?.Invoke(segmentBuilder);
+        _state.SegmentBuilders.Add(segmentBuilder);
+        return this;
+    }
+
+    /// <summary>Appends a new segment for the specified API property reference.</summary>
+    /// <param name="apiPropertyReference">The API property reference.</param>
+    /// <param name="configure">Optional callback to attach extensions to the segment.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiKeyPathBuilder AddSegment
+    (
+        ApiPropertyReference apiPropertyReference,
+        Action<ApiKeyPathSegmentBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPropertyReference);
+
+        var segmentBuilder = new ApiKeyPathSegmentBuilder(apiPropertyReference);
         configure?.Invoke(segmentBuilder);
         _state.SegmentBuilders.Add(segmentBuilder);
         return this;

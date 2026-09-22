@@ -212,10 +212,7 @@ public partial class ApiConventionTests
         #endregion
 
         #region ApiNamingConvention Methods
-        public override string ConvertName(string apiName, ApiNamingConventionContext context)
-        {
-            return apiName + suffix;
-        }
+        public override string ConvertName(string apiName, ApiNamingConventionContext context) => apiName + suffix;
         #endregion
     }
 
@@ -320,10 +317,7 @@ public partial class ApiConventionTests
         #endregion
 
         #region IApiEnumValueConvention
-        public void Apply(ApiEnumValueBuilder builder, ApiEnumValueConventionContext context)
-        {
-            builder.WithName("LockedName");
-        }
+        public void Apply(ApiEnumValueBuilder builder, ApiEnumValueConventionContext context) => builder.WithName("LockedName");
         #endregion
     }
 
@@ -394,10 +388,7 @@ public partial class ApiConventionTests
         #endregion
 
         #region IApiRelationshipConvention
-        public void Apply(ApiSchemaBuilder builder)
-        {
-            builder.AddObject<PropertyConventionRegistered>();
-        }
+        public void Apply(ApiSchemaBuilder builder) => builder.AddObject<PropertyConventionRegistered>();
         #endregion
     }
     #endregion

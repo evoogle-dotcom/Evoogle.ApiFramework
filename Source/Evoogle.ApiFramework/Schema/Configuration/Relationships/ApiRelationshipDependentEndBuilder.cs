@@ -61,30 +61,57 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region WithTraversal Methods
     /// <summary>Sets the optional traversal from this end to the opposite relationship end.</summary>
     /// <param name="apiName">The API name exposed on the source object type.</param>
-    /// <param name="clrMemberName">An optional CLR navigation member name.</param>
-    /// <param name="clrMemberKind">The kind of CLR navigation member.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipDependentEndBuilder WithTraversal(string apiName)
+        => this.WithTraversalCore(apiName, clrMemberReference: null);
+
+    /// <summary>Sets the traversal and its CLR navigation member reference.</summary>
+    /// <param name="apiName">The API name exposed on the source object type.</param>
+    /// <param name="clrMemberReference">The CLR navigation member reference.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipDependentEndBuilder WithTraversal
     (
         string apiName,
-        string? clrMemberName = null,
+        ApiClrMemberReference clrMemberReference
+    )
+    {
+        ArgumentNullException.ThrowIfNull(clrMemberReference);
+        return this.WithTraversalCore(apiName, clrMemberReference);
+    }
+
+    /// <summary>Sets the traversal and its CLR navigation member identity.</summary>
+    /// <param name="apiName">The API name exposed on the source object type.</param>
+    /// <param name="clrMemberName">The CLR navigation member name.</param>
+    /// <param name="clrMemberKind">The CLR navigation member kind.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipDependentEndBuilder WithTraversal
+    (
+        string apiName,
+        string clrMemberName,
         ClrMemberKind clrMemberKind = ClrMemberKind.Property
+    ) => this.WithTraversal
+    (
+        apiName,
+        new ApiClrMemberReference(clrMemberName, clrMemberKind)
+    );
+
+    private ApiRelationshipDependentEndBuilder WithTraversalCore
+    (
+        string apiName,
+        ApiClrMemberReference? clrMemberReference
     )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
         var source = this.CurrentConfigurationSource;
         if (_traversalSource is null || source >= _traversalSource.Value)
         {
-            _traversal = new ApiRelationshipTraversal(apiName, clrMemberName, clrMemberKind);
+            _traversal = new ApiRelationshipTraversal(apiName, clrMemberReference);
             _traversalSource = source;
         }
         return this;
@@ -173,10 +200,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
 
     #region Configuration Source Methods
     /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
-    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
-    {
-        _configurationSourceScope.Apply(source, configure);
-    }
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
     #endregion
 
     #region Build Methods

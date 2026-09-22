@@ -129,10 +129,7 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
             this.WriteLine($"Actual ApiKey:   {this.ActualApiKey.SafeToString()}");
         }
 
-        protected override void Assert()
-        {
-            this.ActualApiKey.Should().BeEquivalentTo(this.ExpectedApiKey);
-        }
+        protected override void Assert() => this.ActualApiKey.Should().BeEquivalentTo(this.ExpectedApiKey);
         #endregion
 
         #region Factory Methods
@@ -268,10 +265,7 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
             this.WriteLine($"Actual ApiKey:   {this.ActualApiKey.SafeToString()}");
         }
 
-        protected override void Assert()
-        {
-            this.ActualApiKey.Should().BeEquivalentTo(this.ExpectedApiKey);
-        }
+        protected override void Assert() => this.ActualApiKey.Should().BeEquivalentTo(this.ExpectedApiKey);
         #endregion
 
         #region Factory Methods
@@ -292,30 +286,21 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
     private class JsonDeserializeTest : JsonDeserializeTest<ApiKey, ApiKeyDescriptor>
     {
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ApiKey CreateExpected(ApiKeyDescriptor? descriptor)
-        {
-            return BuildApiKey(descriptor);
-        }
+        protected override ApiKey CreateExpected(ApiKeyDescriptor? descriptor) => BuildApiKey(descriptor);
         #endregion
     }
 
     private class JsonRoundtripTest : JsonRoundtripTest<ApiKey, ApiKeyDescriptor>
     {
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ApiKey CreateExpected(ApiKeyDescriptor? descriptor)
-        {
-            return BuildApiKey(descriptor);
-        }
+        protected override ApiKey CreateExpected(ApiKeyDescriptor? descriptor) => BuildApiKey(descriptor);
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ApiKey, ApiKeyDescriptor>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ApiKey CreateSource(ApiKeyDescriptor? descriptor)
-        {
-            return BuildApiKey(descriptor);
-        }
+        protected override ApiKey CreateSource(ApiKeyDescriptor? descriptor) => BuildApiKey(descriptor);
         #endregion
     }
 

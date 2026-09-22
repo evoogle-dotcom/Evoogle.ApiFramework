@@ -94,10 +94,7 @@ public partial class ApiSchemaTests
             this.SourceJson = json.ToJsonString();
         }
 
-        protected override void Act()
-        {
-            this.ActualSchema = JsonSerializer.Deserialize<ApiSchema>(this.SourceJson!);
-        }
+        protected override void Act() => this.ActualSchema = JsonSerializer.Deserialize<ApiSchema>(this.SourceJson!);
 
         protected override void Assert()
         {
@@ -159,10 +156,7 @@ public partial class ApiSchemaTests
             }
         }
 
-        protected override void Assert()
-        {
-            this.ActualException.Should().BeOfType<JsonException>();
-        }
+        protected override void Assert() => this.ActualException.Should().BeOfType<JsonException>();
         #endregion
     }
     #endregion

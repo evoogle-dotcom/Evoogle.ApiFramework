@@ -148,10 +148,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
 
         private ApiSchema? SecondSchema { get; set; }
 
-        protected override void Arrange()
-        {
-            this.ExtensionSource = new SnapshotExtension { Value = 42 };
-        }
+        protected override void Arrange() => this.ExtensionSource = new SnapshotExtension { Value = 42 };
 
         protected override void Act()
         {

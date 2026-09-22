@@ -10,6 +10,7 @@ using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.ApiFramework.Schema.Types;
+using Evoogle.ApiFramework.Schema.Types.Internal;
 using Evoogle.ApiFramework.Version;
 using Evoogle.Extensions;
 
@@ -19,7 +20,7 @@ namespace Evoogle.ApiFramework.Schema.Version;
 ///     Describes the single scalar version token associated with an <see cref="ApiObjectType"/>.
 /// </summary>
 /// <remarks>
-///     A property-backed version is configured with a CLR member name and can be materialized
+///     A property-backed version is configured with an API property reference and can be materialized
 ///     from an object instance. A repository-backed version is configured with a CLR type and
 ///     must be materialized from a value supplied by the repository.
 /// </remarks>
@@ -37,17 +38,18 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
     #region Fields
     private readonly VersionSourceKind _sourceKind;
     private readonly Type? _clrRepositoryType;
-    private ApiProperty? _apiResolvedProperty = null;
+    private readonly ApiPropertyBinding _apiPropertyBinding;
     private ApiScalarType? _apiResolvedScalarType = null;
     #endregion
 
     #region Constructors
     /// <summary>Initializes a property-backed version definition.</summary>
-    /// <param name="clrMemberName">The CLR member exposed as an API property.</param>
-    public ApiVersionDefinition(string clrMemberName)
+    /// <param name="apiPropertyReference">The property that supplies the version.</param>
+    public ApiVersionDefinition(ApiPropertyReference apiPropertyReference)
     {
+        ArgumentNullException.ThrowIfNull(apiPropertyReference);
         _sourceKind = VersionSourceKind.Property;
-        this.ClrMemberName = clrMemberName;
+        _apiPropertyBinding = new(apiPropertyReference);
     }
 
     /// <summary>Initializes a repository-backed version definition.</summary>
@@ -56,6 +58,7 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
     {
         _sourceKind = VersionSourceKind.Repository;
         _clrRepositoryType = clrType;
+        _apiPropertyBinding = new(apiPropertyReference: null);
     }
     #endregion
 
@@ -77,7 +80,7 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
         get
         {
             _ = this.ApiScalarType;
-            return _apiResolvedProperty;
+            return _apiPropertyBinding.BoundApiProperty;
         }
     }
 
@@ -85,11 +88,8 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
     /// <exception cref="ApiSchemaException">The schema has not compiled successfully.</exception>
     public ApiScalarType ApiScalarType => this.RequireValue(_apiResolvedScalarType);
 
-    /// <summary>
-    ///     Gets the CLR member name for a property-backed version, or null for a
-    ///     repository-backed version.
-    /// </summary>
-    public string? ClrMemberName { get; }
+    /// <summary>Gets the property reference, or null for a repository-backed version.</summary>
+    public ApiPropertyReference? ApiPropertyReference => _apiPropertyBinding.ApiPropertyReference;
 
     /// <summary>Gets the exact CLR type used to represent the version.</summary>
     /// <exception cref="ApiSchemaException">The schema has not compiled successfully.</exception>
@@ -210,10 +210,12 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
     public override string ToString()
     {
         var clrType = (_apiResolvedScalarType?.ClrType ?? _clrRepositoryType).SafeToString();
-        var clrMemberName = this.ClrMemberName.SafeToString();
+        var apiPropertyReference = this.ApiPropertyReference.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiVersionDefinition)} {{{nameof(this.ClrMemberName)}={clrMemberName}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
+        return $"{nameof(ApiVersionDefinition)} "
+            + $"{{{nameof(this.ApiPropertyReference)}={apiPropertyReference}, "
+            + $"{nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 
@@ -249,35 +251,23 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
     #endregion
 
     #region Implementation Methods
-    private ApiObjectType GetApiObjectType()
-    {
-        return this.Parent as ApiObjectType ?? throw new ApiSchemaException($"An {nameof(ApiVersionDefinition)} must be owned by an {nameof(ApiObjectType)}.");
-    }
+    private ApiObjectType GetApiObjectType() => this.Parent as ApiObjectType ?? throw new ApiSchemaException($"An {nameof(ApiVersionDefinition)} must be owned by an {nameof(ApiObjectType)}.");
 
     private void ResolveApiProperty(ApiSchemaCompilationContext context)
     {
-        if (ApiSchemaNameValidation.IsNameInvalid(this.ClrMemberName))
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionDefinitionInvalidClrMemberName;
-            var description = $"{nameof(this.ClrMemberName)} must not be empty or whitespace";
-            var remediation = $"Specify a valid {nameof(this.ApiProperty.ClrName)} or omit {nameof(this.ClrMemberName)} for a repository-backed version";
-
-            context.AddIssue(severity, code, description, remediation);
-            return;
-        }
-
         var apiObjectType = this.GetApiObjectType();
-        if (!apiObjectType.TryGetPropertyByClrName(this.ClrMemberName!, out var apiProperty))
+        if (!_apiPropertyBinding.TryResolveReference
+        (
+            apiObjectType,
+            context,
+            ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedProperty,
+            "Version property reference"
+        ))
         {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedProperty;
-            var description = $"No {nameof(this.ApiProperty)} has CLR name '{this.ClrMemberName}'";
-            var remediation = $"Add the version member as an {nameof(this.ApiProperty)} on {nameof(ApiObjectType)}['{apiObjectType.ApiName}']";
-
-            context.AddIssue(severity, code, description, remediation);
             return;
         }
+
+        var apiProperty = _apiPropertyBinding.ApiProperty;
 
         if (!apiProperty.IsResolved)
         {
@@ -330,7 +320,6 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
             return;
         }
 
-        _apiResolvedProperty = apiProperty;
         _apiResolvedScalarType = apiScalarType;
     }
 

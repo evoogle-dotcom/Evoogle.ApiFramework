@@ -327,12 +327,18 @@ public sealed partial class ApiObjectType
                 context.AddIssue(apiPath, severity, code, description, remediation);
             }
 
-            if (traversal.ClrMemberName is { } clrMemberName && this.ApiProperties.Any(apiProperty => ClrNameComparer.Instance.Equals(apiProperty.ClrName, clrMemberName)))
+            if (traversal.ClrMemberReference is { } clrMemberReference &&
+                this.ApiProperties.Any(apiProperty => ClrNameComparer.Instance.Equals
+                (
+                    apiProperty.ClrName,
+                    clrMemberReference.ClrMemberName
+                )))
             {
                 var apiPath = traversal.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Error;
                 var code = ApiSchemaCompilationCode.ApiRelationshipTraversalClrMemberConflict;
-                var description = $"CLR member '{clrMemberName}' is bound to both a contained property and traversal on '{this.ApiName}'";
+                var description = $"CLR member '{clrMemberReference.ClrMemberName}' is bound to "
+                    + $"both a contained property and traversal on '{this.ApiName}'";
                 var remediation = "Bind the traversal to a distinct CLR member";
 
                 context.AddIssue(apiPath, severity, code, description, remediation);

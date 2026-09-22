@@ -18,9 +18,15 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema.Key;
 
 /// <summary>
-///     Represents an ordered CLR member path from an explicit or inferred API object root.
+///     Represents an ordered API-property path from an explicit or inferred API object root.
 /// </summary>
 /// <remarks>
+///     <para>
+///         Each segment is configured by API name or CLR name and resolves to a declared
+///         <see cref="ApiProperty"/> during compilation. After successful compilation,
+///         <see cref="ClrPath"/> exposes resolved CLR metadata independently of the configured
+///         reference forms.
+///     </para>
 ///     <para>
 ///         A key path always compiles to one <see cref="ApiRootObjectType"/>, which is the
 ///         <see cref="ApiObjectType"/> from which its <see cref="ApiSegments"/> are navigated.
@@ -121,9 +127,9 @@ public sealed class ApiKeyPath
     #endregion
 
     #region Path Properties
-    /// <summary>Gets the dot-delimited CLR member path.</summary>
+    /// <summary>Gets the resolved dot-delimited CLR member path after compilation.</summary>
     public string ClrPath => string.Join
-        ('.', this.ApiSegments.Select(static segment => segment.ClrMemberName));
+        ('.', this.ApiSegments.Select(static segment => segment.ApiProperty.ClrName));
 
     internal string? ApiPathLabel
     {
@@ -131,7 +137,13 @@ public sealed class ApiKeyPath
         {
             var rootLabel = this.ApiRootObjectTypeReference?.ApiReferenceLabel
                 ?? this.GetInferredRootLabel();
-            return rootLabel is null ? null : $"{rootLabel}.{this.ClrPath}";
+            var propertyPath = string.Join
+            (
+                '.',
+                this.ApiSegments.Select(static segment =>
+                    segment.ApiPropertyReference.ReferenceLabel)
+            );
+            return rootLabel is null ? null : $"{rootLabel}.{propertyPath}";
         }
     }
     #endregion
@@ -141,7 +153,12 @@ public sealed class ApiKeyPath
     public override string ToString()
     {
         var apiRootObjectTypeReference = this.ApiRootObjectTypeReference.SafeToString();
-        var apiSegments = string.Join(".", this.ApiSegments.Select(static segment => segment.ClrMemberName));
+        var apiSegments = string.Join
+        (
+            ".",
+            this.ApiSegments.Select(static segment =>
+                segment.ApiPropertyReference.ReferenceLabel)
+        );
         var extensionCount = this.ExtensionCount.SafeToString();
         return $"{nameof(ApiKeyPath)} "
             + $"{{{nameof(this.ApiRootObjectTypeReference)}={apiRootObjectTypeReference}, "
@@ -200,7 +217,6 @@ public sealed class ApiKeyPath
                 (
                     context,
                     ApiSchemaCompilationCode.ApiKeyPathUnresolvedRootType,
-                    nameof(this.ApiRootObjectTypeReference),
                     nameof(this.ApiRootObjectType)
                 );
 
@@ -270,8 +286,9 @@ public sealed class ApiKeyPath
 
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiKeyPathEmptySegments;
-        var description = $"{nameof(this.ApiSegments)} must contain at least one member name";
-        var remediation = $"Specify at least one CLR member name when creating an {nameof(ApiKeyPath)}";
+        var description = $"{nameof(this.ApiSegments)} must contain at least one property reference";
+        var remediation = $"Specify at least one {nameof(ApiPropertyReference)} when creating an "
+            + $"{nameof(ApiKeyPath)}";
 
         context.AddIssue(severity, code, description, remediation);
     }
@@ -286,7 +303,8 @@ public sealed class ApiKeyPath
         {
             var segment = this.ApiSegments[i];
             var isLast = i == this.ApiSegments.Length - 1;
-            var location = ApiSchemaCompilationLocation.ForIndexedLabel(i, segment.ClrMemberName);
+            var location = ApiSchemaCompilationLocation.ForIndexedLabel
+                (i, segment.ApiPropertyReference.ReferenceLabel);
             segment.Compile(context, location);
 
             if (!segment.IsPropertyResolved)

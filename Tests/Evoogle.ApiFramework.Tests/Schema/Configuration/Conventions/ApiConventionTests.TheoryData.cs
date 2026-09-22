@@ -652,7 +652,7 @@ public partial class ApiConventionTests
                         {
                           ""ApiSegments"": [
                             {
-                              ""ClrMemberName"": ""Id""
+                              ""ApiPropertyReference"": { ""ClrName"": ""Id"" }
                             }
                           ]
                         }
@@ -731,7 +731,7 @@ public partial class ApiConventionTests
                         {
                           ""ApiSegments"": [
                             {
-                              ""ClrMemberName"": ""Name""
+                              ""ApiPropertyReference"": { ""ClrName"": ""Name"" }
                             }
                           ]
                         }
@@ -801,7 +801,7 @@ public partial class ApiConventionTests
                         {
                           ""ApiSegments"": [
                             {
-                              ""ClrMemberName"": ""OrderItemId""
+                              ""ApiPropertyReference"": { ""ClrName"": ""OrderItemId"" }
                             }
                           ]
                         }

@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Key;
+using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 
@@ -13,12 +14,12 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilder>
 {
     #region Fields
-    private readonly string _clrMemberName;
+    private readonly ApiPropertyReference _apiPropertyReference;
     #endregion
 
     #region Properties
-    /// <summary>Gets the CLR member name for this segment.</summary>
-    internal string ClrMemberName => _clrMemberName;
+    /// <summary>Gets the property reference for this segment.</summary>
+    internal ApiPropertyReference ApiPropertyReference => _apiPropertyReference;
     #endregion
 
     #region Constructors
@@ -28,9 +29,8 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// <param name="clrMemberName">The CLR member name for this navigation step.</param>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberName"/> is not one CLR member name.</exception>
     public ApiKeyPathSegmentBuilder(string clrMemberName)
+        : this(ApiPropertyReference.ClrRef(clrMemberName))
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(clrMemberName);
-
         if (clrMemberName.Contains('.'))
         {
             throw new ArgumentException
@@ -39,8 +39,14 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
                 nameof(clrMemberName)
             );
         }
+    }
 
-        _clrMemberName = clrMemberName;
+    /// <summary>Creates a segment builder with the specified property reference.</summary>
+    /// <param name="apiPropertyReference">The property reference for this navigation step.</param>
+    public ApiKeyPathSegmentBuilder(ApiPropertyReference apiPropertyReference)
+    {
+        ArgumentNullException.ThrowIfNull(apiPropertyReference);
+        _apiPropertyReference = apiPropertyReference;
     }
     #endregion
 
@@ -57,6 +63,12 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
 
         return new(clrMemberName);
     }
+
+    /// <summary>Creates a builder for a segment with the specified property reference.</summary>
+    /// <param name="apiPropertyReference">The property reference for this navigation step.</param>
+    /// <returns>A new segment builder.</returns>
+    public static ApiKeyPathSegmentBuilder For(ApiPropertyReference apiPropertyReference) =>
+        new(apiPropertyReference);
     #endregion
 
     #region AddExtension Methods
@@ -66,10 +78,7 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region Build Methods
@@ -78,7 +87,7 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// </summary>
     internal ApiKeyPathSegment Build()
     {
-        var segment = new ApiKeyPathSegment(_clrMemberName);
+        var segment = new ApiKeyPathSegment(_apiPropertyReference);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

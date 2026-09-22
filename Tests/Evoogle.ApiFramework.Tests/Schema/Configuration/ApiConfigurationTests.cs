@@ -231,10 +231,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         private Type? ClrTypeActual { get; set; }
         private string? ApiNameActual { get; set; }
 
-        protected override void Arrange()
-        {
-            this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
-        }
+        protected override void Arrange() => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
 
         protected override void Act()
         {
@@ -294,10 +291,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         private Type? BuilderClrTypeActual { get; set; }
         private int ConfigureCountActual { get; set; }
 
-        protected override void Arrange()
-        {
-            this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
-        }
+        protected override void Arrange() => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
 
         protected override void Act()
         {
@@ -348,10 +342,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         private string? ApiNameActual { get; set; }
         private int ConfigureCountActual { get; set; }
 
-        protected override void Arrange()
-        {
-            this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
-        }
+        protected override void Arrange() => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
 
         protected override void Act()
         {
@@ -463,19 +454,13 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         (
             ApiSchemaBuilder schemaBuilder,
             OneToOneConfiguration configuration
-        )
-        {
-            this.AddRelationshipPrincipal(schemaBuilder, configuration);
-        }
+        ) => this.AddRelationshipPrincipal(schemaBuilder, configuration);
 
         private void AddOneToManyConfiguration
         (
             ApiSchemaBuilder schemaBuilder,
             OneToManyConfiguration configuration
-        )
-        {
-            this.AddRelationshipPrincipal(schemaBuilder, configuration);
-        }
+        ) => this.AddRelationshipPrincipal(schemaBuilder, configuration);
 
         private void AddManyToManyConfiguration
         (
@@ -679,10 +664,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
 
         private Exception? ExceptionActual { get; set; }
 
-        protected override void Arrange()
-        {
-            this.WriteLine($"IsObjectBuilderExtension: {this.IsObjectBuilderExtension}");
-        }
+        protected override void Arrange() => this.WriteLine($"IsObjectBuilderExtension: {this.IsObjectBuilderExtension}");
 
         protected override void Act()
         {

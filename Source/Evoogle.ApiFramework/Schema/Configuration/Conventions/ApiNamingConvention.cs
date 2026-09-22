@@ -154,10 +154,7 @@ public abstract class ApiNamingConvention(ApiNamingConventionTargets targets = A
     /// </summary>
     /// <param name="target">The target to check.</param>
     /// <returns>True if the target is included in the convention's targets; otherwise, false.</returns>
-    private bool IsTargeted(ApiNamingConventionTargets target)
-    {
-        return (this.Targets & target) != ApiNamingConventionTargets.None;
-    }
+    private bool IsTargeted(ApiNamingConventionTargets target) => (this.Targets & target) != ApiNamingConventionTargets.None;
 
     /// <summary>
     ///     Validates that the specified targets contain only known convention target values.

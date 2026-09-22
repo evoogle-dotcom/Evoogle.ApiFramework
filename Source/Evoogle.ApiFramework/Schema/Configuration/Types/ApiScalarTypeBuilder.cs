@@ -22,10 +22,7 @@ public class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiScalarTypeBuilder AddScalarTypeExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiScalarTypeBuilder AddScalarTypeExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region Build Methods

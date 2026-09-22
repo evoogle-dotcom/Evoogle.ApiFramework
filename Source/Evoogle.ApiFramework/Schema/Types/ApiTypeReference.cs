@@ -37,16 +37,12 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
 
     #region Computed Properties
     /// <summary>Gets a value indicating whether this is a complete API-named reference.</summary>
-    public bool IsApiNamedReference =>
-        this.ApiKind is not null &&
-        !string.IsNullOrWhiteSpace(this.ApiName) &&
-        this.ClrType is null;
+    public bool IsApiNamedReference => this.ApiKind is not null && !string.IsNullOrWhiteSpace(this.ApiName)
+        && this.ClrType is null;
 
     /// <summary>Gets a value indicating whether this is a complete CLR-backed reference.</summary>
-    public bool IsClrTypeReference =>
-        this.ApiKind is null &&
-        this.ApiName is null &&
-        this.ClrType is not null;
+    public bool IsClrTypeReference => this.ApiKind is null && this.ApiName is null
+        && this.ClrType is not null;
 
     internal string? ApiReferenceLabel => this.IsApiNamedReference
         ? this.ApiName
@@ -91,102 +87,29 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
     #endregion
 
     #region Factory Methods
-    /// <summary>Creates a CLR-backed reference for <typeparamref name="TClr"/>.</summary>
-    /// <typeparam name="TClr">The CLR type to reference.</typeparam>
+    /// <summary>Creates an API-named reference.</summary>
+    /// <param name="apiKind">The expected kind of the referenced API type.</param>
+    /// <param name="apiName">The API name of the referenced type.</param>
+    /// <returns>A new API-named reference.</returns>
+    public static ApiTypeReference ApiRef(ApiTypeKind apiKind, string apiName) => new(apiKind, apiName);
+
+    /// <summary>Creates a CLR-backed reference.</summary>
+    /// <param name="clrType">The CLR type of the referenced API type.</param>
     /// <returns>A new CLR-backed reference.</returns>
-    public static ApiTypeReference ClrRef<TClr>() => new(typeof(TClr));
-    #endregion
+    public static ApiTypeReference ClrRef(Type clrType) => new(clrType);
 
-    #region Internal Methods
-    internal ApiType? Resolve
-    (
-        ApiSchemaCompilationContext context,
-        ApiSchemaCompilationCode parentUnresolvedCode,
-        string parentUnresolvedName
-    )
-    {
-        ArgumentNullException.ThrowIfNull(context);
-
-        // Validate the API kind before attempting to resolve the reference.
-        if
-        (
-            _hasInvalidApiKind ||
-            this.ApiKind is ApiTypeKind apiKind && !Enum.IsDefined(apiKind)
-        )
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiTypeReferenceInvalidApiKind;
-            var description = $"{nameof(this.ApiKind)} must be a valid {nameof(ApiTypeKind)} value";
-            var remediation = $"Specify a valid {nameof(this.ApiKind)} value";
-
-            context.AddIssue(severity, code, description, remediation);
-            return null;
-        }
-
-        // Ensure that the reference is either an API-named reference or a CLR type reference.
-        if (!this.IsApiNamedReference && !this.IsClrTypeReference)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiTypeReferenceInvalidForm;
-            var description = $"A type reference must specify exactly one complete API-named reference "
-                + $"({nameof(this.ApiKind)} and {nameof(this.ApiName)}) or CLR reference "
-                + $"({nameof(this.ClrType)})";
-            var remediation = $"Specify either {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or "
-                + $"{nameof(this.ClrType)}, but not both";
-
-            context.AddIssue(severity, code, description, remediation);
-            return null;
-        }
-
-        // Attempt to resolve the reference as a CLR type if applicable.
-        if (this.IsClrTypeReference)
-        {
-            if (context.ApiSchema.TryGetTypeByClrType(this.ClrType!, out var apiType))
-            {
-                return apiType;
-            }
-
-            this.AddUnresolvedIssue
-            (
-                context,
-                parentUnresolvedCode,
-                parentUnresolvedName,
-                $"{nameof(this.ClrType)}='{this.ClrType.SafeToName()}'"
-            );
-            return null;
-        }
-
-        // Attempt to resolve the reference as an API-named type if applicable.
-        ApiType? apiNamedType = this.ApiKind switch
-        {
-            ApiTypeKind.Scalar => context.ApiSchema.TryGetScalarTypeByApiName(this.ApiName!, out var apiScalarType) ? apiScalarType : null,
-            ApiTypeKind.Enum => context.ApiSchema.TryGetEnumTypeByApiName(this.ApiName!, out var apiEnumType) ? apiEnumType : null,
-            ApiTypeKind.Object => context.ApiSchema.TryGetObjectTypeByApiName(this.ApiName!, out var apiObjectType) ? apiObjectType : null,
-            ApiTypeKind.Collection => null,
-            _ => null,
-        };
-
-        // Return the resolved API-named type if found.
-        if (apiNamedType is not null)
-        {
-            return apiNamedType;
-        }
-
-        // If the API-named type could not be resolved, add an unresolved issue.
-        var identity = $"{nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
-        this.AddUnresolvedIssue(context, parentUnresolvedCode, parentUnresolvedName, identity);
-        return null;
-    }
+    /// <summary>Creates a CLR-backed reference for <typeparamref name="T"/>.</summary>
+    /// <typeparam name="T">The CLR type to reference.</typeparam>
+    /// <returns>A new CLR-backed reference.</returns>
+    public static ApiTypeReference ClrRef<T>() => new(typeof(T));
     #endregion
 
     #region Equality Methods
     /// <inheritdoc/>
-    public bool Equals(ApiTypeReference? other) =>
-        other is not null &&
-        this.ApiKind == other.ApiKind &&
-        ApiNameComparer.Instance.Equals(this.ApiName, other.ApiName) &&
-        this.ClrType == other.ClrType &&
-        _hasInvalidApiKind == other._hasInvalidApiKind;
+    public bool Equals(ApiTypeReference? other) => other is not null
+        && this.ApiKind == other.ApiKind
+        && ApiNameComparer.Instance.Equals(this.ApiName, other.ApiName)
+        && this.ClrType == other.ClrType;
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => this.Equals(obj as ApiTypeReference);
@@ -196,8 +119,7 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
     (
         this.ApiKind,
         this.ApiName is null ? 0 : ApiNameComparer.Instance.GetHashCode(this.ApiName),
-        this.ClrType,
-        _hasInvalidApiKind
+        this.ClrType
     );
 
     /// <summary>Determines whether two references have equal declaration identities.</summary>
@@ -219,7 +141,95 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
     }
     #endregion
 
+    #region Resolve Methods
+    internal ApiType? Resolve
+    (
+        ApiSchemaCompilationContext context,
+        ApiSchemaCompilationCode unresolvedCode,
+        string referenceName
+    )
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        // Validate the API kind if it was specified no matter the type of reference.
+        // This way it gets validated so developers receive immediate feedback if the API kind is incorrect.
+        if (!this.ValidateApiKind(context))
+        {
+            return null;
+        }
+
+        // Attempt to resolve the reference as a CLR type if applicable.
+        if (this.IsClrTypeReference)
+        {
+            // Attempt to resolve the reference using the CLR type.
+            if (context.ApiSchema.TryGetTypeByClrType(this.ClrType!, out var apiType))
+            {
+                return apiType;
+            }
+
+            // If the CLR-typed reference could not be resolved, add an unresolved issue.
+            var clrTypeIdentity = $"{nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
+            this.AddUnresolvedIssue
+            (
+                context,
+                unresolvedCode,
+                referenceName,
+                clrTypeIdentity
+            );
+            return null;
+        }
+
+        // Attempt to resolve the reference as an API-named type if applicable.
+        if (this.IsApiNamedReference)
+        {
+            // Attempt to resolve the API-named type based on the API kind.
+            ApiType? apiNamedType = this.ApiKind switch
+            {
+                ApiTypeKind.Scalar => context.ApiSchema.TryGetScalarTypeByApiName(this.ApiName!, out var apiScalarType) ? apiScalarType : null,
+                ApiTypeKind.Enum => context.ApiSchema.TryGetEnumTypeByApiName(this.ApiName!, out var apiEnumType) ? apiEnumType : null,
+                ApiTypeKind.Object => context.ApiSchema.TryGetObjectTypeByApiName(this.ApiName!, out var apiObjectType) ? apiObjectType : null,
+                ApiTypeKind.Collection => null,
+                _ => null,
+            };
+
+            // Return the resolved API-named type if found.
+            if (apiNamedType is not null)
+            {
+                return apiNamedType;
+            }
+
+            // If the API-named reference could not be resolved, add an unresolved issue.
+            var apiNamedIdentity = $"{nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
+            this.AddUnresolvedIssue
+            (
+                context,
+                unresolvedCode,
+                referenceName,
+                apiNamedIdentity
+            );
+            return null;
+        }
+
+        // If the reference is neither a valid CLR type nor a valid API-named type, it is considered invalid.
+        this.AddInvalidFormIssue(context);
+        return null;
+    }
+    #endregion
+
     #region Implementation Methods
+    private void AddInvalidFormIssue(ApiSchemaCompilationContext context)
+    {
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiTypeReferenceInvalidForm;
+        var description = $"A type reference must specify exactly one complete API-named reference "
+            + $"({nameof(this.ApiKind)} and {nameof(this.ApiName)}) or CLR reference "
+            + $"({nameof(this.ClrType)})";
+        var remediation = $"Specify either {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or "
+            + $"{nameof(this.ClrType)}, but not both";
+
+        context.AddIssue(severity, code, description, remediation);
+    }
+
     private void AddUnresolvedIssue
     (
         ApiSchemaCompilationContext context,
@@ -237,6 +247,22 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
         var remediation = $"Verify that a compatible type is declared in the schema for {identity}";
 
         context.AddIssue(severity, code, description, remediation);
+    }
+
+    private bool ValidateApiKind(ApiSchemaCompilationContext context)
+    {
+        if (_hasInvalidApiKind || this.ApiKind is ApiTypeKind apiKind && !Enum.IsDefined(apiKind))
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiTypeReferenceInvalidApiKind;
+            var description = $"{nameof(this.ApiKind)} must be a valid {nameof(ApiTypeKind)} value";
+            var remediation = $"Specify a valid {nameof(this.ApiKind)} value";
+
+            context.AddIssue(severity, code, description, remediation);
+            return false;
+        }
+
+        return true;
     }
     #endregion
 }

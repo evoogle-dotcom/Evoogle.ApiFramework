@@ -83,7 +83,8 @@ public static class ApiRelationshipBuilderGenericTestFactory
                 new ApiTypeReference(ApiTypeKind.Object, nameof(Order)),
                 apiForeignKey: new ApiKeyDefinition
                 (
-                    [new ApiKeyPath(null, [new ApiKeyPathSegment(nameof(Order.Id))])]
+                    [new ApiKeyPath(null, [new ApiKeyPathSegment
+                        (ApiPropertyReference.ClrRef(nameof(Order.Id)))])]
                 )
             )
         );

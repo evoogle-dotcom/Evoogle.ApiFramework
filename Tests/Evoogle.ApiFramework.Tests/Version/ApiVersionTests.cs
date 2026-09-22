@@ -92,10 +92,7 @@ public class ApiVersionTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.Source = new CustomVersion("v1");
-        }
+        protected override void Arrange() => this.Source = new CustomVersion("v1");
 
         protected override void Act()
         {

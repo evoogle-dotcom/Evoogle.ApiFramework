@@ -69,10 +69,7 @@ public partial class ApiConventionTests
             );
         }
 
-        protected override void Assert()
-        {
-            this.ApiNameActual.Should().Be(this.ExpectedApiName);
-        }
+        protected override void Assert() => this.ApiNameActual.Should().Be(this.ExpectedApiName);
         #endregion
     }
 
@@ -311,10 +308,7 @@ public partial class ApiConventionTests
             }
         }
 
-        protected override void Assert()
-        {
-            this.ExceptionActual.Should().BeOfType(this.ExpectedExceptionType);
-        }
+        protected override void Assert() => this.ExceptionActual.Should().BeOfType(this.ExpectedExceptionType);
         #endregion
     }
 
@@ -365,10 +359,7 @@ public partial class ApiConventionTests
             }
         }
 
-        protected override void Assert()
-        {
-            this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
-        }
+        protected override void Assert() => this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
         #endregion
     }
     #endregion

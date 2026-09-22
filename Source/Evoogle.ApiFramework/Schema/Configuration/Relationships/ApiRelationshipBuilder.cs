@@ -100,10 +100,7 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
         _state.RegistrationSource ?? ApiConfigurationSource.Explicit;
 
     /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
-    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
-    {
-        _configurationSourceScope.Apply(source, configure);
-    }
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
 
     /// <summary>Records the source that registered this relationship.</summary>
     internal void SetRegistrationSource(ApiConfigurationSource source)

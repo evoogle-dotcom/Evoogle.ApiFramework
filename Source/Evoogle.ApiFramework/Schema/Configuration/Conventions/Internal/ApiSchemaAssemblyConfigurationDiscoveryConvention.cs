@@ -93,15 +93,9 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
     #endregion
 
     #region Helper Methods
-    private static bool IsEligibleConfigurationType(Type type)
-    {
-        return type.IsClass && !type.IsAbstract && !type.ContainsGenericParameters;
-    }
+    private static bool IsEligibleConfigurationType(Type type) => type.IsClass && !type.IsAbstract && !type.ContainsGenericParameters;
 
-    private static string GetTypeName(Type type)
-    {
-        return type.FullName ?? type.Name;
-    }
+    private static string GetTypeName(Type type) => type.FullName ?? type.Name;
 
     private void ApplyConfigurationType(ApiSchemaBuilder builder, Type configurationType)
     {

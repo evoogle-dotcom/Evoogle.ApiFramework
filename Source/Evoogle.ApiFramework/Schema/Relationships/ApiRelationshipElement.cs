@@ -76,7 +76,6 @@ public abstract class ApiRelationshipElement : ApiSchemaElement, IApiKeyPathRoot
         (
             context,
             ApiSchemaCompilationCode.ApiRelationshipElementUnresolvedObjectType,
-            nameof(this.ApiObjectTypeReference),
             nameof(this.ApiObjectType)
         );
     }

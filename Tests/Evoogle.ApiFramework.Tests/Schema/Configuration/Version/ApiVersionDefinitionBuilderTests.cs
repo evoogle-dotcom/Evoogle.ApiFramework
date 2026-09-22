@@ -22,6 +22,8 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
     {
         #region User Supplied Properties
         public required bool ReplaceWithRepositoryVersion { get; init; }
+
+        public bool UsesApiNameReference { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -39,12 +41,24 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
                 new ApiSchemaBuilderContext()
             )
                 .WithName(nameof(VersionedObject))
-                .AddRequiredProperty(x => x.Version)
-                .WithVersion
+                .AddRequiredProperty(x => x.Version);
+
+            if (this.UsesApiNameReference)
+            {
+                builder.WithVersion
+                (
+                    ApiPropertyReference.ApiRef(nameof(VersionedObject.Version)),
+                    version => version.AddVersionExtension(new GraphQlExtension())
+                );
+            }
+            else
+            {
+                builder.WithVersion
                 (
                     x => x.Version,
                     version => version.AddVersionExtension(new GraphQlExtension())
                 );
+            }
 
             if (this.ReplaceWithRepositoryVersion)
             {
@@ -76,9 +90,17 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
             (
                 this.ReplaceWithRepositoryVersion ? typeof(long) : typeof(int)
             );
-            this.Actual.ApiVersion.ClrMemberName.Should().Be
+            this.Actual.ApiVersion.ApiPropertyReference?.ApiName.Should().Be
             (
-                this.ReplaceWithRepositoryVersion ? null : nameof(VersionedObject.Version)
+                !this.ReplaceWithRepositoryVersion && this.UsesApiNameReference
+                    ? nameof(VersionedObject.Version)
+                    : null
+            );
+            this.Actual.ApiVersion.ApiPropertyReference?.ClrName.Should().Be
+            (
+                !this.ReplaceWithRepositoryVersion && !this.UsesApiNameReference
+                    ? nameof(VersionedObject.Version)
+                    : null
             );
             this.Actual.ApiVersion.Extensions.Should().HaveCount
             (
@@ -96,6 +118,12 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Build Property Backed Version",
             ReplaceWithRepositoryVersion = false
+        },
+        new BuildTest
+        {
+            Name = "Build API-Name Property Backed Version",
+            ReplaceWithRepositoryVersion = false,
+            UsesApiNameReference = true
         },
         new BuildTest
         {

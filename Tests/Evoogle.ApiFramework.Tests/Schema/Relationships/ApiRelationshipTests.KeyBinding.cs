@@ -23,8 +23,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_Category_PhysicalProduct_1toN",
-                PrincipalEnd: PrincipalEnd(typeof(Category), "PK_Category"),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(Category), "PK_Category"),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(PhysicalProduct),
                     ForeignKey(KeyPath(typeof(PhysicalProduct), nameof(PhysicalProduct.CategoryId)))
@@ -39,8 +39,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToOneDef
             (
                 ApiName: "REL_Customer_Profile_1to1",
-                PrincipalEnd: PrincipalEnd(typeof(Customer)),
-                DependentEnd: DependentEnd(typeof(CustomerProfile))
+                ApiPrincipalEnd: PrincipalEnd(typeof(Customer)),
+                ApiDependentEnd: DependentEnd(typeof(CustomerProfile))
             )
         },
 
@@ -51,8 +51,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToOneDef
             (
                 ApiName: "REL_User_UserProfile_1to1ViaScalar",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipUser)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipUser)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipUserProfile),
                     ForeignKey
@@ -74,8 +74,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToOneDef
             (
                 ApiName: "REL_User_UserProfile_1to1ViaNested",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipUser)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipUser)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipUserProfile),
                     ForeignKey
@@ -98,8 +98,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_User_Post_1toN_ViaScalar",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipUser)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipUser)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipPost),
                     ForeignKey
@@ -117,8 +117,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_User_Post_1toN_ViaNested",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipUser)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipUser)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipPost),
                     ForeignKey
@@ -141,8 +141,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_Post_Comment_1toN_ViaScalar",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipPost)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipPost)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipComment),
                     ForeignKey
@@ -160,8 +160,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_Post_Comment_1toN_ViaNested",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipPost)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipPost)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipComment),
                     ForeignKey
@@ -184,9 +184,9 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipManyToManyDef
             (
                 ApiName: "REL_Post_Tag_NtoN_ViaPostTag",
-                PrincipalEndA: PrincipalEnd(typeof(RelationshipPost)),
-                PrincipalEndB: PrincipalEnd(typeof(RelationshipTag)),
-                Association: Association
+                ApiPrincipalEndA: PrincipalEnd(typeof(RelationshipPost)),
+                ApiPrincipalEndB: PrincipalEnd(typeof(RelationshipTag)),
+                ApiAssociation: Association
                 (
                     typeof(RelationshipPostTag),
                     ForeignKey
@@ -208,8 +208,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_CatalogItem_OrderLine_1toN_ViaScalarComposite",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipCatalogItem)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipCatalogItem)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipOrderLine),
                     ForeignKey
@@ -236,8 +236,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_CatalogItem_OrderLine_1toN_ViaNestedComposite",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipCatalogItem)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipCatalogItem)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipOrderLine),
                     ForeignKey
@@ -266,8 +266,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_Order_OwnedLine_1toN_ViaOwnerKeyPath",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipOrder)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipOrder)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipOwnedLine),
                     ForeignKey(KeyPath(typeof(RelationshipOrder), nameof(RelationshipOrder.Id)))
@@ -282,8 +282,8 @@ public partial class ApiRelationshipTests
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
                 ApiName: "REL_OrgUnit_OrgUnit_1toN",
-                PrincipalEnd: PrincipalEnd(typeof(RelationshipOrgUnit)),
-                DependentEnd: DependentEnd
+                ApiPrincipalEnd: PrincipalEnd(typeof(RelationshipOrgUnit)),
+                ApiDependentEnd: DependentEnd
                 (
                     typeof(RelationshipOrgUnit),
                     ForeignKey
@@ -317,7 +317,7 @@ public partial class ApiRelationshipTests
     private static ApiRelationshipDependentEndDef DependentEnd
     (
         Type clrObjectType,
-        ApiKeyDef? apiForeignKey = null
+        ApiKeyDefinitionDef? apiForeignKey = null
     )
         => new
         (
@@ -328,8 +328,8 @@ public partial class ApiRelationshipTests
     private static ApiRelationshipAssociationDef Association
     (
         Type clrObjectType,
-        ApiKeyDef? apiForeignKeyA = null,
-        ApiKeyDef? apiForeignKeyB = null
+        ApiKeyDefinitionDef? apiForeignKeyA = null,
+        ApiKeyDefinitionDef? apiForeignKeyB = null
     )
         => new
         (
@@ -338,18 +338,18 @@ public partial class ApiRelationshipTests
             ApiForeignKeyB: apiForeignKeyB
         );
 
-    private static ApiKeyDef ForeignKey(params ApiKeyPathDef[] apiKeyPaths)
+    private static ApiKeyDefinitionDef ForeignKey(params ApiKeyPathDef[] apiKeyPaths)
         => new(ApiName: null!, ApiKeyPaths: [.. apiKeyPaths]);
 
     private static ApiKeyPathDef KeyPath(Type clrRootType, params string[] clrMemberNames)
         => new
         (
             ApiRootObjectTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: clrRootType),
-            ApiKeyPathSegments:
+            ApiSegments:
             [
                 .. clrMemberNames.Select
                 (
-                    static clrMemberName => new ApiKeyPathSegmentDef(ClrMemberName: clrMemberName)
+                    static clrMemberName => new ApiKeyPathSegmentDef(new ApiPropertyReferenceDef(ApiName: null, ClrName: clrMemberName))
                 )
             ]
         );
@@ -361,7 +361,7 @@ public partial class ApiRelationshipTests
             [
                 .. clrMemberNames.Select
                 (
-                    static clrMemberName => new ApiKeyPathSegmentDef(clrMemberName)
+                    static clrMemberName => new ApiKeyPathSegmentDef(new ApiPropertyReferenceDef(ApiName: null, ClrName: clrMemberName))
                 )
             ]
         );

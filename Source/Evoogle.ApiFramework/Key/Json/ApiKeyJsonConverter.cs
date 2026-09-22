@@ -314,10 +314,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
     #endregion
 
     #region Create Implementation Methods
-    private static ApiKey CreateEmpty()
-    {
-        return ApiKey.Empty;
-    }
+    private static ApiKey CreateEmpty() => ApiKey.Empty;
 
     private static ApiKey CreateComposite(PropertyNames propertyNames, ReadState readState)
     {

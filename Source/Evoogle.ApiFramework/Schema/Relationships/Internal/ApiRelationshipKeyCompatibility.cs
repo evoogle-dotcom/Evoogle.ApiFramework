@@ -15,11 +15,9 @@ namespace Evoogle.ApiFramework.Schema.Relationships.Internal;
 internal static class ApiRelationshipKeyCompatibility
 {
     #region Utility Methods
-    public static int? CountKeyLeaves(ApiKeyDefinition keyDefinition)
-    {
+    public static int? CountKeyLeaves(ApiKeyDefinition keyDefinition) =>
         // Each ApiKeyPath in a key corresponds to exactly one scalar leaf.
-        return keyDefinition.ApiKeyPaths.Length;
-    }
+        keyDefinition.ApiKeyPaths.Length;
 
     public static bool AreKeysCompatible(ApiKeyDefinition principalKey, ApiKeyDefinition foreignKey)
         => TryAreKeysCompatible(principalKey, foreignKey, out var isCompatible) && isCompatible;

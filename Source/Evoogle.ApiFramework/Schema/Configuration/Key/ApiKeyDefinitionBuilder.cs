@@ -40,10 +40,7 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyDefinitionBuilder AddKeyExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiKeyDefinitionBuilder AddKeyExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddPath Methods
@@ -155,6 +152,49 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
         _state.KeyPathBuilders.Add(builder);
         return this;
     }
+
+    /// <summary>Adds a key path with an explicit root and property references.</summary>
+    /// <param name="apiRootObjectTypeReference">The explicit root object-type reference.</param>
+    /// <param name="apiPropertyReferences">The ordered property references.</param>
+    /// <param name="configure">An optional path-builder callback.</param>
+    /// <returns>The current builder.</returns>
+    public ApiKeyDefinitionBuilder AddPath
+    (
+        ApiTypeReference apiRootObjectTypeReference,
+        IEnumerable<ApiPropertyReference> apiPropertyReferences,
+        Action<ApiKeyPathBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiRootObjectTypeReference);
+        ArgumentNullException.ThrowIfNull(apiPropertyReferences);
+
+        var segmentBuilders = apiPropertyReferences.Select(static reference =>
+            new ApiKeyPathSegmentBuilder(reference));
+        var builder = new ApiKeyPathBuilder(apiRootObjectTypeReference, segmentBuilders);
+        configure?.Invoke(builder);
+        _state.KeyPathBuilders.Add(builder);
+        return this;
+    }
+
+    /// <summary>Adds an inferred-root key path with property references.</summary>
+    /// <param name="apiPropertyReferences">The ordered property references.</param>
+    /// <param name="configure">An optional path-builder callback.</param>
+    /// <returns>The current builder.</returns>
+    public ApiKeyDefinitionBuilder AddPath
+    (
+        IEnumerable<ApiPropertyReference> apiPropertyReferences,
+        Action<ApiKeyPathBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPropertyReferences);
+
+        var segmentBuilders = apiPropertyReferences.Select(static reference =>
+            new ApiKeyPathSegmentBuilder(reference));
+        var builder = new ApiKeyPathBuilder(segmentBuilders);
+        configure?.Invoke(builder);
+        _state.KeyPathBuilders.Add(builder);
+        return this;
+    }
     #endregion
 
     #region With Methods
@@ -200,7 +240,8 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
 
         return _state.KeyPathBuilders.Any(p =>
             p.ApiRootObjectTypeReference == apiRootObjectTypeReference &&
-            p.SegmentBuilders.Select(s => s.ClrMemberName)
+            p.SegmentBuilders.All(s => s.ApiPropertyReference.IsClrNamedReference) &&
+            p.SegmentBuilders.Select(s => s.ApiPropertyReference.ClrName!)
                 .SequenceEqual(names, ClrNameComparer.Instance));
     }
 

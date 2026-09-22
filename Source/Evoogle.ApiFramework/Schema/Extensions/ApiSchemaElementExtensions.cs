@@ -20,10 +20,7 @@ public static class ApiSchemaElementExtensions
     public static IEnumerator<ApiSchemaElement> CreateBreadthFirstEnumerator
     (
         this ApiSchemaElement apiSchemaElement
-    )
-    {
-        return NodeExtensions.CreateBreadthFirstEnumerator(apiSchemaElement);
-    }
+    ) => NodeExtensions.CreateBreadthFirstEnumerator(apiSchemaElement);
 
     /// <summary>
     ///     Creates a depth-first preorder enumerator starting at the specified element.
@@ -33,10 +30,7 @@ public static class ApiSchemaElementExtensions
     public static IEnumerator<ApiSchemaElement> CreateDepthFirstEnumerator
     (
         this ApiSchemaElement apiSchemaElement
-    )
-    {
-        return NodeExtensions.CreateDepthFirstEnumerator(apiSchemaElement);
-    }
+    ) => NodeExtensions.CreateDepthFirstEnumerator(apiSchemaElement);
     #endregion
 
     #region Traversal Methods
@@ -46,10 +40,7 @@ public static class ApiSchemaElementExtensions
     public static IEnumerable<ApiSchemaElement> Children
     (
         this ApiSchemaElement apiSchemaElement
-    )
-    {
-        return NodeExtensions.Children(apiSchemaElement);
-    }
+    ) => NodeExtensions.Children(apiSchemaElement);
 
     /// <summary>Enumerates descendants with the supplied enumerator.</summary>
     /// <param name="apiSchemaElement">The element excluded from the returned sequence.</param>
@@ -59,10 +50,7 @@ public static class ApiSchemaElementExtensions
     (
         this ApiSchemaElement apiSchemaElement,
         IEnumerator<ApiSchemaElement> enumerator
-    )
-    {
-        return NodeExtensions.Descendants(apiSchemaElement, enumerator);
-    }
+    ) => NodeExtensions.Descendants(apiSchemaElement, enumerator);
 
     /// <summary>Enumerates descendants using the specified traversal strategy.</summary>
     /// <param name="apiSchemaElement">The element whose descendants are enumerated.</param>
@@ -72,10 +60,7 @@ public static class ApiSchemaElementExtensions
     (
         this ApiSchemaElement apiSchemaElement,
         TraversalStrategy strategy = TraversalStrategy.BreadthFirst
-    )
-    {
-        return NodeExtensions.Descendants(apiSchemaElement, strategy);
-    }
+    ) => NodeExtensions.Descendants(apiSchemaElement, strategy);
 
     /// <summary>Enumerates the ownership path from the root to the specified element.</summary>
     /// <param name="apiSchemaElement">The path's terminal element.</param>
@@ -83,10 +68,7 @@ public static class ApiSchemaElementExtensions
     public static IEnumerable<ApiSchemaElement> GetPathFromRoot
     (
         this ApiSchemaElement apiSchemaElement
-    )
-    {
-        return NodeExtensions.GetPathFromRoot(apiSchemaElement);
-    }
+    ) => NodeExtensions.GetPathFromRoot(apiSchemaElement);
 
     /// <summary>Enumerates the ownership path from the specified element to the root.</summary>
     /// <param name="apiSchemaElement">The path's initial element.</param>
@@ -94,10 +76,7 @@ public static class ApiSchemaElementExtensions
     public static IEnumerable<ApiSchemaElement> GetPathToRoot
     (
         this ApiSchemaElement apiSchemaElement
-    )
-    {
-        return NodeExtensions.GetPathToRoot(apiSchemaElement);
-    }
+    ) => NodeExtensions.GetPathToRoot(apiSchemaElement);
 
     /// <summary>Determines whether an element is a descendant of another element.</summary>
     /// <param name="apiSchemaElement">The potential descendant.</param>
@@ -107,10 +86,7 @@ public static class ApiSchemaElementExtensions
     (
         this ApiSchemaElement apiSchemaElement,
         ApiSchemaElement potentialAncestor
-    )
-    {
-        return NodeExtensions.IsDescendantOf(apiSchemaElement, potentialAncestor);
-    }
+    ) => NodeExtensions.IsDescendantOf(apiSchemaElement, potentialAncestor);
 
     /// <summary>Enumerates an element and its descendants with the supplied enumerator.</summary>
     /// <param name="apiSchemaElement">The element included at the start of traversal.</param>
@@ -120,10 +96,7 @@ public static class ApiSchemaElementExtensions
     (
         this ApiSchemaElement apiSchemaElement,
         IEnumerator<ApiSchemaElement> enumerator
-    )
-    {
-        return NodeExtensions.SelfAndDescendants(apiSchemaElement, enumerator);
-    }
+    ) => NodeExtensions.SelfAndDescendants(apiSchemaElement, enumerator);
 
     /// <summary>Enumerates an element and its descendants using a traversal strategy.</summary>
     /// <param name="apiSchemaElement">The element included at the start of traversal.</param>
@@ -133,10 +106,7 @@ public static class ApiSchemaElementExtensions
     (
         this ApiSchemaElement apiSchemaElement,
         TraversalStrategy strategy = TraversalStrategy.BreadthFirst
-    )
-    {
-        return NodeExtensions.SelfAndDescendants(apiSchemaElement, strategy);
-    }
+    ) => NodeExtensions.SelfAndDescendants(apiSchemaElement, strategy);
 
     /// <summary>Traverses elements with an enumerator and delegate visitor.</summary>
     /// <param name="apiSchemaElement">The traversal's starting element.</param>
@@ -147,10 +117,7 @@ public static class ApiSchemaElementExtensions
         this ApiSchemaElement apiSchemaElement,
         IEnumerator<ApiSchemaElement> enumerator,
         Func<ApiSchemaElement, bool> visitorFunction
-    )
-    {
-        NodeExtensions.Traverse(apiSchemaElement, enumerator, visitorFunction);
-    }
+    ) => NodeExtensions.Traverse(apiSchemaElement, enumerator, visitorFunction);
 
     /// <summary>Traverses elements with a strategy and delegate visitor.</summary>
     /// <param name="apiSchemaElement">The traversal's starting element.</param>
@@ -161,10 +128,7 @@ public static class ApiSchemaElementExtensions
         this ApiSchemaElement apiSchemaElement,
         TraversalStrategy strategy,
         Func<ApiSchemaElement, bool> visitorFunction
-    )
-    {
-        NodeExtensions.Traverse(apiSchemaElement, strategy, visitorFunction);
-    }
+    ) => NodeExtensions.Traverse(apiSchemaElement, strategy, visitorFunction);
 
     /// <summary>Traverses elements with an enumerator and visitor object.</summary>
     /// <param name="apiSchemaElement">The traversal's starting element.</param>
@@ -175,10 +139,7 @@ public static class ApiSchemaElementExtensions
         this ApiSchemaElement apiSchemaElement,
         IEnumerator<ApiSchemaElement> enumerator,
         INodeVisitor<ApiSchemaElement> visitor
-    )
-    {
-        NodeExtensions.Traverse(apiSchemaElement, enumerator, visitor);
-    }
+    ) => NodeExtensions.Traverse(apiSchemaElement, enumerator, visitor);
 
     /// <summary>Traverses elements with a strategy and visitor object.</summary>
     /// <param name="apiSchemaElement">The traversal's starting element.</param>
@@ -189,9 +150,6 @@ public static class ApiSchemaElementExtensions
         this ApiSchemaElement apiSchemaElement,
         TraversalStrategy strategy,
         INodeVisitor<ApiSchemaElement> visitor
-    )
-    {
-        NodeExtensions.Traverse(apiSchemaElement, strategy, visitor);
-    }
+    ) => NodeExtensions.Traverse(apiSchemaElement, strategy, visitor);
     #endregion
 }

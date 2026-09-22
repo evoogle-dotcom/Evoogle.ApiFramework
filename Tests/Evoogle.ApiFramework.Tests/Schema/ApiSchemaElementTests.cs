@@ -89,10 +89,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.Schemas = GetSchemas();
-        }
+        protected override void Arrange() => this.Schemas = GetSchemas();
 
         protected override void Act()
         { }
@@ -114,10 +111,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.Schema = CreateTraversalSchema();
-        }
+        protected override void Arrange() => this.Schema = CreateTraversalSchema();
 
         protected override void Act()
         { }
@@ -291,10 +285,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             }
         }
 
-        protected override void Assert()
-        {
-            this.Exception.Should().BeOfType<ApiSchemaException>();
-        }
+        protected override void Assert() => this.Exception.Should().BeOfType<ApiSchemaException>();
         #endregion
     }
 
@@ -436,10 +427,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         #endregion
 
         #region Methods
-        public void SetChildren(params ApiSchemaElement[] children)
-        {
-            _children = children;
-        }
+        public void SetChildren(params ApiSchemaElement[] children) => _children = children;
         #endregion
 
         #region ApiSchemaElement Methods
@@ -565,7 +553,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             apiOptions: null,
             apiProperties: [apiProperty],
             apiKeys: [],
-            new ApiVersionDefinition(nameof(TreeObject.Id)),
+            new ApiVersionDefinition(ApiPropertyReference.ClrRef(nameof(TreeObject.Id))),
             typeof(TreeObject)
         );
         var schema = new ApiSchema

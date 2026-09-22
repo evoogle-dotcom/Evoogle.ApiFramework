@@ -6,6 +6,7 @@
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Schema.Version;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -20,14 +21,17 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     #region Property Types
     private readonly record struct PropertyNames
     {
-        public required string ClrMemberName { get; init; }
+        public required string ApiPropertyReference { get; init; }
         public required string ClrType { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
 
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ClrMemberName = policy.ConvertName(nameof(ApiVersionDefinition.ClrMemberName)),
+                ApiPropertyReference = policy.ConvertName
+                (
+                    nameof(ApiVersionDefinition.ApiPropertyReference)
+                ),
                 ClrType = policy.ConvertName(nameof(ApiVersionDefinition.ClrType)),
                 ExtensibleBase = GetExtensiblePropertyNames(policy)
             };
@@ -37,9 +41,9 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     #region Read Types
     private sealed class ReadState : ExtensibleReadData
     {
-        public bool HasClrMemberName { get; set; }
+        public bool HasApiPropertyReference { get; set; }
         public bool HasClrType { get; set; }
-        public string? ClrMemberName { get; set; }
+        public ApiPropertyReference? ApiPropertyReference { get; set; }
         public Type? ClrType { get; set; }
     }
 
@@ -47,7 +51,7 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     {
         public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ClrMemberName, HandleClrMemberName },
+            { propertyNames.ApiPropertyReference, HandleApiPropertyReference },
             { propertyNames.ClrType, HandleClrType },
             {
                 propertyNames.ExtensibleBase.Extensions,
@@ -55,14 +59,15 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
             }
         };
 
-        private static void HandleClrMemberName
+        private static void HandleApiPropertyReference
         (
             ref Utf8JsonReader reader,
             DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
         )
         {
-            context.ReadData.HasClrMemberName = true;
-            context.ReadData.ClrMemberName = reader.GetString();
+            context.ReadData.HasApiPropertyReference = true;
+            context.ReadData.ApiPropertyReference =
+                JsonSerializer.Deserialize<ApiPropertyReference>(ref reader, context.Options);
         }
 
         private static void HandleClrType
@@ -120,13 +125,23 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var readData = readContext.ReadData;
-        if (readData.HasClrType == readData.HasClrMemberName)
+        if (readData.HasClrType == readData.HasApiPropertyReference)
         {
-            throw new JsonException($"An {nameof(ApiVersionDefinition)} must contain exactly one of {nameof(ApiVersionDefinition.ClrType)} or {nameof(ApiVersionDefinition.ClrMemberName)}.");
+            throw new JsonException($"An {nameof(ApiVersionDefinition)} must contain exactly one "
+                + $"of {nameof(ApiVersionDefinition.ClrType)} or "
+                + $"{nameof(ApiVersionDefinition.ApiPropertyReference)}.");
         }
 
-        var value = readData.HasClrMemberName
-            ? new ApiVersionDefinition(readData.ClrMemberName!)
+        if (readData.HasApiPropertyReference && readData.ApiPropertyReference is null)
+        {
+            throw new JsonException
+            (
+                $"{nameof(ApiVersionDefinition.ApiPropertyReference)} must not be null."
+            );
+        }
+
+        var value = readData.HasApiPropertyReference
+            ? new ApiVersionDefinition(readData.ApiPropertyReference!)
             : new ApiVersionDefinition(readData.ClrType!);
 
         AttachExtensions(value, readContext.ReadData.Extensions);
@@ -152,7 +167,7 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
         writer.WriteJsonObject(state: (apiVersionDefinition, writeContext), writeObject: static (writer, state) =>
         {
             var (apiVersionDefinition, writeContext) = state;
-            WriteClrMemberName(writer, apiVersionDefinition, writeContext);
+            WriteApiPropertyReference(writer, apiVersionDefinition, writeContext);
             WriteClrType(writer, apiVersionDefinition, writeContext);
 
             WriteExtensibleBaseExtensions
@@ -167,13 +182,17 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteClrMemberName(Utf8JsonWriter writer, ApiVersionDefinition apiVersionDefinition, DefaultWriteContext<PropertyNames> writeContext)
-    {
-        if (apiVersionDefinition.IsPropertyBacked)
-        {
-            writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ClrMemberName, value: apiVersionDefinition.ClrMemberName, options: writeContext.Options);
-        }
-    }
+    private static void WriteApiPropertyReference
+    (
+        Utf8JsonWriter writer,
+        ApiVersionDefinition apiVersionDefinition,
+        DefaultWriteContext<PropertyNames> writeContext
+    ) => writer.TryWritePropertyWithSerializer
+    (
+        propertyName: writeContext.PropertyNames.ApiPropertyReference,
+        obj: apiVersionDefinition.ApiPropertyReference,
+        options: writeContext.Options
+    );
 
     private static void WriteClrType(Utf8JsonWriter writer, ApiVersionDefinition apiVersionDefinition, DefaultWriteContext<PropertyNames> writeContext)
     {

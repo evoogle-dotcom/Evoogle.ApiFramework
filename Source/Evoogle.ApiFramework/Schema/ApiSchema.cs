@@ -314,10 +314,7 @@ public sealed class ApiSchema : ApiSchemaElement
         }
     }
 
-    internal void CompleteCompilation(bool isSuccessful)
-    {
-        Interlocked.Exchange(ref _compilationState, isSuccessful ? 2 : 3);
-    }
+    internal void CompleteCompilation(bool isSuccessful) => Interlocked.Exchange(ref _compilationState, isSuccessful ? 2 : 3);
 
     private void ValidateApiName(ApiSchemaCompilationContext context)
     {

@@ -114,16 +114,11 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             this.WriteLine();
         }
 
-        protected override void Act()
-        {
+        protected override void Act() =>
             // Deserialize the schema — succeeds because warnings do not throw
             this.ActualSchema = JsonSerializer.Deserialize<ApiSchema>(this.SourceJson);
-        }
 
-        protected override void Assert()
-        {
-            this.ActualSchema.Should().NotBeNull();
-        }
+        protected override void Assert() => this.ActualSchema.Should().NotBeNull();
         #endregion
     }
 
@@ -137,10 +132,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         #endregion
 
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ApiSchema? CreateExpected(ApiSchemaDef? descriptor)
-        {
-            return BuildTestApiSchema(descriptor);
-        }
+        protected override ApiSchema? CreateExpected(ApiSchemaDef? descriptor) => BuildApiSchema(descriptor);
         #endregion
     }
 
@@ -154,20 +146,14 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         #endregion
 
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ApiSchema? CreateExpected(ApiSchemaDef? descriptor)
-        {
-            return BuildTestApiSchema(descriptor);
-        }
+        protected override ApiSchema? CreateExpected(ApiSchemaDef? descriptor) => BuildApiSchema(descriptor);
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ApiSchema, ApiSchemaDef>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ApiSchema? CreateSource(ApiSchemaDef? descriptor)
-        {
-            return BuildTestApiSchema(descriptor);
-        }
+        protected override ApiSchema? CreateSource(ApiSchemaDef? descriptor) => BuildApiSchema(descriptor);
         #endregion
     }
 

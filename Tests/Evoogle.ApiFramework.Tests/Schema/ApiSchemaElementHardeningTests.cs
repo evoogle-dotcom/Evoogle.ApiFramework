@@ -173,8 +173,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             }
 
             ApiSchemaCompiler.Compile(this.FirstSchema).ThrowIfInvalid();
-            this.FirstElementsBefore =
-                [.. this.FirstSchema.SelfAndDescendants(TraversalStrategy.DepthFirst)];
+            this.FirstElementsBefore = [.. this.FirstSchema.SelfAndDescendants(TraversalStrategy.DepthFirst)];
             this.SharedParent = this.SharedElement!.Parent;
             this.FirstSharedPath = this.SharedElement.ApiPath;
             this.FirstSchemaContext = this.SharedElement.ApiSchemaContext;
@@ -183,8 +182,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         protected override void Act()
         {
             this.SecondResult = ApiSchemaCompiler.Compile(this.SecondSchema!);
-            this.FirstElementsAfter =
-                [.. this.FirstSchema!.SelfAndDescendants(TraversalStrategy.DepthFirst)];
+            this.FirstElementsAfter = [.. this.FirstSchema!.SelfAndDescendants(TraversalStrategy.DepthFirst)];
         }
 
         protected override void Assert()
@@ -222,15 +220,9 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.Fixture = CreateInlineSchemaFixture();
-        }
+        protected override void Arrange() => this.Fixture = CreateInlineSchemaFixture();
 
-        protected override void Act()
-        {
-            this.Result = ApiSchemaCompiler.Compile(this.Fixture!.Schema);
-        }
+        protected override void Act() => this.Result = ApiSchemaCompiler.Compile(this.Fixture!.Schema);
 
         protected override void Assert()
         {
@@ -428,7 +420,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         {
             var segmentSource = new List<ApiKeyPathSegment>
             {
-                new(nameof(InlineKeyedChild.Id))
+                new(ApiPropertyReference.ClrRef(nameof(InlineKeyedChild.Id)))
             };
             this.KeyPath = new ApiKeyPath(new ApiTypeReference(typeof(InlineKeyedChild)), segmentSource);
             segmentSource.Clear();
@@ -525,7 +517,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             var changedSegments = this.KeyPath.ApiSegments.SetItem
             (
                 0,
-                new ApiKeyPathSegment("Other")
+                new ApiKeyPathSegment(ApiPropertyReference.ClrRef("Other"))
             );
             changedSegments.Should().NotEqual(this.KeyPath.ApiSegments);
             this.KeyPath.ApiSegments.Single().ClrMemberName.Should()
@@ -960,7 +952,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         var keyedPath = new ApiKeyPath
         (
             apiRootObjectTypeReference: null,
-            [new ApiKeyPathSegment(nameof(InlineKeyedChild.Id))]
+            [new ApiKeyPathSegment(ApiPropertyReference.ClrRef(nameof(InlineKeyedChild.Id)))]
         );
         var objectTypeWithKey = new ApiObjectType
         (

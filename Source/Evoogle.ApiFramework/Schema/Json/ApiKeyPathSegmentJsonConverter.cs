@@ -6,6 +6,7 @@
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Schema.Key;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     private readonly record struct ApiKeyPathSegmentPropertyNames
     {
         #region Immutable Properties
-        public required string ClrMemberName { get; init; }
+        public required string ApiPropertyReference { get; init; }
         #endregion
     }
 
@@ -39,7 +40,10 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
             {
                 ApiKeyPathSegment = new ApiKeyPathSegmentPropertyNames
                 {
-                    ClrMemberName = policy.ConvertName(nameof(Key.ApiKeyPathSegment.ClrMemberName))
+                    ApiPropertyReference = policy.ConvertName
+                    (
+                        nameof(Key.ApiKeyPathSegment.ApiPropertyReference)
+                    )
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -51,7 +55,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     private class ApiKeyPathSegmentReadData
     {
         #region Properties
-        public string? ClrMemberName { get; set; }
+        public ApiPropertyReference? ApiPropertyReference { get; set; }
         #endregion
     }
 
@@ -68,7 +72,10 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
         public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiKeyPathSegment Property Handlers
-            { propertyNames.ApiKeyPathSegment.ClrMemberName, HandleApiKeyPathSegmentClrMemberName },
+            {
+                propertyNames.ApiKeyPathSegment.ApiPropertyReference,
+                HandleApiKeyPathSegmentApiPropertyReference
+            },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
@@ -76,11 +83,15 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
         #endregion
 
         #region ApiKeyPathSegment Methods
-        private static void HandleApiKeyPathSegmentClrMemberName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiKeyPathSegmentApiPropertyReference
+        (
+            ref Utf8JsonReader reader,
+            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+        )
         {
             context.ReadData.ApiKeyPathSegment ??= new ApiKeyPathSegmentReadData();
-
-            context.ReadData.ApiKeyPathSegment.ClrMemberName = reader.GetString();
+            context.ReadData.ApiKeyPathSegment.ApiPropertyReference =
+                JsonSerializer.Deserialize<ApiPropertyReference>(ref reader, context.Options);
         }
         #endregion
     }
@@ -120,9 +131,11 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var readState = readContext.ReadData.ApiKeyPathSegment;
 
-        var clrMemberName = readState?.ClrMemberName;
-
-        var apiKeyPathSegment = new ApiKeyPathSegment(clrMemberName!);
+        var apiPropertyReference = readState?.ApiPropertyReference ?? throw new JsonException
+        (
+            $"An {nameof(ApiKeyPathSegment)} requires an {nameof(ApiPropertyReference)}."
+        );
+        var apiKeyPathSegment = new ApiKeyPathSegment(apiPropertyReference);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiKeyPathSegment, extensions);
@@ -147,7 +160,8 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
         writer.WriteJsonObject(state: (apiKeyPathSegment, writeContext), writeObject: static (writer, state) =>
         {
             var (apiKeyPathSegment, writeContext) = state;
-            WriteApiKeyPathSegmentClrMemberName(writer, apiKeyPathSegment, writeContext);
+            WriteApiKeyPathSegmentApiPropertyReference
+                (writer, apiKeyPathSegment, writeContext);
 
             WriteExtensibleBaseExtensions
             (
@@ -161,7 +175,16 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKeyPathSegmentClrMemberName(Utf8JsonWriter writer, ApiKeyPathSegment apiKeyPathSegment, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiKeyPathSegment.ClrMemberName, value: apiKeyPathSegment.ClrMemberName, options: writeContext.Options);
+    private static void WriteApiKeyPathSegmentApiPropertyReference
+    (
+        Utf8JsonWriter writer,
+        ApiKeyPathSegment apiKeyPathSegment,
+        DefaultWriteContext<PropertyNames> writeContext
+    ) => writer.TryWritePropertyWithSerializer
+    (
+        propertyName: writeContext.PropertyNames.ApiKeyPathSegment.ApiPropertyReference,
+        obj: apiKeyPathSegment.ApiPropertyReference,
+        options: writeContext.Options
+    );
     #endregion
 }

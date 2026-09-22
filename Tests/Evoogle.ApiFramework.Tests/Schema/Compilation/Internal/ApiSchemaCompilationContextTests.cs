@@ -55,10 +55,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
             };
         }
 
-        protected override void Assert()
-        {
-            this.ActualPaths.Should().Equal(this.ExpectedPaths);
-        }
+        protected override void Assert() => this.ActualPaths.Should().Equal(this.ExpectedPaths);
         #endregion
     }
 

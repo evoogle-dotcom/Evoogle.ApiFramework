@@ -38,10 +38,7 @@ internal sealed class ApiAnnotationReaderSet
 
     internal IReadOnlyList<ApiSchemaCompilationIssue> Issues => _issues;
 
-    internal void ResetIssues()
-    {
-        _issues.Clear();
-    }
+    internal void ResetIssues() => _issues.Clear();
     #endregion
 
     #region Annotation Methods
@@ -1235,9 +1232,6 @@ internal sealed class ApiAnnotationReaderSet
     #endregion
 
     #region Helper Methods
-    private static bool IsEligibleType(Type type)
-    {
-        return !type.IsAbstract && (type.IsClass || type.IsValueType);
-    }
+    private static bool IsEligibleType(Type type) => !type.IsAbstract && (type.IsClass || type.IsValueType);
     #endregion
 }

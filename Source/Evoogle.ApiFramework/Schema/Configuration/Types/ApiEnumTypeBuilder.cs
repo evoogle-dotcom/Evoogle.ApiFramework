@@ -29,10 +29,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder AddEnumTypeExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiEnumTypeBuilder AddEnumTypeExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddValue Methods

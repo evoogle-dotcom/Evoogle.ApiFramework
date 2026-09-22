@@ -84,10 +84,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
 
     #region Methods
     /// <summary>Clears configuration-discovery issues for a new schema build.</summary>
-    internal void ResetConfigurationIssues()
-    {
-        _configurationIssues.Clear();
-    }
+    internal void ResetConfigurationIssues() => _configurationIssues.Clear();
 
     /// <summary>Records a configuration-discovery issue for the current schema build.</summary>
     internal void AddConfigurationIssue(ApiSchemaCompilationIssue issue)
@@ -98,10 +95,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     }
 
     /// <summary>Runs a configuration callback at the supplied source precedence.</summary>
-    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
-    {
-        _configurationSourceScope.Apply(source, configure);
-    }
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
 
     /// <summary>
     ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder{TScalar}"/> for the CLR type <typeparamref name="TScalar"/>.

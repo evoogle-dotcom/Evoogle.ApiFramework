@@ -80,10 +80,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddSchemaExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiSchemaBuilder AddSchemaExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddObject Methods
@@ -456,10 +453,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     <see cref="ApiVersionAttribute"/>, etc.).
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder UseDefaultAnnotations()
-    {
-        return this.UseAnnotations(a => a.AddReader(new ApiAttributeAnnotationReader()));
-    }
+    public ApiSchemaBuilder UseDefaultAnnotations() => this.UseAnnotations(a => a.AddReader(new ApiAttributeAnnotationReader()));
     #endregion
 
     #region Internal Annotation Discovery Methods
@@ -682,7 +676,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
                     continue;
                 }
 
-                if (end.ApiTraversal is { ClrMemberName: not null } traversal)
+                if (end.ApiTraversal?.ClrMemberReference is { } clrMemberReference)
                 {
                     foreach (var objectBuilder in _context.ApiObjectTypeBuilders)
                     {
@@ -696,7 +690,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
                         {
                             objectBuilder.RemoveConventionPropertyByClrName
                             (
-                                traversal.ClrMemberName
+                                clrMemberReference.ClrMemberName
                             );
                         }
                     }

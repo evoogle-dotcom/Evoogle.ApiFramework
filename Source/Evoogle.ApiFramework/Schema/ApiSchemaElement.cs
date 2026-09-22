@@ -194,10 +194,7 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
 
     internal virtual IEnumerable<ApiSchemaElement> GetOwnedElements() => [];
 
-    internal virtual void CompileCore(ApiSchemaCompilationContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-    }
+    internal virtual void CompileCore(ApiSchemaCompilationContext context) => ArgumentNullException.ThrowIfNull(context);
 
     internal void AttachExtensions(IEnumerable<KeyValuePair<Type, object>> extensions)
     {

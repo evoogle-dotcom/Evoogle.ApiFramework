@@ -374,10 +374,7 @@ public partial class ApiConventionTests
             }
         }
 
-        protected override void Assert()
-        {
-            this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
-        }
+        protected override void Assert() => this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
         #endregion
     }
     #endregion

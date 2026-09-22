@@ -62,10 +62,7 @@ public sealed class ApiEnumValueBuilder
     /// </summary>
     /// <param name="apiName">The explicit API name to use.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumValueBuilder WithName(string apiName)
-    {
-        return this.SetApiName(apiName, ApiConfigurationSource.Explicit);
-    }
+    public ApiEnumValueBuilder WithName(string apiName) => this.SetApiName(apiName, ApiConfigurationSource.Explicit);
     #endregion
 
     #region Internal Convention Methods

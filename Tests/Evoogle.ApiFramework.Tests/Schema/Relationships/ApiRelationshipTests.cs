@@ -64,8 +64,8 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
                     AssertOneToRelationshipBinding
                     (
-                        expectedRelationshipDef.PrincipalEnd,
-                        expectedRelationshipDef.DependentEnd,
+                        expectedRelationshipDef.ApiPrincipalEnd,
+                        expectedRelationshipDef.ApiDependentEnd,
                         actualRelationship
                     );
                     break;
@@ -76,8 +76,8 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
                     AssertOneToRelationshipBinding
                     (
-                        expectedRelationshipDef.PrincipalEnd,
-                        expectedRelationshipDef.DependentEnd,
+                        expectedRelationshipDef.ApiPrincipalEnd,
+                        expectedRelationshipDef.ApiDependentEnd,
                         actualRelationship
                     );
                     break;
@@ -88,9 +88,9 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
                     AssertManyToManyRelationshipBinding
                     (
-                        expectedRelationshipDef.PrincipalEndA,
-                        expectedRelationshipDef.PrincipalEndB,
-                        expectedRelationshipDef.Association,
+                        expectedRelationshipDef.ApiPrincipalEndA,
+                        expectedRelationshipDef.ApiPrincipalEndB,
+                        expectedRelationshipDef.ApiAssociation,
                         actualRelationship
                     );
                     break;
@@ -306,7 +306,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
                 (expectedAssociation.ApiObjectTypeReference.ClrType);
         }
 
-        private static void AssertKeyDefinition(ApiKeyDef expectedKey, ApiKeyDefinition actualKey)
+        private static void AssertKeyDefinition(ApiKeyDefinitionDef expectedKey, ApiKeyDefinition actualKey)
         {
             if (actualKey is ApiNamedKeyDefinition actualNamedKey)
             {
@@ -339,11 +339,15 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
                 actualKeyPath.ClrRootType.Should().Be(expectedKeyPath.ApiRootObjectTypeReference.ClrType);
             }
 
-            actualKeyPath.ApiSegments.Should().HaveCount(expectedKeyPath.ApiKeyPathSegments.Count);
+            actualKeyPath.ApiSegments.Should().HaveCount(expectedKeyPath.ApiSegments.Count);
 
-            for (var i = 0; i < expectedKeyPath.ApiKeyPathSegments.Count; i++)
+            for (var i = 0; i < expectedKeyPath.ApiSegments.Count; i++)
             {
-                actualKeyPath.ApiSegments[i].ClrMemberName.Should().Be(expectedKeyPath.ApiKeyPathSegments[i].ClrMemberName);
+                var apiExpectedSegmentDef = expectedKeyPath.ApiSegments[i];
+                var apiActualSegment = actualKeyPath.ApiSegments[i];
+
+                apiActualSegment.ApiPropertyReference.ApiName.Should().Be(apiExpectedSegmentDef.ApiPropertyReference.ApiName);
+                apiActualSegment.ApiPropertyReference.ClrName.Should().Be(apiExpectedSegmentDef.ApiPropertyReference.ClrName);
             }
         }
     }

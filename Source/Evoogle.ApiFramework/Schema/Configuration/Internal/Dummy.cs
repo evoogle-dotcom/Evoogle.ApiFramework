@@ -245,10 +245,7 @@ internal static class Dummy
     /// </remarks>
     internal class EmailAddressConfigurationGeneric : IApiScalarTypeConfiguration<EmailAddress>
     {
-        public void Configure(ApiScalarTypeBuilder<EmailAddress> builder)
-        {
-            builder.WithName("EmailAddress");
-        }
+        public void Configure(ApiScalarTypeBuilder<EmailAddress> builder) => builder.WithName("EmailAddress");
     }
 
     /// <summary>

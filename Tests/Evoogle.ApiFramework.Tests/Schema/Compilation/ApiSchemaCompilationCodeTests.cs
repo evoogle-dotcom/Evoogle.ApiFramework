@@ -38,10 +38,7 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
             this.ActualJson = JsonSerializer.Serialize(this.Code, options);
         }
 
-        protected override void Assert()
-        {
-            this.ActualJson.Should().Be($"\"{this.ExpectedValue}\"");
-        }
+        protected override void Assert() => this.ActualJson.Should().Be($"\"{this.ExpectedValue}\"");
         #endregion
     }
     #endregion
@@ -73,11 +70,6 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
         (
             ApiSchemaCompilationCode.ApiVersionDefinitionNullableClrType,
             "API_VERSION_DEFINITION_NULLABLE_CLR_TYPE"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiVersionDefinitionInvalidClrMemberName,
-            "API_VERSION_DEFINITION_INVALID_CLR_MEMBER_NAME"
         ),
         CreateSerializationTest
         (

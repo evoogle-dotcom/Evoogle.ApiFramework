@@ -51,26 +51,17 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public sealed class AssemblyObjectConfiguration : IApiObjectTypeConfiguration<DiscoveryObject>
     {
-        public void Configure(ApiObjectTypeBuilder<DiscoveryObject> builder)
-        {
-            builder.WithName("DiscoveredObject");
-        }
+        public void Configure(ApiObjectTypeBuilder<DiscoveryObject> builder) => builder.WithName("DiscoveredObject");
     }
 
     public sealed class AssemblyScalarConfiguration : IApiScalarTypeConfiguration<DiscoveryScalar>
     {
-        public void Configure(ApiScalarTypeBuilder<DiscoveryScalar> builder)
-        {
-            builder.WithName("DiscoveredScalar");
-        }
+        public void Configure(ApiScalarTypeBuilder<DiscoveryScalar> builder) => builder.WithName("DiscoveredScalar");
     }
 
     public sealed class AssemblyIntScalarConfiguration : IApiScalarTypeConfiguration<int>
     {
-        public void Configure(ApiScalarTypeBuilder<int> builder)
-        {
-            builder.WithName("Int");
-        }
+        public void Configure(ApiScalarTypeBuilder<int> builder) => builder.WithName("Int");
     }
 
     public sealed class AssemblyEnumConfiguration : IApiEnumTypeConfiguration<DiscoveryEnum>
@@ -169,18 +160,12 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             ConstructorCount++;
         }
 
-        public void Configure(ApiObjectTypeBuilder<DiscoveryObject> builder)
-        {
-            builder.WithName("FreshObject");
-        }
+        public void Configure(ApiObjectTypeBuilder<DiscoveryObject> builder) => builder.WithName("FreshObject");
     }
 
     public sealed class EligibleConfiguration : IApiObjectTypeConfiguration<EligibilityObject>
     {
-        public void Configure(ApiObjectTypeBuilder<EligibilityObject> builder)
-        {
-            builder.WithName("EligibleObject");
-        }
+        public void Configure(ApiObjectTypeBuilder<EligibilityObject> builder) => builder.WithName("EligibleObject");
     }
 
     public sealed class EligibilityObject
@@ -341,10 +326,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public sealed class RoleScalarConfiguration : IApiScalarTypeConfiguration<int>
     {
-        public void Configure(ApiScalarTypeBuilder<int> builder)
-        {
-            builder.WithName("RoleInt");
-        }
+        public void Configure(ApiScalarTypeBuilder<int> builder) => builder.WithName("RoleInt");
     }
 
     public sealed class FailingRoleDiscoveryConfiguration :
@@ -444,10 +426,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public sealed class PrecedenceConfiguration : IApiObjectTypeConfiguration<PrecedenceObject>
     {
-        public void Configure(ApiObjectTypeBuilder<PrecedenceObject> builder)
-        {
-            builder.WithName("ExplicitName");
-        }
+        public void Configure(ApiObjectTypeBuilder<PrecedenceObject> builder) => builder.WithName("ExplicitName");
     }
 
     public sealed class PrecedenceObject
@@ -489,10 +468,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         private ApiSchema? ApiSchemaActual { get; set; }
         private bool ReturnedSameBuilder { get; set; }
 
-        protected override void Arrange()
-        {
-            this.WriteLine($"UseMarkerType: {this.UseMarkerType}");
-        }
+        protected override void Arrange() => this.WriteLine($"UseMarkerType: {this.UseMarkerType}");
 
         protected override void Act()
         {
@@ -548,10 +524,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
         private ArgumentNullException? ExceptionActual { get; set; }
 
-        protected override void Arrange()
-        {
-            this.WriteLine($"ScanKind: {this.ScanKind}");
-        }
+        protected override void Arrange() => this.WriteLine($"ScanKind: {this.ScanKind}");
 
         protected override void Act()
         {
@@ -597,10 +570,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         private HashSet<Type> ObservedTypes { get; set; } = [];
         private ApiSchema? ApiSchemaActual { get; set; }
 
-        protected override void Arrange()
-        {
-            this.ObservedTypes = [];
-        }
+        protected override void Arrange() => this.ObservedTypes = [];
 
         protected override void Act()
         {
@@ -636,10 +606,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         private int FirstIssueCount { get; set; }
         private int SecondIssueCount { get; set; }
 
-        protected override void Arrange()
-        {
-            FreshInstanceConfiguration.ConstructorCount = 0;
-        }
+        protected override void Arrange() => FreshInstanceConfiguration.ConstructorCount = 0;
 
         protected override void Act()
         {

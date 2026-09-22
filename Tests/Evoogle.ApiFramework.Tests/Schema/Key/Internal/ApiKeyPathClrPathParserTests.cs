@@ -30,10 +30,7 @@ public class ApiKeyPathClrPathParserTests(ITestOutputHelper output) : XUnitTests
         protected override void Arrange()
         { }
 
-        protected override void Act()
-        {
-            this.ActualResult = ApiKeyPathClrPathParser.Parse(this.ClrPath);
-        }
+        protected override void Act() => this.ActualResult = ApiKeyPathClrPathParser.Parse(this.ClrPath);
 
         protected override void Assert()
         {

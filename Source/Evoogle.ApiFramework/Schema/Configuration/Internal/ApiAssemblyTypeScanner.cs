@@ -21,10 +21,7 @@ internal static class ApiAssemblyTypeScanner
 {
     internal static ApiAssemblyTypeScanResult Scan(
         Assembly assembly,
-        Func<Type, bool>? filter = null)
-    {
-        return Scan(assembly, filter, static sourceAssembly => sourceAssembly.GetExportedTypes());
-    }
+        Func<Type, bool>? filter = null) => Scan(assembly, filter, static sourceAssembly => sourceAssembly.GetExportedTypes());
 
     internal static ApiAssemblyTypeScanResult Scan(
         Assembly assembly,
@@ -100,10 +97,7 @@ internal static class ApiAssemblyTypeScanner
         Assembly assembly,
         Exception exception,
         string description,
-        string remediation)
-    {
-        return CreateAssemblyIssue(GetAssemblyName(assembly), exception, description, remediation);
-    }
+        string remediation) => CreateAssemblyIssue(GetAssemblyName(assembly), exception, description, remediation);
 
     private static ApiSchemaCompilationIssue CreateAssemblyIssue(
         string apiPath,
@@ -120,8 +114,5 @@ internal static class ApiAssemblyTypeScanner
             exception: exception);
     }
 
-    private static string GetAssemblyName(Assembly assembly)
-    {
-        return assembly.GetName().Name ?? assembly.FullName ?? assembly.ToString();
-    }
+    private static string GetAssemblyName(Assembly assembly) => assembly.GetName().Name ?? assembly.FullName ?? assembly.ToString();
 }

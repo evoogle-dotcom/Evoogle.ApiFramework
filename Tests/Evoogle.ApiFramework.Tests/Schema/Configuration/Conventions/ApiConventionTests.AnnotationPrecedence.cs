@@ -77,10 +77,7 @@ public partial class ApiConventionTests
             this.WriteLine();
         }
 
-        protected override void Act()
-        {
-            this.ApiSchemaActual = this.ApiSchemaBuilder!.Build();
-        }
+        protected override void Act() => this.ApiSchemaActual = this.ApiSchemaBuilder!.Build();
 
         protected override void Assert()
         {

@@ -288,9 +288,6 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     (
         ApiConfigurationSource source,
         Action<ApiRelationshipOneToManyBuilder> configure
-    )
-    {
-        this.ApplyConfiguration(source, () => configure(this));
-    }
+    ) => this.ApplyConfiguration(source, () => configure(this));
     #endregion
 }

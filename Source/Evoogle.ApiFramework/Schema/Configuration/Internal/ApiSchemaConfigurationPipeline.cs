@@ -473,10 +473,7 @@ internal sealed class ApiSchemaConfigurationPipeline
         }
     }
 
-    private void ApplyConvention(Action apply)
-    {
-        _context.ApplyConfiguration(ApiConfigurationSource.Convention, apply);
-    }
+    private void ApplyConvention(Action apply) => _context.ApplyConfiguration(ApiConfigurationSource.Convention, apply);
     #endregion
 
     #region Validation Methods

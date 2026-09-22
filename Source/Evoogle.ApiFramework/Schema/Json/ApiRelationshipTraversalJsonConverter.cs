@@ -22,15 +22,16 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
     private readonly record struct PropertyNames
     {
         public required string ApiName { get; init; }
-        public required string ClrMemberName { get; init; }
-        public required string ClrMemberKind { get; init; }
+        public required string ClrMemberReference { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
 
         public static PropertyNames Create(JsonNamingPolicy policy) => new()
         {
             ApiName = policy.ConvertName(nameof(ApiRelationshipTraversal.ApiName)),
-            ClrMemberName = policy.ConvertName(nameof(ApiRelationshipTraversal.ClrMemberName)),
-            ClrMemberKind = policy.ConvertName(nameof(ApiRelationshipTraversal.ClrMemberKind)),
+            ClrMemberReference = policy.ConvertName
+            (
+                nameof(ApiRelationshipTraversal.ClrMemberReference)
+            ),
             ExtensibleBase = GetExtensiblePropertyNames(policy)
         };
     }
@@ -40,8 +41,7 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
     private sealed class ReadState : ExtensibleReadData
     {
         public string? ApiName { get; set; }
-        public string? ClrMemberName { get; set; }
-        public ClrMemberKind ClrMemberKind { get; set; } = ClrMemberKind.Property;
+        public ApiClrMemberReference? ClrMemberReference { get; set; }
     }
 
     private sealed class ReadHandlers(PropertyNames names)
@@ -49,8 +49,7 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
         public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             { names.ApiName, HandleApiName },
-            { names.ClrMemberName, HandleClrMemberName },
-            { names.ClrMemberKind, HandleClrMemberKind },
+            { names.ClrMemberReference, HandleClrMemberReference },
             {
                 names.ExtensibleBase.Extensions,
                 CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>()
@@ -63,27 +62,12 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
             DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
         ) => context.ReadData.ApiName = reader.GetString();
 
-        private static void HandleClrMemberName
+        private static void HandleClrMemberReference
         (
             ref Utf8JsonReader reader,
             DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
-        ) => context.ReadData.ClrMemberName = reader.GetString();
-
-        private static void HandleClrMemberKind
-        (
-            ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
-        )
-        {
-            var name = reader.GetString();
-            if (!Enum.TryParse<ClrMemberKind>(name, ignoreCase: true, out var kind) ||
-                !Enum.IsDefined(kind))
-            {
-                throw new JsonException("Invalid CLR member kind for relationship traversal.");
-            }
-
-            context.ReadData.ClrMemberKind = kind;
-        }
+        ) => context.ReadData.ClrMemberReference =
+            JsonSerializer.Deserialize<ApiClrMemberReference>(ref reader, context.Options);
     }
     #endregion
 
@@ -116,10 +100,7 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var state = readContext.ReadData;
-        var traversal = new ApiRelationshipTraversal
-        (
-            state.ApiName!, state.ClrMemberName, state.ClrMemberKind
-        );
+        var traversal = new ApiRelationshipTraversal(state.ApiName!, state.ClrMemberReference);
         AttachExtensions(traversal, state.Extensions);
         return traversal;
     }
@@ -144,8 +125,7 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
         {
             var (apiRelationshipTraversal, writeContext) = state;
             WriteApiName(writer, apiRelationshipTraversal, writeContext);
-            WriteClrMemberName(writer, apiRelationshipTraversal, writeContext);
-            WriteClrMemberKind(writer, apiRelationshipTraversal, writeContext);
+            WriteClrMemberReference(writer, apiRelationshipTraversal, writeContext);
             WriteExtensibleBaseExtensions
             (
                 writer,
@@ -161,15 +141,16 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
     private static void WriteApiName(Utf8JsonWriter writer, ApiRelationshipTraversal apiRelationshipTraversal, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiName, value: apiRelationshipTraversal.ApiName, options: writeContext.Options);
 
-    private static void WriteClrMemberName(Utf8JsonWriter writer, ApiRelationshipTraversal apiRelationshipTraversal, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ClrMemberName, value: apiRelationshipTraversal.ClrMemberName, options: writeContext.Options);
-
-    private static void WriteClrMemberKind(Utf8JsonWriter writer, ApiRelationshipTraversal apiRelationshipTraversal, DefaultWriteContext<PropertyNames> writeContext)
-    {
-        if (apiRelationshipTraversal.HasClrMember)
-        {
-            writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ClrMemberKind, value: apiRelationshipTraversal.ClrMemberKind.ToString(), options: writeContext.Options);
-        }
-    }
+    private static void WriteClrMemberReference
+    (
+        Utf8JsonWriter writer,
+        ApiRelationshipTraversal apiRelationshipTraversal,
+        DefaultWriteContext<PropertyNames> writeContext
+    ) => writer.TryWritePropertyWithSerializer
+    (
+        propertyName: writeContext.PropertyNames.ClrMemberReference,
+        obj: apiRelationshipTraversal.ClrMemberReference,
+        options: writeContext.Options
+    );
     #endregion
 }

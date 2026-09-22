@@ -20,14 +20,15 @@ internal static class ApiObjectTypeBuilderExtensions
             {
                 foreach (var keyPath in apiKeyDefinition.ApiKeyPaths)
                 {
-                    var clrMemberNames = keyPath.ApiSegments.Select(s => s.ClrMemberName);
+                    var apiPropertyReferences = keyPath.ApiSegments.Select
+                        (s => s.ApiPropertyReference);
                     if (keyPath.ApiRootObjectTypeReference is null)
                     {
-                        k.AddPath(clrMemberNames);
+                        k.AddPath(apiPropertyReferences);
                     }
                     else
                     {
-                        k.AddPath(keyPath.ApiRootObjectTypeReference, clrMemberNames);
+                        k.AddPath(keyPath.ApiRootObjectTypeReference, apiPropertyReferences);
                     }
                 }
             });
@@ -72,8 +73,8 @@ internal static class ApiObjectTypeBuilderExtensions
             return;
         }
 
-        var clrMemberName = apiVersionDefinition.ClrMemberName;
-        if (clrMemberName is null)
+        var apiPropertyReference = apiVersionDefinition.ApiPropertyReference;
+        if (apiPropertyReference is null)
         {
             builder.WithRepositoryVersion
             (
@@ -85,7 +86,7 @@ internal static class ApiObjectTypeBuilderExtensions
         {
             builder.WithVersion
             (
-                clrMemberName,
+                apiPropertyReference,
                 x => x.ConfigureExtensions(apiVersionDefinition)
             );
         }

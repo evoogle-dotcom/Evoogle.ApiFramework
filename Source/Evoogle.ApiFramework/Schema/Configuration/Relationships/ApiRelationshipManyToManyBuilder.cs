@@ -385,9 +385,6 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     (
         ApiConfigurationSource source,
         Action<ApiRelationshipManyToManyBuilder> configure
-    )
-    {
-        this.ApplyConfiguration(source, () => configure(this));
-    }
+    ) => this.ApplyConfiguration(source, () => configure(this));
     #endregion
 }

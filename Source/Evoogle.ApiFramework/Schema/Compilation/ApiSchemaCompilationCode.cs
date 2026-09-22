@@ -23,6 +23,67 @@ namespace Evoogle.ApiFramework.Schema.Compilation;
 [JsonConverter(typeof(EnumJsonConverter<ApiSchemaCompilationCode>))]
 public enum ApiSchemaCompilationCode
 {
+    #region ApiAnnotation Compilation Codes
+    /// <summary>
+    ///     An annotation reader threw while reading metadata for a schema target.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_READER_EXECUTION_FAILED")]
+    ApiAnnotationReaderExecutionFailed,
+
+    /// <summary>
+    ///     An annotation reader returned an invalid or unsupported contribution.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_INVALID_CONTRIBUTION")]
+    ApiAnnotationInvalidContribution,
+
+    /// <summary>
+    ///     A CLR type has conflicting built-in API type marker annotations.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_TYPE_MARKER_CONFLICT")]
+    ApiAnnotationTypeMarkerConflict,
+
+    /// <summary>
+    ///     Multiple annotation readers discovered different API type kinds for the same CLR type.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_TYPE_DISCOVERY_CONFLICT")]
+    ApiAnnotationTypeDiscoveryConflict,
+
+    /// <summary>
+    ///     Multiple annotation key paths use the same order within one named key.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_KEY_ORDER_CONFLICT")]
+    ApiAnnotationKeyOrderConflict,
+
+    /// <summary>
+    ///     An annotation reader returned multiple valid version declarations for one object type.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_VERSION_CONFLICT")]
+    ApiAnnotationVersionConflict,
+    #endregion
+
+    #region ApiAssembly Compilation Codes
+    /// <summary>
+    ///     Assembly type discovery failed while scanning an assembly or evaluating a candidate
+    ///     filter.
+    /// </summary>
+    [EnumMember(Value = "API_ASSEMBLY_DISCOVERY_FAILED")]
+    ApiAssemblyDiscoveryFailed,
+    #endregion
+
+    #region ApiClrMemberReference Compilation Codes
+    /// <summary>
+    ///     A CLR member reference has an invalid CLR member kind.
+    /// </summary>
+    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_MEMBER_KIND")]
+    ApiClrMemberReferenceInvalidClrMemberKind,
+
+    /// <summary>
+    ///     A CLR member reference has an invalid CLR member name.
+    /// </summary>
+    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_MEMBER_NAME")]
+    ApiClrMemberReferenceInvalidClrMemberName,
+    #endregion
+
     #region ApiCollectionType Compilation Codes
     /// <summary>
     ///     The collection type's item type expression is null.
@@ -55,6 +116,20 @@ public enum ApiSchemaCompilationCode
     /// </summary>
     [EnumMember(Value = "API_COLLECTION_ITEM_OPTIONAL_NON_NULLABLE_MISMATCH")]
     ApiCollectionItemOptionalNonNullableMismatch,
+    #endregion
+
+    #region ApiConfiguration Compilation Codes
+    /// <summary>
+    ///     A discovered configuration could not be activated.
+    /// </summary>
+    [EnumMember(Value = "API_CONFIGURATION_ACTIVATION_FAILED")]
+    ApiConfigurationActivationFailed,
+
+    /// <summary>
+    ///     A discovered configuration threw while exposing its identity or applying its configuration.
+    /// </summary>
+    [EnumMember(Value = "API_CONFIGURATION_EXECUTION_FAILED")]
+    ApiConfigurationExecutionFailed,
     #endregion
 
     #region ApiEnumType Compilation Codes
@@ -103,6 +178,14 @@ public enum ApiSchemaCompilationCode
     ApiEnumValueInvalidClrName,
     #endregion
 
+    #region ApiKeyDefinition Compilation Codes
+    /// <summary>
+    ///     An <see cref="ApiKeyDefinition"/> has no key paths defined. At least one <see cref="ApiKeyPath"/> is required.
+    /// </summary>
+    [EnumMember(Value = "API_KEY_DEFINITION_NULL_OR_EMPTY_PATHS")]
+    ApiKeyDefinitionNullOrEmptyPaths,
+    #endregion
+
     #region ApiKeyPath Compilation Codes
     /// <summary>
     ///     An <see cref="ApiKeyPath"/> has no segments. At least one segment is required to identify a scalar property.
@@ -142,26 +225,14 @@ public enum ApiSchemaCompilationCode
 
     #region ApiKeyPathSegment Compilation Codes
     /// <summary>
-    ///     An <see cref="ApiKeyPath"/> segment's CLR member name is null, empty, or whitespace.
-    /// </summary>
-    [EnumMember(Value = "API_KEY_PATH_SEGMENT_INVALID_CLR_MEMBER_NAME")]
-    ApiKeyPathSegmentInvalidClrMemberName,
-
-    /// <summary>
-    ///     An <see cref="ApiKeyPath"/> segment's CLR member name could not be resolved to an
+    ///     An <see cref="ApiKeyPath"/> segment's property reference could not be resolved to an
     ///     <see cref="ApiProperty"/> on the current object type.
     /// </summary>
     [EnumMember(Value = "API_KEY_PATH_SEGMENT_UNRESOLVED_API_PROPERTY")]
     ApiKeyPathSegmentUnresolvedApiProperty,
     #endregion
 
-    #region ApiKeyDefinition and ApiNamedKeyDefinition Compilation Codes
-    /// <summary>
-    ///     An <see cref="ApiKeyDefinition"/> has no key paths defined. At least one <see cref="ApiKeyPath"/> is required.
-    /// </summary>
-    [EnumMember(Value = "API_KEY_DEFINITION_NULL_OR_EMPTY_PATHS")]
-    ApiKeyDefinitionNullOrEmptyPaths,
-
+    #region ApiNamedKeyDefinition Compilation Codes
     /// <summary>
     ///     An <see cref="ApiNamedKeyDefinition"/>'s API name is null, empty, or whitespace.
     /// </summary>
@@ -291,38 +362,12 @@ public enum ApiSchemaCompilationCode
     ApiPropertyOptionalNonNullableMismatch,
     #endregion
 
-    #region ApiVersionDefinition Compilation Codes
-    /// <summary>The version definition's CLR type is null.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_NULL_CLR_TYPE")]
-    ApiVersionDefinitionNullClrType,
-
-    /// <summary>The version definition uses a nullable CLR value type.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_NULLABLE_CLR_TYPE")]
-    ApiVersionDefinitionNullableClrType,
-
-    /// <summary>The property-backed version has an invalid CLR member name.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_INVALID_CLR_MEMBER_NAME")]
-    ApiVersionDefinitionInvalidClrMemberName,
-
-    /// <summary>No scalar schema type matches the version CLR type.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_UNRESOLVED_SCALAR_TYPE")]
-    ApiVersionDefinitionUnresolvedScalarType,
-
-    /// <summary>No API property matches the property-backed version CLR member name.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_UNRESOLVED_PROPERTY")]
-    ApiVersionDefinitionUnresolvedProperty,
-
-    /// <summary>The property-backed version refers to a non-scalar API property.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_NON_SCALAR_PROPERTY")]
-    ApiVersionDefinitionNonScalarProperty,
-
-    /// <summary>The version member and scalar API type use different CLR types.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_CLR_TYPE_MISMATCH")]
-    ApiVersionDefinitionClrTypeMismatch,
-
-    /// <summary>The property-backed version refers to an optional API property.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_OPTIONAL_PROPERTY")]
-    ApiVersionDefinitionOptionalProperty,
+    #region ApiPropertyReference Compilation Codes
+    /// <summary>
+    ///     An API property reference does not contain exactly one complete API name or CLR name reference.
+    /// </summary>
+    [EnumMember(Value = "API_PROPERTY_REFERENCE_INVALID_FORM")]
+    ApiPropertyReferenceInvalidForm,
     #endregion
 
     #region ApiRelationship Compilation Codes
@@ -439,6 +484,26 @@ public enum ApiSchemaCompilationCode
     ApiRelationshipIncompatiblePrincipalForeignKey,
     #endregion
 
+    #region ApiRelationshipTraversal Compilation Codes
+    /// <summary>A relationship traversal has an invalid API name.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_API_NAME")]
+    ApiRelationshipTraversalInvalidApiName,
+
+    /// <summary>A relationship traversal has an invalid CLR navigation member binding.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_CLR_MEMBER")]
+    ApiRelationshipTraversalInvalidClrMember,
+
+    /// <summary>
+    ///     A relationship traversal conflicts with another API field on its source type.
+    /// </summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_DUPLICATE_API_NAME")]
+    ApiRelationshipTraversalDuplicateApiName,
+
+    /// <summary>A CLR member is bound to both a contained property and a traversal.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_CLR_MEMBER_CONFLICT")]
+    ApiRelationshipTraversalClrMemberConflict,
+    #endregion
+
     #region ApiSchemaElement Compilation Codes
     /// <summary>
     ///     The same schema element instance appears in more than one structural ownership position
@@ -540,6 +605,22 @@ public enum ApiSchemaCompilationCode
     ApiSchemaExtensionInvalidSnapshot,
     #endregion
 
+    #region ApiType Compilation Codes
+    /// <summary>
+    ///     The type's CLR type is null.
+    /// </summary>
+    [EnumMember(Value = "API_TYPE_NULL_CLR_TYPE")]
+    ApiTypeNullClrType,
+    #endregion
+
+    #region ApiTypeExpression Compilation Codes
+    /// <summary>
+    ///     A type expression does not contain exactly one inline type or type reference.
+    /// </summary>
+    [EnumMember(Value = "API_TYPE_EXPRESSION_INVALID_FORM")]
+    ApiTypeExpressionInvalidForm,
+    #endregion
+
     #region ApiTypeReference Compilation Codes
     /// <summary>
     ///     A type reference's API kind could not be read from schema JSON.
@@ -554,100 +635,33 @@ public enum ApiSchemaCompilationCode
     ApiTypeReferenceInvalidForm,
     #endregion
 
-    #region ApiTypeExpression Compilation Codes
-    /// <summary>
-    ///     A type expression does not contain exactly one inline type or type reference.
-    /// </summary>
-    [EnumMember(Value = "API_TYPE_EXPRESSION_INVALID_FORM")]
-    ApiTypeExpressionInvalidForm,
-    #endregion
+    #region ApiVersionDefinition Compilation Codes
+    /// <summary>The version definition's CLR type is null.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_NULL_CLR_TYPE")]
+    ApiVersionDefinitionNullClrType,
 
-    #region ApiType Compilation Codes
-    /// <summary>
-    ///     The type's CLR type is null.
-    /// </summary>
-    [EnumMember(Value = "API_TYPE_NULL_CLR_TYPE")]
-    ApiTypeNullClrType,
-    #endregion
+    /// <summary>The version definition uses a nullable CLR value type.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_NULLABLE_CLR_TYPE")]
+    ApiVersionDefinitionNullableClrType,
 
-    #region ApiConfiguration Compilation Codes
-    /// <summary>
-    ///     A discovered configuration could not be activated.
-    /// </summary>
-    [EnumMember(Value = "API_CONFIGURATION_ACTIVATION_FAILED")]
-    ApiConfigurationActivationFailed,
+    /// <summary>No scalar schema type matches the version CLR type.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_UNRESOLVED_SCALAR_TYPE")]
+    ApiVersionDefinitionUnresolvedScalarType,
 
-    /// <summary>
-    ///     A discovered configuration threw while exposing its identity or applying its configuration.
-    /// </summary>
-    [EnumMember(Value = "API_CONFIGURATION_EXECUTION_FAILED")]
-    ApiConfigurationExecutionFailed,
-    #endregion
+    /// <summary>No API property matches the property-backed version property reference.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_UNRESOLVED_PROPERTY")]
+    ApiVersionDefinitionUnresolvedProperty,
 
-    #region ApiAssembly Compilation Codes
-    /// <summary>
-    ///     Assembly type discovery failed while scanning an assembly or evaluating a candidate
-    ///     filter.
-    /// </summary>
-    [EnumMember(Value = "API_ASSEMBLY_DISCOVERY_FAILED")]
-    ApiAssemblyDiscoveryFailed,
-    #endregion
+    /// <summary>The property-backed version refers to a non-scalar API property.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_NON_SCALAR_PROPERTY")]
+    ApiVersionDefinitionNonScalarProperty,
 
-    #region ApiAnnotation Compilation Codes
-    /// <summary>
-    ///     An annotation reader threw while reading metadata for a schema target.
-    /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_READER_EXECUTION_FAILED")]
-    ApiAnnotationReaderExecutionFailed,
+    /// <summary>The version member and scalar API type use different CLR types.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_CLR_TYPE_MISMATCH")]
+    ApiVersionDefinitionClrTypeMismatch,
 
-    /// <summary>
-    ///     An annotation reader returned an invalid or unsupported contribution.
-    /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_INVALID_CONTRIBUTION")]
-    ApiAnnotationInvalidContribution,
-
-    /// <summary>
-    ///     A CLR type has conflicting built-in API type marker annotations.
-    /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_TYPE_MARKER_CONFLICT")]
-    ApiAnnotationTypeMarkerConflict,
-
-    /// <summary>
-    ///     Multiple annotation readers discovered different API type kinds for the same CLR type.
-    /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_TYPE_DISCOVERY_CONFLICT")]
-    ApiAnnotationTypeDiscoveryConflict,
-
-    /// <summary>
-    ///     Multiple annotation key paths use the same order within one named key.
-    /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_KEY_ORDER_CONFLICT")]
-    ApiAnnotationKeyOrderConflict,
-
-    /// <summary>
-    ///     An annotation reader returned multiple valid version declarations for one object type.
-    /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_VERSION_CONFLICT")]
-    ApiAnnotationVersionConflict,
-    #endregion
-
-    #region ApiRelationshipTraversal Compilation Codes
-    /// <summary>A relationship traversal has an invalid API name.</summary>
-    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_API_NAME")]
-    ApiRelationshipTraversalInvalidApiName,
-
-    /// <summary>A relationship traversal has an invalid CLR navigation member binding.</summary>
-    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_CLR_MEMBER")]
-    ApiRelationshipTraversalInvalidClrMember,
-
-    /// <summary>
-    ///     A relationship traversal conflicts with another API field on its source type.
-    /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_DUPLICATE_API_NAME")]
-    ApiRelationshipTraversalDuplicateApiName,
-
-    /// <summary>A CLR member is bound to both a contained property and a traversal.</summary>
-    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_CLR_MEMBER_CONFLICT")]
-    ApiRelationshipTraversalClrMemberConflict,
+    /// <summary>The property-backed version refers to an optional API property.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_OPTIONAL_PROPERTY")]
+    ApiVersionDefinitionOptionalProperty,
     #endregion
 }

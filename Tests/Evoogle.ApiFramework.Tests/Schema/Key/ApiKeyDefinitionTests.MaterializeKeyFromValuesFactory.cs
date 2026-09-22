@@ -14,15 +14,9 @@ namespace Evoogle.ApiFramework.Schema.Key;
 public static class ApiKeyDefinitionMaterializeKeyFromValuesTestFactory
 {
     #region Configure Values Methods
-    public static void ConfigureTextIntTerminalScalar(ApiKeyMaterializationContext context)
-    {
-        context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), "1234");
-    }
+    public static void ConfigureTextIntTerminalScalar(ApiKeyMaterializationContext context) => context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), "1234");
 
-    public static void ConfigureTextStringTerminalScalar(ApiKeyMaterializationContext context)
-    {
-        context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Name), "1234");
-    }
+    public static void ConfigureTextStringTerminalScalar(ApiKeyMaterializationContext context) => context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Name), "1234");
 
     public static void ConfigureCompositeApiKeyValues(ApiKeyMaterializationContext context)
     {
@@ -53,10 +47,7 @@ public static class ApiKeyDefinitionMaterializeKeyFromValuesTestFactory
             .WithKey<KeyOwnedComposite>(nameof(KeyOwnedComposite.LineNumber), 3);
     }
 
-    public static void ConfigureOwnerOnlyDependentKey(ApiKeyMaterializationContext context)
-    {
-        context.WithText<KeyOwner>(nameof(KeyOwner.Id), "99");
-    }
+    public static void ConfigureOwnerOnlyDependentKey(ApiKeyMaterializationContext context) => context.WithText<KeyOwner>(nameof(KeyOwner.Id), "99");
 
     public static void ConfigureCustomPartNameFormatterValues(ApiKeyMaterializationContext context)
     {
@@ -65,34 +56,16 @@ public static class ApiKeyDefinitionMaterializeKeyFromValuesTestFactory
             .WithText<KeyTwoScalarPartComposite>(nameof(KeyTwoScalarPartComposite.Id2), "abc");
     }
 
-    public static void ConfigureMissingCompositeValue(ApiKeyMaterializationContext context)
-    {
-        context.WithKey<KeyTwoScalarPartComposite>(nameof(KeyTwoScalarPartComposite.Id1), 1);
-    }
+    public static void ConfigureMissingCompositeValue(ApiKeyMaterializationContext context) => context.WithKey<KeyTwoScalarPartComposite>(nameof(KeyTwoScalarPartComposite.Id1), 1);
 
-    public static void ConfigureNullText(ApiKeyMaterializationContext context)
-    {
-        context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), null);
-    }
+    public static void ConfigureNullText(ApiKeyMaterializationContext context) => context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), null);
 
-    public static void ConfigureWhitespaceText(ApiKeyMaterializationContext context)
-    {
-        context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), "   ");
-    }
+    public static void ConfigureWhitespaceText(ApiKeyMaterializationContext context) => context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), "   ");
 
-    public static void ConfigureEmptyApiKey(ApiKeyMaterializationContext context)
-    {
-        context.WithKey<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), ApiKey.Empty);
-    }
+    public static void ConfigureEmptyApiKey(ApiKeyMaterializationContext context) => context.WithKey<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), ApiKey.Empty);
 
-    public static void ConfigureInvalidTextParse(ApiKeyMaterializationContext context)
-    {
-        context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), "abc");
-    }
+    public static void ConfigureInvalidTextParse(ApiKeyMaterializationContext context) => context.WithText<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), "abc");
 
-    public static void ConfigureMismatchedApiKeyKind(ApiKeyMaterializationContext context)
-    {
-        context.WithKey<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), ApiKey.FromString("1234"));
-    }
+    public static void ConfigureMismatchedApiKeyKind(ApiKeyMaterializationContext context) => context.WithKey<KeyOneScalarPart>(nameof(KeyOneScalarPart.Id), ApiKey.FromString("1234"));
     #endregion
 }

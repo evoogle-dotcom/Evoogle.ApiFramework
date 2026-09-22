@@ -4,7 +4,8 @@
 
 Accepted on 2026-09-16 for the operation runtime alpha. The schema metadata, builders,
 compilation, and JSON foundation were implemented on 2026-09-16. Service retrieval and client
-materialization remain part of the operation runtime alpha.
+materialization remain part of the operation runtime alpha. Reusable CLR-member and API-property
+reference models were adopted on 2026-09-19.
 
 ## Context and Problem Statement
 
@@ -86,6 +87,32 @@ Order --customer--> Person          Order --customer--> Person
 This use of *navigation member* means a CLR member bound to a traversal. Existing schema usage of
 *navigational relationship* to mean a relationship without a foreign-key binding is a separate
 concept; it does not imply that a CLR member exists.
+
+### Reference and binding model
+
+Schema components distinguish a configured identity from the target resolved during compilation:
+
+- `ApiClrMemberReference` identifies one public instance CLR property or field by the required pair
+  `ClrMemberName` and `ClrMemberKind`. A traversal owns either one complete reference or no reference;
+  absence means the traversal has no CLR navigation binding.
+- `ApiPropertyReference` identifies a declared `ApiProperty` by exactly one of its API name or CLR
+  name. The reference does not repeat `ClrMemberKind`; that is declaration metadata owned by the
+  resolved `ApiProperty`.
+- Internal one-shot bindings retain configured references and their resolved targets. Resolution
+  occurs during schema compilation, and a failed resolution consumes the binding attempt just as a
+  successful resolution does.
+
+This follows the existing `ApiTypeReference` and `ApiTypeBinding` split. CLR-member references are
+used when a consumer binds directly to POCO structure. API-property references are used when a
+consumer refers to schema-declared property metadata. Consequently, relationship traversals use
+CLR-member references, while key-path segments and property-backed version definitions use
+API-property references.
+
+Key paths may mix API-name and CLR-name property references. After successful compilation,
+`ApiKeyPath.ClrPath` is derived from the resolved properties' CLR names, regardless of how each
+segment was configured. Compact `ClrPath` JSON is used only when every segment was configured by
+CLR name and no segment extension requires detailed output; API-name or mixed paths use detailed
+`ApiSegments` JSON so reference identity survives a round trip.
 
 ## Service Retrieval
 

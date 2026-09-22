@@ -88,7 +88,7 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
         return this;
     }
 
-    /// <inheritdoc cref="ApiObjectTypeBuilder.WithVersion"/>
+    /// <inheritdoc cref="ApiObjectTypeBuilder.WithVersion(string, Action{ApiVersionDefinitionBuilder}?)"/>
     public new ApiObjectTypeBuilder<TObject> WithVersion
     (
         string clrMemberName,
@@ -96,6 +96,17 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     )
     {
         base.WithVersion(clrMemberName, configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.WithVersion(ApiPropertyReference, Action{ApiVersionDefinitionBuilder}?)"/>
+    public new ApiObjectTypeBuilder<TObject> WithVersion
+    (
+        ApiPropertyReference apiPropertyReference,
+        Action<ApiVersionDefinitionBuilder>? configure = null
+    )
+    {
+        base.WithVersion(apiPropertyReference, configure);
         return this;
     }
 

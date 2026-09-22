@@ -59,10 +59,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipAssociationBuilder AddRelationshipAssociationExtension(Type extensionType, object extension)
-    {
-        return this.AddExtension(extensionType, extension);
-    }
+    public ApiRelationshipAssociationBuilder AddRelationshipAssociationExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
     #endregion
 
     #region WithForeignKey Methods
@@ -189,10 +186,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
 
     #region Configuration Source Methods
     /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
-    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
-    {
-        _configurationSourceScope.Apply(source, configure);
-    }
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
     #endregion
 
     #region Build Methods

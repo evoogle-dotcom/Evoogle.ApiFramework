@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Version;
+using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Version;
 
@@ -11,14 +12,18 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Version;
 public sealed class ApiVersionDefinitionBuilder : ExtensionBuilder<ApiVersionDefinitionBuilder>
 {
     #region Fields
-    private readonly string? _clrMemberName;
+    private readonly ApiPropertyReference? _apiPropertyReference;
     private readonly Type? _clrRepositoryType;
     #endregion
 
     #region Constructors
     internal ApiVersionDefinitionBuilder(string clrMemberName)
+        : this(ApiPropertyReference.ClrRef(clrMemberName))
+    { }
+
+    internal ApiVersionDefinitionBuilder(ApiPropertyReference apiPropertyReference)
     {
-        _clrMemberName = clrMemberName;
+        _apiPropertyReference = apiPropertyReference;
     }
 
     internal ApiVersionDefinitionBuilder(Type clrType)
@@ -39,8 +44,8 @@ public sealed class ApiVersionDefinitionBuilder : ExtensionBuilder<ApiVersionDef
     #region Build Methods
     internal ApiVersionDefinition Build()
     {
-        var apiVersionDefinition = _clrMemberName is not null
-            ? new ApiVersionDefinition(_clrMemberName)
+        var apiVersionDefinition = _apiPropertyReference is not null
+            ? new ApiVersionDefinition(_apiPropertyReference)
             : new ApiVersionDefinition(_clrRepositoryType!);
         var extensions = this.BuildExtensions();
         if (extensions is not null)

@@ -47,10 +47,7 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
             this.WriteLine($"Actual:   {this.Actual}");
         }
 
-        protected override void Assert()
-        {
-            this.Actual.Should().Be(this.Expected);
-        }
+        protected override void Assert() => this.Actual.Should().Be(this.Expected);
         #endregion
     }
 

@@ -761,15 +761,15 @@ public partial class ApiTypeTests
                 ],
                 ApiKeys:
                 [
-                    new ApiKeyDef
+                    new ApiKeyDefinitionDef
                     (
                         ApiName: "PK_Company_Id",
-                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiSegments: [new ApiKeyPathSegmentDef(ApiPropertyReference: new ApiPropertyReferenceDef(ApiName: null, ClrName: nameof(Company.Id)))])]
                     ),
-                    new ApiKeyDef
+                    new ApiKeyDefinitionDef
                     (
                         ApiName: "AK_Company_Name",
-                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiSegments: [new ApiKeyPathSegmentDef(ApiPropertyReference: new ApiPropertyReferenceDef(ApiName: null, ClrName: nameof(Company.Name)))])]
                     )
                 ]
             ),
@@ -1289,15 +1289,15 @@ public partial class ApiTypeTests
                 ],
                 ApiKeys:
                 [
-                    new ApiKeyDef
+                    new ApiKeyDefinitionDef
                     (
                         ApiName: "PK_Company_Id",
-                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiSegments: [new ApiKeyPathSegmentDef(ApiPropertyReference: new ApiPropertyReferenceDef(ApiName: null, ClrName: nameof(Company.Id)))])]
                     ),
-                    new ApiKeyDef
+                    new ApiKeyDefinitionDef
                     (
                         ApiName: "AK_Company_Name",
-                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiSegments: [new ApiKeyPathSegmentDef(ApiPropertyReference: new ApiPropertyReferenceDef(ApiName: null, ClrName: nameof(Company.Name)))])]
                     )
                 ]
             ),

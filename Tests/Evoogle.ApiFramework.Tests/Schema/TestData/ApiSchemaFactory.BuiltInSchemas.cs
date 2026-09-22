@@ -55,7 +55,8 @@ public static partial class ApiSchemaFactory
         => WithExtensions(new ApiKeyPath(new ApiTypeReference(rootType), segments), extensions);
 
     private static ApiKeyPathSegment KPS(string propertyName, OrderedDictionary<Type, object>? extensions = null)
-         => WithExtensions(new ApiKeyPathSegment(propertyName), extensions);
+         => WithExtensions
+            (new ApiKeyPathSegment(ApiPropertyReference.ClrRef(propertyName)), extensions);
 
     private static ApiKeyDefinition KD(IEnumerable<ApiKeyPath> paths, OrderedDictionary<Type, object>? extensions = null)
         => WithExtensions(new ApiKeyDefinition(paths), extensions);
@@ -807,7 +808,7 @@ public static partial class ApiSchemaFactory
         ],
         apiVersion: new ApiVersionDefinition
         (
-            nameof(RelationshipCatalogItem.Revision)
+            ApiPropertyReference.ClrRef(nameof(RelationshipCatalogItem.Revision))
         ));
 
         // RelationshipCatalogKey
@@ -1018,7 +1019,7 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Point.Y),    expression: TE.ClrRef<long>(),   required: true),
             P(name: nameof(Point.Note), expression: TE.ClrRef<string>(), required: false)
         ],
-        apiVersion: new ApiVersionDefinition(nameof(Point.X)));
+        apiVersion: new ApiVersionDefinition(ApiPropertyReference.ClrRef(nameof(Point.X))));
 
         var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties:
