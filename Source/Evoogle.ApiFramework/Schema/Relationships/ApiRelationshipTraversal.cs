@@ -156,7 +156,7 @@ public sealed class ApiRelationshipTraversal(string apiName, ApiClrMemberReferen
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember;
-        var description = $"CLR navigation member '{this.ClrMemberReference!.ClrMemberName}' is "
+        var description = $"CLR navigation member '{this.ClrMemberReference!.ClrName}' is "
             + $"incompatible with '{targetType.ClrType}'";
         var remediation = "Bind a readable and writable member with the traversal's target and cardinality";
 

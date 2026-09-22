@@ -47,23 +47,23 @@ public static partial class ApiSchemaFactory
 
     public record ApiClrMemberReferenceDef
     {
-        public ApiClrMemberReferenceDef(string clrMemberName, ClrMemberKind clrMemberKind)
+        public ApiClrMemberReferenceDef(string clrName, ClrMemberKind clrKind)
         {
-            this.ClrMemberName = clrMemberName;
-            this.ClrMemberKind = clrMemberKind;
-            this.HasInvalidClrMemberKind = false;
+            this.ClrName = clrName;
+            this.ClrKind = clrKind;
+            this.HasInvalidClrKind = false;
         }
 
-        public ApiClrMemberReferenceDef(string? clrMemberName, ClrMemberKind? clrMemberKind, bool hasInvalidClrMemberKind)
+        public ApiClrMemberReferenceDef(string? clrName, ClrMemberKind? clrKind, bool hasInvalidClrKind)
         {
-            this.ClrMemberName = clrMemberName;
-            this.ClrMemberKind = clrMemberKind;
-            this.HasInvalidClrMemberKind = hasInvalidClrMemberKind;
+            this.ClrName = clrName;
+            this.ClrKind = clrKind;
+            this.HasInvalidClrKind = hasInvalidClrKind;
         }
 
-        public string? ClrMemberName { get; }
-        public ClrMemberKind? ClrMemberKind { get; }
-        public bool HasInvalidClrMemberKind { get; }
+        public string? ClrName { get; }
+        public ClrMemberKind? ClrKind { get; }
+        public bool HasInvalidClrKind { get; }
     };
 
     public record ApiCollectionTypeDef
@@ -293,9 +293,9 @@ public static partial class ApiSchemaFactory
 
         return new ApiClrMemberReference
         (
-            apiClrMemberReferenceDef.ClrMemberName!,
-            apiClrMemberReferenceDef.ClrMemberKind,
-            apiClrMemberReferenceDef.HasInvalidClrMemberKind
+            apiClrMemberReferenceDef.ClrName!,
+            apiClrMemberReferenceDef.ClrKind,
+            apiClrMemberReferenceDef.HasInvalidClrKind
         );
     }
 

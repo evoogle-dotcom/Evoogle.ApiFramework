@@ -72,16 +72,16 @@ public enum ApiSchemaCompilationCode
 
     #region ApiClrMemberReference Compilation Codes
     /// <summary>
-    ///     A CLR member reference has an invalid CLR member kind.
+    ///     A CLR member reference has an invalid CLR kind.
     /// </summary>
-    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_MEMBER_KIND")]
-    ApiClrMemberReferenceInvalidClrMemberKind,
+    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_KIND")]
+    ApiClrMemberReferenceInvalidClrKind,
 
     /// <summary>
-    ///     A CLR member reference has an invalid CLR member name.
+    ///     A CLR member reference has an invalid CLR name.
     /// </summary>
-    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_MEMBER_NAME")]
-    ApiClrMemberReferenceInvalidClrMemberName,
+    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_NAME")]
+    ApiClrMemberReferenceInvalidClrName,
     #endregion
 
     #region ApiCollectionType Compilation Codes

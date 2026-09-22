@@ -60,8 +60,8 @@ public class ApiRelationshipTraversalReferenceTests(ITestOutputHelper output) : 
                 );
                 this.Json.Should().Contain
                 (
-                    $"\"{nameof(ApiClrMemberReference.ClrMemberName)}\":" +
-                    $"\"{this.ClrMemberReference.ClrMemberName}\""
+                    $"\"{nameof(ApiClrMemberReference.ClrName)}\":" +
+                    $"\"{this.ClrMemberReference.ClrName}\""
                 );
             }
         }

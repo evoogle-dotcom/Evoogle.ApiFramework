@@ -115,7 +115,7 @@ public ApiPropertyBuilder(string apiName, string clrName);
 public ApiKeyPathBuilder AddPath(Type clrRootType, params string[] clrMemberNames);
 ```
 
-Use `ClrMemberName` when a name can identify either a CLR property or field. A more specific
+Use `ClrMemberName` when a name can identify either a CLR property or field and the containing type does not already establish the member context. Use `ClrName` in `ApiClrMemberReference`, where the containing type supplies that context. A more specific
 property-based name is appropriate only when the value is guaranteed to identify a CLR property
 and cannot identify a field.
 

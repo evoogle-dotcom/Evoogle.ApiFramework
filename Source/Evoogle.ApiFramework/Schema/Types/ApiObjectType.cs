@@ -331,13 +331,13 @@ public sealed partial class ApiObjectType
                 this.ApiProperties.Any(apiProperty => ClrNameComparer.Instance.Equals
                 (
                     apiProperty.ClrName,
-                    clrMemberReference.ClrMemberName
+                    clrMemberReference.ClrName
                 )))
             {
                 var apiPath = traversal.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Error;
                 var code = ApiSchemaCompilationCode.ApiRelationshipTraversalClrMemberConflict;
-                var description = $"CLR member '{clrMemberReference.ClrMemberName}' is bound to "
+                var description = $"CLR member '{clrMemberReference.ClrName}' is bound to "
                     + $"both a contained property and traversal on '{this.ApiName}'";
                 var remediation = "Bind the traversal to a distinct CLR member";
 

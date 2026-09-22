@@ -93,7 +93,7 @@ concept; it does not imply that a CLR member exists.
 Schema components distinguish a configured identity from the target resolved during compilation:
 
 - `ApiClrMemberReference` identifies one public instance CLR property or field by the required pair
-  `ClrMemberName` and `ClrMemberKind`. A traversal owns either one complete reference or no reference;
+  `ClrName` and `ClrKind`. A traversal owns either one complete reference or no reference;
   absence means the traversal has no CLR navigation binding.
 - `ApiPropertyReference` identifies a declared `ApiProperty` by exactly one of its API name or CLR
   name. The reference does not repeat `ClrMemberKind`; that is declaration metadata owned by the

@@ -690,7 +690,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
                         {
                             objectBuilder.RemoveConventionPropertyByClrName
                             (
-                                clrMemberReference.ClrMemberName
+                                clrMemberReference.ClrName
                             );
                         }
                     }
