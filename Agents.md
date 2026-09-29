@@ -51,7 +51,7 @@ The primary formatting conventions include:
 - CRLF line endings.
 - 4-space indentation.
 - A final newline.
-- A target maximum line length of 100 characters.
+- A target maximum line length of 120 characters.
 - File-scoped namespaces.
 - Opening braces on new lines.
 - Braces for control-flow statements.
