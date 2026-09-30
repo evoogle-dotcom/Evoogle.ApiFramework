@@ -7,7 +7,7 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
 
-/// <summary>Builds the expected <see cref="ApiSchema"/> from a built-in <see cref="TestData.ApiSchemaKind"/> fixture.</summary>
+/// <summary>Builds the expected <see cref="ApiSchema"/> from a built-in <see cref="ApiSchemaKind"/> fixture.</summary>
 public class ApiSchemaExpressionBuildThrowsTest : ApiSchemaExpressionBuildTest
 {
     #region User Supplied Properties

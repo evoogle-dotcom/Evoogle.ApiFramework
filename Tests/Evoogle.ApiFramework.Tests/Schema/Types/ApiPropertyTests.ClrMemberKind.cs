@@ -101,8 +101,8 @@ public partial class ApiPropertyTests
             this.ActualFieldValue = this.FieldApiProperty!
                 .GetValue<ClrMemberKindDerived, int>(this.ClrObject!);
 
-            this.PropertyApiProperty.SetValue<ClrMemberKindDerived, int>(this.ClrObject!, 30);
-            this.FieldApiProperty.SetValue<ClrMemberKindDerived, int>(this.ClrObject!, 40);
+            this.PropertyApiProperty.SetValue(this.ClrObject!, 30);
+            this.FieldApiProperty.SetValue(this.ClrObject!, 40);
         }
 
         protected override void Assert()
@@ -125,8 +125,7 @@ public partial class ApiPropertyTests
         },
         new GenericCacheBindingTest
         {
-            Name = $"{nameof(ApiProperty)} generic accessors cache {nameof(ClrMemberKind.Property)} and " +
-                $"{nameof(ClrMemberKind.Field)} separately",
+            Name = $"{nameof(ApiProperty)} generic accessors cache {nameof(ClrMemberKind.Property)} and {nameof(ClrMemberKind.Field)} separately",
         },
     ];
     #endregion
@@ -173,13 +172,10 @@ public partial class ApiPropertyTests
         }
         """;
 
-        var apiSchema = JsonSerializer.Deserialize<ApiSchema>(sourceJson)
-            ?? throw new InvalidOperationException($"{nameof(ApiSchema)} deserialization failed.");
-        var apiObjectType = apiSchema.GetObjectTypeByApiName(nameof(ClrMemberKindDerived))
-            ?? throw new InvalidOperationException($"{nameof(ApiObjectType)} lookup failed.");
+        var apiSchema = JsonSerializer.Deserialize<ApiSchema>(sourceJson) ?? throw new InvalidOperationException($"{nameof(ApiSchema)} deserialization failed.");
+        var apiObjectType = apiSchema.GetObjectTypeByApiName(nameof(ClrMemberKindDerived)) ?? throw new InvalidOperationException($"{nameof(ApiObjectType)} lookup failed.");
 
-        return apiObjectType.GetPropertyByApiName("Value")
-            ?? throw new InvalidOperationException($"{nameof(ApiProperty)} lookup failed.");
+        return apiObjectType.GetPropertyByApiName("Value") ?? throw new InvalidOperationException($"{nameof(ApiProperty)} lookup failed.");
     }
     #endregion
 }

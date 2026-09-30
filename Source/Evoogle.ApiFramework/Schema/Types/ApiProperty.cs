@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -11,8 +10,8 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
-using Evoogle.Coercion;
 using Evoogle.Extensions;
+using Evoogle.MemberAccess;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Types;
@@ -27,10 +26,9 @@ namespace Evoogle.ApiFramework.Schema.Types;
 ///         objects, collections, and complex types.
 ///     </para>
 ///     <para>
-///         For optimal performance, getter and setter accessors are compiled once during schema compilation
-///         as lambda expressions using the owning <see cref="ApiObjectType"/>'s CLR type. The compiled
-///         delegates are stored directly on each <see cref="ApiProperty"/> instance and provide near-native
-///         performance (~10-20x faster than reflection) for property/field access operations.
+///         During schema compilation, the CLR member is resolved to a <see cref="MemberAccessor"/>. Core owns
+///         the process-wide accessor and compiled-delegate caches, while this class provides schema-aware
+///         convenience methods that use the schema's configured type coercion.
 ///     </para>
 ///     <para>
 ///         The non-generic Try* methods accept <see cref="object"/> and will box value types by design. Prefer
@@ -40,68 +38,12 @@ namespace Evoogle.ApiFramework.Schema.Types;
 [JsonConverter(typeof(ApiPropertyJsonConverter))]
 public sealed partial class ApiProperty : ApiSchemaElement
 {
-    #region ApiProperty Types
-    private delegate void ClrByRefAction<TObject, in TValue>(ref TObject clrObject, ApiSchemaContext apiSchemaContext, TValue? clrValue);
-
-    private readonly record struct ClrCacheKey
-    (
-        Type ClrObjectType,
-        string ClrMemberName,
-        ClrMemberKind ClrMemberKind
-    );
-
-    private readonly record struct ClrGetterCacheValue<TObject, TValue>(Func<TObject, ApiSchemaContext, TValue?>? ClrGetter);
-
-    private readonly record struct ClrSetterCacheValue<TObject, TValue>(Action<TObject, ApiSchemaContext, TValue?>? ClrSetter);
-
-    private readonly record struct ClrSetterByRefCacheValue<TObject, TValue>(ClrByRefAction<TObject, TValue?>? ClrSetterByRef)
-        where TObject : struct;
-
-    private static class ClrGetterCache<TObject, TValue>
-    {
-        public static readonly ConcurrentDictionary<ClrCacheKey, ClrGetterCacheValue<TObject, TValue>> Cache = new();
-    }
-
-    private static class ClrSetterCache<TObject, TValue>
-    {
-        public static readonly ConcurrentDictionary<ClrCacheKey, ClrSetterCacheValue<TObject, TValue>> Cache = new();
-    }
-
-    private static class ClrSetterByRefCache<TObject, TValue>
-        where TObject : struct
-    {
-        public static readonly ConcurrentDictionary<ClrCacheKey, ClrSetterByRefCacheValue<TObject, TValue>> Cache = new();
-    }
-
-    private readonly record struct CoerceMethodCacheKey(Type ClrInputType, Type ClrOutputType);
-    #endregion
-
     #region ApiProperty Fields
     private readonly ClrMemberKind? _clrMemberKind;
 
+    private MemberAccessor? _clrMemberAccessor;
+
     private bool _hasInvalidApiTypeModifiers;
-
-    private Func<object, ApiSchemaContext, object?>? _clrGetter;
-
-    private Action<object, ApiSchemaContext, object?>? _clrSetter;
-
-    private static readonly ConcurrentDictionary<CoerceMethodCacheKey, MethodInfo> _coerceMethodCache = new();
-
-    private static readonly MethodInfo? _genericCoerceMethodDefinition = TypeReflection.GetGenericMethodDefinition
-    (
-        type: typeof(TypeCoercion),
-        methodName: nameof(TypeCoercion.Coerce),
-        bindingFlags: BindingFlags.Public | BindingFlags.Instance,
-        parameterCount: 2
-    );
-
-    private static readonly MethodInfo? _nonGenericCoerceMethod = TypeReflection.GetMethod
-    (
-        type: typeof(TypeCoercion),
-        methodName: nameof(TypeCoercion.Coerce),
-        bindingFlags: BindingFlags.Public | BindingFlags.Instance,
-        parameterTypes: [typeof(object), typeof(Type), typeof(TypeCoercionContext)]
-    );
     #endregion
 
     #region Constructors
@@ -173,12 +115,6 @@ public sealed partial class ApiProperty : ApiSchemaElement
     internal ApiTypeExpression ApiTypeExpression { get; }
 
     internal void MarkInvalidApiTypeModifiers() => _hasInvalidApiTypeModifiers = true;
-
-    private static MethodInfo GenericCoerceMethodDefinition => _genericCoerceMethodDefinition
-        ?? throw new ApiSchemaException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
-
-    private static MethodInfo NonGenericCoerceMethod => _nonGenericCoerceMethod
-        ?? throw new ApiSchemaException($"Failed to locate non-generic method for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
     #endregion
 
     #region ApiProperty Computed Properties
@@ -190,7 +126,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
     internal bool IsResolved => this.ApiTypeExpression?.IsResolved == true;
 
-    internal Type? ClrMemberType { get; private set; }
+    internal Type? ClrMemberType => _clrMemberAccessor?.MemberType;
     #endregion
 
     #region Object Methods
@@ -236,7 +172,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
         if (this.ValidateClrMemberKind(context) && this.ApiTypeExpression?.IsResolved == true)
         {
-            this.CompileClrGetterAndSetter(context);
+            this.InitializeClrMemberAccessor(context);
         }
     }
 
@@ -285,52 +221,55 @@ public sealed partial class ApiProperty : ApiSchemaElement
         this.ApiTypeExpression.ResolveForProperty(context);
     }
 
-    private void CompileClrFieldGetterAndSetter(ApiSchemaCompilationContext context, FieldInfo clrFieldInfo)
+    private void InitializeClrFieldAccessor(ApiSchemaCompilationContext context, FieldInfo clrFieldInfo)
     {
-        var apiObjectType = this.GetApiObjectType();
-        var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
+        var clrMemberAccessor = MemberAccessor.Create(clrFieldInfo);
+        _clrMemberAccessor = clrMemberAccessor;
 
-        // Build compiled field getter and setter
-        try
+        if (clrMemberAccessor.CanRead)
         {
-            _clrGetter = BuildNonGenericClrFieldGetter(clrObjectType, clrFieldInfo);
-        }
-        catch (Exception ex)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyInvalidFieldGetter;
-            var description = $"Failed to compile field getter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
-            var remediation = $"Verify that field '{clrMemberName}' is readable and can be used in expression trees";
+            try
+            {
+                MemberAccessorFactory.CreateGetter(clrFieldInfo);
+            }
+            catch (Exception ex)
+            {
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiPropertyInvalidFieldGetter;
+                var rootCause = GetGetterRootCauseMessage(ex, clrFieldInfo.FieldType);
+                var description = $"Failed to compile field getter for '{clrMemberName}': {rootCause}";
+                var remediation = $"Verify that field '{clrMemberName}' is readable and can be used in expression trees";
 
-            context.AddIssue(severity, code, description, remediation);
-        }
-
-        try
-        {
-            _clrSetter = BuildNonGenericClrFieldSetter(clrObjectType, clrFieldInfo);
-        }
-        catch (Exception ex)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyInvalidFieldSetter;
-            var description = $"Failed to compile field setter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
-            var remediation = $"Verify that field '{clrMemberName}' is writable and can be used in expression trees";
-            context.AddIssue(severity, code, description, remediation);
+                context.AddIssue(severity, code, description, remediation);
+            }
         }
 
-        // Validate nullability alignment between API declaration and CLR member
+        if (clrMemberAccessor.CanWrite && !clrMemberAccessor.DeclaringType.IsValueType)
+        {
+            try
+            {
+                MemberAccessorFactory.CreateCoercingSetter(clrFieldInfo);
+            }
+            catch (Exception ex)
+            {
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiPropertyInvalidFieldSetter;
+                var description = $"Failed to compile field setter for '{clrMemberName}': {GetRootCauseMessage(ex)}";
+                var remediation = $"Verify that field '{clrMemberName}' is writable and can be used in expression trees";
+
+                context.AddIssue(severity, code, description, remediation);
+            }
+        }
+
         var clrFieldNullableInfo = FieldReflection.GetNullabilityInfo(clrFieldInfo);
         this.ValidateNullabilityMismatch(context, clrFieldNullableInfo, clrMemberName);
     }
 
-    private void CompileClrPropertyGetterAndSetter(ApiSchemaCompilationContext context, PropertyInfo clrPropertyInfo)
+    private void InitializeClrPropertyAccessor(ApiSchemaCompilationContext context, PropertyInfo clrPropertyInfo)
     {
-        var apiObjectType = this.GetApiObjectType();
-        var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
-        // Exclude indexers
         if (clrPropertyInfo.GetIndexParameters().Length > 0)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
@@ -341,44 +280,52 @@ public sealed partial class ApiProperty : ApiSchemaElement
             return;
         }
 
-        // Build compiled property getter and setter
-        try
-        {
-            _clrGetter = BuildNonGenericClrPropertyGetter(clrObjectType, clrPropertyInfo);
-        }
-        catch (Exception ex)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertyGetter;
-            var description = $"Failed to compile property getter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
-            var remediation = $"Verify that property '{clrMemberName}' is readable and can be used in expression trees";
+        var clrMemberAccessor = MemberAccessor.Create(clrPropertyInfo);
+        _clrMemberAccessor = clrMemberAccessor;
 
-            context.AddIssue(severity, code, description, remediation);
-        }
-
-        try
+        if (clrMemberAccessor.CanRead)
         {
-            _clrSetter = BuildNonGenericClrPropertySetter(clrObjectType, clrPropertyInfo);
-        }
-        catch (Exception ex)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertySetter;
-            var description = $"Failed to compile property setter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
-            var remediation = $"Verify that property '{clrMemberName}' is writable and can be used in expression trees";
+            try
+            {
+                MemberAccessorFactory.CreateGetter(clrPropertyInfo);
+            }
+            catch (Exception ex)
+            {
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertyGetter;
+                var rootCause = GetGetterRootCauseMessage(ex, clrPropertyInfo.PropertyType);
+                var description = $"Failed to compile property getter for '{clrMemberName}': {rootCause}";
+                var remediation = $"Verify that property '{clrMemberName}' is readable and can be used in expression trees";
 
-            context.AddIssue(severity, code, description, remediation);
+                context.AddIssue(severity, code, description, remediation);
+            }
         }
 
-        // Validate nullability alignment between API declaration and CLR member
+        if (clrMemberAccessor.CanWrite && !clrMemberAccessor.DeclaringType.IsValueType)
+        {
+            try
+            {
+                MemberAccessorFactory.CreateCoercingSetter(clrPropertyInfo);
+            }
+            catch (Exception ex)
+            {
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertySetter;
+                var description = $"Failed to compile property setter for '{clrMemberName}': {GetRootCauseMessage(ex)}";
+                var remediation = $"Verify that property '{clrMemberName}' is writable and can be used in expression trees";
+
+                context.AddIssue(severity, code, description, remediation);
+            }
+        }
+
         var clrPropertyNullableInfo = PropertyReflection.GetNullabilityInfo(clrPropertyInfo);
         this.ValidateNullabilityMismatch(context, clrPropertyNullableInfo, clrMemberName);
     }
 
-    private void CompileClrGetterAndSetter(ApiSchemaCompilationContext context)
+    private void InitializeClrMemberAccessor(ApiSchemaCompilationContext context)
     {
         var apiObjectType = this.GetApiObjectType();
-        var clrObjectType = apiObjectType.ClrType;
+        var clrObjectType = apiObjectType?.ClrType;
         var clrMemberName = this.ClrName;
 
         if (clrObjectType is null)
@@ -422,8 +369,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
                         return;
                     }
 
-                    this.ClrMemberType = clrPropertyInfo.PropertyType;
-                    this.CompileClrPropertyGetterAndSetter(context, clrPropertyInfo);
+                    this.InitializeClrPropertyAccessor(context, clrPropertyInfo);
                     return;
 
                 case ClrMemberKind.Field:
@@ -450,8 +396,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
                         return;
                     }
 
-                    this.ClrMemberType = clrFieldInfo.FieldType;
-                    this.CompileClrFieldGetterAndSetter(context, clrFieldInfo);
+                    this.InitializeClrFieldAccessor(context, clrFieldInfo);
                     return;
             }
         }
@@ -459,11 +404,24 @@ public sealed partial class ApiProperty : ApiSchemaElement
         {
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrMember;
-            var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {GetRootCauseMessage(ex)}";
             var remediation = $"Verify that '{clrMemberName}' exists as a public {this.ClrMemberKind.ToString().ToLowerInvariant()} on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
 
             context.AddIssue(severity, code, description, remediation);
         }
+    }
+
+    private static string GetRootCauseMessage(Exception exception)
+        => exception.GetBaseException().Message.TrimEnd('.');
+
+    private static string GetGetterRootCauseMessage(Exception exception, Type clrMemberType)
+    {
+        if (clrMemberType.IsPointer)
+        {
+            return $"No coercion operator is defined between types '{clrMemberType}' and '{typeof(object)}'";
+        }
+
+        return GetRootCauseMessage(exception);
     }
 
     private bool ValidateClrMemberKind(ApiSchemaCompilationContext context)
