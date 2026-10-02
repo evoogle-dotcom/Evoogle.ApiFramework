@@ -70,18 +70,42 @@ public enum ApiSchemaCompilationCode
     ApiAssemblyDiscoveryFailed,
     #endregion
 
-    #region ApiClrMemberReference Compilation Codes
+    #region ClrMemberReference Compilation Codes
     /// <summary>
     ///     A CLR member reference has an invalid CLR kind.
     /// </summary>
     [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_KIND")]
-    ApiClrMemberReferenceInvalidClrKind,
+    ClrMemberReferenceInvalidClrKind,
 
     /// <summary>
     ///     A CLR member reference has an invalid CLR name.
     /// </summary>
     [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_NAME")]
-    ApiClrMemberReferenceInvalidClrName,
+    ClrMemberReferenceInvalidClrName,
+
+    /// <summary>
+    ///     A CLR member reference could not resolve its property or field.
+    /// </summary>
+    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_UNRESOLVED")]
+    ClrMemberReferenceUnresolved,
+
+    /// <summary>
+    ///     A resolved CLR member is incompatible with its schema role.
+    /// </summary>
+    [EnumMember(Value = "API_CLR_MEMBER_INCOMPATIBLE")]
+    ClrMemberIncompatible,
+
+    /// <summary>
+    ///     A CLR member getter could not be created or is invalid.
+    /// </summary>
+    [EnumMember(Value = "API_CLR_MEMBER_INVALID_GETTER")]
+    ClrMemberInvalidGetter,
+
+    /// <summary>
+    ///     A CLR member setter could not be created or is invalid.
+    /// </summary>
+    [EnumMember(Value = "API_CLR_MEMBER_INVALID_SETTER")]
+    ClrMemberInvalidSetter,
     #endregion
 
     #region ApiCollectionType Compilation Codes
@@ -288,52 +312,10 @@ public enum ApiSchemaCompilationCode
     ApiPropertyInvalidApiName,
 
     /// <summary>
-    ///     The property's CLR name is null, empty, or whitespace.
-    /// </summary>
-    [EnumMember(Value = "API_PROPERTY_INVALID_CLR_NAME")]
-    ApiPropertyInvalidClrName,
-
-    /// <summary>
-    ///     The property's CLR member is not a valid field or property.
-    /// </summary>
-    [EnumMember(Value = "API_PROPERTY_INVALID_CLR_MEMBER")]
-    ApiPropertyInvalidClrMember,
-
-    /// <summary>
     ///     The property's type modifiers could not be read from schema JSON.
     /// </summary>
     [EnumMember(Value = "API_PROPERTY_INVALID_API_TYPE_MODIFIERS")]
     ApiPropertyInvalidApiTypeModifiers,
-
-    /// <summary>
-    ///     The property's field getter could not be created or is invalid.
-    /// </summary>
-    [EnumMember(Value = "API_PROPERTY_INVALID_FIELD_GETTER")]
-    ApiPropertyInvalidFieldGetter,
-
-    /// <summary>
-    ///     The property's field setter could not be created or is invalid.
-    /// </summary>
-    [EnumMember(Value = "API_PROPERTY_INVALID_FIELD_SETTER")]
-    ApiPropertyInvalidFieldSetter,
-
-    /// <summary>
-    ///     The property's property getter could not be created or is invalid.
-    /// </summary>
-    [EnumMember(Value = "API_PROPERTY_INVALID_PROPERTY_GETTER")]
-    ApiPropertyInvalidPropertyGetter,
-
-    /// <summary>
-    ///     The property's property setter could not be created or is invalid.
-    /// </summary>
-    [EnumMember(Value = "API_PROPERTY_INVALID_PROPERTY_SETTER")]
-    ApiPropertyInvalidPropertySetter,
-
-    /// <summary>
-    ///     The property's CLR member (field or property) could not be found on the CLR type.
-    /// </summary>
-    [EnumMember(Value = "API_PROPERTY_MISSING_CLR_MEMBER")]
-    ApiPropertyMissingClrMember,
 
     /// <summary>
     ///     The property's type expression is null.
@@ -489,10 +471,6 @@ public enum ApiSchemaCompilationCode
     [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_API_NAME")]
     ApiRelationshipTraversalInvalidApiName,
 
-    /// <summary>A relationship traversal has an invalid CLR navigation member binding.</summary>
-    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_CLR_MEMBER")]
-    ApiRelationshipTraversalInvalidClrMember,
-
     /// <summary>
     ///     A relationship traversal conflicts with another API field on its source type.
     /// </summary>
@@ -501,7 +479,7 @@ public enum ApiSchemaCompilationCode
 
     /// <summary>A CLR member is bound to both a contained property and a traversal.</summary>
     [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_CLR_MEMBER_CONFLICT")]
-    ApiRelationshipTraversalClrMemberConflict,
+    ApiRelationshipTraversalClrNavigationMemberConflict,
     #endregion
 
     #region ApiSchemaElement Compilation Codes

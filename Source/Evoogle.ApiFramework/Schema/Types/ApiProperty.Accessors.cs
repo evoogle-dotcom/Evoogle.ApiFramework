@@ -133,7 +133,7 @@ public sealed partial class ApiProperty
     /// <summary>Attempts to get the member value, optionally coercing it to <paramref name="clrValueType"/>.</summary>
     public bool TryGetValue(object? clrObject, out object? clrValue, Type? clrValueType = null)
     {
-        var accessor = _clrMemberAccessor;
+        var accessor = _clrMemberBinding.BoundClrMemberAccessor;
         if (clrObject is null || accessor?.CanRead != true)
         {
             clrValue = default;
@@ -148,7 +148,7 @@ public sealed partial class ApiProperty
     /// <summary>Attempts to get the member value using the requested generic types.</summary>
     public bool TryGetValue<TObject, TValue>(TObject? clrObject, out TValue? clrValue)
     {
-        var accessor = _clrMemberAccessor;
+        var accessor = _clrMemberBinding.BoundClrMemberAccessor;
         if (clrObject is null || accessor?.CanRead != true)
         {
             clrValue = default;
@@ -165,7 +165,7 @@ public sealed partial class ApiProperty
     /// <summary>Attempts to set the member value, coercing it when needed.</summary>
     public bool TrySetValue(object? clrObject, object? clrValue)
     {
-        var accessor = _clrMemberAccessor;
+        var accessor = _clrMemberBinding.BoundClrMemberAccessor;
         return clrObject is not null
             && accessor?.CanWrite == true
             && accessor.TrySetValue(clrObject, clrValue, this.ApiSchemaContext.TypeCoercion, this.ApiSchemaContext.TypeCoercionContext);
@@ -174,7 +174,7 @@ public sealed partial class ApiProperty
     /// <summary>Attempts to set the member value using the requested generic types.</summary>
     public bool TrySetValue<TObject, TValue>(TObject? clrObject, TValue? clrValue)
     {
-        var accessor = _clrMemberAccessor;
+        var accessor = _clrMemberBinding.BoundClrMemberAccessor;
         if (clrObject is null || accessor?.CanWrite != true)
         {
             return false;
@@ -189,7 +189,7 @@ public sealed partial class ApiProperty
     public bool TrySetValueByRef<TObject, TValue>(ref TObject clrObject, TValue? clrValue)
         where TObject : struct
     {
-        var accessor = _clrMemberAccessor;
+        var accessor = _clrMemberBinding.BoundClrMemberAccessor;
         if (accessor?.CanWrite != true)
         {
             return false;
@@ -248,7 +248,7 @@ public sealed partial class ApiProperty
     #region Implementation Methods
     private MemberAccessor RequireClrMemberAccessor(bool canRead)
     {
-        var accessor = _clrMemberAccessor;
+        var accessor = _clrMemberBinding.BoundClrMemberAccessor;
         var isAvailable = canRead ? accessor?.CanRead == true : accessor?.CanWrite == true;
         if (isAvailable)
         {

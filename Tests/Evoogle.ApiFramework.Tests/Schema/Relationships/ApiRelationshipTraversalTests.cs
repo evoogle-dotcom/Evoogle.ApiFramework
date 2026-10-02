@@ -132,7 +132,7 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 //             people.SourceObjectType.Should().BeSameAs(orderType);
 //             people.TargetObjectType.Should().BeSameAs(personType);
 //             people.IsToMany.Should().BeTrue();
-//             people.HasClrMember.Should().Be(this.UseClrBindings);
+//             people.HasClrNavigationMember.Should().Be(this.UseClrBindings);
 //             orderType.ApiProperties.Should().ContainSingle(property =>
 //                 property.ApiName == "contactPerson" &&
 //                 ReferenceEquals(property.ApiType, personType));
@@ -142,7 +142,7 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 //             order.SourceObjectType.Should().BeSameAs(personType);
 //             order.TargetObjectType.Should().BeSameAs(orderType);
 //             order.IsToMany.Should().BeFalse();
-//             order.HasClrMember.Should().Be(this.UseClrBindings);
+//             order.HasClrNavigationMember.Should().Be(this.UseClrBindings);
 //             if (!this.UseClrBindings)
 //             {
 //                 _json.Should().NotContain("\"ClrMemberName\"");
@@ -202,14 +202,14 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 //                 _result!.Schema.Should().BeNull();
 //                 var expectedCode = this.ExplicitPropertyApiName == "people"
 //                     ? ApiSchemaCompilationCode.ApiRelationshipTraversalDuplicateApiName
-//                     : ApiSchemaCompilationCode.ApiRelationshipTraversalClrMemberConflict;
+//                     : ApiSchemaCompilationCode.ApiRelationshipTraversalClrNavigationMemberConflict;
 //                 _result.Issues.Should().ContainSingle(issue =>
 //                     issue.Code == expectedCode);
 //                 if (this.ExplicitPropertyApiName == "people")
 //                 {
 //                     _result.Issues.Should().ContainSingle(issue =>
 //                         issue.Code ==
-//                             ApiSchemaCompilationCode.ApiRelationshipTraversalClrMemberConflict);
+//                             ApiSchemaCompilationCode.ApiRelationshipTraversalClrNavigationMemberConflict);
 //                 }
 //                 return;
 //             }

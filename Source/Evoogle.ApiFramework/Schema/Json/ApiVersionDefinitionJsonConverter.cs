@@ -28,10 +28,7 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ApiPropertyReference = policy.ConvertName
-                (
-                    nameof(ApiVersionDefinition.ApiPropertyReference)
-                ),
+                ApiPropertyReference = policy.ConvertName(nameof(ApiVersionDefinition.ApiProperty)), // Mapping property name from ApiPropertyReference to ApiProperty by design
                 ClrType = policy.ConvertName(nameof(ApiVersionDefinition.ClrType)),
                 ExtensibleBase = GetExtensiblePropertyNames(policy)
             };

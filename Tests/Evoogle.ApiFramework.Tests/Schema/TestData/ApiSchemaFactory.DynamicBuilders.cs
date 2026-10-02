@@ -25,36 +25,16 @@ public static partial class ApiSchemaFactory
     ) : ApiSchemaElementDef(ExtensionTypes);
 
     // Types
-
-    // public record ApiVersionDefinitionDef : ApiSchemaElementDef
-    // {
-    //     public ApiVersionDefinitionDef(Type clrType, List<Type>? extensionTypes = null)
-    //         : base(extensionTypes)
-    //     {
-    //         this.ClrType = clrType;
-    //     }
-
-    //     public ApiVersionDefinitionDef(ApiPropertyReferenceDef apiPropertyReference, List<Type>? extensionTypes = null)
-    //         : base(extensionTypes)
-    //     {
-    //         this.ApiPropertyReference = apiPropertyReference;
-    //     }
-
-    //     public Type? ClrType { get; }
-    //     public ApiPropertyReferenceDef? ApiPropertyReference { get; }
-    // }
-
-
-    public record ApiClrMemberReferenceDef
+    public record ClrMemberReferenceDef
     {
-        public ApiClrMemberReferenceDef(ClrMemberKind clrKind, string clrName)
+        public ClrMemberReferenceDef(ClrMemberKind clrKind, string clrName)
         {
             this.ClrKind = clrKind;
             this.ClrName = clrName;
             this.HasInvalidClrKind = false;
         }
 
-        public ApiClrMemberReferenceDef(ClrMemberKind? clrKind, string? clrName, bool hasInvalidClrKind)
+        public ClrMemberReferenceDef(ClrMemberKind? clrKind, string? clrName, bool hasInvalidClrKind)
         {
             this.ClrKind = clrKind;
             this.ClrName = clrName;
@@ -179,6 +159,7 @@ public static partial class ApiSchemaFactory
     public record ApiRelationshipDependentEndDef
     (
         ApiTypeReferenceDef ApiObjectTypeReference,
+        ApiRelationshipTraversalDef? ApiTraversal = null,
         ApiKeyDefinitionDef? ApiForeignKey = null,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipElementDef(ApiObjectTypeReference, ExtensionTypes);
@@ -220,9 +201,17 @@ public static partial class ApiSchemaFactory
     public record ApiRelationshipPrincipalEndDef
     (
         ApiTypeReferenceDef ApiObjectTypeReference,
+        ApiRelationshipTraversalDef? ApiTraversal = null,
         string? ApiPrincipalKeyName = null,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipElementDef(ApiObjectTypeReference, ExtensionTypes);
+
+    public record ApiRelationshipTraversalDef
+    (
+        string ApiName,
+        ClrMemberReferenceDef? ClrNavigationMember = null,
+        List<Type>? ExtensionTypes = null
+    ) : ApiSchemaElementDef(ExtensionTypes);
 
     // Version
     public record ApiVersionDefinitionDef : ApiSchemaElementDef
@@ -284,18 +273,18 @@ public static partial class ApiSchemaFactory
     }
 
     // Types
-    public static ApiClrMemberReference? BuildApiClrMemberReference(ApiClrMemberReferenceDef? apiClrMemberReferenceDef)
+    public static ClrMemberReference? BuildClrMemberReference(ClrMemberReferenceDef? clrMemberReferenceDef)
     {
-        if (apiClrMemberReferenceDef == null)
+        if (clrMemberReferenceDef == null)
         {
             return default;
         }
 
-        return new ApiClrMemberReference
+        return new ClrMemberReference
         (
-            apiClrMemberReferenceDef.ClrKind,
-            apiClrMemberReferenceDef.ClrName!,
-            apiClrMemberReferenceDef.HasInvalidClrKind
+            clrMemberReferenceDef.ClrKind,
+            clrMemberReferenceDef.ClrName!,
+            clrMemberReferenceDef.HasInvalidClrKind
         );
     }
 
@@ -659,13 +648,14 @@ public static partial class ApiSchemaFactory
     private static ApiRelationshipPrincipalEnd BuildApiRelationshipPrincipalEnd(ApiRelationshipPrincipalEndDef def)
     {
         var apiObjectTypeReference = BuildApiTypeReference(def.ApiObjectTypeReference)!;
+        var apiTraversal = def.ApiTraversal != null ? BuildApiRelationshipTraversal(def.ApiTraversal) : null;
         var apiPrincipalKeyName = def.ApiPrincipalKeyName;
 
         var apiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEnd
         (
             apiObjectTypeReference,
-            apiTraversal: null,
-            apiPrincipalKeyName: apiPrincipalKeyName
+            apiTraversal,
+            apiPrincipalKeyName
         );
 
         AttachExtensions(apiRelationshipPrincipalEnd, def);
@@ -676,15 +666,33 @@ public static partial class ApiSchemaFactory
     private static ApiRelationshipDependentEnd BuildApiRelationshipDependentEnd(ApiRelationshipDependentEndDef def)
     {
         var apiObjectTypeReference = BuildApiTypeReference(def.ApiObjectTypeReference)!;
+        var apiTraversal = def.ApiTraversal != null ? BuildApiRelationshipTraversal(def.ApiTraversal) : null;
         var apiForeignKey = def.ApiForeignKey != null ? BuildApiKeyDefinition(def.ApiForeignKey) : null;
 
-        var apiRelationshipDependentEnd = apiForeignKey != null
-            ? new ApiRelationshipDependentEnd(apiObjectTypeReference, apiTraversal: null, apiForeignKey: apiForeignKey)
-            : new ApiRelationshipDependentEnd(apiObjectTypeReference, apiTraversal: null, apiForeignKey: null);
+        var apiRelationshipDependentEnd = new ApiRelationshipDependentEnd
+        (
+            apiObjectTypeReference,
+            apiTraversal,
+            apiForeignKey
+        );
 
         AttachExtensions(apiRelationshipDependentEnd, def);
 
         return apiRelationshipDependentEnd;
+    }
+
+    private static ApiRelationshipTraversal BuildApiRelationshipTraversal(ApiRelationshipTraversalDef def)
+    {
+        var apiName = def.ApiName;
+        var clrNavigationMember = def.ClrNavigationMember != null
+            ? BuildClrMemberReference(def.ClrNavigationMember)
+            : null;
+
+        var apiRelationshipTraversal = new ApiRelationshipTraversal(apiName, clrNavigationMember);
+
+        AttachExtensions(apiRelationshipTraversal, def);
+
+        return apiRelationshipTraversal;
     }
 
     // Extensions

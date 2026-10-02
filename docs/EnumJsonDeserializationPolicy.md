@@ -71,7 +71,7 @@ the materializer must opt in only the JSON property names whose null values it n
 
 `ApiProperty.ClrMemberKind` is the first use of this policy. It is required metadata whose only
 concrete values are `Property` and `Field`. JSON materialization may hold a nullable backing value;
-schema compilation reports `ApiPropertyInvalidClrMember` when that value is absent or invalid.
+schema compilation reports `ClrMemberReferenceInvalidClrKind` when that value is absent or invalid.
 After successful compilation, `ClrMemberKind` is non-null and forms, together with `ClrName`,
 the authoritative CLR member-binding identity.
 

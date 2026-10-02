@@ -56,6 +56,12 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipEnd — cycle: end → relationship → end → ...
         new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
 
+        // ApiRelationshipTraversal — cycles: traversal → relationship end / object type → traversal → ...
+        new ExcludeMember(typeof(ApiRelationshipTraversal), nameof(ApiRelationshipTraversal.SourceEnd)),
+        new ExcludeMember(typeof(ApiRelationshipTraversal), nameof(ApiRelationshipTraversal.TargetEnd)),
+        new ExcludeMember(typeof(ApiRelationshipTraversal), nameof(ApiRelationshipTraversal.SourceObjectType)),
+        new ExcludeMember(typeof(ApiRelationshipTraversal), nameof(ApiRelationshipTraversal.TargetObjectType)),
+
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 

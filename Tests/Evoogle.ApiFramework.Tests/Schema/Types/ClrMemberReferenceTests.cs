@@ -16,14 +16,14 @@ using static Evoogle.XUnit.Tests.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Schema.Types;
 
-public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(output)
+public class ClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
     private class EqualityTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiClrMemberReference Lhs { get; init; }
-        public required ApiClrMemberReference Rhs { get; init; }
+        public required ClrMemberReference Lhs { get; init; }
+        public required ClrMemberReference Rhs { get; init; }
         public required bool ExpectedEquality { get; init; }
         #endregion
 
@@ -57,33 +57,33 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
         #endregion
     }
 
-    private class JsonDeserializeTest : JsonDeserializeTest<ApiClrMemberReference, ApiClrMemberReferenceDef>
+    private class JsonDeserializeTest : JsonDeserializeTest<ClrMemberReference, ClrMemberReferenceDef>
     {
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ApiClrMemberReference? CreateExpected(ApiClrMemberReferenceDef? descriptor) => BuildApiClrMemberReference(descriptor);
+        protected override ClrMemberReference? CreateExpected(ClrMemberReferenceDef? descriptor) => BuildClrMemberReference(descriptor);
         #endregion
     }
 
-    private class JsonRoundtripTest : JsonRoundtripTest<ApiClrMemberReference, ApiClrMemberReferenceDef>
+    private class JsonRoundtripTest : JsonRoundtripTest<ClrMemberReference, ClrMemberReferenceDef>
     {
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ApiClrMemberReference? CreateExpected(ApiClrMemberReferenceDef? descriptor) => BuildApiClrMemberReference(descriptor);
+        protected override ClrMemberReference? CreateExpected(ClrMemberReferenceDef? descriptor) => BuildClrMemberReference(descriptor);
         #endregion
     }
 
-    private class JsonSerializeTest : JsonSerializeTest<ApiClrMemberReference, ApiClrMemberReferenceDef>
+    private class JsonSerializeTest : JsonSerializeTest<ClrMemberReference, ClrMemberReferenceDef>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ApiClrMemberReference? CreateSource(ApiClrMemberReferenceDef? descriptor) => BuildApiClrMemberReference(descriptor);
+        protected override ClrMemberReference? CreateSource(ClrMemberReferenceDef? descriptor) => BuildClrMemberReference(descriptor);
         #endregion
     }
     #endregion
 
     #region Test Fields
-    private static readonly ApiClrMemberReference _apiAcmeFieldReference = new(ClrMemberKind.Field, "Acme");
-    private static readonly ApiClrMemberReference _apiValueFieldReference = new(ClrMemberKind.Field, "Value");
-    private static readonly ApiClrMemberReference _apiValuePropertyReference = new(ClrMemberKind.Property, "Value");
-    private static readonly ApiClrMemberReference _apiVALUEPropertyReference = new(ClrMemberKind.Property, "VALUE");
+    private static readonly ClrMemberReference _clrAcmeFieldReference = new(ClrMemberKind.Field, "Acme");
+    private static readonly ClrMemberReference _clrValueFieldReference = new(ClrMemberKind.Field, "Value");
+    private static readonly ClrMemberReference _clrValuePropertyReference = new(ClrMemberKind.Property, "Value");
+    private static readonly ClrMemberReference _clrVALUEPropertyReference = new(ClrMemberKind.Property, "VALUE");
     #endregion
 
     #region Test Properties
@@ -99,49 +99,49 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
     [
         new EqualityTest
         {
-            Name = $"{_apiValueFieldReference} == {_apiValueFieldReference}",
-            Lhs = _apiValueFieldReference,
-            Rhs = _apiValueFieldReference,
+            Name = $"{_clrValueFieldReference} == {_clrValueFieldReference}",
+            Lhs = _clrValueFieldReference,
+            Rhs = _clrValueFieldReference,
             ExpectedEquality = true,
         },
 
         new EqualityTest
         {
-            Name = $"{_apiValueFieldReference} != {_apiValuePropertyReference}",
-            Lhs = _apiValueFieldReference,
-            Rhs = _apiValuePropertyReference,
+            Name = $"{_clrValueFieldReference} != {_clrValuePropertyReference}",
+            Lhs = _clrValueFieldReference,
+            Rhs = _clrValuePropertyReference,
             ExpectedEquality = false,
         },
 
         new EqualityTest
         {
-            Name = $"{_apiValuePropertyReference} == {_apiValuePropertyReference}",
-            Lhs = _apiValuePropertyReference,
-            Rhs = _apiValuePropertyReference,
+            Name = $"{_clrValuePropertyReference} == {_clrValuePropertyReference}",
+            Lhs = _clrValuePropertyReference,
+            Rhs = _clrValuePropertyReference,
             ExpectedEquality = true,
         },
 
         new EqualityTest
         {
-            Name = $"{_apiValuePropertyReference} != {_apiValueFieldReference}",
-            Lhs = _apiValuePropertyReference,
-            Rhs = _apiValueFieldReference,
+            Name = $"{_clrValuePropertyReference} != {_clrValueFieldReference}",
+            Lhs = _clrValuePropertyReference,
+            Rhs = _clrValueFieldReference,
             ExpectedEquality = false,
         },
 
         new EqualityTest
         {
-            Name = $"{_apiAcmeFieldReference} != {_apiValueFieldReference}",
-            Lhs = _apiAcmeFieldReference,
-            Rhs = _apiValueFieldReference,
+            Name = $"{_clrAcmeFieldReference} != {_clrValueFieldReference}",
+            Lhs = _clrAcmeFieldReference,
+            Rhs = _clrValueFieldReference,
             ExpectedEquality = false,
         },
 
         new EqualityTest
         {
-            Name = $"{_apiValuePropertyReference} != {_apiVALUEPropertyReference}",
-            Lhs = _apiValuePropertyReference,
-            Rhs = _apiVALUEPropertyReference,
+            Name = $"{_clrValuePropertyReference} != {_clrVALUEPropertyReference}",
+            Lhs = _clrValuePropertyReference,
+            Rhs = _clrVALUEPropertyReference,
             ExpectedEquality = false,
         },
     ];
@@ -150,77 +150,77 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
     [
         new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)}",
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)}",
             SourceJson = @"
             {
                 ""ClrName"": ""Value"",
                 ""ClrKind"": ""Field""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
         },
         new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)} and camel-case JSON",
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
             SourceJson = @"
             {
                 ""clrName"": ""Value"",
                 ""clrKind"": ""Field""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
         },
         new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)}",
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)}",
             SourceJson = @"
             {
                 ""ClrName"": ""Value"",
                 ""ClrKind"": ""Property""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
         },
         new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)} and camel-case JSON",
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
             SourceJson = @"
             {
                 ""clrName"": ""Value"",
                 ""clrKind"": ""Property""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
         },
 
         // Invalid JSON
         new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with invalid {nameof(ApiClrMemberReference.ClrKind)} is preserved for schema validation",
+            Name = $"{nameof(ClrMemberReference)} with invalid {nameof(ClrMemberReference.ClrKind)} is preserved for schema validation",
             SourceJson = @"
             {
                 ""ClrName"": ""Value"",
                 ""ClrKind"": ""42""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: null, clrName: "Value", hasInvalidClrKind: true)
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: null, clrName: "Value", hasInvalidClrKind: true)
         },
 
         new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with missing {nameof(ApiClrMemberReference.ClrName)} is preserved for schema validation",
+            Name = $"{nameof(ClrMemberReference)} with missing {nameof(ClrMemberReference.ClrName)} is preserved for schema validation",
             SourceJson = @"
             {
                 ""ClrKind"": ""Property""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: null, hasInvalidClrKind: false)
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: null, hasInvalidClrKind: false)
         },
 
         new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with missing {nameof(ApiClrMemberReference.ClrKind)} is preserved for schema validation",
+            Name = $"{nameof(ClrMemberReference)} with missing {nameof(ClrMemberReference.ClrKind)} is preserved for schema validation",
             SourceJson = @"
             {
                 ""ClrName"": ""Value""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: null, clrName: "Value", hasInvalidClrKind: true)
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: null, clrName: "Value", hasInvalidClrKind: true)
         },
     ];
 
@@ -228,13 +228,13 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
     [
         new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)}",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)}",
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
         },
         new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)}",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)}",
+            ExpectedFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
         },
     ];
 
@@ -242,8 +242,8 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
     [
         new JsonSerializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)}",
-            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value"),
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)}",
+            SourceFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value"),
             ExpectedJson = @"
             {
                 ""ClrKind"": ""Field"",
@@ -252,9 +252,9 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
         },
         new JsonSerializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)} and camel-case JSON",
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
-            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value"),
+            SourceFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value"),
             ExpectedJson = @"
             {
                 ""clrKind"": ""Field"",
@@ -263,8 +263,8 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
         },
         new JsonSerializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)}",
-            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value"),
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)}",
+            SourceFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value"),
             ExpectedJson = @"
             {
                 ""ClrKind"": ""Property"",
@@ -273,9 +273,9 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
         },
         new JsonSerializeTest
         {
-            Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)} and camel-case JSON",
+            Name = $"{nameof(ClrMemberReference)} with {nameof(ClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
-            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value"),
+            SourceFactoryArgument = new ClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value"),
             ExpectedJson = @"
             {
                 ""clrKind"": ""Property"",

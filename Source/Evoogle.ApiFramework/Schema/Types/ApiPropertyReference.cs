@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
+
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;

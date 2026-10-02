@@ -676,7 +676,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
                     continue;
                 }
 
-                if (end.ApiTraversal?.ClrMemberReference is { } clrMemberReference)
+                if (end.ApiTraversal?.ClrNavigationMember is { } clrNavigationMember)
                 {
                     foreach (var objectBuilder in _context.ApiObjectTypeBuilders)
                     {
@@ -690,7 +690,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
                         {
                             objectBuilder.RemoveConventionPropertyByClrName
                             (
-                                clrMemberReference.ClrName
+                                clrNavigationMember.ClrName
                             );
                         }
                     }

@@ -51,7 +51,7 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
     {
         public required Scenario Scenario { get; init; }
 
-        private ApiClrMemberBinding? ClrMemberBinding { get; set; }
+        private ClrMemberBinding? ClrMemberBinding { get; set; }
 
         private ApiPropertyBinding? ApiPropertyBinding { get; set; }
 
@@ -82,46 +82,49 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                     case Scenario.ResolveProperty:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(ClrMemberKind.Property, nameof(BindingObject.Id))
+                            new ClrMemberReference(ClrMemberKind.Property, nameof(BindingObject.Id))
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
                             typeof(BindingObject),
                             CreateContext(),
-                            ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember,
-                            "Traversal CLR member reference"
+                            "Traversal CLR member reference",
+                            requiresRead: true,
+                            requiresWrite: true
                         );
                         break;
                     case Scenario.ResolveField:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Code))
+                            new ClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Code))
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
                             typeof(BindingObject),
                             CreateContext(),
-                            ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember,
-                            "Traversal CLR member reference"
+                            "Traversal CLR member reference",
+                            requiresRead: true,
+                            requiresWrite: true
                         );
                         break;
                     case Scenario.EnforceMemberKind:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Id))
+                            new ClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Id))
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
                             typeof(BindingObject),
                             CreateContext(),
-                            ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember,
-                            "Traversal CLR member reference"
+                            "Traversal CLR member reference",
+                            requiresRead: true,
+                            requiresWrite: true
                         );
                         break;
                     case Scenario.RejectDirectMemberWithReference:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(ClrMemberKind.Property, nameof(BindingObject.Id))
+                            new ClrMemberReference(ClrMemberKind.Property, nameof(BindingObject.Id))
                         );
                         this.ClrMemberBinding.Bind(propertyInfo);
                         break;
@@ -140,21 +143,23 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                     case Scenario.ConsumeFailedMemberResolution:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Id))
+                            new ClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Id))
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
                             typeof(BindingObject),
                             CreateContext(),
-                            ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember,
-                            "Traversal CLR member reference"
+                            "Traversal CLR member reference",
+                            requiresRead: true,
+                            requiresWrite: true
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
                             typeof(BindingObject),
                             CreateContext(),
-                            ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember,
-                            "Traversal CLR member reference"
+                            "Traversal CLR member reference",
+                            requiresRead: true,
+                            requiresWrite: true
                         );
                         break;
                     case Scenario.RejectMemberResolutionWithoutReference:
@@ -163,8 +168,9 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                         (
                             typeof(BindingObject),
                             CreateContext(),
-                            ApiSchemaCompilationCode.ApiRelationshipTraversalInvalidClrMember,
-                            "Traversal CLR member reference"
+                            "Traversal CLR member reference",
+                            requiresRead: true,
+                            requiresWrite: true
                         );
                         break;
                     case Scenario.DirectApiProperty:
@@ -253,15 +259,24 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                     this.ClrMemberBinding!.IsBound.Should().BeTrue();
                     this.ClrMemberBinding.ClrMemberInfo.Should().BeAssignableTo<PropertyInfo>();
                     this.ClrMemberBinding.ClrMemberType.Should().Be<int>();
+                    this.ClrMemberBinding.ClrMemberAccessor.MemberInfo.Should()
+                        .BeSameAs(this.ClrMemberBinding.ClrMemberInfo);
+                    this.ClrMemberBinding.ClrMemberAccessor.CanRead.Should().BeTrue();
+                    this.ClrMemberBinding.ClrMemberAccessor.CanWrite.Should().BeTrue();
                     break;
                 case Scenario.DirectField:
                 case Scenario.ResolveField:
                     this.ClrMemberBinding!.IsBound.Should().BeTrue();
                     this.ClrMemberBinding.ClrMemberInfo.Should().BeAssignableTo<FieldInfo>();
                     this.ClrMemberBinding.ClrMemberType.Should().Be<string>();
+                    this.ClrMemberBinding.ClrMemberAccessor.MemberInfo.Should()
+                        .BeSameAs(this.ClrMemberBinding.ClrMemberInfo);
+                    this.ClrMemberBinding.ClrMemberAccessor.CanRead.Should().BeTrue();
+                    this.ClrMemberBinding.ClrMemberAccessor.CanWrite.Should().BeTrue();
                     break;
                 case Scenario.EnforceMemberKind:
                     this.ClrMemberBinding!.IsBound.Should().BeFalse();
+                    this.ClrMemberBinding.BoundClrMemberAccessor.Should().BeNull();
                     break;
                 case Scenario.DirectApiProperty:
                 case Scenario.ResolveApiName:

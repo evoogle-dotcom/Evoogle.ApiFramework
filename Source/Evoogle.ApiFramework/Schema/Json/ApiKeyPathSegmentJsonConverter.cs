@@ -40,10 +40,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
             {
                 ApiKeyPathSegment = new ApiKeyPathSegmentPropertyNames
                 {
-                    ApiPropertyReference = policy.ConvertName
-                    (
-                        nameof(Key.ApiKeyPathSegment.ApiPropertyReference)
-                    )
+                    ApiPropertyReference = policy.ConvertName(nameof(Key.ApiKeyPathSegment.ApiProperty)) // Mapping property name from ApiPropertyReference to ApiProperty by design
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };

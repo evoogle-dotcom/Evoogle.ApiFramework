@@ -21,8 +21,8 @@ namespace Evoogle.ApiFramework.Schema.Types;
 ///     A schema component represents an optional CLR binding by making this reference nullable,
 ///     rather than by making either part of the identity nullable.
 /// </remarks>
-[JsonConverter(typeof(ApiClrMemberReferenceJsonConverter))]
-public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
+[JsonConverter(typeof(ClrMemberReferenceJsonConverter))]
+public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
 {
     #region Fields
     private readonly ClrMemberKind? _clrKind;
@@ -35,18 +35,20 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
 
     /// <summary>Gets the CLR member name.</summary>
     public string ClrName { get; }
+
+    internal ClrMemberKind? NullableClrKind => _clrKind;
     #endregion
 
     #region Constructors
     /// <summary>Creates a CLR member reference.</summary>
     /// <param name="clrKind">The CLR member kind.</param>
     /// <param name="clrName">The CLR member name.</param>
-    public ApiClrMemberReference(ClrMemberKind clrKind, string clrName)
+    public ClrMemberReference(ClrMemberKind clrKind, string clrName)
         : this(clrKind, clrName, false)
     {
     }
 
-    internal ApiClrMemberReference(ClrMemberKind? clrKind, string clrName, bool hasInvalidClrKind)
+    internal ClrMemberReference(ClrMemberKind? clrKind, string clrName, bool hasInvalidClrKind)
     {
         _clrKind = clrKind;
         this.ClrName = clrName;
@@ -56,12 +58,12 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
 
     #region Equality Methods
     /// <inheritdoc/>
-    public bool Equals(ApiClrMemberReference? other) => other is not null
+    public bool Equals(ClrMemberReference? other) => other is not null
         && _clrKind == other._clrKind
         && ClrNameComparer.Instance.Equals(this.ClrName, other.ClrName);
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => this.Equals(obj as ApiClrMemberReference);
+    public override bool Equals(object? obj) => this.Equals(obj as ClrMemberReference);
 
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine
@@ -71,11 +73,11 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
     );
 
     /// <summary>Determines whether two references identify the same CLR member.</summary>
-    public static bool operator ==(ApiClrMemberReference? left, ApiClrMemberReference? right) =>
-        EqualityComparer<ApiClrMemberReference>.Default.Equals(left, right);
+    public static bool operator ==(ClrMemberReference? left, ClrMemberReference? right) =>
+        EqualityComparer<ClrMemberReference>.Default.Equals(left, right);
 
     /// <summary>Determines whether two references identify different CLR members.</summary>
-    public static bool operator !=(ApiClrMemberReference? left, ApiClrMemberReference? right) =>
+    public static bool operator !=(ClrMemberReference? left, ClrMemberReference? right) =>
         !(left == right);
     #endregion
 
@@ -85,7 +87,8 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
     {
         var clrKind = _clrKind.SafeToString();
         var clrName = this.ClrName.SafeToString();
-        return $"{nameof(ApiClrMemberReference)} {{{nameof(this.ClrKind)}={clrKind}, {nameof(this.ClrName)}={clrName}}}";
+        return $"{nameof(ClrMemberReference)} " +
+            $"{{{nameof(this.ClrKind)}={clrKind}, {nameof(this.ClrName)}={clrName}}}";
     }
     #endregion
 
@@ -94,71 +97,111 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
     (
         Type clrObjectType,
         ApiSchemaCompilationContext context,
-        ApiSchemaCompilationCode unresolvedCode,
+        string referenceApiPath,
         string referenceName
     )
     {
         ArgumentNullException.ThrowIfNull(clrObjectType);
         ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(referenceApiPath);
 
         // Validate the CLR member kind and name before attempting to resolve the reference.
-        var isClrKindInvalid = !this.ValidateClrKind(context);
-        var isClrNameInvalid = !this.ValidateClrName(context);
-        if (isClrKindInvalid || isClrNameInvalid)
+        if (!this.Validate(context, referenceApiPath))
         {
             return null;
         }
 
-        var bindingFlags = BindingFlags.Public | BindingFlags.Instance;
-        MemberInfo? clrMemberInfo = this.ClrKind switch
+        try
         {
-            ClrMemberKind.Property => clrObjectType.GetProperty(this.ClrName, bindingFlags),
-            ClrMemberKind.Field => clrObjectType.GetField(this.ClrName, bindingFlags),
-            _ => null
-        };
-        if (clrMemberInfo is not null)
+            var bindingFlags = BindingFlags.Public | BindingFlags.Instance;
+            MemberInfo? clrMemberInfo = this.ClrKind switch
+            {
+                ClrMemberKind.Property => clrObjectType.GetProperty(this.ClrName, bindingFlags),
+                ClrMemberKind.Field => clrObjectType.GetField(this.ClrName, bindingFlags),
+                _ => null
+            };
+            if (clrMemberInfo is not null)
+            {
+                return clrMemberInfo;
+            }
+        }
+        catch (Exception exception)
         {
-            return clrMemberInfo;
+            this.AddResolutionExceptionIssue(clrObjectType, context, referenceApiPath, referenceName, exception);
+            return null;
         }
 
+        var apiPath = referenceApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = unresolvedCode;
-        var description = $"{referenceName} could not resolve CLR {this.ClrKind.ToString().ToLowerInvariant()} '{this.ClrName}' on CLR type '{clrObjectType}'";
+        var code = ApiSchemaCompilationCode.ClrMemberReferenceUnresolved;
+        var description = $"{referenceName} could not resolve CLR " +
+            $"{this.ClrKind.ToString().ToLowerInvariant()} '{this.ClrName}' on CLR type '{clrObjectType}'";
         var remediation = $"Reference an existing public instance CLR {this.ClrKind.ToString().ToLowerInvariant()}";
 
-        context.AddIssue(severity, code, description, remediation);
+        context.AddIssue(apiPath, severity, code, description, remediation);
         return null;
     }
     #endregion
 
     #region Implementation Methods
-    private bool ValidateClrKind(ApiSchemaCompilationContext context)
+    private void AddResolutionExceptionIssue
+    (
+        Type clrObjectType,
+        ApiSchemaCompilationContext context,
+        string referenceApiPath,
+        string referenceName,
+        Exception exception
+    )
+    {
+        var apiPath = referenceApiPath;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ClrMemberReferenceUnresolved;
+        var description = $"{referenceName} could not resolve CLR {this.ClrKind.ToString().ToLowerInvariant()} " +
+            $"'{this.ClrName}' on CLR type '{clrObjectType}': {exception.GetBaseException().Message.TrimEnd('.')}";
+        var remediation = $"Reference an unambiguous public instance CLR {this.ClrKind.ToString().ToLowerInvariant()}";
+
+        context.AddIssue(apiPath, severity, code, description, remediation);
+    }
+
+    internal bool Validate(ApiSchemaCompilationContext context, string? validationApiPath = null)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        validationApiPath ??= context.ApiPath;
+        var isClrKindValid = this.ValidateClrKind(context, validationApiPath);
+        var isClrNameValid = this.ValidateClrName(context, validationApiPath);
+        return isClrKindValid && isClrNameValid;
+    }
+
+    private bool ValidateClrKind(ApiSchemaCompilationContext context, string validationApiPath)
     {
         if (_hasInvalidClrKind || _clrKind is ClrMemberKind clrKind && !Enum.IsDefined(clrKind))
         {
+            var apiPath = validationApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiClrMemberReferenceInvalidClrKind;
+            var code = ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind;
             var description = $"{nameof(this.ClrKind)} must be a valid {nameof(Types.ClrMemberKind)} value";
             var remediation = $"Specify a valid {nameof(this.ClrKind)} value";
 
-            context.AddIssue(severity, code, description, remediation);
+            context.AddIssue(apiPath, severity, code, description, remediation);
             return false;
         }
 
         return true;
     }
 
-    private bool ValidateClrName(ApiSchemaCompilationContext context)
+    private bool ValidateClrName(ApiSchemaCompilationContext context, string validationApiPath)
     {
         var isClrNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ClrName);
         if (isClrNameInvalid)
         {
+            var apiPath = validationApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiClrMemberReferenceInvalidClrName;
+            var code = ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrName;
             var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ClrName)} value";
 
-            context.AddIssue(severity, code, description, remediation);
+            context.AddIssue(apiPath, severity, code, description, remediation);
             return false;
         }
 

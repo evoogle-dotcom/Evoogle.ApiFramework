@@ -10,6 +10,7 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.ApiFramework.Schema.Types.Internal;
 using Evoogle.Extensions;
 using Evoogle.MemberAccess;
 using Evoogle.Reflection;
@@ -39,9 +40,7 @@ namespace Evoogle.ApiFramework.Schema.Types;
 public sealed partial class ApiProperty : ApiSchemaElement
 {
     #region ApiProperty Fields
-    private readonly ClrMemberKind? _clrMemberKind;
-
-    private MemberAccessor? _clrMemberAccessor;
+    private readonly ClrMemberBinding _clrMemberBinding;
 
     private bool _hasInvalidApiTypeModifiers;
     #endregion
@@ -79,8 +78,13 @@ public sealed partial class ApiProperty : ApiSchemaElement
         this.ApiName = apiName;
         this.ApiTypeExpression = apiTypeExpression;
         this.ApiTypeModifiers = apiTypeModifiers;
-        this.ClrName = clrName;
-        _clrMemberKind = clrMemberKind;
+        var clrMemberReference = new ClrMemberReference
+        (
+            clrMemberKind,
+            clrName,
+            hasInvalidClrKind: clrMemberKind is null
+        );
+        _clrMemberBinding = new ClrMemberBinding(clrMemberReference);
     }
     #endregion
 
@@ -103,14 +107,14 @@ public sealed partial class ApiProperty : ApiSchemaElement
     public ApiTypeModifiers ApiTypeModifiers { get; }
 
     /// <summary>Gets the CLR name of the member backing this API property.</summary>
-    public string ClrName { get; }
+    public string ClrName => _clrMemberBinding.ClrMemberReference!.ClrName;
 
     /// <summary>
     ///     Gets the authoritative CLR member kind used with <see cref="ClrName"/> to bind this property.
     ///     <see cref="ClrMemberKind.Property"/> resolves only properties and
     ///     <see cref="ClrMemberKind.Field"/> resolves only fields.
     /// </summary>
-    public ClrMemberKind ClrMemberKind => this.RequireValue(_clrMemberKind);
+    public ClrMemberKind ClrMemberKind => _clrMemberBinding.ClrMemberReference!.ClrKind;
 
     internal ApiTypeExpression ApiTypeExpression { get; }
 
@@ -126,7 +130,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
     internal bool IsResolved => this.ApiTypeExpression?.IsResolved == true;
 
-    internal Type? ClrMemberType => _clrMemberAccessor?.MemberType;
+    internal Type? ClrMemberType => _clrMemberBinding.BoundClrMemberAccessor?.MemberType;
     #endregion
 
     #region Object Methods
@@ -137,7 +141,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
         var apiTypeExpression = this.ApiTypeExpression.SafeToString();
         var apiTypeModifiers = this.ApiTypeModifiers.SafeToString();
         var clrName = this.ClrName.SafeToString();
-        var clrMemberKind = _clrMemberKind.SafeToString();
+        var clrMemberKind = _clrMemberBinding.ClrMemberReference!.NullableClrKind.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
         return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrMemberKind)}={clrMemberKind}, {nameof(this.ExtensionCount)}={extensionCount}}}";
@@ -168,11 +172,13 @@ public sealed partial class ApiProperty : ApiSchemaElement
         this.ValidateApiName(context);
         this.ValidateApiTypeModifiers(context);
         this.ResolveApiTypeExpression(context);
-        this.ValidateClrName(context);
-
-        if (this.ValidateClrMemberKind(context) && this.ApiTypeExpression?.IsResolved == true)
+        if (this.ApiTypeExpression?.IsResolved == true)
         {
             this.InitializeClrMemberAccessor(context);
+        }
+        else
+        {
+            _clrMemberBinding.ClrMemberReference!.Validate(context);
         }
     }
 
@@ -221,256 +227,41 @@ public sealed partial class ApiProperty : ApiSchemaElement
         this.ApiTypeExpression.ResolveForProperty(context);
     }
 
-    private void InitializeClrFieldAccessor(ApiSchemaCompilationContext context, FieldInfo clrFieldInfo)
-    {
-        var clrMemberName = this.ClrName;
-        var clrMemberAccessor = MemberAccessor.Create(clrFieldInfo);
-        _clrMemberAccessor = clrMemberAccessor;
-
-        if (clrMemberAccessor.CanRead)
-        {
-            try
-            {
-                MemberAccessorFactory.CreateGetter(clrFieldInfo);
-            }
-            catch (Exception ex)
-            {
-                var severity = ApiSchemaCompilationSeverity.Error;
-                var code = ApiSchemaCompilationCode.ApiPropertyInvalidFieldGetter;
-                var rootCause = GetGetterRootCauseMessage(ex, clrFieldInfo.FieldType);
-                var description = $"Failed to compile field getter for '{clrMemberName}': {rootCause}";
-                var remediation = $"Verify that field '{clrMemberName}' is readable and can be used in expression trees";
-
-                context.AddIssue(severity, code, description, remediation);
-            }
-        }
-
-        if (clrMemberAccessor.CanWrite && !clrMemberAccessor.DeclaringType.IsValueType)
-        {
-            try
-            {
-                MemberAccessorFactory.CreateCoercingSetter(clrFieldInfo);
-            }
-            catch (Exception ex)
-            {
-                var severity = ApiSchemaCompilationSeverity.Error;
-                var code = ApiSchemaCompilationCode.ApiPropertyInvalidFieldSetter;
-                var description = $"Failed to compile field setter for '{clrMemberName}': {GetRootCauseMessage(ex)}";
-                var remediation = $"Verify that field '{clrMemberName}' is writable and can be used in expression trees";
-
-                context.AddIssue(severity, code, description, remediation);
-            }
-        }
-
-        var clrFieldNullableInfo = FieldReflection.GetNullabilityInfo(clrFieldInfo);
-        this.ValidateNullabilityMismatch(context, clrFieldNullableInfo, clrMemberName);
-    }
-
-    private void InitializeClrPropertyAccessor(ApiSchemaCompilationContext context, PropertyInfo clrPropertyInfo)
-    {
-        var clrMemberName = this.ClrName;
-
-        if (clrPropertyInfo.GetIndexParameters().Length > 0)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertyGetter;
-            var description = $"Property '{clrMemberName}' is an indexer, which is not supported";
-
-            context.AddIssue(severity, code, description, remediation: null);
-            return;
-        }
-
-        var clrMemberAccessor = MemberAccessor.Create(clrPropertyInfo);
-        _clrMemberAccessor = clrMemberAccessor;
-
-        if (clrMemberAccessor.CanRead)
-        {
-            try
-            {
-                MemberAccessorFactory.CreateGetter(clrPropertyInfo);
-            }
-            catch (Exception ex)
-            {
-                var severity = ApiSchemaCompilationSeverity.Error;
-                var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertyGetter;
-                var rootCause = GetGetterRootCauseMessage(ex, clrPropertyInfo.PropertyType);
-                var description = $"Failed to compile property getter for '{clrMemberName}': {rootCause}";
-                var remediation = $"Verify that property '{clrMemberName}' is readable and can be used in expression trees";
-
-                context.AddIssue(severity, code, description, remediation);
-            }
-        }
-
-        if (clrMemberAccessor.CanWrite && !clrMemberAccessor.DeclaringType.IsValueType)
-        {
-            try
-            {
-                MemberAccessorFactory.CreateCoercingSetter(clrPropertyInfo);
-            }
-            catch (Exception ex)
-            {
-                var severity = ApiSchemaCompilationSeverity.Error;
-                var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertySetter;
-                var description = $"Failed to compile property setter for '{clrMemberName}': {GetRootCauseMessage(ex)}";
-                var remediation = $"Verify that property '{clrMemberName}' is writable and can be used in expression trees";
-
-                context.AddIssue(severity, code, description, remediation);
-            }
-        }
-
-        var clrPropertyNullableInfo = PropertyReflection.GetNullabilityInfo(clrPropertyInfo);
-        this.ValidateNullabilityMismatch(context, clrPropertyNullableInfo, clrMemberName);
-    }
-
     private void InitializeClrMemberAccessor(ApiSchemaCompilationContext context)
     {
         var apiObjectType = this.GetApiObjectType();
         var clrObjectType = apiObjectType?.ClrType;
-        var clrMemberName = this.ClrName;
 
         if (clrObjectType is null)
         {
-            // If the parent CLR object type is null, skip further processing
+            // The reference remains independently validatable when the parent has no CLR type.
+            _clrMemberBinding.ClrMemberReference!.Validate(context);
             return;
         }
 
-        var isClrMemberNameInvalid = ApiSchemaNameValidation.IsNameInvalid(clrMemberName);
-        if (isClrMemberNameInvalid)
+        if (!_clrMemberBinding.TryResolveReference
+        (
+            clrObjectType,
+            context,
+            "API property CLR member reference",
+            requiresRead: false,
+            requiresWrite: false
+        ))
         {
-            // If the CLR member name is invalid, skip further processing
             return;
         }
 
-        try
+        var clrNullableInfo = _clrMemberBinding.ClrMemberInfo switch
         {
-            switch (this.ClrMemberKind)
-            {
-                case ClrMemberKind.Property:
-                    var clrPropertyInfo = TypeReflection.GetProperty
-                    (
-                        clrObjectType,
-                        clrMemberName,
-                        BindingFlags.Public | BindingFlags.Instance
-                    );
-
-                    if (clrPropertyInfo is null)
-                    {
-                        this.AddMissingClrMemberIssue
-                        (
-                            context,
-                            clrObjectType,
-                            clrMemberName
-                        );
-                        return;
-                    }
-
-                    if (!ValidateClrMemberType(context, clrPropertyInfo.PropertyType, clrMemberName))
-                    {
-                        return;
-                    }
-
-                    this.InitializeClrPropertyAccessor(context, clrPropertyInfo);
-                    return;
-
-                case ClrMemberKind.Field:
-                    var clrFieldInfo = TypeReflection.GetField
-                    (
-                        clrObjectType,
-                        clrMemberName,
-                        BindingFlags.Public | BindingFlags.Instance
-                    );
-
-                    if (clrFieldInfo is null)
-                    {
-                        this.AddMissingClrMemberIssue
-                        (
-                            context,
-                            clrObjectType,
-                            clrMemberName
-                        );
-                        return;
-                    }
-
-                    if (!ValidateClrMemberType(context, clrFieldInfo.FieldType, clrMemberName))
-                    {
-                        return;
-                    }
-
-                    this.InitializeClrFieldAccessor(context, clrFieldInfo);
-                    return;
-            }
-        }
-        catch (Exception ex)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrMember;
-            var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {GetRootCauseMessage(ex)}";
-            var remediation = $"Verify that '{clrMemberName}' exists as a public {this.ClrMemberKind.ToString().ToLowerInvariant()} on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
-
-            context.AddIssue(severity, code, description, remediation);
-        }
-    }
-
-    private static string GetRootCauseMessage(Exception exception)
-        => exception.GetBaseException().Message.TrimEnd('.');
-
-    private static string GetGetterRootCauseMessage(Exception exception, Type clrMemberType)
-    {
-        if (clrMemberType.IsPointer)
-        {
-            return $"No coercion operator is defined between types '{clrMemberType}' and '{typeof(object)}'";
-        }
-
-        return GetRootCauseMessage(exception);
-    }
-
-    private bool ValidateClrMemberKind(ApiSchemaCompilationContext context)
-    {
-        var isClrMemberKindValid = _clrMemberKind is ClrMemberKind.Property or ClrMemberKind.Field;
-        if (isClrMemberKindValid)
-        {
-            return true;
-        }
-
-        var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrMember;
-        var description = $"{nameof(this.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}";
-        var remediation = $"Specify {nameof(this.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}";
-
-        context.AddIssue(severity, code, description, remediation);
-        return false;
-    }
-
-    private void AddMissingClrMemberIssue(ApiSchemaCompilationContext context, Type clrObjectType, string clrMemberName)
-    {
-        var clrMemberKindName = this.ClrMemberKind.ToString().ToLowerInvariant();
-        var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiPropertyMissingClrMember;
-        var description = $"CLR {clrMemberKindName} '{clrMemberName}' was not found on CLR type '{clrObjectType.SafeToName()}'";
-        var remediation = $"Add a public CLR {clrMemberKindName} named '{clrMemberName}' to CLR type '{clrObjectType.SafeToName()}'";
-
-        context.AddIssue(severity, code, description, remediation);
-    }
-
-    private void ValidateClrName(ApiSchemaCompilationContext context)
-    {
-        var isClrNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ClrName);
-        if (isClrNameInvalid)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrName;
-            var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
-            var remediation = $"Specify a valid {nameof(this.ClrName)} value";
-
-            context.AddIssue(severity, code, description, remediation);
-        }
+            PropertyInfo clrPropertyInfo => PropertyReflection.GetNullabilityInfo(clrPropertyInfo),
+            FieldInfo clrFieldInfo => FieldReflection.GetNullabilityInfo(clrFieldInfo),
+            _ => throw new ApiSchemaException("A CLR member binding must contain a property or field.")
+        };
+        this.ValidateNullabilityMismatch(context, clrNullableInfo, this.ClrName);
     }
 
     private ApiObjectType GetApiObjectType()
-    {
-        return this.Parent as ApiObjectType
-            ?? throw new ApiSchemaException($"An {nameof(ApiProperty)} must be owned by an {nameof(ApiObjectType)}.");
-    }
+        => this.Parent as ApiObjectType ?? throw new ApiSchemaException($"An {nameof(ApiProperty)} must be owned by an {nameof(ApiObjectType)}.");
     #endregion
 
     #region Validation Methods
@@ -542,23 +333,6 @@ public sealed partial class ApiProperty : ApiSchemaElement
                 context.AddIssue(severity, code, description, remediation);
             }
         }
-    }
-
-    private static bool ValidateClrMemberType(ApiSchemaCompilationContext context, Type memberType, string memberName)
-    {
-        // Check if the type is a ref struct (cannot be boxed/unboxed)
-        if (memberType.IsByRefLike)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrMember;
-            var description = $"CLR member '{memberName}' has type '{memberType.SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.";
-            var remediation = $"Change the type of CLR member '{memberName}' to a non-ref struct type.";
-
-            context.AddIssue(severity, code, description, remediation);
-            return false;
-        }
-
-        return true;
     }
     #endregion
 }

@@ -377,7 +377,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Code"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Code"" } }
                                         ]
                                     }
                                 ]
@@ -445,7 +445,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -513,7 +513,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -523,7 +523,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Name"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Name"" } }
                                         ]
                                     }
                                 ]
@@ -605,12 +605,12 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""OrderId"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""OrderId"" } }
                                         ]
                                     },
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""LineItemNumber"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""LineItemNumber"" } }
                                         ]
                                     }
                                 ]
@@ -701,17 +701,17 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id1"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id1"" } }
                                         ]
                                     },
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id2"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id2"" } }
                                         ]
                                     },
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id3"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id3"" } }
                                         ]
                                     }
                                 ]
@@ -779,7 +779,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -847,7 +847,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -915,7 +915,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Code"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Code"" } }
                                         ]
                                     }
                                 ]
@@ -983,13 +983,13 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""NestedPart"" } },
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""NestedPart"" } },
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     },
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Name"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Name"" } }
                                         ]
                                     }
                                 ]
@@ -1026,7 +1026,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1095,12 +1095,12 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     },
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""LineNumber"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""LineNumber"" } }
                                         ]
                                     }
                                 ]
@@ -1137,7 +1137,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1197,7 +1197,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1234,7 +1234,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1288,7 +1288,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1361,7 +1361,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1407,7 +1407,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1430,7 +1430,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Order, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""CustomerId"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""CustomerId"" } }
                                         ]
                                     }
                                 ]
@@ -1524,7 +1524,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1547,7 +1547,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Invoice, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""OrderId"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""OrderId"" } }
                                         ]
                                     }
                                 ]
@@ -1600,7 +1600,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1654,7 +1654,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1680,7 +1680,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTag, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""ProductId"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""ProductId"" } }
                                         ]
                                     }
                                 ]
@@ -1690,7 +1690,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTag, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""TagId"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""TagId"" } }
                                         ]
                                     }
                                 ]
@@ -1744,7 +1744,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1772,7 +1772,7 @@ public partial class ApiAnnotationTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1824,7 +1824,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTagFromType, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""ProductId"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""ProductId"" } }
                                         ]
                                     }
                                 ]
@@ -1834,7 +1834,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTagFromType, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""TagId"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""TagId"" } }
                                         ]
                                     }
                                 ]

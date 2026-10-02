@@ -14,19 +14,19 @@ public partial class ApiSchemaTests
     #region Test Types
     public ref struct TypesWithRefStructMembers
     {
-        // This will trigger ApiPropertyInvalidClrMember
+        // This will trigger ClrMemberIncompatible
         public Span<byte> SpanField;
 
-        // This will trigger ApiPropertyInvalidClrMember
+        // This will trigger ClrMemberIncompatible
         public Span<byte> SpanProperty { get; set; }
     }
 
     public unsafe class TypesWithPointerMembers
     {
-        // This will trigger ApiPropertyInvalidFieldGetter/SETTER
+        // This will trigger ClrMemberInvalidGetter/Setter
         public byte* PointerField;
 
-        // This will trigger ApiPropertyInvalidPropertyGetter/SETTER
+        // This will trigger ClrMemberInvalidGetter/Setter
         public byte* PointerProperty { get; set; }
     }
 
@@ -802,7 +802,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrName,
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrName,
                     description: $"{nameof(ApiProperty.ClrName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiProperty.ClrName)} value"
                 ),
@@ -851,9 +851,9 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyMissingClrMember,
-                    description: $"CLR field 'Value' was not found on CLR type '{nameof(ClrMemberKindPropertyOnlyType)}'",
-                    remediation: $"Add a public CLR field named 'Value' to CLR type '{nameof(ClrMemberKindPropertyOnlyType)}'"
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceUnresolved,
+                    description: $"API property CLR member reference could not resolve CLR field 'Value' on CLR type '{typeof(ClrMemberKindPropertyOnlyType)}'",
+                    remediation: "Reference an existing public instance CLR field"
                 ),
             ]
         },
@@ -900,9 +900,9 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindFieldOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyMissingClrMember,
-                    description: $"CLR property 'Value' was not found on CLR type '{nameof(ClrMemberKindFieldOnlyType)}'",
-                    remediation: $"Add a public CLR property named 'Value' to CLR type '{nameof(ClrMemberKindFieldOnlyType)}'"
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceUnresolved,
+                    description: $"API property CLR member reference could not resolve CLR property 'Value' on CLR type '{typeof(ClrMemberKindFieldOnlyType)}'",
+                    remediation: "Reference an existing public instance CLR property"
                 ),
             ]
         },
@@ -949,9 +949,9 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"NonExistent\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyMissingClrMember,
-                    description: $"CLR property 'NonExistentProperty' was not found on CLR type '{nameof(ScalarsOnly)}'",
-                    remediation: $"Add a public CLR property named 'NonExistentProperty' to CLR type '{nameof(ScalarsOnly)}'"
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceUnresolved,
+                    description: $"API property CLR member reference could not resolve CLR property 'NonExistentProperty' on CLR type '{typeof(ScalarsOnly)}'",
+                    remediation: "Reference an existing public instance CLR property"
                 ),
             ]
         },
@@ -1057,17 +1057,17 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
-                    description: $"CLR member '{nameof(TypesWithRefStructMembers.SpanField)}' has type '{typeof(Span<byte>).SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.",
-                    remediation: $"Change the type of CLR member '{nameof(TypesWithRefStructMembers.SpanField)}' to a non-ref struct type."
+                    code: ApiSchemaCompilationCode.ClrMemberIncompatible,
+                    description: $"API property CLR member reference '{nameof(TypesWithRefStructMembers.SpanField)}' has unsupported by-ref-like CLR type '{typeof(Span<byte>).SafeToName()}'",
+                    remediation: "Bind a CLR member whose value can be boxed and accessed through object"
                 ),
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
-                    description: $"CLR member '{nameof(TypesWithRefStructMembers.SpanProperty)}' has type '{typeof(Span<byte>).SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.",
-                    remediation: $"Change the type of CLR member '{nameof(TypesWithRefStructMembers.SpanProperty)}' to a non-ref struct type."
+                    code: ApiSchemaCompilationCode.ClrMemberIncompatible,
+                    description: $"API property CLR member reference '{nameof(TypesWithRefStructMembers.SpanProperty)}' has unsupported by-ref-like CLR type '{typeof(Span<byte>).SafeToName()}'",
+                    remediation: "Bind a CLR member whose value can be boxed and accessed through object"
                 ),
             ]
         },
@@ -1286,33 +1286,33 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidFieldGetter,
-                    description: $"Failed to compile field getter for '{nameof(TypesWithPointerMembers.PointerField)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
-                    remediation: $"Verify that field '{nameof(TypesWithPointerMembers.PointerField)}' is readable and can be used in expression trees"
+                    code: ApiSchemaCompilationCode.ClrMemberInvalidGetter,
+                    description: $"Failed to compile getter for API property CLR member reference '{nameof(TypesWithPointerMembers.PointerField)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
+                    remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerField)}' is readable and can be used in expression trees"
                 ),
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidFieldSetter,
-                    description: $"Failed to compile field setter for '{nameof(TypesWithPointerMembers.PointerField)}': Type must not be a pointer type (Parameter 'type')",
-                    remediation: $"Verify that field '{nameof(TypesWithPointerMembers.PointerField)}' is writable and can be used in expression trees"
+                    code: ApiSchemaCompilationCode.ClrMemberInvalidSetter,
+                    description: $"Failed to compile setter for API property CLR member reference '{nameof(TypesWithPointerMembers.PointerField)}': Type must not be a pointer type (Parameter 'type')",
+                    remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerField)}' is writable and can be used in expression trees"
                 ),
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidPropertyGetter,
-                    description: $"Failed to compile property getter for '{nameof(TypesWithPointerMembers.PointerProperty)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
-                    remediation: $"Verify that property '{nameof(TypesWithPointerMembers.PointerProperty)}' is readable and can be used in expression trees"
+                    code: ApiSchemaCompilationCode.ClrMemberInvalidGetter,
+                    description: $"Failed to compile getter for API property CLR member reference '{nameof(TypesWithPointerMembers.PointerProperty)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
+                    remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerProperty)}' is readable and can be used in expression trees"
                 ),
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidPropertySetter,
-                    description: $"Failed to compile property setter for '{nameof(TypesWithPointerMembers.PointerProperty)}': Type must not be a pointer type (Parameter 'type')",
-                    remediation: $"Verify that property '{nameof(TypesWithPointerMembers.PointerProperty)}' is writable and can be used in expression trees"
+                    code: ApiSchemaCompilationCode.ClrMemberInvalidSetter,
+                    description: $"Failed to compile setter for API property CLR member reference '{nameof(TypesWithPointerMembers.PointerProperty)}': Type must not be a pointer type (Parameter 'type')",
+                    remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerProperty)}' is writable and can be used in expression trees"
                 ),
             ]
         },
@@ -1485,7 +1485,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -1496,7 +1496,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Code"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Code"" } }
                                         ]
                                     }
                                 ]
@@ -2095,7 +2095,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -2276,7 +2276,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
                                         ]
                                     }
                                 ]
@@ -2339,7 +2339,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""MissingId"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""MissingId"" } }
                                         ]
                                     }
                                 ]
@@ -2413,8 +2413,8 @@ public partial class ApiSchemaTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } },
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Code"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } },
+                                            { ""ApiProperty"": { ""ClrName"": ""Code"" } }
                                         ]
                                     }
                                 ]
@@ -2504,7 +2504,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Tests"" },
                                         ""ApiSegments"": [
-                                            { ""ApiPropertyReference"": { ""ClrName"": ""Item"" } }
+                                            { ""ApiProperty"": { ""ClrName"": ""Item"" } }
                                         ]
                                     }
                                 ]
@@ -2557,7 +2557,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2658,7 +2658,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2797,7 +2797,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2823,7 +2823,7 @@ public partial class ApiSchemaTests
                             ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" },
                             ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalId"" } } ] }
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalId"" } } ] }
                                 ]
                             }
                         }
@@ -2866,7 +2866,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2927,7 +2927,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2986,7 +2986,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3045,7 +3045,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3095,7 +3095,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3109,7 +3109,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests""
@@ -3134,13 +3134,13 @@ public partial class ApiSchemaTests
                             ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" },
                             ""ApiForeignKeyA"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalAId"" } } ] },
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalBId"" } } ] }
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalAId"" } } ] },
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalBId"" } } ] }
                                 ]
                             },
                             ""ApiForeignKeyB"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalBId"" } } ] }
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalBId"" } } ] }
                                 ]
                             }
                         }
@@ -3182,7 +3182,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3196,7 +3196,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests""
@@ -3221,13 +3221,13 @@ public partial class ApiSchemaTests
                             ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" },
                             ""ApiForeignKeyA"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalAId"" } } ] }
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalAId"" } } ] }
                                 ]
                             },
                             ""ApiForeignKeyB"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalAId"" } } ] },
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalBId"" } } ] }
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalAId"" } } ] },
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalBId"" } } ] }
                                 ]
                             }
                         }
@@ -3269,7 +3269,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3293,8 +3293,8 @@ public partial class ApiSchemaTests
                             ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" },
                             ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalId"" } } ] },
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalId2"" } } ] }
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalId"" } } ] },
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalId2"" } } ] }
                                 ]
                             }
                         }
@@ -3337,7 +3337,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
@@ -3360,7 +3360,7 @@ public partial class ApiSchemaTests
                             ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" },
                             ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalCode"" } } ] }
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalCode"" } } ] }
                                 ]
                             }
                         }
@@ -3402,7 +3402,7 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3467,11 +3467,11 @@ public partial class ApiSchemaTests
                         ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Id"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
                             },
                             {
                                 ""ApiName"": ""PK_Code"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""Code"" } } ] } ]
+                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Code"" } } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
@@ -3494,7 +3494,7 @@ public partial class ApiSchemaTests
                             ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" },
                             ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiPropertyReference"": { ""ClrName"": ""PrincipalId"" } } ] }
+                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalId"" } } ] }
                                 ]
                             }
                         }
@@ -3555,9 +3555,9 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
-                    description: $"{nameof(ApiProperty.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}",
-                    remediation: $"Specify {nameof(ApiProperty.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}"
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind,
+                    description: $"{nameof(ClrMemberReference.ClrKind)} must be a valid {nameof(ClrMemberKind)} value",
+                    remediation: $"Specify a valid {nameof(ClrMemberReference.ClrKind)} value"
                 ),
             ]
         },
@@ -3602,9 +3602,9 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
-                    description: $"{nameof(ApiProperty.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}",
-                    remediation: $"Specify {nameof(ApiProperty.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}"
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind,
+                    description: $"{nameof(ClrMemberReference.ClrKind)} must be a valid {nameof(ClrMemberKind)} value",
+                    remediation: $"Specify a valid {nameof(ClrMemberReference.ClrKind)} value"
                 ),
             ]
         },
@@ -3648,9 +3648,9 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
-                    description: $"{nameof(ApiProperty.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}",
-                    remediation: $"Specify {nameof(ApiProperty.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}"
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind,
+                    description: $"{nameof(ClrMemberReference.ClrKind)} must be a valid {nameof(ClrMemberKind)} value",
+                    remediation: $"Specify a valid {nameof(ClrMemberReference.ClrKind)} value"
                 ),
             ]
         },

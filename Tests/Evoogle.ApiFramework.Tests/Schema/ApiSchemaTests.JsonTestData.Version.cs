@@ -80,7 +80,7 @@ public partial class ApiSchemaTests
                         ],
                         ""ApiKeys"": [],
                         ""ApiVersion"": {
-                            ""ApiPropertyReference"": { ""ClrName"": ""Id"" }
+                            ""ApiProperty"": { ""ClrName"": ""Id"" }
                         },
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests""
                     }

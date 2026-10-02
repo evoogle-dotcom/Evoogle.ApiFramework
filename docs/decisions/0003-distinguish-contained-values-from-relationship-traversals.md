@@ -92,15 +92,16 @@ concept; it does not imply that a CLR member exists.
 
 Schema components distinguish a configured identity from the target resolved during compilation:
 
-- `ApiClrMemberReference` identifies one public instance CLR property or field by the required pair
-  `ClrName` and `ClrKind`. A traversal owns either one complete reference or no reference;
-  absence means the traversal has no CLR navigation binding.
+- `ClrMemberReference` identifies one public instance CLR property or field by the required pair
+  `ClrName` and `ClrKind`. `ApiRelationshipTraversal.ClrNavigationMember` exposes either one
+  complete reference or no reference; absence means the traversal has no CLR navigation binding.
 - `ApiPropertyReference` identifies a declared `ApiProperty` by exactly one of its API name or CLR
   name. The reference does not repeat `ClrMemberKind`; that is declaration metadata owned by the
   resolved `ApiProperty`.
 - Internal one-shot bindings retain configured references and their resolved targets. Resolution
   occurs during schema compilation, and a failed resolution consumes the binding attempt just as a
-  successful resolution does.
+  successful resolution does. CLR-member bindings also retain the shared compiled member accessor,
+  so contained properties and relationship traversals use one reflection and access pipeline.
 
 This follows the existing `ApiTypeReference` and `ApiTypeBinding` split. CLR-member references are
 used when a consumer binds directly to POCO structure. API-property references are used when a
@@ -148,6 +149,11 @@ objects to that member. Application code receives the populated POCO; it does no
 assignment.
 An unselected traversal must not be interpreted as an empty relationship merely because its CLR
 member has a default or null value.
+
+`ApiRelationshipTraversal` exposes the same object, generic, Try, and by-reference member-access
+operations as `ApiProperty` when a CLR navigation member is bound. These operations use the
+schema's configured type coercion when direct assignment is unavailable. They access only the CLR
+member; reading a value does not establish that the relationship was loaded.
 
 Providers translate the selected canonical result into their protocol representations. JSON:API
 may express related resources through relationship linkage and an `included` array; GraphQL and
