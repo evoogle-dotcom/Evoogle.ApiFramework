@@ -47,46 +47,47 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Property Backed ApiVersionDefinition"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Property Backed ApiVersionDefinition",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Person"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "Person",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [],
-                        ""ApiVersion"": {
-                            ""ApiProperty"": { ""ClrName"": ""Id"" }
+                        "ApiKeys": [],
+                        "ApiVersion": {
+                            "ApiProperty": { "ClrName": "Id" }
                         },
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }"
+                "ApiRelationships": []
+            }
+            """
         },
 
         new ApiSchemaJsonTestCase
@@ -110,35 +111,36 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Repository Backed ApiVersionDefinition"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Repository Backed ApiVersionDefinition",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Empty"",
-                        ""ApiProperties"": [],
-                        ""ApiKeys"": [],
-                        ""ApiVersion"": {
-                            ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Object",
+                        "ApiName": "Empty",
+                        "ApiProperties": [],
+                        "ApiKeys": [],
+                        "ApiVersion": {
+                            "ClrType": "System.Int32, System.Private.CoreLib"
                         },
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Empty, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Empty, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }"
+                "ApiRelationships": []
+            }
+            """
         }
     ];
     #endregion

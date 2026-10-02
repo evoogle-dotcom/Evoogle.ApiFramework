@@ -21,46 +21,47 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiEnumTypeEnumValueDiscoveryConvention)} that discovers all enum values",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [],
-              ""ApiEnumTypes"": [
+              "ApiScalarTypes": [],
+              "ApiEnumTypes": [
                 {
-                  ""ApiKind"": ""Enum"",
-                  ""ApiName"": ""PipelineStatus"",
-                  ""ApiEnumValues"": [
+                  "ApiKind": "Enum",
+                  "ApiName": "PipelineStatus",
+                  "ApiEnumValues": [
                     {
-                      ""ApiName"": ""Active"",
-                      ""ClrName"": ""Active"",
-                      ""ClrOrdinal"": 0
+                      "ApiName": "Active",
+                      "ClrName": "Active",
+                      "ClrOrdinal": 0
                     },
                     {
-                      ""ApiName"": ""InProgress"",
-                      ""ClrName"": ""InProgress"",
-                      ""ClrOrdinal"": 1
+                      "ApiName": "InProgress",
+                      "ClrName": "InProgress",
+                      "ClrOrdinal": 1
                     },
                     {
-                      ""ApiName"": ""OnHold"",
-                      ""ClrName"": ""OnHold"",
-                      ""ClrOrdinal"": 2
+                      "ApiName": "OnHold",
+                      "ClrName": "OnHold",
+                      "ClrOrdinal": 2
                     },
                     {
-                      ""ApiName"": ""Queued"",
-                      ""ClrName"": ""Queued"",
-                      ""ClrOrdinal"": 3
+                      "ApiName": "Queued",
+                      "ClrName": "Queued",
+                      "ClrOrdinal": 3
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiObjectTypes"": [],
-              ""ApiRelationships"": []
-            }",
+              "ApiObjectTypes": [],
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithEnumTypeEnumValueDiscoveryThatDiscoversAllEnumValues()
         },
@@ -68,46 +69,47 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiEnumTypeEnumValueDiscoveryConvention)} with explicit enum value override",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [],
-              ""ApiEnumTypes"": [
+              "ApiScalarTypes": [],
+              "ApiEnumTypes": [
                 {
-                  ""ApiKind"": ""Enum"",
-                  ""ApiName"": ""PipelineStatus"",
-                  ""ApiEnumValues"": [
+                  "ApiKind": "Enum",
+                  "ApiName": "PipelineStatus",
+                  "ApiEnumValues": [
                     {
-                      ""ApiName"": ""Enabled"",
-                      ""ClrName"": ""Active"",
-                      ""ClrOrdinal"": 0
+                      "ApiName": "Enabled",
+                      "ClrName": "Active",
+                      "ClrOrdinal": 0
                     },
                     {
-                      ""ApiName"": ""InProgress"",
-                      ""ClrName"": ""InProgress"",
-                      ""ClrOrdinal"": 1
+                      "ApiName": "InProgress",
+                      "ClrName": "InProgress",
+                      "ClrOrdinal": 1
                     },
                     {
-                      ""ApiName"": ""OnHold"",
-                      ""ClrName"": ""OnHold"",
-                      ""ClrOrdinal"": 2
+                      "ApiName": "OnHold",
+                      "ClrName": "OnHold",
+                      "ClrOrdinal": 2
                     },
                     {
-                      ""ApiName"": ""Queued"",
-                      ""ClrName"": ""Queued"",
-                      ""ClrOrdinal"": 3
+                      "ApiName": "Queued",
+                      "ClrName": "Queued",
+                      "ClrOrdinal": 3
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiObjectTypes"": [],
-              ""ApiRelationships"": []
-            }",
+              "ApiObjectTypes": [],
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithEnumTypeEnumValueDiscoveryWithExplicitEnumValueOverride()
         },
@@ -116,24 +118,25 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiNamingConvention)} for scalar type",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [
+              "ApiScalarTypes": [
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""customScalar"",
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+CustomScalar, Evoogle.ApiFramework.Tests""
+                  "ApiKind": "Scalar",
+                  "ApiName": "customScalar",
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+CustomScalar, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiEnumTypes"": [],
-              ""ApiObjectTypes"": [],
-              ""ApiRelationships"": []
-            }",
+              "ApiEnumTypes": [],
+              "ApiObjectTypes": [],
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithNamingConventionForScalarType()
         },
@@ -141,46 +144,47 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiNamingConvention)} for enum type and all enum values",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [],
-              ""ApiEnumTypes"": [
+              "ApiScalarTypes": [],
+              "ApiEnumTypes": [
                 {
-                  ""ApiKind"": ""Enum"",
-                  ""ApiName"": ""pipelineStatus"",
-                  ""ApiEnumValues"": [
+                  "ApiKind": "Enum",
+                  "ApiName": "pipelineStatus",
+                  "ApiEnumValues": [
                     {
-                      ""ApiName"": ""active"",
-                      ""ClrName"": ""Active"",
-                      ""ClrOrdinal"": 0
+                      "ApiName": "active",
+                      "ClrName": "Active",
+                      "ClrOrdinal": 0
                     },
                     {
-                      ""ApiName"": ""inProgress"",
-                      ""ClrName"": ""InProgress"",
-                      ""ClrOrdinal"": 1
+                      "ApiName": "inProgress",
+                      "ClrName": "InProgress",
+                      "ClrOrdinal": 1
                     },
                     {
-                      ""ApiName"": ""onHold"",
-                      ""ClrName"": ""OnHold"",
-                      ""ClrOrdinal"": 2
+                      "ApiName": "onHold",
+                      "ClrName": "OnHold",
+                      "ClrOrdinal": 2
                     },
                     {
-                      ""ApiName"": ""queued"",
-                      ""ClrName"": ""Queued"",
-                      ""ClrOrdinal"": 3
+                      "ApiName": "queued",
+                      "ClrName": "Queued",
+                      "ClrOrdinal": 3
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiObjectTypes"": [],
-              ""ApiRelationships"": []
-            }",
+              "ApiObjectTypes": [],
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithNamingConventionForEnumTypeAndAllEnumValues()
         },
@@ -188,31 +192,32 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiNamingConvention)} for enum type and preserves typed explicit enum value API name",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [],
-              ""ApiEnumTypes"": [
+              "ApiScalarTypes": [],
+              "ApiEnumTypes": [
                 {
-                  ""ApiKind"": ""Enum"",
-                  ""ApiName"": ""pipelineStatus"",
-                  ""ApiEnumValues"": [
+                  "ApiKind": "Enum",
+                  "ApiName": "pipelineStatus",
+                  "ApiEnumValues": [
                     {
-                      ""ApiName"": ""Enabled"",
-                      ""ClrName"": ""Active"",
-                      ""ClrOrdinal"": 0
+                      "ApiName": "Enabled",
+                      "ClrName": "Active",
+                      "ClrOrdinal": 0
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiObjectTypes"": [],
-              ""ApiRelationships"": []
-            }",
+              "ApiObjectTypes": [],
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory
                     .BuildWithNamingConventionForEnumTypeAndPreservesTypedExplicitEnumValueApiName()
@@ -221,36 +226,37 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiNamingConvention)} for enum type and preserves string explicit enum value API names",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [],
-              ""ApiEnumTypes"": [
+              "ApiScalarTypes": [],
+              "ApiEnumTypes": [
                 {
-                  ""ApiKind"": ""Enum"",
-                  ""ApiName"": ""pipelineStatus"",
-                  ""ApiEnumValues"": [
+                  "ApiKind": "Enum",
+                  "ApiName": "pipelineStatus",
+                  "ApiEnumValues": [
                     {
-                      ""ApiName"": ""Enabled"",
-                      ""ClrName"": ""Active"",
-                      ""ClrOrdinal"": 0
+                      "ApiName": "Enabled",
+                      "ClrName": "Active",
+                      "ClrOrdinal": 0
                     },
                     {
-                      ""ApiName"": ""InProgress"",
-                      ""ClrName"": ""InProgress"",
-                      ""ClrOrdinal"": 1
+                      "ApiName": "InProgress",
+                      "ClrName": "InProgress",
+                      "ClrOrdinal": 1
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiObjectTypes"": [],
-              ""ApiRelationships"": []
-            }",
+              "ApiObjectTypes": [],
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory
                     .BuildWithNamingConventionForEnumTypeAndPreservesStringExplicitEnumValueApiNames()
@@ -259,299 +265,304 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiNamingConvention)} for object type and expression inferred property names",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-                ""ApiName"": ""Test"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "Test",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""string"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "string",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""personWithId"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "personWithId",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""id"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                                "ApiName": "id",
+                                "ApiType": {
+                                    "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""name"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "name",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""email"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "email",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Email"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Email",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                        "ApiKeys": [],
+                        "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }",
+                "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () => ApiConventionTestsFactory.BuildWithNamingConventionForObjectTypeAndExpressionInferredPropertyNames()
         },
 
         new BuildTest
         {
             Name = $"Build with {nameof(ApiNamingConvention)} for object type and preserves selector explicit API name",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-                ""ApiName"": ""Test"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "Test",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""string"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "string",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""personWithId"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "personWithId",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""id"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                                "ApiName": "id",
+                                "ApiType": {
+                                    "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""name"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "name",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""EmailAddress"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "EmailAddress",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Email"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Email",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                        "ApiKeys": [],
+                        "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }",
+                "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () => ApiConventionTestsFactory.BuildWithNamingConventionForObjectTypeAndPreservesSelectorExplicitApiName()
         },
 
         new BuildTest
         {
             Name = $"Build with {nameof(ApiNamingConvention)} for object type and preserves callback explicit API name",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-                ""ApiName"": ""Test"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "Test",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""string"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "string",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""personWithId"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "personWithId",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""id"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                                "ApiName": "id",
+                                "ApiType": {
+                                    "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""name"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "name",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""EmailAddress"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "EmailAddress",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Email"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Email",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                        "ApiKeys": [],
+                        "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }",
+                "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () => ApiConventionTestsFactory.BuildWithNamingConventionForObjectTypeAndPreservesCallbackExplicitApiName()
         },
 
         new BuildTest
         {
             Name = $"Build with {nameof(ApiNamingConvention)} for object type and preserves string based explicit API names",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-                ""ApiName"": ""Test"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "Test",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""string"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "string",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Person"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "Person",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""EmailAddress"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "EmailAddress",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Email"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Email",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                        "ApiKeys": [],
+                        "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }",
+                "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () => ApiConventionTestsFactory.BuildWithNamingConventionForObjectTypeAndPreservesStringBasedExplicitApiNames()
         },
 
         new BuildTest
         {
             Name = $"Build with custom {nameof(ApiNamingConvention)}s that appends 'Api' and 'Model' to API name",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [],
-              ""ApiEnumTypes"": [
+              "ApiScalarTypes": [],
+              "ApiEnumTypes": [
                 {
-                  ""ApiKind"": ""Enum"",
-                  ""ApiName"": ""PipelineStatusApiModel"",
-                  ""ApiEnumValues"": [
+                  "ApiKind": "Enum",
+                  "ApiName": "PipelineStatusApiModel",
+                  "ApiEnumValues": [
                     {
-                      ""ApiName"": ""ActiveApiModel"",
-                      ""ClrName"": ""Active"",
-                      ""ClrOrdinal"": 0
+                      "ApiName": "ActiveApiModel",
+                      "ClrName": "Active",
+                      "ClrOrdinal": 0
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiObjectTypes"": [
+              "ApiObjectTypes": [
                 {
-                  ""ApiKind"": ""Object"",
-                  ""ApiName"": ""PersonWithIdApiModel"",
-                  ""ApiProperties"": [],
-                  ""ApiKeys"": [],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                  "ApiKind": "Object",
+                  "ApiName": "PersonWithIdApiModel",
+                  "ApiProperties": [],
+                  "ApiKeys": [],
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiRelationships"": []
-            }",
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithCustomNamingConventionsThatAppendsApiAndModelToApiName()
         },
@@ -559,31 +570,32 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with custom {nameof(ApiNamingConvention)}s that hard codes API enum value and appends 'Changed' to API name",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [],
-              ""ApiEnumTypes"": [
+              "ApiScalarTypes": [],
+              "ApiEnumTypes": [
                 {
-                  ""ApiKind"": ""Enum"",
-                  ""ApiName"": ""PipelineStatusChanged"",
-                  ""ApiEnumValues"": [
+                  "ApiKind": "Enum",
+                  "ApiName": "PipelineStatusChanged",
+                  "ApiEnumValues": [
                     {
-                      ""ApiName"": ""LockedName"",
-                      ""ClrName"": ""Active"",
-                      ""ClrOrdinal"": 0
+                      "ApiName": "LockedName",
+                      "ClrName": "Active",
+                      "ClrOrdinal": 0
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PipelineStatus, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiObjectTypes"": [],
-              ""ApiRelationships"": []
-            }",
+              "ApiObjectTypes": [],
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithCustomNamingConventionsThatHardCodesApiEnumValueAndAppendsChangedToApiName()
         },
@@ -592,78 +604,79 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiObjectTypePrimaryKeyInferenceConvention)} that discovers primary key property 'Id'",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [
+              "ApiScalarTypes": [
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""Guid"",
-                  ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "Guid",
+                  "ClrType": "System.Guid, System.Private.CoreLib"
                 },
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""String"",
-                  ""ClrType"": ""System.String, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "String",
+                  "ClrType": "System.String, System.Private.CoreLib"
                 }
               ],
-              ""ApiEnumTypes"": [],
-              ""ApiObjectTypes"": [
+              "ApiEnumTypes": [],
+              "ApiObjectTypes": [
                 {
-                  ""ApiKind"": ""Object"",
-                  ""ApiName"": ""PersonWithId"",
-                  ""ApiProperties"": [
+                  "ApiKind": "Object",
+                  "ApiName": "PersonWithId",
+                  "ApiProperties": [
                     {
-                      ""ApiName"": ""Id"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                      "ApiName": "Id",
+                      "ApiType": {
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Id"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Id",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""Name"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "Name",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Name"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Name",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""Email"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "Email",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""None"",
-                      ""ClrName"": ""Email"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "None",
+                      "ClrName": "Email",
+                      "ClrMemberKind": "Property"
                     }
                   ],
-                  ""ApiKeys"": [
+                  "ApiKeys": [
                     {
-                      ""ApiName"": ""PrimaryKey"",
-                      ""ApiKeyPaths"": [
+                      "ApiName": "PrimaryKey",
+                      "ApiKeyPaths": [
                         {
-                          ""ApiSegments"": [
+                          "ApiSegments": [
                             {
-                              ""ApiProperty"": { ""ClrName"": ""Id"" }
+                              "ApiProperty": { "ClrName": "Id" }
                             }
                           ]
                         }
                       ]
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiRelationships"": []
-            }",
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithObjectTypePrimaryKeyInferenceThatDiscoversId()
         },
@@ -671,78 +684,79 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiObjectTypePrimaryKeyInferenceConvention)} that discovers primary key property 'Id' but does not overwrite an explicit primary key",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [
+              "ApiScalarTypes": [
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""Guid"",
-                  ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "Guid",
+                  "ClrType": "System.Guid, System.Private.CoreLib"
                 },
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""String"",
-                  ""ClrType"": ""System.String, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "String",
+                  "ClrType": "System.String, System.Private.CoreLib"
                 }
               ],
-              ""ApiEnumTypes"": [],
-              ""ApiObjectTypes"": [
+              "ApiEnumTypes": [],
+              "ApiObjectTypes": [
                 {
-                  ""ApiKind"": ""Object"",
-                  ""ApiName"": ""PersonWithId"",
-                  ""ApiProperties"": [
+                  "ApiKind": "Object",
+                  "ApiName": "PersonWithId",
+                  "ApiProperties": [
                     {
-                      ""ApiName"": ""Id"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                      "ApiName": "Id",
+                      "ApiType": {
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Id"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Id",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""Name"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "Name",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Name"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Name",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""Email"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "Email",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""None"",
-                      ""ClrName"": ""Email"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "None",
+                      "ClrName": "Email",
+                      "ClrMemberKind": "Property"
                     }
                   ],
-                  ""ApiKeys"": [
+                  "ApiKeys": [
                     {
-                      ""ApiName"": ""PrimaryKey"",
-                      ""ApiKeyPaths"": [
+                      "ApiName": "PrimaryKey",
+                      "ApiKeyPaths": [
                         {
-                          ""ApiSegments"": [
+                          "ApiSegments": [
                             {
-                              ""ApiProperty"": { ""ClrName"": ""Name"" }
+                              "ApiProperty": { "ClrName": "Name" }
                             }
                           ]
                         }
                       ]
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiRelationships"": []
-            }",
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithObjectTypePrimaryKeyInferenceThatDiscoversIdButDoesNotOverwriteAnExplicitPrimaryKey()
         },
@@ -750,69 +764,70 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiObjectTypePrimaryKeyInferenceConvention)} that discovers primary key property 'ClassNameId'",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [
+              "ApiScalarTypes": [
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""Guid"",
-                  ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "Guid",
+                  "ClrType": "System.Guid, System.Private.CoreLib"
                 },
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""String"",
-                  ""ClrType"": ""System.String, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "String",
+                  "ClrType": "System.String, System.Private.CoreLib"
                 }
               ],
-              ""ApiEnumTypes"": [],
-              ""ApiObjectTypes"": [
+              "ApiEnumTypes": [],
+              "ApiObjectTypes": [
                 {
-                  ""ApiKind"": ""Object"",
-                  ""ApiName"": ""OrderItem"",
-                  ""ApiProperties"": [
+                  "ApiKind": "Object",
+                  "ApiName": "OrderItem",
+                  "ApiProperties": [
                     {
-                      ""ApiName"": ""OrderItemId"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                      "ApiName": "OrderItemId",
+                      "ApiType": {
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""OrderItemId"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "OrderItemId",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""Description"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "Description",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Description"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Description",
+                      "ClrMemberKind": "Property"
                     }
                   ],
-                  ""ApiKeys"": [
+                  "ApiKeys": [
                     {
-                      ""ApiName"": ""PrimaryKey"",
-                      ""ApiKeyPaths"": [
+                      "ApiName": "PrimaryKey",
+                      "ApiKeyPaths": [
                         {
-                          ""ApiSegments"": [
+                          "ApiSegments": [
                             {
-                              ""ApiProperty"": { ""ClrName"": ""OrderItemId"" }
+                              "ApiProperty": { "ClrName": "OrderItemId" }
                             }
                           ]
                         }
                       ]
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+OrderItem, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+OrderItem, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiRelationships"": []
-            }",
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithObjectTypePrimaryKeyInferenceThatDiscoversClassNameId()
         },
@@ -821,65 +836,66 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiPropertyNullabilityModifierConvention)}",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [
+              "ApiScalarTypes": [
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""Guid"",
-                  ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "Guid",
+                  "ClrType": "System.Guid, System.Private.CoreLib"
                 },
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""String"",
-                  ""ClrType"": ""System.String, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "String",
+                  "ClrType": "System.String, System.Private.CoreLib"
                 }
               ],
-              ""ApiEnumTypes"": [],
-              ""ApiObjectTypes"": [
+              "ApiEnumTypes": [],
+              "ApiObjectTypes": [
                 {
-                  ""ApiKind"": ""Object"",
-                  ""ApiName"": ""PersonWithId"",
-                  ""ApiProperties"": [
+                  "ApiKind": "Object",
+                  "ApiName": "PersonWithId",
+                  "ApiProperties": [
                     {
-                      ""ApiName"": ""Id"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                      "ApiName": "Id",
+                      "ApiType": {
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Id"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Id",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""Name"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "Name",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Name"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Name",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""Email"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "Email",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""None"",
-                      ""ClrName"": ""Email"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "None",
+                      "ClrName": "Email",
+                      "ClrMemberKind": "Property"
                     }
                   ],
-                  ""ApiKeys"": [],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                  "ApiKeys": [],
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiRelationships"": []
-            }",
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithObjectTypePropertyNullabilityModifiers()
         },
@@ -887,65 +903,66 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiPropertyNullabilityModifierConvention)} and explicit property modifier",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [
+              "ApiScalarTypes": [
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""Guid"",
-                  ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "Guid",
+                  "ClrType": "System.Guid, System.Private.CoreLib"
                 },
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""String"",
-                  ""ClrType"": ""System.String, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "String",
+                  "ClrType": "System.String, System.Private.CoreLib"
                 }
               ],
-              ""ApiEnumTypes"": [],
-              ""ApiObjectTypes"": [
+              "ApiEnumTypes": [],
+              "ApiObjectTypes": [
                 {
-                  ""ApiKind"": ""Object"",
-                  ""ApiName"": ""PersonWithId"",
-                  ""ApiProperties"": [
+                  "ApiKind": "Object",
+                  "ApiName": "PersonWithId",
+                  "ApiProperties": [
                     {
-                      ""ApiName"": ""Id"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                      "ApiName": "Id",
+                      "ApiType": {
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Id"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Id",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""Name"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "Name",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Name"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Name",
+                      "ClrMemberKind": "Property"
                     },
                     {
-                      ""ApiName"": ""email"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                      "ApiName": "email",
+                      "ApiType": {
+                        "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Email"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Email",
+                      "ClrMemberKind": "Property"
                     }
                   ],
-                  ""ApiKeys"": [],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                  "ApiKeys": [],
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiRelationships"": []
-            }",
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithObjectTypePropertyNullabilityModifiersAndExplicitPropertyModifier()
         },
@@ -954,200 +971,203 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiObjectTypePropertyDiscoveryConvention)} that discovers public instance properties",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-                ""ApiName"": ""Test"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "Test",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""PersonWithId"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "PersonWithId",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Email"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "Email",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Email"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Email",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                        "ApiKeys": [],
+                        "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }",
+                "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () => ApiConventionTestsFactory.BuildWithObjectTypePropertyDiscoveryThatDiscoversPublicInstanceProperties()
         },
 
         new BuildTest
         {
             Name = $"Build with {nameof(ApiObjectTypePropertyDiscoveryConvention)} that discovers public instance fields",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-                ""ApiName"": ""Test"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "Test",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TypeWithField"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TypeWithField",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Field""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Field"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Field""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Field"
                             },
                             {
-                                ""ApiName"": ""Count"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                "ApiName": "Count",
+                                "ApiType": {
+                                    "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Count"",
-                                ""ClrMemberKind"": ""Field""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Count",
+                                "ClrMemberKind": "Field"
                             }
                         ],
-                        ""ApiKeys"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+TypeWithField, Evoogle.ApiFramework.Tests""
+                        "ApiKeys": [],
+                        "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+TypeWithField, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }",
+                "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () => ApiConventionTestsFactory.BuildWithObjectTypePropertyDiscoveryThatDiscoversPublicInstanceFields()
         },
 
         new BuildTest
         {
             Name = $"Build with {nameof(ApiObjectTypePropertyDiscoveryConvention)} that does not duplicate explicitly added properties",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-                ""ApiName"": ""Test"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "Test",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""PersonWithId"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "PersonWithId",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""identifier"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                                "ApiName": "identifier",
+                                "ApiType": {
+                                    "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""displayName"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "displayName",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Email"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "Email",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Email"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Email",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
+                        "ApiKeys": [],
+                        "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }",
+                "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () => ApiConventionTestsFactory.BuildWithObjectTypePropertyDiscoveryThatDoesNotDuplicateExplicitlyAddedProperties()
         },
 
@@ -1155,60 +1175,61 @@ public partial class ApiConventionTests
         new BuildTest
         {
             Name = $"Build with {nameof(ApiSchemaAssemblyTypeInferenceConvention)}",
-            ApiSchemaExpectedJson = @"
+            ApiSchemaExpectedJson = """
             {
-              ""ApiName"": ""Test"",
-              ""ApiVersion"": ""0.1.0"",
-              ""ApiOptions"": {
-                ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+              "ApiName": "Test",
+              "ApiVersion": "0.1.0",
+              "ApiOptions": {
+                "ApiKeyNullHandling": "UseDefaultOnNull"
               },
-              ""ApiScalarTypes"": [
+              "ApiScalarTypes": [
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""AssemblyScannedScalar"",
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+AssemblyScannedScalar, Evoogle.ApiFramework.Tests""
+                  "ApiKind": "Scalar",
+                  "ApiName": "AssemblyScannedScalar",
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+AssemblyScannedScalar, Evoogle.ApiFramework.Tests"
                 },
                 {
-                  ""ApiKind"": ""Scalar"",
-                  ""ApiName"": ""Guid"",
-                  ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                  "ApiKind": "Scalar",
+                  "ApiName": "Guid",
+                  "ClrType": "System.Guid, System.Private.CoreLib"
                 }
               ],
-              ""ApiEnumTypes"": [
+              "ApiEnumTypes": [
                 {
-                  ""ApiKind"": ""Enum"",
-                  ""ApiName"": ""AssemblyScannedEnum"",
-                  ""ApiEnumValues"": [
+                  "ApiKind": "Enum",
+                  "ApiName": "AssemblyScannedEnum",
+                  "ApiEnumValues": [
                     {
-                      ""ApiName"": ""Active"",
-                      ""ClrName"": ""Active"",
-                      ""ClrOrdinal"": 0
+                      "ApiName": "Active",
+                      "ClrName": "Active",
+                      "ClrOrdinal": 0
                     }
                   ],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+AssemblyScannedEnum, Evoogle.ApiFramework.Tests""
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+AssemblyScannedEnum, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiObjectTypes"": [
+              "ApiObjectTypes": [
                 {
-                  ""ApiKind"": ""Object"",
-                  ""ApiName"": ""AssemblyScannedObject"",
-                  ""ApiProperties"": [
+                  "ApiKind": "Object",
+                  "ApiName": "AssemblyScannedObject",
+                  "ApiProperties": [
                     {
-                      ""ApiName"": ""Id"",
-                      ""ApiType"": {
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                      "ApiName": "Id",
+                      "ApiType": {
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      ""ApiTypeModifiers"": ""Required"",
-                      ""ClrName"": ""Id"",
-                      ""ClrMemberKind"": ""Property""
+                      "ApiTypeModifiers": "Required",
+                      "ClrName": "Id",
+                      "ClrMemberKind": "Property"
                     }
                   ],
-                  ""ApiKeys"": [],
-                  ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+AssemblyScannedObject, Evoogle.ApiFramework.Tests""
+                  "ApiKeys": [],
+                  "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+AssemblyScannedObject, Evoogle.ApiFramework.Tests"
                 }
               ],
-              ""ApiRelationships"": []
-            }",
+              "ApiRelationships": []
+            }
+            """,
             ApiSchemaActualBuildExpression = static () =>
                 ApiConventionTestsFactory.BuildWithSchemaAssemblyTypeInference()
         },

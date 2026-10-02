@@ -26,7 +26,7 @@ public partial class ApiTypeTests
         {
             Name = "Null",
             FactoryArgument = null,
-            Json = "null"
+            Json = """null"""
         },
 
         // ApiScalarType
@@ -38,12 +38,13 @@ public partial class ApiTypeTests
                 ApiName: nameof(Boolean),
                 ClrType: typeof(bool)
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Boolean"",
-                ""ClrType"": ""System.Boolean, System.Private.CoreLib""
-            }"
+                "ApiKind": "Scalar",
+                "ApiName": "Boolean",
+                "ClrType": "System.Boolean, System.Private.CoreLib"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -55,17 +56,18 @@ public partial class ApiTypeTests
                 ClrType: typeof(bool),
                 ExtensionTypes: [ typeof(GraphQlExtension) ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Boolean"",
-                ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
-                ""Extensions"": {
-                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests"": {
-                        ""Count"": 42
+                "ApiKind": "Scalar",
+                "ApiName": "Boolean",
+                "ClrType": "System.Boolean, System.Private.CoreLib",
+                "Extensions": {
+                    "Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests": {
+                        "Count": 42
                     }
                 }
-            }"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -76,12 +78,13 @@ public partial class ApiTypeTests
                 ApiName: nameof(Int32),
                 ClrType: typeof(int)
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Int32"",
-                ""ClrType"": ""System.Int32, System.Private.CoreLib""
-            }"
+                "ApiKind": "Scalar",
+                "ApiName": "Int32",
+                "ClrType": "System.Int32, System.Private.CoreLib"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -92,12 +95,13 @@ public partial class ApiTypeTests
                 ApiName: nameof(Single),
                 ClrType: typeof(float)
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Single"",
-                ""ClrType"": ""System.Single, System.Private.CoreLib""
-            }"
+                "ApiKind": "Scalar",
+                "ApiName": "Single",
+                "ClrType": "System.Single, System.Private.CoreLib"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -108,12 +112,13 @@ public partial class ApiTypeTests
                 ApiName: nameof(String),
                 ClrType: typeof(string)
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""String"",
-                ""ClrType"": ""System.String, System.Private.CoreLib""
-            }"
+                "ApiKind": "Scalar",
+                "ApiName": "String",
+                "ClrType": "System.String, System.Private.CoreLib"
+            }
+            """
         },
 
         // ApiEnumType
@@ -125,34 +130,35 @@ public partial class ApiTypeTests
                 ApiName: nameof(StopLight),
                 ClrType: typeof(StopLight)
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Enum"",
-                ""ApiName"": ""StopLight"",
-                ""ApiEnumValues"": [
+                "ApiKind": "Enum",
+                "ApiName": "StopLight",
+                "ApiEnumValues": [
                     {
-                        ""ApiName"": ""None"",
-                        ""ClrName"": ""None"",
-                        ""ClrOrdinal"": 0
+                        "ApiName": "None",
+                        "ClrName": "None",
+                        "ClrOrdinal": 0
                     },
                     {
-                        ""ApiName"": ""Green"",
-                        ""ClrName"": ""Green"",
-                        ""ClrOrdinal"": 1
+                        "ApiName": "Green",
+                        "ClrName": "Green",
+                        "ClrOrdinal": 1
                     },
                     {
-                        ""ApiName"": ""Yellow"",
-                        ""ClrName"": ""Yellow"",
-                        ""ClrOrdinal"": 2
+                        "ApiName": "Yellow",
+                        "ClrName": "Yellow",
+                        "ClrOrdinal": 2
                     },
                     {
-                        ""ApiName"": ""Red"",
-                        ""ClrName"": ""Red"",
-                        ""ClrOrdinal"": 3
+                        "ApiName": "Red",
+                        "ClrName": "Red",
+                        "ClrOrdinal": 3
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Tests""
-            }"
+                "ClrType": "Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Tests"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -164,39 +170,40 @@ public partial class ApiTypeTests
                 ClrType: typeof(StopLight),
                 ExtensionTypes: [ typeof(JsonApiExtension) ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Enum"",
-                ""ApiName"": ""StopLight"",
-                ""ApiEnumValues"": [
+                "ApiKind": "Enum",
+                "ApiName": "StopLight",
+                "ApiEnumValues": [
                     {
-                        ""ApiName"": ""None"",
-                        ""ClrName"": ""None"",
-                        ""ClrOrdinal"": 0
+                        "ApiName": "None",
+                        "ClrName": "None",
+                        "ClrOrdinal": 0
                     },
                     {
-                        ""ApiName"": ""Green"",
-                        ""ClrName"": ""Green"",
-                        ""ClrOrdinal"": 1
+                        "ApiName": "Green",
+                        "ClrName": "Green",
+                        "ClrOrdinal": 1
                     },
                     {
-                        ""ApiName"": ""Yellow"",
-                        ""ClrName"": ""Yellow"",
-                        ""ClrOrdinal"": 2
+                        "ApiName": "Yellow",
+                        "ClrName": "Yellow",
+                        "ClrOrdinal": 2
                     },
                     {
-                        ""ApiName"": ""Red"",
-                        ""ClrName"": ""Red"",
-                        ""ClrOrdinal"": 3
+                        "ApiName": "Red",
+                        "ClrName": "Red",
+                        "ClrOrdinal": 3
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Tests"",
-                ""Extensions"": {
-                    ""Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Tests"": {
-                        ""Website"": ""http://jsonapi.org""
+                "ClrType": "Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Tests",
+                "Extensions": {
+                    "Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Tests": {
+                        "Website": "http://jsonapi.org"
                     }
                 }
-            }"
+            }
+            """
         },
 
         // ApiCollectionType
@@ -213,16 +220,17 @@ public partial class ApiTypeTests
                 ),
                 ApiItemTypeModifiers: ApiTypeModifiers.Required
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Collection"",
-                ""ApiItemType"": {
-                    ""ApiKind"": ""Scalar"",
-                    ""ApiName"": ""String""
+                "ApiKind": "Collection",
+                "ApiItemType": {
+                    "ApiKind": "Scalar",
+                    "ApiName": "String"
                 },
-                ""ApiItemTypeModifiers"": ""Required"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
-            }"
+                "ApiItemTypeModifiers": "Required",
+                "ClrType": "System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -238,16 +246,17 @@ public partial class ApiTypeTests
                 ),
                 ApiItemTypeModifiers: ApiTypeModifiers.None
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Collection"",
-                ""ApiItemType"": {
-                    ""ApiKind"": ""Scalar"",
-                    ""ApiName"": ""String""
+                "ApiKind": "Collection",
+                "ApiItemType": {
+                    "ApiKind": "Scalar",
+                    "ApiName": "String"
                 },
-                ""ApiItemTypeModifiers"": ""None"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
-            }"
+                "ApiItemTypeModifiers": "None",
+                "ClrType": "System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -263,16 +272,17 @@ public partial class ApiTypeTests
                 ),
                 ApiItemTypeModifiers: ApiTypeModifiers.Required
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Collection"",
-                ""ApiItemType"": {
-                    ""ApiKind"": ""Enum"",
-                    ""ApiName"": ""StopLight""
+                "ApiKind": "Collection",
+                "ApiItemType": {
+                    "ApiKind": "Enum",
+                    "ApiName": "StopLight"
                 },
-                ""ApiItemTypeModifiers"": ""Required"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
-            }"
+                "ApiItemTypeModifiers": "Required",
+                "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Tests]], System.Private.CoreLib"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -288,16 +298,17 @@ public partial class ApiTypeTests
                 ),
                 ApiItemTypeModifiers: ApiTypeModifiers.None
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Collection"",
-                ""ApiItemType"": {
-                    ""ApiKind"": ""Enum"",
-                    ""ApiName"": ""StopLight""
+                "ApiKind": "Collection",
+                "ApiItemType": {
+                    "ApiKind": "Enum",
+                    "ApiName": "StopLight"
                 },
-                ""ApiItemTypeModifiers"": ""None"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.Nullable\u00601[[Evoogle.ApiFramework.TestData.StopLight,Evoogle.ApiFramework.Tests]],System.Private.CoreLib]],System.Private.CoreLib""
-            }"
+                "ApiItemTypeModifiers": "None",
+                "ClrType": "System.Collections.Generic.List\u00601[[System.Nullable\u00601[[Evoogle.ApiFramework.TestData.StopLight,Evoogle.ApiFramework.Tests]],System.Private.CoreLib]],System.Private.CoreLib"
+            }
+            """
         },
 
         // ApiObjectType With API Named Typed Expressions
@@ -360,75 +371,76 @@ public partial class ApiTypeTests
                     ),
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Object"",
-                ""ApiName"": ""ScalarsOnly"",
-                ""ApiProperties"": [
+                "ApiKind": "Object",
+                "ApiName": "ScalarsOnly",
+                "ApiProperties": [
                     {
-                        ""ApiName"": ""RequiredName"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""String""
+                        "ApiName": "RequiredName",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredName"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredName",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredNumber"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Int64""
+                        "ApiName": "RequiredNumber",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Int64"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredNumber"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredNumber",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredPredicate"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Boolean""
+                        "ApiName": "RequiredPredicate",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Boolean"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredPredicate"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredPredicate",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""OptionalName"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""String""
+                        "ApiName": "OptionalName",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalName"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalName",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalNumber"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Int64""
+                        "ApiName": "OptionalNumber",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Int64"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalNumber"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalNumber",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalPredicate"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Boolean""
+                        "ApiName": "OptionalPredicate",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Boolean"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalPredicate"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalPredicate",
+                        "ClrMemberKind": "Field"
                     }
                 ],
-                ""ApiKeys"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
-            }"
+                "ApiKeys": [],
+                "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -491,78 +503,79 @@ public partial class ApiTypeTests
                     ),
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Object"",
-                ""ApiName"": ""ScalarsOnly"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""ThrowOnNull""
+                "ApiKind": "Object",
+                "ApiName": "ScalarsOnly",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "ThrowOnNull"
                 },
-                ""ApiProperties"": [
+                "ApiProperties": [
                     {
-                        ""ApiName"": ""RequiredName"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""String""
+                        "ApiName": "RequiredName",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredName"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredName",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredNumber"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Int64""
+                        "ApiName": "RequiredNumber",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Int64"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredNumber"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredNumber",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredPredicate"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Boolean""
+                        "ApiName": "RequiredPredicate",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Boolean"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredPredicate"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredPredicate",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""OptionalName"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""String""
+                        "ApiName": "OptionalName",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalName"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalName",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalNumber"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Int64""
+                        "ApiName": "OptionalNumber",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Int64"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalNumber"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalNumber",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalPredicate"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Boolean""
+                        "ApiName": "OptionalPredicate",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Boolean"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalPredicate"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalPredicate",
+                        "ClrMemberKind": "Field"
                     }
                 ],
-                ""ApiKeys"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
-            }"
+                "ApiKeys": [],
+                "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -625,83 +638,84 @@ public partial class ApiTypeTests
                     ),
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Object"",
-                ""ApiName"": ""ScalarsOnly"",
-                ""ApiProperties"": [
+                "ApiKind": "Object",
+                "ApiName": "ScalarsOnly",
+                "ApiProperties": [
                     {
-                        ""ApiName"": ""RequiredName"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""String""
+                        "ApiName": "RequiredName",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredName"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredName",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredNumber"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Int64""
+                        "ApiName": "RequiredNumber",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Int64"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredNumber"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredNumber",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredPredicate"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Boolean""
+                        "ApiName": "RequiredPredicate",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Boolean"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredPredicate"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredPredicate",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""OptionalName"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""String""
+                        "ApiName": "OptionalName",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalName"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalName",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalNumber"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Int64""
+                        "ApiName": "OptionalNumber",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Int64"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalNumber"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalNumber",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalPredicate"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Boolean""
+                        "ApiName": "OptionalPredicate",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Boolean"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalPredicate"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalPredicate",
+                        "ClrMemberKind": "Field"
                     }
                 ],
-                ""ApiKeys"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"",
-                ""Extensions"": {
-                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests"": {
-                        ""Count"": 42
+                "ApiKeys": [],
+                "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests",
+                "Extensions": {
+                    "Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests": {
+                        "Count": 42
                     },
-                    ""Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Tests"": {
-                        ""Website"": ""http://jsonapi.org""
+                    "Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Tests": {
+                        "Website": "http://jsonapi.org"
                     }
                 }
-            }"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -773,77 +787,78 @@ public partial class ApiTypeTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Object"",
-                ""ApiName"": ""Company"",
-                ""ApiProperties"": [
+                "ApiKind": "Object",
+                "ApiName": "Company",
+                "ApiProperties": [
                     {
-                        ""ApiName"": ""Id"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""Ulid""
+                        "ApiName": "Id",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "Ulid"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""Id"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "Id",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""Name"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Scalar"",
-                            ""ApiName"": ""String""
+                        "ApiName": "Name",
+                        "ApiType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""Name"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "Name",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""Owner"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Object"",
-                            ""ApiName"": ""Person""
+                        "ApiName": "Owner",
+                        "ApiType": {
+                            "ApiKind": "Object",
+                            "ApiName": "Person"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""Owner"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "Owner",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""Employees"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Collection"",
-                            ""ApiItemType"": {
-                                ""ApiKind"": ""Object"",
-                                ""ApiName"": ""Person""
+                        "ApiName": "Employees",
+                        "ApiType": {
+                            "ApiKind": "Collection",
+                            "ApiItemType": {
+                                "ApiKind": "Object",
+                                "ApiName": "Person"
                             },
-                            ""ApiItemTypeModifiers"": ""Required"",
-                            ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
+                            "ApiItemTypeModifiers": "Required",
+                            "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests]], System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""Employees"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "Employees",
+                        "ClrMemberKind": "Property"
                     }
                 ],
-                ""ApiKeys"": [
+                "ApiKeys": [
                     {
-                        ""ApiName"": ""PK_Company_Id"",
-                        ""ApiKeyPaths"": [
+                        "ApiName": "PK_Company_Id",
+                        "ApiKeyPaths": [
                             {
-                                ""ClrPath"": ""Id""
+                                "ClrPath": "Id"
                             }
                         ]
                     },
                     {
-                        ""ApiName"": ""AK_Company_Name"",
-                        ""ApiKeyPaths"": [
+                        "ApiName": "AK_Company_Name",
+                        "ApiKeyPaths": [
                             {
-                                ""ClrPath"": ""Name""
+                                "ClrPath": "Name"
                             }
                         ]
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Tests""
-            }"
+                "ClrType": "Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Tests"
+            }
+            """
         },
 
         // ApiObjectType With CLR Typed Expressions
@@ -906,69 +921,70 @@ public partial class ApiTypeTests
                     ),
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Object"",
-                ""ApiName"": ""ScalarsOnly"",
-                ""ApiProperties"": [
+                "ApiKind": "Object",
+                "ApiName": "ScalarsOnly",
+                "ApiProperties": [
                     {
-                        ""ApiName"": ""RequiredName"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiName": "RequiredName",
+                        "ApiType": {
+                            "ClrType": "System.String,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredName"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredName",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredNumber"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        "ApiName": "RequiredNumber",
+                        "ApiType": {
+                            "ClrType": "System.Int64,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredNumber"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredNumber",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredPredicate"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        "ApiName": "RequiredPredicate",
+                        "ApiType": {
+                            "ClrType": "System.Boolean,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredPredicate"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredPredicate",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""OptionalName"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiName": "OptionalName",
+                        "ApiType": {
+                            "ClrType": "System.String,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalName"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalName",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalNumber"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        "ApiName": "OptionalNumber",
+                        "ApiType": {
+                            "ClrType": "System.Int64,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalNumber"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalNumber",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalPredicate"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        "ApiName": "OptionalPredicate",
+                        "ApiType": {
+                            "ClrType": "System.Boolean,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalPredicate"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalPredicate",
+                        "ClrMemberKind": "Field"
                     }
                 ],
-                ""ApiKeys"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
-            }"
+                "ApiKeys": [],
+                "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -1031,72 +1047,73 @@ public partial class ApiTypeTests
                     ),
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Object"",
-                ""ApiName"": ""ScalarsOnly"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""ThrowOnNull""
+                "ApiKind": "Object",
+                "ApiName": "ScalarsOnly",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "ThrowOnNull"
                 },
-                ""ApiProperties"": [
+                "ApiProperties": [
                     {
-                        ""ApiName"": ""RequiredName"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiName": "RequiredName",
+                        "ApiType": {
+                            "ClrType": "System.String,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredName"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredName",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredNumber"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        "ApiName": "RequiredNumber",
+                        "ApiType": {
+                            "ClrType": "System.Int64,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredNumber"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredNumber",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredPredicate"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        "ApiName": "RequiredPredicate",
+                        "ApiType": {
+                            "ClrType": "System.Boolean,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredPredicate"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredPredicate",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""OptionalName"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiName": "OptionalName",
+                        "ApiType": {
+                            "ClrType": "System.String,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalName"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalName",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalNumber"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        "ApiName": "OptionalNumber",
+                        "ApiType": {
+                            "ClrType": "System.Int64,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalNumber"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalNumber",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalPredicate"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        "ApiName": "OptionalPredicate",
+                        "ApiType": {
+                            "ClrType": "System.Boolean,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalPredicate"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalPredicate",
+                        "ClrMemberKind": "Field"
                     }
                 ],
-                ""ApiKeys"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
-            }"
+                "ApiKeys": [],
+                "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -1159,77 +1176,78 @@ public partial class ApiTypeTests
                     ),
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Object"",
-                ""ApiName"": ""ScalarsOnly"",
-                ""ApiProperties"": [
+                "ApiKind": "Object",
+                "ApiName": "ScalarsOnly",
+                "ApiProperties": [
                     {
-                        ""ApiName"": ""RequiredName"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiName": "RequiredName",
+                        "ApiType": {
+                            "ClrType": "System.String,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredName"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredName",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredNumber"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        "ApiName": "RequiredNumber",
+                        "ApiType": {
+                            "ClrType": "System.Int64,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredNumber"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredNumber",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""RequiredPredicate"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        "ApiName": "RequiredPredicate",
+                        "ApiType": {
+                            "ClrType": "System.Boolean,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""RequiredPredicate"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "RequiredPredicate",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""OptionalName"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiName": "OptionalName",
+                        "ApiType": {
+                            "ClrType": "System.String,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalName"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalName",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalNumber"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        "ApiName": "OptionalNumber",
+                        "ApiType": {
+                            "ClrType": "System.Int64,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalNumber"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalNumber",
+                        "ClrMemberKind": "Field"
                     },
                     {
-                        ""ApiName"": ""OptionalPredicate"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        "ApiName": "OptionalPredicate",
+                        "ApiType": {
+                            "ClrType": "System.Boolean,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""OptionalPredicate"",
-                        ""ClrMemberKind"": ""Field""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "OptionalPredicate",
+                        "ClrMemberKind": "Field"
                     }
                 ],
-                ""ApiKeys"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"",
-                ""Extensions"": {
-                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests"": {
-                        ""Count"": 42
+                "ApiKeys": [],
+                "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests",
+                "Extensions": {
+                    "Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests": {
+                        "Count": 42
                     },
-                    ""Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Tests"": {
-                        ""Website"": ""http://jsonapi.org""
+                    "Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Tests": {
+                        "Website": "http://jsonapi.org"
                     }
                 }
-            }"
+            }
+            """
         },
 
         new ApiTypeJsonTestCase
@@ -1301,73 +1319,74 @@ public partial class ApiTypeTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiKind"": ""Object"",
-                ""ApiName"": ""Company"",
-                ""ApiProperties"": [
+                "ApiKind": "Object",
+                "ApiName": "Company",
+                "ApiProperties": [
                     {
-                        ""ApiName"": ""Id"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.Ulid,Ulid""
+                        "ApiName": "Id",
+                        "ApiType": {
+                            "ClrType": "System.Ulid,Ulid"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""Id"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "Id",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""Name"",
-                        ""ApiType"": {
-                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiName": "Name",
+                        "ApiType": {
+                            "ClrType": "System.String,System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""Required"",
-                        ""ClrName"": ""Name"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "Required",
+                        "ClrName": "Name",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""Owner"",
-                        ""ApiType"": {
-                            ""ClrType"": ""Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Tests""
+                        "ApiName": "Owner",
+                        "ApiType": {
+                            "ClrType": "Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Tests"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""Owner"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "Owner",
+                        "ClrMemberKind": "Property"
                     },
                     {
-                        ""ApiName"": ""Employees"",
-                        ""ApiType"": {
-                            ""ApiKind"": ""Collection"",
-                            ""ApiItemType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Tests""
+                        "ApiName": "Employees",
+                        "ApiType": {
+                            "ApiKind": "Collection",
+                            "ApiItemType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiItemTypeModifiers"": ""Required"",
-                            ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
+                            "ApiItemTypeModifiers": "Required",
+                            "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests]], System.Private.CoreLib"
                         },
-                        ""ApiTypeModifiers"": ""None"",
-                        ""ClrName"": ""Employees"",
-                        ""ClrMemberKind"": ""Property""
+                        "ApiTypeModifiers": "None",
+                        "ClrName": "Employees",
+                        "ClrMemberKind": "Property"
                     }
                 ],
-                ""ApiKeys"": [
+                "ApiKeys": [
                     {
-                        ""ApiName"": ""PK_Company_Id"",
-                        ""ApiKeyPaths"": [
+                        "ApiName": "PK_Company_Id",
+                        "ApiKeyPaths": [
                             {
-                                ""ClrPath"": ""Id""
+                                "ClrPath": "Id"
                             }
                         ]
                     },
                     {
-                        ""ApiName"": ""AK_Company_Name"",
-                        ""ApiKeyPaths"": [
+                        "ApiName": "AK_Company_Name",
+                        "ApiKeyPaths": [
                             {
-                                ""ClrPath"": ""Name""
+                                "ClrPath": "Name"
                             }
                         ]
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Tests""
-            }"
+                "ClrType": "Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Tests"
+            }
+            """
         },
     ];
     #endregion

@@ -162,31 +162,32 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiCollectionType)} Throws If {nameof(ApiCollectionType.ApiItemType)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiCollectionType Throws If ApiItemType Is Null"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiName": "ApiCollectionType Throws If ApiItemType Is Null",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Items"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemTypeModifiers"": ""Required"",
-                                    ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+                                "ApiName": "Items",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemTypeModifiers": "Required",
+                                    "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                ""ClrName"": ""Items"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Items",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -205,35 +206,36 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiCollectionType)} Throws If {nameof(ApiCollectionType.ApiItemType)} Is Unresolved",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiCollectionType Throws If ApiItemType Is Unresolved"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiName": "ApiCollectionType Throws If ApiItemType Is Unresolved",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Items"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemType"": {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiName"": ""String""
+                                "ApiName": "Items",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": {
+                                        "ApiKind": "Scalar",
+                                        "ApiName": "String"
                                     },
-                                    ""ApiItemTypeModifiers"": ""Required"",
-                                    ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+                                    "ApiItemTypeModifiers": "Required",
+                                    "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                ""ClrName"": ""Items"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Items",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -256,36 +258,37 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumType Throws If ApiName Is Invalid"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumType Throws If ApiName Is Invalid",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": """",
-                        ""ApiEnumValues"": [
+                        "ApiKind": "Enum",
+                        "ApiName": "",
+                        "ApiEnumValues": [
                             {
-                                ""ApiName"": ""Unspecified"",
-                                ""ClrName"": ""Unspecified"",
-                                ""ClrOrdinal"": 0
+                                "ApiName": "Unspecified",
+                                "ClrName": "Unspecified",
+                                "ClrOrdinal": 0
                             },
                             {
-                                ""ApiName"": ""Male"",
-                                ""ClrName"": ""Male"",
-                                ""ClrOrdinal"": 1
+                                "ApiName": "Male",
+                                "ClrName": "Male",
+                                "ClrOrdinal": 1
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Female",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -304,35 +307,36 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumType Throws If ClrType Is Null"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumType Throws If ClrType Is Null",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
                             {
-                                ""ApiName"": ""Unspecified"",
-                                ""ClrName"": ""Unspecified"",
-                                ""ClrOrdinal"": 0
+                                "ApiName": "Unspecified",
+                                "ClrName": "Unspecified",
+                                "ClrOrdinal": 0
                             },
                             {
-                                ""ApiName"": ""Male"",
-                                ""ClrName"": ""Male"",
-                                ""ClrOrdinal"": 1
+                                "ApiName": "Male",
+                                "ClrName": "Male",
+                                "ClrOrdinal": 1
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Female",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 2
                             }
                         ]
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -351,36 +355,37 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Not a CLR Enum",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumType Throws If ClrType Is Not a CLR Enum"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumType Throws If ClrType Is Not a CLR Enum",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
                             {
-                                ""ApiName"": ""Unspecified"",
-                                ""ClrName"": ""Unspecified"",
-                                ""ClrOrdinal"": 0
+                                "ApiName": "Unspecified",
+                                "ClrName": "Unspecified",
+                                "ClrOrdinal": 0
                             },
                             {
-                                ""ApiName"": ""Male"",
-                                ""ClrName"": ""Male"",
-                                ""ClrOrdinal"": 1
+                                "ApiName": "Male",
+                                "ClrName": "Male",
+                                "ClrOrdinal": 1
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Female",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 2
                             }
                         ],
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -399,19 +404,20 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Is Null"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumType Throws If ApiEnumValues Is Null",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -430,20 +436,21 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Empty",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Is Empty"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumType Throws If ApiEnumValues Is Empty",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [],
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -462,36 +469,37 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ApiName)} Values",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ApiName Values"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumType Throws If ApiEnumValues Has Duplicate ApiName Values",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
                             {
-                                ""ApiName"": ""Unspecified"",
-                                ""ClrName"": ""Unspecified"",
-                                ""ClrOrdinal"": 0
+                                "ApiName": "Unspecified",
+                                "ClrName": "Unspecified",
+                                "ClrOrdinal": 0
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Male"",
-                                ""ClrOrdinal"": 1
+                                "ApiName": "Female",
+                                "ClrName": "Male",
+                                "ClrOrdinal": 1
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Female",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -510,36 +518,37 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrName)} Values",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ClrName Values"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumType Throws If ApiEnumValues Has Duplicate ClrName Values",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
                             {
-                                ""ApiName"": ""Unspecified"",
-                                ""ClrName"": ""Unspecified"",
-                                ""ClrOrdinal"": 0
+                                "ApiName": "Unspecified",
+                                "ClrName": "Unspecified",
+                                "ClrOrdinal": 0
                             },
                             {
-                                ""ApiName"": ""Male"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 1
+                                "ApiName": "Male",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 1
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Female",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -558,41 +567,42 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrOrdinal)} Values",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ClrOrdinal Values"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumType Throws If ApiEnumValues Has Duplicate ClrOrdinal Values",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
                             {
-                                ""ApiName"": ""Unspecified"",
-                                ""ClrName"": ""Unspecified"",
-                                ""ClrOrdinal"": 0
+                                "ApiName": "Unspecified",
+                                "ClrName": "Unspecified",
+                                "ClrOrdinal": 0
                             },
                             {
-                                ""ApiName"": ""Male"",
-                                ""ClrName"": ""Male"",
-                                ""ClrOrdinal"": 1
+                                "ApiName": "Male",
+                                "ClrName": "Male",
+                                "ClrOrdinal": 1
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Female",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 2
                             },
                             {
-                                ""ApiName"": ""Alien"",
-                                ""ClrName"": ""Alien"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Alien",
+                                "ClrName": "Alien",
+                                "ClrOrdinal": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -615,36 +625,37 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ApiName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumValue Throws If ApiName Is Invalid"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumValue Throws If ApiName Is Invalid",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
                             {
-                                ""ApiName"": ""Unspecified"",
-                                ""ClrName"": ""Unspecified"",
-                                ""ClrOrdinal"": 0
+                                "ApiName": "Unspecified",
+                                "ClrName": "Unspecified",
+                                "ClrOrdinal": 0
                             },
                             {
-                                ""ApiName"": """",
-                                ""ClrName"": ""Male"",
-                                ""ClrOrdinal"": 1
+                                "ApiName": "",
+                                "ClrName": "Male",
+                                "ClrOrdinal": 1
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Female",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -663,36 +674,37 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ClrName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiEnumValue Throws If ClrName Is Invalid"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiEnumValue Throws If ClrName Is Invalid",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
                             {
-                                ""ApiName"": ""Unspecified"",
-                                ""ClrName"": ""Unspecified"",
-                                ""ClrOrdinal"": 0
+                                "ApiName": "Unspecified",
+                                "ClrName": "Unspecified",
+                                "ClrOrdinal": 0
                             },
                             {
-                                ""ApiName"": ""Male"",
-                                ""ClrName"": """",
-                                ""ClrOrdinal"": 1
+                                "ApiName": "Male",
+                                "ClrName": "",
+                                "ClrOrdinal": 1
                             },
                             {
-                                ""ApiName"": ""Female"",
-                                ""ClrName"": ""Female"",
-                                ""ClrOrdinal"": 2
+                                "ApiName": "Female",
+                                "ClrName": "Female",
+                                "ClrOrdinal": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -715,37 +727,38 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If ApiName Is Invalid"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Throws If ApiName Is Invalid",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarsOnly"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ScalarsOnly",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": """",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""RequiredName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "RequiredName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -764,37 +777,38 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ClrName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If ClrName Is Invalid"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Throws If ClrName Is Invalid",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarsOnly"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ScalarsOnly",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""RequiredName"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "RequiredName",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": """",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -813,37 +827,38 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Specified CLR Field Is Missing",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If Specified CLR Field Is Missing"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Throws If Specified CLR Field Is Missing",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ClrMemberKindPropertyOnlyType"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ClrMemberKindPropertyOnlyType",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Value"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Value",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Value"",
-                                ""ClrMemberKind"": ""Field""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Value",
+                                "ClrMemberKind": "Field"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -862,37 +877,38 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Specified CLR Property Is Missing",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If Specified CLR Property Is Missing"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Throws If Specified CLR Property Is Missing",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ClrMemberKindFieldOnlyType"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ClrMemberKindFieldOnlyType",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Value"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Value",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Value"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Value",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindFieldOnlyType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindFieldOnlyType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -911,37 +927,38 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If CLR Member Is Missing",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If CLR Member Is Missing"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Throws If CLR Member Is Missing",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarsOnly"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ScalarsOnly",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""NonExistent"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "NonExistent",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NonExistentProperty"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NonExistentProperty",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -960,27 +977,28 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Type Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If Type Is Null"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiName": "ApiProperty Throws If Type Is Null",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarsOnly"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ScalarsOnly",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""RequiredName"",
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""RequiredName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "RequiredName",
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "RequiredName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -999,57 +1017,58 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Type Is An Invalid CLR Member",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If Type Is An Invalid CLR Member"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Throws If Type Is An Invalid CLR Member",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Byte"",
-                        ""ClrType"": ""System.Byte, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Byte",
+                        "ClrType": "System.Byte, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TypesWithRefStructMembers"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TypesWithRefStructMembers",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""SpanField"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemType"": {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiName"": ""Byte""
+                                "ApiName": "SpanField",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": {
+                                        "ApiKind": "Scalar",
+                                        "ApiName": "Byte"
                                     },
-                                    ""ApiItemTypeModifiers"": ""Required"",
-                                    ""ClrType"": ""System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib""
+                                    "ApiItemTypeModifiers": "Required",
+                                    "ClrType": "System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""SpanField"",
-                                ""ClrMemberKind"": ""Field""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "SpanField",
+                                "ClrMemberKind": "Field"
                             },
                             {
-                                ""ApiName"": ""SpanProperty"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemType"": {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiName"": ""Byte""
+                                "ApiName": "SpanProperty",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": {
+                                        "ApiKind": "Scalar",
+                                        "ApiName": "Byte"
                                     },
-                                    ""ApiItemTypeModifiers"": ""Required"",
-                                    ""ClrType"": ""System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib""
+                                    "ApiItemTypeModifiers": "Required",
+                                    "ClrType": "System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""SpanProperty"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "SpanProperty",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests\u002BTypesWithRefStructMembers, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests\u002BTypesWithRefStructMembers, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
@@ -1076,31 +1095,32 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Api Named Reference Type Does Not Exist",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because Api Named Reference Type Does Not Exist"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiName": "ApiProperty Throws If Type Is Unresolved Because Api Named Reference Type Does Not Exist",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarsOnly"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ScalarsOnly",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""RequiredName"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "RequiredName",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""RequiredName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "RequiredName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1118,30 +1138,31 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because CLR Reference Type Does Not Exist",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because CLR Reference Type Does Not Exist"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiName": "ApiProperty Throws If Type Is Unresolved Because CLR Reference Type Does Not Exist",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarsOnly"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ScalarsOnly",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""RequiredName"",
-                                ""ApiType"": {
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                "ApiName": "RequiredName",
+                                "ApiType": {
+                                    "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""RequiredName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "RequiredName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1159,28 +1180,29 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Type Reference Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because Type Reference Is Invalid"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiName": "ApiProperty Throws If Type Is Unresolved Because Type Reference Is Invalid",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarsOnly"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ScalarsOnly",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""RequiredName"",
-                                ""ApiType"": {},
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""RequiredName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "RequiredName",
+                                "ApiType": {},
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "RequiredName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1198,28 +1220,29 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiTypeReference)} Form Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If ApiTypeReference Form Is Invalid"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiName": "ApiProperty Throws If ApiTypeReference Form Is Invalid",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarsOnly"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ScalarsOnly",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""RequiredName"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""RequiredName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "RequiredName",
+                                "ApiType": { "ApiKind": "Scalar" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "RequiredName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1238,47 +1261,48 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Unable To Get Or Set Field/Property Value",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Throws If Unable To Get Or Set Field/Property Value"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Throws If Unable To Get Or Set Field/Property Value",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Byte"",
-                        ""ClrType"": ""System.Byte, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Byte",
+                        "ClrType": "System.Byte, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TypesWithPointerMembers"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TypesWithPointerMembers",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""PointerField"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Byte""
+                                "ApiName": "PointerField",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Byte"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""PointerField"",
-                                ""ClrMemberKind"": ""Field""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "PointerField",
+                                "ClrMemberKind": "Field"
                             },
                             {
-                                ""ApiName"": ""PointerProperty"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Byte""
+                                "ApiName": "PointerProperty",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Byte"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""PointerProperty"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "PointerProperty",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests\u002BTypesWithPointerMembers, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests\u002BTypesWithPointerMembers, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=4, Errors=4, Warnings=0.",
             ExpectedIssues =
             [
@@ -1325,47 +1349,48 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Has Duplicate ApiName",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiObjectType Throws If ApiProperties Has Duplicate ApiName"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiObjectType Throws If ApiProperties Has Duplicate ApiName",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NameAlt"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NameAlt",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1384,47 +1409,48 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Has Duplicate ClrName",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiObjectType Throws If ApiProperties Has Duplicate ClrName"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiObjectType Throws If ApiProperties Has Duplicate ClrName",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""NameAlias"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "NameAlias",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyClrNameType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyClrNameType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1443,69 +1469,70 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiKeys Has Duplicate ApiName",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiObjectType Throws If ApiKeys Has Duplicate ApiName"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiObjectType Throws If ApiKeys Has Duplicate ApiName",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Code"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Code",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Code"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Code",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Primary"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "Primary",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
-                                        ""ApiSegments"": [
-                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
+                                        "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" },
+                                        "ApiSegments": [
+                                            { "ApiProperty": { "ClrName": "Id" } }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                ""ApiName"": ""Primary"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "Primary",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
-                                        ""ApiSegments"": [
-                                            { ""ApiProperty"": { ""ClrName"": ""Code"" } }
+                                        "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" },
+                                        "ApiSegments": [
+                                            { "ApiProperty": { "ClrName": "Code" } }
                                         ]
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1530,19 +1557,20 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ApiName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiScalarType Throws If ApiName Is Invalid"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiScalarType Throws If ApiName Is Invalid",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": """",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1561,18 +1589,19 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ClrType)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiScalarType Throws If ClrType Is Null"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiScalarType Throws If ClrType Is Null",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1595,13 +1624,14 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": """",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiName": "",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -1620,24 +1650,25 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiScalarTypes)} Has Duplicate {nameof(ApiScalarType.ApiName)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
@@ -1664,24 +1695,25 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiScalarTypes)} Has Duplicate {nameof(ApiScalarType.ClrType)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""StringAlias"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "StringAlias",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
@@ -1708,35 +1740,36 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiEnumTypes)} Has Duplicate {nameof(ApiEnumType.ApiName)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
-                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
-                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
-                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
+                            { "ApiName": "Unspecified", "ClrName": "Unspecified", "ClrOrdinal": 0 },
+                            { "ApiName": "Male", "ClrName": "Male", "ClrOrdinal": 1 },
+                            { "ApiName": "Female", "ClrName": "Female", "ClrOrdinal": 2 }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
-                            { ""ApiName"": ""None"", ""ClrName"": ""None"", ""ClrOrdinal"": 0 },
-                            { ""ApiName"": ""Green"", ""ClrName"": ""Green"", ""ClrOrdinal"": 1 },
-                            { ""ApiName"": ""Yellow"", ""ClrName"": ""Yellow"", ""ClrOrdinal"": 2 },
-                            { ""ApiName"": ""Red"", ""ClrName"": ""Red"", ""ClrOrdinal"": 3 }
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
+                            { "ApiName": "None", "ClrName": "None", "ClrOrdinal": 0 },
+                            { "ApiName": "Green", "ClrName": "Green", "ClrOrdinal": 1 },
+                            { "ApiName": "Yellow", "ClrName": "Yellow", "ClrOrdinal": 2 },
+                            { "ApiName": "Red", "ClrName": "Red", "ClrOrdinal": 3 }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
@@ -1763,34 +1796,35 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiEnumTypes)} Has Duplicate {nameof(ApiEnumType.ClrType)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [
+                "ApiName": "ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""Gender"",
-                        ""ApiEnumValues"": [
-                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
-                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
-                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        "ApiKind": "Enum",
+                        "ApiName": "Gender",
+                        "ApiEnumValues": [
+                            { "ApiName": "Unspecified", "ClrName": "Unspecified", "ClrOrdinal": 0 },
+                            { "ApiName": "Male", "ClrName": "Male", "ClrOrdinal": 1 },
+                            { "ApiName": "Female", "ClrName": "Female", "ClrOrdinal": 2 }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""GenderAlias"",
-                        ""ApiEnumValues"": [
-                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
-                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
-                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        "ApiKind": "Enum",
+                        "ApiName": "GenderAlias",
+                        "ApiEnumValues": [
+                            { "ApiName": "Unspecified", "ClrName": "Unspecified", "ClrOrdinal": 0 },
+                            { "ApiName": "Male", "ClrName": "Male", "ClrOrdinal": 1 },
+                            { "ApiName": "Female", "ClrName": "Female", "ClrOrdinal": 2 }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
@@ -1817,55 +1851,56 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiObjectTypes)} Has Duplicate {nameof(ApiObjectType.ApiName)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "Name",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""NameAlt"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NameAlt"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "NameAlt",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NameAlt",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "Name",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyClrNameType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyClrNameType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
@@ -1892,62 +1927,63 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiObjectTypes)} Has Duplicate {nameof(ApiObjectType.ClrType)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObjectA"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObjectA",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "Name",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""NameAlt"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NameAlt"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "NameAlt",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NameAlt",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObjectB"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObjectB",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "Name",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""NameAlt"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NameAlt"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "NameAlt",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NameAlt",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
@@ -1974,30 +2010,31 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiNamedTypes)} Has Duplicate {nameof(ApiNamedType.ApiName)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiNamedTypes Has Duplicate ApiName"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiSchema Throws If ApiNamedTypes Has Duplicate ApiName",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""MyType"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "MyType",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""MyType"",
-                        ""ApiEnumValues"": [
-                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
-                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
-                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        "ApiKind": "Enum",
+                        "ApiName": "MyType",
+                        "ApiEnumValues": [
+                            { "ApiName": "Unspecified", "ClrName": "Unspecified", "ClrOrdinal": 0 },
+                            { "ApiName": "Male", "ClrName": "Male", "ClrOrdinal": 1 },
+                            { "ApiName": "Female", "ClrName": "Female", "ClrOrdinal": 2 }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2016,30 +2053,31 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiNamedTypes)} Has Duplicate {nameof(ApiNamedType.ClrType)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiNamedTypes Has Duplicate ClrType"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiSchema Throws If ApiNamedTypes Has Duplicate ClrType",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""GenderScalar"",
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ApiKind": "Scalar",
+                        "ApiName": "GenderScalar",
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiEnumTypes"": [
+                "ApiEnumTypes": [
                     {
-                        ""ApiKind"": ""Enum"",
-                        ""ApiName"": ""GenderEnum"",
-                        ""ApiEnumValues"": [
-                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
-                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
-                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        "ApiKind": "Enum",
+                        "ApiName": "GenderEnum",
+                        "ApiEnumValues": [
+                            { "ApiName": "Unspecified", "ClrName": "Unspecified", "ClrOrdinal": 0 },
+                            { "ApiName": "Male", "ClrName": "Male", "ClrOrdinal": 1 },
+                            { "ApiName": "Female", "ClrName": "Female", "ClrOrdinal": 2 }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiObjectTypes"": []
-            }",
+                "ApiObjectTypes": []
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2063,48 +2101,49 @@ public partial class ApiSchemaTests
         {
             Name = $"{nameof(ApiNamedKeyDefinition)} Throws If " +
                 $"{nameof(ApiNamedKeyDefinition.ApiName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiKeyDefinition Throws If ApiName Is Invalid And Owned By ApiObjectType"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiKeyDefinition Throws If ApiName Is Invalid And Owned By ApiObjectType",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiKeyPaths"": [
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
-                                        ""ApiSegments"": [
-                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
+                                        "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" },
+                                        "ApiSegments": [
+                                            { "ApiProperty": { "ClrName": "Id" } }
                                         ]
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2125,42 +2164,43 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyDefinition)} Throws If {nameof(ApiKeyDefinition.ApiKeyPaths)} Is Null Or Empty",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiKeyDefinition Throws If ApiKeyPaths Is Null Or Empty"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiKeyDefinition Throws If ApiKeyPaths Is Null Or Empty",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PrimaryKey"",
-                                ""ApiKeyPaths"": []
+                                "ApiName": "PrimaryKey",
+                                "ApiKeyPaths": []
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2180,47 +2220,48 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPath)} Throws If {nameof(ApiKeyPath.ApiSegments)} Is Empty",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiKeyPath Throws If ApiSegments Is Empty"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiKeyPath Throws If ApiSegments Is Empty",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PrimaryKey"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PrimaryKey",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
-                                        ""ApiSegments"": []
+                                        "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" },
+                                        "ApiSegments": []
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2243,49 +2284,50 @@ public partial class ApiSchemaTests
         {
             Name = $"{nameof(ApiKeyPath)} Throws If "
                 + $"{nameof(ApiKeyPath.ApiRootObjectTypeReference)} Is Unresolved",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiKeyPath Throws If ApiRootObjectTypeReference Is Unresolved"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiKeyPath Throws If ApiRootObjectTypeReference Is Unresolved",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PrimaryKey"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PrimaryKey",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests"" },
-                                        ""ApiSegments"": [
-                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } }
+                                        "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests" },
+                                        "ApiSegments": [
+                                            { "ApiProperty": { "ClrName": "Id" } }
                                         ]
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2306,49 +2348,50 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPathSegment)} Throws If {nameof(ApiKeyPathSegment.ClrMemberName)} Is Unresolved",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiKeyPathSegment Throws If ClrMemberName Is Unresolved"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiKeyPathSegment Throws If ClrMemberName Is Unresolved",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PrimaryKey"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PrimaryKey",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
-                                        ""ApiSegments"": [
-                                            { ""ApiProperty"": { ""ClrName"": ""MissingId"" } }
+                                        "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" },
+                                        "ApiSegments": [
+                                            { "ApiProperty": { "ClrName": "MissingId" } }
                                         ]
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2371,59 +2414,60 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPath)} Throws If Navigation Segment Resolves To Non Object Type",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiKeyPath Throws If Navigation Segment Resolves To Non Object Type"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiKeyPath Throws If Navigation Segment Resolves To Non Object Type",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "TestObject",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Code"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Code",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Code"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Code",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PrimaryKey"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PrimaryKey",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
-                                        ""ApiSegments"": [
-                                            { ""ApiProperty"": { ""ClrName"": ""Id"" } },
-                                            { ""ApiProperty"": { ""ClrName"": ""Code"" } }
+                                        "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" },
+                                        "ApiSegments": [
+                                            { "ApiProperty": { "ClrName": "Id" } },
+                                            { "ApiProperty": { "ClrName": "Code" } }
                                         ]
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2446,74 +2490,75 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPath)} Throws If Scalar Segment Resolves To Non Scalar Type",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiKeyPath Throws If Scalar Segment Resolves To Non Scalar Type"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiKeyPath Throws If Scalar Segment Resolves To Non Scalar Type",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Owned"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "Owned",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnedType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnedType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Owner"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "Owner",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Item"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""Owned""
+                                "ApiName": "Item",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "Owned"
                                 },
-                                ""ClrName"": ""Item"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "Item",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PrimaryKey"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PrimaryKey",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Tests"" },
-                                        ""ApiSegments"": [
-                                            { ""ApiProperty"": { ""ClrName"": ""Item"" } }
+                                        "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Tests" },
+                                        "ApiSegments": [
+                                            { "ApiProperty": { "ClrName": "Item" } }
                                         ]
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2540,46 +2585,47 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationship)} Throws If {nameof(ApiRelationship.ApiName)} Is Invalid",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationship Throws If ApiName Is Invalid"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationship Throws If ApiName Is Invalid",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": """",
-                        ""ApiPrincipalEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiDependentEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "",
+                        "ApiPrincipalEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiDependentEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2598,31 +2644,32 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipOneTo.ApiPrincipalEnd)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipOneTo Throws If ApiPrincipalEnd Is Null"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipOneTo Throws If ApiPrincipalEnd Is Null",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiDependentEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiDependentEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2641,37 +2688,38 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipOneTo.ApiDependentEnd)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipOneTo Throws If ApiDependentEnd Is Null"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipOneTo Throws If ApiDependentEnd Is Null",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2690,32 +2738,33 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipElement)} Throws If {nameof(ApiRelationshipElement.ApiObjectTypeReference)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipElement Throws If ApiObjectTypeReference Is Null"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipElement Throws If ApiObjectTypeReference Is Null",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { },
-                        ""ApiDependentEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": { },
+                        "ApiDependentEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2735,32 +2784,33 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipElement)} Throws If {nameof(ApiRelationshipElement.ApiObjectTypeReference)} Is Unresolved",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipElement Throws If ApiObjectTypeReference Is Unresolved"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipElement Throws If ApiObjectTypeReference Is Unresolved",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { ""ApiObjectType"": { ""ClrType"": ""System.Object, System.Private.CoreLib"" } },
-                        ""ApiDependentEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": { "ApiObjectType": { "ClrType": "System.Object, System.Private.CoreLib" } },
+                        "ApiDependentEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2780,56 +2830,57 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} Is Unresolved",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipPrincipalEnd Throws If ApiPrincipalKeyName Is Unresolved"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipPrincipalEnd Throws If ApiPrincipalKeyName Is Unresolved",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": {
-                            ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" },
-                            ""ApiPrincipalKeyName"": ""NonExistentKey""
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" },
+                            "ApiPrincipalKeyName": "NonExistentKey"
                         },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalId"" } } ] }
+                        "ApiDependentEnd": {
+                            "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" },
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalId" } } ] }
                                 ]
                             }
                         }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2849,49 +2900,50 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} Is Supplied Without Foreign Key",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipOneTo Throws If Principal Key Name Is Supplied Without Foreign Key"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipOneTo Throws If Principal Key Name Is Supplied Without Foreign Key",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": {
-                            ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" },
-                            ""ApiPrincipalKeyName"": ""Id""
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" },
+                            "ApiPrincipalKeyName": "Id"
                         },
-                        ""ApiDependentEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiDependentEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2910,47 +2962,48 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiPrincipalEndA Is Null"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipManyToMany Throws If ApiPrincipalEndA Is Null",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelAssociation"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" },
-                            { ""ApiName"": ""PrincipalBId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalBId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelAssociation",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalAId", "ClrMemberKind": "Property" },
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalBId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""ManyToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEndB"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiAssociation"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "ManyToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEndB": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiAssociation": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -2969,47 +3022,48 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiPrincipalEndB Is Null"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipManyToMany Throws If ApiPrincipalEndB Is Null",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelAssociation"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" },
-                            { ""ApiName"": ""PrincipalBId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalBId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelAssociation",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalAId", "ClrMemberKind": "Property" },
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalBId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""ManyToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEndA"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiAssociation"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "ManyToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEndA": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiAssociation": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3028,38 +3082,39 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiAssociation)} Is Null",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiAssociation Is Null"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipManyToMany Throws If ApiAssociation Is Null",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""ManyToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEndA"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiPrincipalEndB"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "ManyToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEndA": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiPrincipalEndB": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3078,75 +3133,76 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyA)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} Count Does Not Match Principal End A Key Type",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiForeignKeyA ApiKeyPaths Count Mismatch"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipManyToMany Throws If ApiForeignKeyA ApiKeyPaths Count Mismatch",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipalB"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipalB",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelAssociation"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" },
-                            { ""ApiName"": ""PrincipalBId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalBId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelAssociation",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalAId", "ClrMemberKind": "Property" },
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalBId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""ManyToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEndA"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiPrincipalEndB"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiAssociation"": {
-                            ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" },
-                            ""ApiForeignKeyA"": {
-                                ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalAId"" } } ] },
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalBId"" } } ] }
+                        "ApiKind": "ManyToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEndA": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiPrincipalEndB": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests" } },
+                        "ApiAssociation": {
+                            "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" },
+                            "ApiForeignKeyA": {
+                                "ApiKeyPaths": [
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalAId" } } ] },
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalBId" } } ] }
                                 ]
                             },
-                            ""ApiForeignKeyB"": {
-                                ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalBId"" } } ] }
+                            "ApiForeignKeyB": {
+                                "ApiKeyPaths": [
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalBId" } } ] }
                                 ]
                             }
                         }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3165,75 +3221,76 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyB)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} Count Does Not Match Principal End B Key Type",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiForeignKeyB ApiKeyPaths Count Mismatch"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipManyToMany Throws If ApiForeignKeyB ApiKeyPaths Count Mismatch",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipalB"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipalB",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelAssociation"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" },
-                            { ""ApiName"": ""PrincipalBId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalBId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelAssociation",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalAId", "ClrMemberKind": "Property" },
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalBId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""ManyToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEndA"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiPrincipalEndB"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiAssociation"": {
-                            ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" },
-                            ""ApiForeignKeyA"": {
-                                ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalAId"" } } ] }
+                        "ApiKind": "ManyToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEndA": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiPrincipalEndB": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests" } },
+                        "ApiAssociation": {
+                            "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" },
+                            "ApiForeignKeyA": {
+                                "ApiKeyPaths": [
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalAId" } } ] }
                                 ]
                             },
-                            ""ApiForeignKeyB"": {
-                                ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalAId"" } } ] },
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalBId"" } } ] }
+                            "ApiForeignKeyB": {
+                                "ApiKeyPaths": [
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalAId" } } ] },
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalBId" } } ] }
                                 ]
                             }
                         }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3252,55 +3309,56 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipDependentEnd.ApiForeignKey)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} Count Does Not Match Principal Key Type",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipOneTo Throws If Dependent ForeignKey ApiKeyPaths Count Mismatch"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipOneTo Throws If Dependent ForeignKey ApiKeyPaths Count Mismatch",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" },
-                            { ""ApiName"": ""PrincipalId2"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId2"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" },
+                            { "ApiName": "PrincipalId2", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId2", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalId"" } } ] },
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalId2"" } } ] }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiDependentEnd": {
+                            "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" },
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalId" } } ] },
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalId2" } } ] }
                                 ]
                             }
                         }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3319,54 +3377,55 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If Explicit Principal Key Type Is Incompatible With Foreign Key Type",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipOneTo Throws If Explicit Principal Key Type Is Incompatible"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" },
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"", ""ClrType"": ""System.String, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipOneTo Throws If Explicit Principal Key Type Is Incompatible",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" },
+                    { "ApiKind": "Scalar", "ApiName": "String", "ClrType": "System.String, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "PK_Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalCode"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalCode"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalCode", "ApiType": { "ApiKind": "Scalar", "ApiName": "String" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalCode", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiPrincipalKeyName"": ""PK_Id"" },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalCode"" } } ] }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" }, "ApiPrincipalKeyName": "PK_Id" },
+                        "ApiDependentEnd": {
+                            "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" },
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalCode" } } ] }
                                 ]
                             }
                         }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3385,52 +3444,53 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiRelationships)} Has Duplicate {nameof(ApiRelationship.ApiName)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiSchema Throws If ApiRelationships Has Duplicate ApiName"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiSchema Throws If ApiRelationships Has Duplicate ApiName",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""DupRel"",
-                        ""ApiPrincipalEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiDependentEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "DupRel",
+                        "ApiPrincipalEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiDependentEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" } }
                     },
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""DupRel"",
-                        ""ApiPrincipalEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiDependentEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" } }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "DupRel",
+                        "ApiPrincipalEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests" } },
+                        "ApiDependentEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" } }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3449,58 +3509,59 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If Principal Key Type Is Ambiguous",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiRelationshipOneTo Throws If Principal Key Type Is Ambiguous"",
-                ""ApiScalarTypes"": [
-                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                "ApiName": "ApiRelationshipOneTo Throws If Principal Key Type Is Ambiguous",
+                "ApiScalarTypes": [
+                    { "ApiKind": "Scalar", "ApiName": "Int32", "ClrType": "System.Int32, System.Private.CoreLib" }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelPrincipal"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" },
-                            { ""ApiName"": ""Code"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Code"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelPrincipal",
+                        "ApiProperties": [
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" },
+                            { "ApiName": "Code", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Code", "ClrMemberKind": "Property" }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_Id"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Id"" } } ] } ]
+                                "ApiName": "PK_Id",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Id" } } ] } ]
                             },
                             {
-                                ""ApiName"": ""PK_Code"",
-                                ""ApiKeyPaths"": [ { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""Code"" } } ] } ]
+                                "ApiName": "PK_Code",
+                                "ApiKeyPaths": [ { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "Code" } } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelDependent"",
-                        ""ApiProperties"": [
-                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        "ApiKind": "Object",
+                        "ApiName": "RelDependent",
+                        "ApiProperties": [
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" } },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
-                                    { ""ApiRootObjectType"": { ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }, ""ApiSegments"": [ { ""ApiProperty"": { ""ClrName"": ""PrincipalId"" } } ] }
+                        "ApiKind": "OneToMany",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": { "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests" } },
+                        "ApiDependentEnd": {
+                            "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" },
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
+                                    { "ApiRootObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests" }, "ApiSegments": [ { "ApiProperty": { "ClrName": "PrincipalId" } } ] }
                                 ]
                             }
                         }
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3517,37 +3578,38 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} reports an invalid {nameof(ApiProperty.ClrMemberKind)} JSON value",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Reports Invalid ClrMemberKind"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Reports Invalid ClrMemberKind",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ClrMemberKindPropertyOnlyType"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ClrMemberKindPropertyOnlyType",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Value"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Value",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Value"",
-                                ""ClrMemberKind"": ""Unknown""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Value",
+                                "ClrMemberKind": "Unknown"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3564,37 +3626,38 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} reports a null {nameof(ApiProperty.ClrMemberKind)} JSON value",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Reports Null ClrMemberKind"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Reports Null ClrMemberKind",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ClrMemberKindPropertyOnlyType"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ClrMemberKindPropertyOnlyType",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Value"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Value",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Value"",
-                                ""ClrMemberKind"": null
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Value",
+                                "ClrMemberKind": null
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3611,36 +3674,37 @@ public partial class ApiSchemaTests
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} reports an omitted {nameof(ApiProperty.ClrMemberKind)} JSON value",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Reports Omitted ClrMemberKind"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Reports Omitted ClrMemberKind",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ClrMemberKindPropertyOnlyType"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "ClrMemberKindPropertyOnlyType",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Value"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Value",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Value""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Value"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
@@ -3662,20 +3726,21 @@ public partial class ApiSchemaTests
         new CompileWarnsTest
         {
             Name = $"{nameof(ApiObjectType)} Warns If ApiProperties Is Null Or Empty",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiObjectType Warns If ApiProperties Is Null Or Empty"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiName": "ApiObjectType Warns If ApiProperties Is Null Or Empty",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Empty"",
-                        ""ApiProperties"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
+                        "ApiKind": "Object",
+                        "ApiName": "Empty",
+                        "ApiProperties": [],
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedWarnings =
             [
                 new ApiSchemaCompilationIssue
@@ -3693,34 +3758,35 @@ public partial class ApiSchemaTests
         new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Required Property Maps To Nullable CLR Member",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Warns If Required Property Maps To Nullable CLR Member"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Warns If Required Property Maps To Nullable CLR Member",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""NullabilityMismatch"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "NullabilityMismatch",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""NullableProp"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NullableProp"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "NullableProp",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NullableProp",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.NullabilityMismatch, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.NullabilityMismatch, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedWarnings =
             [
                 new ApiSchemaCompilationIssue
@@ -3738,33 +3804,34 @@ public partial class ApiSchemaTests
         new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Optional Property Maps To Non-Nullable CLR Reference Type Member",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Warns If Optional Property Maps To Non-Nullable CLR Reference Type Member"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Warns If Optional Property Maps To Non-Nullable CLR Reference Type Member",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""NullabilityMismatch"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "NullabilityMismatch",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""NonNullableProp"",
-                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                ""ClrName"": ""NonNullableProp"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiName": "NonNullableProp",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                "ClrName": "NonNullableProp",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.NullabilityMismatch, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.NullabilityMismatch, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedWarnings =
             [
                 new ApiSchemaCompilationIssue
@@ -3782,38 +3849,39 @@ public partial class ApiSchemaTests
         new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Required Collection Item Maps To Nullable CLR Element Type",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Warns If Required Collection Item Maps To Nullable CLR Element Type"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Warns If Required Collection Item Maps To Nullable CLR Element Type",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""CollectionNullabilityMismatch"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "CollectionNullabilityMismatch",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""NullableItemsProp"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                    ""ApiItemTypeModifiers"": ""Required"",
-                                    ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+                                "ApiName": "NullableItemsProp",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                    "ApiItemTypeModifiers": "Required",
+                                    "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                ""ClrName"": ""NullableItemsProp"",
-                                ""ClrMemberKind"": ""Property""
+                                "ClrName": "NullableItemsProp",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.CollectionNullabilityMismatch, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.CollectionNullabilityMismatch, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedWarnings =
             [
                 new ApiSchemaCompilationIssue
@@ -3831,38 +3899,39 @@ public partial class ApiSchemaTests
         new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""ApiProperty Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type"",
-                ""ApiScalarTypes"": [
+                "ApiName": "ApiProperty Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type",
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""CollectionNullabilityMismatch"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "CollectionNullabilityMismatch",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""NonNullableItemsProp"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
-                                    ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+                                "ApiName": "NonNullableItemsProp",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": { "ApiKind": "Scalar", "ApiName": "String" },
+                                    "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NonNullableItemsProp"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NonNullableItemsProp",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.CollectionNullabilityMismatch, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.CollectionNullabilityMismatch, Evoogle.ApiFramework.Tests"
                     }
                 ]
-            }",
+            }
+            """,
             ExpectedWarnings =
             [
                 new ApiSchemaCompilationIssue

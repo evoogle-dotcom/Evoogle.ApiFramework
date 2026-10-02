@@ -214,208 +214,209 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Relationship Schema for One-To-One Relationship And Scalar And Nested Foreign Key Paths"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Relationship Schema for One-To-One Relationship And Scalar And Nested Foreign Key Paths",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Ulid"",
-                        ""ClrType"": ""System.Ulid,Ulid""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Ulid",
+                        "ClrType": "System.Ulid,Ulid"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipUser"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipUser",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""UserName"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "UserName",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""UserName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "UserName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipUser_Id"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipUser_Id",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipUserProfile"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipUserProfile",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""UserId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "UserId",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""UserId"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "UserId",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""UserRef"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""RelationshipUserRef""
+                                "ApiName": "UserRef",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "RelationshipUserRef"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""UserRef"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "UserRef",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""DisplayName"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "DisplayName",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""DisplayName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "DisplayName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipUserProfile_UserId"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipUserProfile_UserId",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""UserId""
+                                        "ClrPath": "UserId"
                                     }
                                 ]
                             },
                             {
-                                ""ApiName"": ""AK_RelationshipUserProfile_UserRef"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "AK_RelationshipUserProfile_UserRef",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""UserRef.UserId""
+                                        "ClrPath": "UserRef.UserId"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipUserRef"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipUserRef",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""UserId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "UserId",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""UserId"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "UserId",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipUserRef_UserId"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipUserRef_UserId",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""UserId""
+                                        "ClrPath": "UserId"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUserRef,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUserRef,Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToOne"",
-                        ""ApiName"": ""User_Profile_NestedFK"",
-                        ""ApiPrincipalEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests""
+                        "ApiKind": "OneToOne",
+                        "ApiName": "User_Profile_NestedFK",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests"
                             }
                         },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Tests""
+                        "ApiDependentEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""UserRef.UserId""
+                                        "ClrPath": "UserRef.UserId"
                                     }
                                 ]
                             }
                         },
-                        ""ApiDeleteBehavior"": ""Delete""
+                        "ApiDeleteBehavior": "Delete"
                     },
                     {
-                        ""ApiKind"": ""OneToOne"",
-                        ""ApiName"": ""User_Profile_ScalarFK"",
-                        ""ApiPrincipalEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests""
+                        "ApiKind": "OneToOne",
+                        "ApiName": "User_Profile_ScalarFK",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiTraversal"": {
-                                ""ApiName"": ""Profile"",
-                                ""ClrNavigationMember"": {
-                                    ""ClrKind"": ""Property"",
-                                    ""ClrName"": ""Profile""
+                            "ApiTraversal": {
+                                "ApiName": "Profile",
+                                "ClrNavigationMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Profile"
                                 }
                             }
                         },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Tests""
+                        "ApiDependentEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""UserId""
+                                        "ClrPath": "UserId"
                                     }
                                 ]
                             },
-                            ""ApiTraversal"": {
-                                ""ApiName"": ""User"",
-                                ""ClrNavigationMember"": {
-                                    ""ClrKind"": ""Property"",
-                                    ""ClrName"": ""User""
+                            "ApiTraversal": {
+                                "ApiName": "User",
+                                "ClrNavigationMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "User"
                                 }
                             }
                         },
-                        ""ApiDeleteBehavior"": ""Delete""
+                        "ApiDeleteBehavior": "Delete"
                     }
                 ]
-            }"
+            }
+            """
         },
 
         // ApiSchema With Relationship Schema for One-To-Many Relationship
@@ -756,363 +757,364 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Relationship Schema for One-To-Many Relationship And Scalar And Nested Foreign Key Paths"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Relationship Schema for One-To-Many Relationship And Scalar And Nested Foreign Key Paths",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String,System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Ulid"",
-                        ""ClrType"": ""System.Ulid,Ulid""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Ulid",
+                        "ClrType": "System.Ulid,Ulid"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipComment"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipComment",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""PostId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "PostId",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""PostId"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "PostId",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""PostRef"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""RelationshipPostRef""
+                                "ApiName": "PostRef",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "RelationshipPostRef"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""PostRef"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "PostRef",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Body"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Body",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Body"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Body",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Post"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""RelationshipPost""
+                                "ApiName": "Post",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "RelationshipPost"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Post"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Post",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipComment_Id"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipComment_Id",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipPost"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipPost",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""AuthorUserId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "AuthorUserId",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""AuthorUserId"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "AuthorUserId",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""AuthorUserRef"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""RelationshipUserRef""
+                                "ApiName": "AuthorUserRef",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "RelationshipUserRef"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""AuthorUserRef"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "AuthorUserRef",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Title"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Title",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Title"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Title",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Comments"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemType"": {
-                                        ""ApiKind"": ""Object"",
-                                        ""ApiName"": ""RelationshipComment""
+                                "ApiName": "Comments",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": {
+                                        "ApiKind": "Object",
+                                        "ApiName": "RelationshipComment"
                                     },
-                                    ""ApiItemTypeModifiers"": ""Required"",
-                                    ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests]],System.Private.CoreLib""
+                                    "ApiItemTypeModifiers": "Required",
+                                    "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests]],System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Comments"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Comments",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipPost_Id"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipPost_Id",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipPostRef"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipPostRef",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""PostId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "PostId",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""PostId"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "PostId",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipPostRef_PostId"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipPostRef_PostId",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""PostId""
+                                        "ClrPath": "PostId"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPostRef,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPostRef,Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipUser"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipUser",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""UserName"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "UserName",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""UserName"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "UserName",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipUser_Id"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipUser_Id",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipUserRef"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipUserRef",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""UserId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "UserId",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""UserId"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "UserId",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipUserRef_UserId"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipUserRef_UserId",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""UserId""
+                                        "ClrPath": "UserId"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUserRef,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUserRef,Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""Post_Comments_NestedFK"",
-                        ""ApiPrincipalEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests""
+                        "ApiKind": "OneToMany",
+                        "ApiName": "Post_Comments_NestedFK",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"
                             }
                         },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests""
+                        "ApiDependentEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""PostRef.PostId""
+                                        "ClrPath": "PostRef.PostId"
                                     }
                                 ]
                             }
                         },
-                        ""ApiDeleteBehavior"": ""Delete""
+                        "ApiDeleteBehavior": "Delete"
                     },
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""Post_Comments_ScalarFK"",
-                        ""ApiPrincipalEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests""
+                        "ApiKind": "OneToMany",
+                        "ApiName": "Post_Comments_ScalarFK",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"
                             }
                         },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests""
+                        "ApiDependentEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""PostId""
+                                        "ClrPath": "PostId"
                                     }
                                 ]
                             }
                         },
-                        ""ApiDeleteBehavior"": ""Delete""
+                        "ApiDeleteBehavior": "Delete"
                     },
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""User_Posts_NestedFK"",
-                        ""ApiPrincipalEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests""
+                        "ApiKind": "OneToMany",
+                        "ApiName": "User_Posts_NestedFK",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests"
                             }
                         },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests""
+                        "ApiDependentEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""AuthorUserRef.UserId""
+                                        "ClrPath": "AuthorUserRef.UserId"
                                     }
                                 ]
                             }
                         },
-                        ""ApiDeleteBehavior"": ""Delete""
+                        "ApiDeleteBehavior": "Delete"
                     },
                     {
-                        ""ApiKind"": ""OneToMany"",
-                        ""ApiName"": ""User_Posts_ScalarFK"",
-                        ""ApiPrincipalEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests""
+                        "ApiKind": "OneToMany",
+                        "ApiName": "User_Posts_ScalarFK",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiTraversal"": {
-                                ""ApiName"": ""Posts"",
-                                ""ClrNavigationMember"": {
-                                    ""ClrKind"": ""Property"",
-                                    ""ClrName"": ""Posts""
+                            "ApiTraversal": {
+                                "ApiName": "Posts",
+                                "ClrNavigationMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Posts"
                                 }
                             }
                         },
-                        ""ApiDependentEnd"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests""
+                        "ApiDependentEnd": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiForeignKey"": {
-                                ""ApiKeyPaths"": [
+                            "ApiForeignKey": {
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""AuthorUserId""
+                                        "ClrPath": "AuthorUserId"
                                     }
                                 ]
                             },
-                            ""ApiTraversal"": {
-                                ""ApiName"": ""User"",
-                                ""ClrNavigationMember"": {
-                                    ""ClrKind"": ""Property"",
-                                    ""ClrName"": ""User""
+                            "ApiTraversal": {
+                                "ApiName": "User",
+                                "ClrNavigationMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "User"
                                 }
                             }
                         },
-                        ""ApiDeleteBehavior"": ""Delete""
+                        "ApiDeleteBehavior": "Delete"
                     }
                 ]
-            }"
+            }
+            """
         },
 
         // ApiSchema With Relationship Schema for Many-To-Many Relationship
@@ -1296,193 +1298,194 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Relationship Schema for Many-To-Many Relationship And Scalar Foreign Key Paths"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Relationship Schema for Many-To-Many Relationship And Scalar Foreign Key Paths",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String,System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String,System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Ulid"",
-                        ""ClrType"": ""System.Ulid,Ulid""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Ulid",
+                        "ClrType": "System.Ulid,Ulid"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipPost"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipPost",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Title"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Title",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Title"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Title",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipPost_Id"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipPost_Id",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipPostTag"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipPostTag",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""PostId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "PostId",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""PostId"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "PostId",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""TagId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "TagId",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""TagId"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "TagId",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipPostTag_PostId_TagId"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipPostTag_PostId_TagId",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""PostId""
+                                        "ClrPath": "PostId"
                                     },
                                     {
-                                        ""ClrPath"": ""TagId""
+                                        "ClrPath": "TagId"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""RelationshipTag"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "RelationshipTag",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Ulid""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Ulid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_RelationshipTag_Id"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_RelationshipTag_Id",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": [
+                "ApiRelationships": [
                     {
-                        ""ApiKind"": ""ManyToMany"",
-                        ""ApiName"": ""Post_Tags"",
-                        ""ApiPrincipalEndA"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests""
+                        "ApiKind": "ManyToMany",
+                        "ApiName": "Post_Tags",
+                        "ApiPrincipalEndA": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiTraversal"": {
-                                ""ApiName"": ""Tags"",
-                                ""ClrNavigationMember"": {
-                                    ""ClrKind"": ""Property"",
-                                    ""ClrName"": ""Tags""
+                            "ApiTraversal": {
+                                "ApiName": "Tags",
+                                "ClrNavigationMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Tags"
                                 }
                             }
                         },
-                        ""ApiPrincipalEndB"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Tests""
+                        "ApiPrincipalEndB": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiTraversal"": {
-                                ""ApiName"": ""Posts"",
-                                ""ClrNavigationMember"": {
-                                    ""ClrKind"": ""Property"",
-                                    ""ClrName"": ""Posts""
+                            "ApiTraversal": {
+                                "ApiName": "Posts",
+                                "ClrNavigationMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Posts"
                                 }
                             }
                         },
-                        ""ApiAssociation"": {
-                            ""ApiObjectType"": {
-                                ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Tests""
+                        "ApiAssociation": {
+                            "ApiObjectType": {
+                                "ClrType": "Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Tests"
                             },
-                            ""ApiForeignKeyA"": {
-                                ""ApiKeyPaths"": [
+                            "ApiForeignKeyA": {
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""PostId""
+                                        "ClrPath": "PostId"
                                     }
                                 ]
                             },
-                            ""ApiForeignKeyB"": {
-                                ""ApiKeyPaths"": [
+                            "ApiForeignKeyB": {
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""TagId""
+                                        "ClrPath": "TagId"
                                     }
                                 ]
                             }
                         },
-                        ""ApiDeleteBehavior"": ""Delete""
+                        "ApiDeleteBehavior": "Delete"
                     }
                 ]
-            }"
+            }
+            """
         }
     ];
     #endregion

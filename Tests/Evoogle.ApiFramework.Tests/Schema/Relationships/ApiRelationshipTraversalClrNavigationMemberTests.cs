@@ -56,12 +56,15 @@ public class ApiRelationshipTraversalClrNavigationMemberTests(ITestOutputHelper 
             {
                 this.Json.Should().Contain
                 (
-                    $"\"{nameof(ApiRelationshipTraversal.ClrNavigationMember)}\""
+                    $$"""
+                    "{{nameof(ApiRelationshipTraversal.ClrNavigationMember)}}"
+                    """
                 );
                 this.Json.Should().Contain
                 (
-                    $"\"{nameof(ClrMemberReference.ClrName)}\":" +
-                    $"\"{this.ClrNavigationMember.ClrName}\""
+                    $$"""
+                    "{{nameof(ClrMemberReference.ClrName)}}":"{{this.ClrNavigationMember.ClrName}}"
+                    """
                 );
             }
         }

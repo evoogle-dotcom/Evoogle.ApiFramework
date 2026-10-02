@@ -162,25 +162,43 @@ public class ApiPropertyReferenceTests(ITestOutputHelper output) : XUnitTests(ou
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ApiName)}",
-            SourceJson = @"{ ""ApiName"": ""Value"" }",
+            SourceJson = """
+            {
+                "ApiName": "Value"
+            }
+            """,
             ExpectedFactoryArgument = new ApiPropertyReferenceDef("Value",  null)
         },
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ApiName)} and null {nameof(ApiPropertyReference.ClrName)}",
-            SourceJson = @"{ ""ApiName"": ""Value"", ""ClrName"": null }",
+            SourceJson = """
+            {
+                "ApiName": "Value",
+                "ClrName": null
+            }
+            """,
             ExpectedFactoryArgument = new ApiPropertyReferenceDef("Value",  null)
         },
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ClrName)}",
-            SourceJson = @"{ ""ClrName"": ""Value"" }",
+            SourceJson = """
+            {
+                "ClrName": "Value"
+            }
+            """,
             ExpectedFactoryArgument = new ApiPropertyReferenceDef(null, "Value")
         },
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ClrName)} and null {nameof(ApiPropertyReference.ApiName)}",
-            SourceJson = @"{ ""ApiName"": null, ""ClrName"": ""Value"" }",
+            SourceJson = """
+            {
+                "ApiName": null,
+                "ClrName": "Value"
+            }
+            """,
             ExpectedFactoryArgument = new ApiPropertyReferenceDef(null, "Value")
         },
 
@@ -188,14 +206,22 @@ public class ApiPropertyReferenceTests(ITestOutputHelper output) : XUnitTests(ou
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ApiName)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
-            SourceJson = @"{ ""apiName"": ""Value"" }",
+            SourceJson = """
+            {
+                "apiName": "Value"
+            }
+            """,
             ExpectedFactoryArgument = new ApiPropertyReferenceDef("Value",  null)
         },
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ClrName)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
-            SourceJson = @"{ ""clrName"": ""Value"" }",
+            SourceJson = """
+            {
+                "clrName": "Value"
+            }
+            """,
             ExpectedFactoryArgument = new ApiPropertyReferenceDef(null, "Value")
         },
 
@@ -203,13 +229,18 @@ public class ApiPropertyReferenceTests(ITestOutputHelper output) : XUnitTests(ou
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ApiName)} and {nameof(ApiPropertyReference.ClrName)} having null values are preserved for schema validation",
-            SourceJson = @"{}",
+            SourceJson = """{}""",
             ExpectedFactoryArgument = new ApiPropertyReferenceDef(null, null)
         },
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ApiName)} and {nameof(ApiPropertyReference.ClrName)} having non-null values are preserved for schema validation",
-            SourceJson = @"{ ""ApiName"": ""ApiValue"", ""ClrName"": ""ClrValue"" }",
+            SourceJson = """
+            {
+                "ApiName": "ApiValue",
+                "ClrName": "ClrValue"
+            }
+            """,
             ExpectedFactoryArgument = new ApiPropertyReferenceDef("ApiValue", "ClrValue")
         },
     ];
@@ -234,41 +265,67 @@ public class ApiPropertyReferenceTests(ITestOutputHelper output) : XUnitTests(ou
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ApiName)}",
             SourceFactoryArgument = new ApiPropertyReferenceDef("Value",  null),
-            ExpectedJson = @"{ ""ApiName"": ""Value"" }"
+            ExpectedJson = """
+            {
+                "ApiName": "Value"
+            }
+            """
         },
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ClrName)}",
             SourceFactoryArgument = new ApiPropertyReferenceDef(null, "Value"),
-            ExpectedJson = @"{ ""ClrName"": ""Value"" }"
+            ExpectedJson = """
+            {
+                "ClrName": "Value"
+            }
+            """
         },
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ApiName)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
             SourceFactoryArgument = new ApiPropertyReferenceDef("Value",  null),
-            ExpectedJson = @"{ ""apiName"": ""Value"" }"
+            ExpectedJson = """
+            {
+                "apiName": "Value"
+            }
+            """
         },
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ClrName)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
             SourceFactoryArgument = new ApiPropertyReferenceDef(null, "Value"),
-            ExpectedJson = @"{ ""clrName"": ""Value"" }"
+            ExpectedJson = """
+            {
+                "clrName": "Value"
+            }
+            """
         },
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ApiName)} and explicit null {nameof(ApiPropertyReference.ClrName)}",
             JsonSerializerOptions = WriteNullPropertyOptions,
             SourceFactoryArgument = new ApiPropertyReferenceDef("Value",  null),
-            ExpectedJson = @"{ ""ApiName"": ""Value"", ""ClrName"": null }"
+            ExpectedJson = """
+            {
+                "ApiName": "Value",
+                "ClrName": null
+            }
+            """
         },
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiPropertyReference)} with {nameof(ApiPropertyReference.ClrName)} and explicit null {nameof(ApiPropertyReference.ApiName)}",
             JsonSerializerOptions = WriteNullPropertyOptions,
             SourceFactoryArgument = new ApiPropertyReferenceDef(null, "Value"),
-            ExpectedJson = @"{ ""ApiName"": null, ""ClrName"": ""Value"" }"
+            ExpectedJson = """
+            {
+                "ApiName": null,
+                "ClrName": "Value"
+            }
+            """
         },
     ];
     #endregion

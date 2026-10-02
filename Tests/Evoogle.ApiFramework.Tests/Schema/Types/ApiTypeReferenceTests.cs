@@ -181,45 +181,49 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Boolean""
-            }",
+                "ApiKind": "Scalar",
+                "ApiName": "Boolean"
+            }
+            """,
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "Boolean", ClrType: null)
         },
 
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ClrType)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ClrType"": ""System.Boolean, System.Private.CoreLib""
-            }",
+                "ClrType": "System.Boolean, System.Private.CoreLib"
+            }
+            """,
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool))
         },
 
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)} and explicit null {nameof(ApiTypeReference.ClrType)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Boolean"",
-                ""ClrType"": null
-            }",
+                "ApiKind": "Scalar",
+                "ApiName": "Boolean",
+                "ClrType": null
+            }
+            """,
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "Boolean", ClrType: null)
         },
 
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ClrType)} and explicit null {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)}",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiKind"": null,
-                ""ApiName"": null,
-                ""ClrType"": ""System.Boolean, System.Private.CoreLib""
-            }",
+                "ApiKind": null,
+                "ApiName": null,
+                "ClrType": "System.Boolean, System.Private.CoreLib"
+            }
+            """,
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool))
         },
 
@@ -227,11 +231,12 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)} with camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
-            SourceJson = @"
+            SourceJson = """
             {
-                ""apiKind"": ""Scalar"",
-                ""apiName"": ""Boolean""
-            }",
+                "apiKind": "Scalar",
+                "apiName": "Boolean"
+            }
+            """,
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "Boolean", ClrType: null),
         },
 
@@ -239,21 +244,23 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ClrType)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
-            SourceJson = @"
+            SourceJson = """
             {
-                ""clrType"": ""System.Boolean, System.Private.CoreLib""
-            }",
+                "clrType": "System.Boolean, System.Private.CoreLib"
+            }
+            """,
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool)),
         },
 
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)} in reverse order",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiName"": ""Boolean"",
-                ""ApiKind"": ""Scalar""
-            }",
+                "ApiName": "Boolean",
+                "ApiKind": "Scalar"
+            }
+            """,
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "Boolean", ClrType: null)
         },
 
@@ -261,19 +268,20 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)} and {nameof(ApiTypeReference.ClrType)} having null values are preserved for schema validation",
-            SourceJson = @"{}",
+            SourceJson = """{}""",
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: null)
         },
 
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)} and {nameof(ApiTypeReference.ClrType)} having non-null values are preserved for schema validation",
-            SourceJson = @"
+            SourceJson = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Boolean"",
-                ""ClrType"": ""System.Boolean, System.Private.CoreLib""
-            }",
+                "ApiKind": "Scalar",
+                "ApiName": "Boolean",
+                "ClrType": "System.Boolean, System.Private.CoreLib"
+            }
+            """,
             ExpectedFactoryArgument = new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "Boolean", ClrType: typeof(bool))
         },
     ];
@@ -299,21 +307,23 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)}",
             SourceFactoryArgument = new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "Boolean", ClrType: null),
-            ExpectedJson = @"
+            ExpectedJson = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Boolean""
-            }"
+                "ApiKind": "Scalar",
+                "ApiName": "Boolean"
+            }
+            """
         },
 
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ClrType)}",
             SourceFactoryArgument = new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool)),
-            ExpectedJson = @"
+            ExpectedJson = """
             {
-                ""ClrType"": ""System.Boolean, System.Private.CoreLib""
-            }"
+                "ClrType": "System.Boolean, System.Private.CoreLib"
+            }
+            """
         },
 
         new JsonSerializeTest
@@ -321,11 +331,12 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)} with camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
             SourceFactoryArgument = new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "Boolean", ClrType: null),
-            ExpectedJson = @"
+            ExpectedJson = """
             {
-                ""apiKind"": ""Scalar"",
-                ""apiName"": ""Boolean""
-            }"
+                "apiKind": "Scalar",
+                "apiName": "Boolean"
+            }
+            """
         },
 
         new JsonSerializeTest
@@ -333,10 +344,11 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ClrType)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
             SourceFactoryArgument = new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool)),
-            ExpectedJson = @"
+            ExpectedJson = """
             {
-                ""clrType"": ""System.Boolean, System.Private.CoreLib""
-            }"
+                "clrType": "System.Boolean, System.Private.CoreLib"
+            }
+            """
         },
 
         new JsonSerializeTest
@@ -344,12 +356,13 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)} and explicit null {nameof(ApiTypeReference.ClrType)}",
             JsonSerializerOptions = WriteNullPropertyOptions,
             SourceFactoryArgument = new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "Boolean", ClrType: null),
-            ExpectedJson = @"
+            ExpectedJson = """
             {
-                ""ApiKind"": ""Scalar"",
-                ""ApiName"": ""Boolean"",
-                ""ClrType"": null
-            }"
+                "ApiKind": "Scalar",
+                "ApiName": "Boolean",
+                "ClrType": null
+            }
+            """
         },
 
         new JsonSerializeTest
@@ -357,12 +370,13 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
             Name = $"{nameof(ApiTypeReference)} with {nameof(ApiTypeReference.ClrType)} and explicit null {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)}",
             JsonSerializerOptions = WriteNullPropertyOptions,
             SourceFactoryArgument = new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool)),
-            ExpectedJson = @"
+            ExpectedJson = """
             {
-                ""ApiKind"": null,
-                ""ApiName"": null,
-                ""ClrType"": ""System.Boolean, System.Private.CoreLib""
-            }"
+                "ApiKind": null,
+                "ApiName": null,
+                "ClrType": "System.Boolean, System.Private.CoreLib"
+            }
+            """
         },
     ];
     #endregion

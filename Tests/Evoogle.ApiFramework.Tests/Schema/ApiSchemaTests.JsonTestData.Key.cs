@@ -78,75 +78,76 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Key Schema (KeyOneScalarPart)"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Key Schema (KeyOneScalarPart)",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyOneScalarPart"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOneScalarPart",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyOneScalarPart"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyOneScalarPart",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             },
                             {
-                                ""ApiName"": ""AK_KeyOneScalarPart"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "AK_KeyOneScalarPart",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Name""
+                                        "ClrPath": "Name"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOneScalarPart, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOneScalarPart, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }"
+                "ApiRelationships": []
+            }
+            """
         },
 
         // ApiSchema With Key Schema (KeyTwoScalarPartComposite)
@@ -214,80 +215,81 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Key Schema (KeyTwoScalarPartComposite)"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Key Schema (KeyTwoScalarPartComposite)",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyTwoScalarPartComposite"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyTwoScalarPartComposite",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id1"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id1",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id1"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id1",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Id2"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Id2",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Id2"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Id2",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyTwoScalarPartComposite"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyTwoScalarPartComposite",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id1""
+                                        "ClrPath": "Id1"
                                     },
                                     {
-                                        ""ClrPath"": ""Id2""
+                                        "ClrPath": "Id2"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyTwoScalarPartComposite, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyTwoScalarPartComposite, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }"
+                "ApiRelationships": []
+            }
+            """
         },
 
         // ApiSchema With Key Schema (KeyThreeScalarPartComposite)
@@ -369,98 +371,99 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Key Schema (KeyThreeScalarPartComposite)"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Key Schema (KeyThreeScalarPartComposite)",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyThreeScalarPartComposite"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyThreeScalarPartComposite",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id1"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id1",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id1"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id1",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Id2"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Id2",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Id2"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Id2",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Id3"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Guid""
+                                "ApiName": "Id3",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Guid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id3"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id3",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyThreeScalarPartComposite"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyThreeScalarPartComposite",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id1""
+                                        "ClrPath": "Id1"
                                     },
                                     {
-                                        ""ClrPath"": ""Id2""
+                                        "ClrPath": "Id2"
                                     },
                                     {
-                                        ""ClrPath"": ""Id3""
+                                        "ClrPath": "Id3"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyThreeScalarPartComposite, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyThreeScalarPartComposite, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }"
+                "ApiRelationships": []
+            }
+            """
         },
 
         // ApiSchema With Key Schema (KeyNested And KeyNestedComposite)
@@ -555,107 +558,108 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Key Schema (KeyNested And KeyNestedComposite)"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Key Schema (KeyNested And KeyNestedComposite)",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyNested"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyNested",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyNestedPart"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyNestedPart",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyNested, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyNested, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyNestedComposite"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyNestedComposite",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""NestedPart"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""KeyNested""
+                                "ApiName": "NestedPart",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "KeyNested"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NestedPart"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NestedPart",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyNestedComposite"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyNestedComposite",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""NestedPart.Id""
+                                        "ClrPath": "NestedPart.Id"
                                     },
                                     {
-                                        ""ClrPath"": ""Name""
+                                        "ClrPath": "Name"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyNestedComposite, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyNestedComposite, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }"
+                "ApiRelationships": []
+            }
+            """
         },
 
         // ApiSchema With Key Schema (KeyOwner, KeyOwnedComposite, And KeyOwnedDependent)
@@ -793,165 +797,166 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Key Schema (KeyOwner, KeyOwnedComposite, And KeyOwnedDependent)"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Key Schema (KeyOwner, KeyOwnedComposite, And KeyOwnedDependent)",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyOwnedComposite"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOwnedComposite",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""LineNumber"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "LineNumber",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""LineNumber"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "LineNumber",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyOwnedComposite"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyOwnedComposite",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": {
-                                            ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                                        "ApiRootObjectType": {
+                                            "ClrType": "Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"
                                         },
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     },
                                     {
-                                        ""ClrPath"": ""LineNumber""
+                                        "ClrPath": "LineNumber"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwnedComposite, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOwnedComposite, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyOwnedDependent"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOwnedDependent",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyOwnedDependent"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyOwnedDependent",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": {
-                                            ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                                        "ApiRootObjectType": {
+                                            "ClrType": "Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"
                                         },
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwnedDependent, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOwnedDependent, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyOwner"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOwner",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Dependents"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemType"": {
-                                        ""ApiKind"": ""Object"",
-                                        ""ApiName"": ""KeyOwnedComposite""
+                                "ApiName": "Dependents",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": {
+                                        "ApiKind": "Object",
+                                        "ApiName": "KeyOwnedComposite"
                                     },
-                                    ""ApiItemTypeModifiers"": ""Required"",
-                                    ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
+                                    "ApiItemTypeModifiers": "Required",
+                                    "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Dependents"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Dependents",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Dependent"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""KeyOwnedDependent""
+                                "ApiName": "Dependent",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "KeyOwnedDependent"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Dependent"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Dependent",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyOwner"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyOwner",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }"
+                "ApiRelationships": []
+            }
+            """
         },
 
         // ApiSchema With Full Key Schema
@@ -1305,405 +1310,406 @@ public partial class ApiSchemaTests
                     )
                 ]
             ),
-            Json = @"
+            Json = """
             {
-                ""ApiName"": ""ApiSchema With Full Key Schema"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                "ApiName": "ApiSchema With Full Key Schema",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
                 },
-                ""ApiScalarTypes"": [
+                "ApiScalarTypes": [
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Guid",
+                        "ClrType": "System.Guid, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
                     },
                     {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyNested"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyNested",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyNestedPart"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyNestedPart",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyNested, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyNested, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyNestedComposite"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyNestedComposite",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""NestedPart"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""KeyNested""
+                                "ApiName": "NestedPart",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "KeyNested"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NestedPart"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "NestedPart",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyNestedComposite"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyNestedComposite",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""NestedPart.Id""
+                                        "ClrPath": "NestedPart.Id"
                                     },
                                     {
-                                        ""ClrPath"": ""Name""
+                                        "ClrPath": "Name"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyNestedComposite, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyNestedComposite, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyOneScalarPart"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOneScalarPart",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Name",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyOneScalarPart"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyOneScalarPart",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             },
                             {
-                                ""ApiName"": ""AK_KeyOneScalarPart"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "AK_KeyOneScalarPart",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Name""
+                                        "ClrPath": "Name"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOneScalarPart, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOneScalarPart, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyOwnedComposite"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOwnedComposite",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""LineNumber"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "LineNumber",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""LineNumber"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "LineNumber",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyOwnedComposite"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyOwnedComposite",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": {
-                                            ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                                        "ApiRootObjectType": {
+                                            "ClrType": "Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"
                                         },
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     },
                                     {
-                                        ""ClrPath"": ""LineNumber""
+                                        "ClrPath": "LineNumber"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwnedComposite, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOwnedComposite, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyOwnedDependent"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOwnedDependent",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyOwnedDependent"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyOwnedDependent",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ApiRootObjectType"": {
-                                            ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                                        "ApiRootObjectType": {
+                                            "ClrType": "Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"
                                         },
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwnedDependent, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOwnedDependent, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyOwner"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOwner",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Dependents"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Collection"",
-                                    ""ApiItemType"": {
-                                        ""ApiKind"": ""Object"",
-                                        ""ApiName"": ""KeyOwnedComposite""
+                                "ApiName": "Dependents",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": {
+                                        "ApiKind": "Object",
+                                        "ApiName": "KeyOwnedComposite"
                                     },
-                                    ""ApiItemTypeModifiers"": ""Required"",
-                                    ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
+                                    "ApiItemTypeModifiers": "Required",
+                                    "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Dependents"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Dependents",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Dependent"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""KeyOwnedDependent""
+                                "ApiName": "Dependent",
+                                "ApiType": {
+                                    "ApiKind": "Object",
+                                    "ApiName": "KeyOwnedDependent"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Dependent"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Dependent",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyOwner"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyOwner",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id""
+                                        "ClrPath": "Id"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyThreeScalarPartComposite"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyThreeScalarPartComposite",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id1"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id1",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id1"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id1",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Id2"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Id2",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Id2"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Id2",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Id3"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Guid""
+                                "ApiName": "Id3",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Guid"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id3"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id3",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyThreeScalarPartComposite"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyThreeScalarPartComposite",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id1""
+                                        "ClrPath": "Id1"
                                     },
                                     {
-                                        ""ClrPath"": ""Id2""
+                                        "ClrPath": "Id2"
                                     },
                                     {
-                                        ""ClrPath"": ""Id3""
+                                        "ClrPath": "Id3"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyThreeScalarPartComposite, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyThreeScalarPartComposite, Evoogle.ApiFramework.Tests"
                     },
                     {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""KeyTwoScalarPartComposite"",
-                        ""ApiProperties"": [
+                        "ApiKind": "Object",
+                        "ApiName": "KeyTwoScalarPartComposite",
+                        "ApiProperties": [
                             {
-                                ""ApiName"": ""Id1"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                "ApiName": "Id1",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id1"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "Required",
+                                "ClrName": "Id1",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Id2"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Id2",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Id2"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Id2",
+                                "ClrMemberKind": "Property"
                             },
                             {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
+                                "ApiName": "Description",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
                                 },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
+                                "ApiTypeModifiers": "None",
+                                "ClrName": "Description",
+                                "ClrMemberKind": "Property"
                             }
                         ],
-                        ""ApiKeys"": [
+                        "ApiKeys": [
                             {
-                                ""ApiName"": ""PK_KeyTwoScalarPartComposite"",
-                                ""ApiKeyPaths"": [
+                                "ApiName": "PK_KeyTwoScalarPartComposite",
+                                "ApiKeyPaths": [
                                     {
-                                        ""ClrPath"": ""Id1""
+                                        "ClrPath": "Id1"
                                     },
                                     {
-                                        ""ClrPath"": ""Id2""
+                                        "ClrPath": "Id2"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyTwoScalarPartComposite, Evoogle.ApiFramework.Tests""
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyTwoScalarPartComposite, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                ""ApiRelationships"": []
-            }"
+                "ApiRelationships": []
+            }
+            """
         },
     ];
     #endregion

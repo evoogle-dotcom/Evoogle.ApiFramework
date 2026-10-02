@@ -170,10 +170,30 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
             (
                 ApiPropertyReference.ClrRef("Id")
             );
-            this.ActualJson.Should().Contain("\"ApiSegments\"");
-            this.ActualJson.Should().Contain("\"ApiName\":\"nested\"");
-            this.ActualJson.Should().Contain("\"ClrName\":\"Id\"");
-            this.ActualJson.Should().NotContain("\"ClrPath\"");
+            this.ActualJson.Should().Contain
+            (
+                """
+                "ApiSegments"
+                """
+            );
+            this.ActualJson.Should().Contain
+            (
+                """
+                "ApiName":"nested"
+                """
+            );
+            this.ActualJson.Should().Contain
+            (
+                """
+                "ClrName":"Id"
+                """
+            );
+            this.ActualJson.Should().NotContain
+            (
+                """
+                "ClrPath"
+                """
+            );
         }
     }
 

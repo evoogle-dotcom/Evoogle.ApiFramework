@@ -16,7 +16,7 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Empty",
-            SourceJson = "null",
+            SourceJson = """null""",
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -32,7 +32,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiKeyKind.String)}:alpha",
-            SourceJson = @"{""ApiKind"":""String"",""ClrValue"":""alpha""}",
+            SourceJson = """
+            {
+                "ApiKind": "String",
+                "ClrValue": "alpha"
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -46,7 +51,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiKeyKind.String)}:ALPHA",
-            SourceJson = @"{""ApiKind"":""String"",""ClrValue"":""ALPHA""}",
+            SourceJson = """
+            {
+                "ApiKind": "String",
+                "ClrValue": "ALPHA"
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -61,7 +71,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiKeyKind.Int32)}:42",
-            SourceJson = @"{""ApiKind"":""Int32"",""ClrValue"":42}",
+            SourceJson = """
+            {
+                "ApiKind": "Int32",
+                "ClrValue": 42
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -76,7 +91,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiKeyKind.Int64)}:24",
-            SourceJson = @"{""ApiKind"":""Int64"",""ClrValue"":24}",
+            SourceJson = """
+            {
+                "ApiKind": "Int64",
+                "ClrValue": 24
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -91,7 +111,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiKeyKind.Guid)}:{TestGuid}",
-            SourceJson = @"{""ApiKind"":""Guid"",""ClrValue"":""" + TestGuid + @"""}",
+            SourceJson = $$"""
+            {
+                "ApiKind": "Guid",
+                "ClrValue": "{{TestGuid}}"
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -106,7 +131,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiKeyKind.Ulid)}:{TestUlid}",
-            SourceJson = @"{""ApiKind"":""Ulid"",""ClrValue"":""" + TestUlid + @"""}",
+            SourceJson = $$"""
+            {
+                "ApiKind": "Ulid",
+                "ClrValue": "{{TestUlid}}"
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -121,7 +151,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiKeyKind.Culture)}:en-US",
-            SourceJson = @"{""ApiKind"":""Culture"",""ClrValue"":""en-US""}",
+            SourceJson = """
+            {
+                "ApiKind": "Culture",
+                "ClrValue": "en-US"
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -135,7 +170,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiKeyKind.Culture)}:fr-FR",
-            SourceJson = @"{""ApiKind"":""Culture"",""ClrValue"":""fr-FR""}",
+            SourceJson = """
+            {
+                "ApiKind": "Culture",
+                "ClrValue": "fr-FR"
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 ScalarConfig: new ApiKeyScalarConfig
@@ -152,7 +192,21 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:24|24",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Int32"",""ClrValue"":24},{""ApiKind"":""Int32"",""ClrValue"":24}]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    }
+                ]
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 CompositePartsConfig: [
@@ -179,7 +233,21 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:24|42",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Int32"",""ClrValue"":24},{""ApiKind"":""Int32"",""ClrValue"":42}]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiKind": "Int32",
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 CompositePartsConfig: [
@@ -207,7 +275,23 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:alpha=24|beta=24",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ClrValue"":24}]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiName": "alpha",
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiName": "beta",
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    }
+                ]
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 CompositePartsConfig: [
@@ -235,7 +319,23 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:alpha=24|beta=42",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ClrValue"":42}]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiName": "alpha",
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiName": "beta",
+                        "ApiKind": "Int32",
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 CompositePartsConfig: [
@@ -263,7 +363,23 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:alpha=24|zeta=42",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""zeta"",""ApiKind"":""Int32"",""ClrValue"":42}]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiName": "alpha",
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiName": "zeta",
+                        "ApiKind": "Int32",
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """,
             ExpectedFactoryArgument = new ApiKeyDescriptor
             (
                 CompositePartsConfig: [
@@ -296,7 +412,11 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Error: Missing top-level ApiKind",
-            SourceJson = @"{""ClrValue"":""alpha""}",
+            SourceJson = """
+            {
+                "ClrValue": "alpha"
+            }
+            """,
             ExpectedFactoryArgument = null,
             ExpectedExceptionType = typeof(System.Text.Json.JsonException),
             ExpectedExceptionMessage = "Missing required property"
@@ -306,7 +426,14 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Error: Composite with empty ApiParts array",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+
+                ]
+            }
+            """,
             ExpectedFactoryArgument = null,
             ExpectedExceptionType = typeof(System.Text.Json.JsonException),
             ExpectedExceptionMessage = "requires non-empty array property"
@@ -317,7 +444,14 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Error: Composite with null element in ApiParts",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[null]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    null
+                ]
+            }
+            """,
             ExpectedFactoryArgument = null,
             ExpectedExceptionType = typeof(System.Text.Json.JsonException),
             ExpectedExceptionMessage = "requires non-empty array property"
@@ -327,7 +461,16 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Error: Composite part missing ApiKind",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ClrValue"":42}]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """,
             ExpectedFactoryArgument = null,
             ExpectedExceptionType = typeof(System.Text.Json.JsonException),
             ExpectedExceptionMessage = "Missing required property"
@@ -337,7 +480,17 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Error: Composite part ApiKind is Composite",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Composite"",""ClrValue"":42}]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiKind": "Composite",
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """,
             ExpectedFactoryArgument = null,
             ExpectedExceptionType = typeof(System.Text.Json.JsonException),
             ExpectedExceptionMessage = "is not valid as a scalar value"
@@ -347,7 +500,17 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Error: Composite part ApiKind is Empty",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Empty"",""ClrValue"":42}]}",
+            SourceJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiKind": "Empty",
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """,
             ExpectedFactoryArgument = null,
             ExpectedExceptionType = typeof(System.Text.Json.JsonException),
             ExpectedExceptionMessage = "is not valid as a scalar value"
@@ -357,7 +520,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Error: Int32 ClrValue out of range",
-            SourceJson = @"{""ApiKind"":""Int32"",""ClrValue"":2147483648}",
+            SourceJson = """
+            {
+                "ApiKind": "Int32",
+                "ClrValue": 2147483648
+            }
+            """,
             ExpectedFactoryArgument = null,
             ExpectedExceptionType = typeof(System.Text.Json.JsonException),
             ExpectedExceptionMessage = "out of range for Int32"
@@ -367,7 +535,12 @@ public partial class ApiKeyTests
         new JsonDeserializeTest
         {
             Name = "Error: Int32 ClrValue is floating-point",
-            SourceJson = @"{""ApiKind"":""Int32"",""ClrValue"":1.5}",
+            SourceJson = """
+            {
+                "ApiKind": "Int32",
+                "ClrValue": 1.5
+            }
+            """,
             ExpectedFactoryArgument = null,
             ExpectedExceptionType = typeof(System.Text.Json.JsonException),
             ExpectedExceptionMessage = "could not be read as integer"
@@ -653,7 +826,7 @@ public partial class ApiKeyTests
                     Kind: ApiKeyKind.Empty
                 )
             ),
-            ExpectedJson = "null"
+            ExpectedJson = """null"""
         },
 
         // Scalars
@@ -670,7 +843,12 @@ public partial class ApiKeyTests
                     StringValue: "alpha"
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""String"",""ClrValue"":""alpha""}"
+            ExpectedJson = """
+            {
+                "ApiKind": "String",
+                "ClrValue": "alpha"
+            }
+            """
         },
 
         new JsonSerializeTest
@@ -684,7 +862,12 @@ public partial class ApiKeyTests
                     StringValue: "ALPHA"
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""String"",""ClrValue"":""ALPHA""}"
+            ExpectedJson = """
+            {
+                "ApiKind": "String",
+                "ClrValue": "ALPHA"
+            }
+            """
         },
 
         // .. Int32
@@ -699,7 +882,12 @@ public partial class ApiKeyTests
                     Int32Value: 42
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Int32"",""ClrValue"":42}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Int32",
+                "ClrValue": 42
+            }
+            """
         },
 
         // .. Int64
@@ -714,7 +902,12 @@ public partial class ApiKeyTests
                     Int64Value: 24
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Int64"",""ClrValue"":24}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Int64",
+                "ClrValue": 24
+            }
+            """
         },
 
         // .. Guid
@@ -729,7 +922,12 @@ public partial class ApiKeyTests
                     GuidValue: TestGuid
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Guid"",""ClrValue"":""" + TestGuid + @"""}"
+            ExpectedJson = $$"""
+            {
+                "ApiKind": "Guid",
+                "ClrValue": "{{TestGuid}}"
+            }
+            """
         },
 
         // .. Ulid
@@ -744,7 +942,12 @@ public partial class ApiKeyTests
                     UlidValue: TestUlid
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Ulid"",""ClrValue"":""" + TestUlid + @"""}"
+            ExpectedJson = $$"""
+            {
+                "ApiKind": "Ulid",
+                "ClrValue": "{{TestUlid}}"
+            }
+            """
         },
 
         // .. Culture
@@ -759,7 +962,12 @@ public partial class ApiKeyTests
                     CultureValue: "en-US"
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Culture"",""ClrValue"":""en-US""}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Culture",
+                "ClrValue": "en-US"
+            }
+            """
         },
 
         new JsonSerializeTest
@@ -773,7 +981,12 @@ public partial class ApiKeyTests
                     CultureValue: "fr-FR"
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Culture"",""ClrValue"":""fr-FR""}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Culture",
+                "ClrValue": "fr-FR"
+            }
+            """
         },
 
         // Composites
@@ -803,7 +1016,21 @@ public partial class ApiKeyTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Int32"",""ClrValue"":24},{""ApiKind"":""Int32"",""ClrValue"":24}]}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    }
+                ]
+            }
+            """
         },
 
         new JsonSerializeTest
@@ -830,7 +1057,21 @@ public partial class ApiKeyTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Int32"",""ClrValue"":24},{""ApiKind"":""Int32"",""ClrValue"":42}]}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiKind": "Int32",
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """
         },
 
         // .. Named (named parts)
@@ -860,7 +1101,23 @@ public partial class ApiKeyTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ClrValue"":24}]}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiName": "alpha",
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiName": "beta",
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    }
+                ]
+            }
+            """
         },
         new JsonSerializeTest
         {
@@ -888,7 +1145,23 @@ public partial class ApiKeyTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ClrValue"":42}]}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiName": "alpha",
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiName": "beta",
+                        "ApiKind": "Int32",
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """
         },
         new JsonSerializeTest
         {
@@ -916,7 +1189,23 @@ public partial class ApiKeyTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""zeta"",""ApiKind"":""Int32"",""ClrValue"":42}]}"
+            ExpectedJson = """
+            {
+                "ApiKind": "Composite",
+                "ApiParts": [
+                    {
+                        "ApiName": "alpha",
+                        "ApiKind": "Int32",
+                        "ClrValue": 24
+                    },
+                    {
+                        "ApiName": "zeta",
+                        "ApiKind": "Int32",
+                        "ClrValue": 42
+                    }
+                ]
+            }
+            """
         },
     ];
     #endregion

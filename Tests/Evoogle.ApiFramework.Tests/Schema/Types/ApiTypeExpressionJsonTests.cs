@@ -48,25 +48,47 @@ public class ApiTypeExpressionJsonTests(ITestOutputHelper output) : XUnitTests(o
         new ShapeReadTest
         {
             Name = "API reference accepts reversed property order",
-            SourceJson = """{"ApiName":"Boolean","ApiKind":"Scalar"}""",
+            SourceJson = """
+            {
+                "ApiName": "Boolean",
+                "ApiKind": "Scalar"
+            }
+            """,
             ExpectsReference = true
         },
         new ShapeReadTest
         {
             Name = "API reference ignores inactive null CLR type",
-            SourceJson = """{"ApiKind":"Scalar","ClrType":null,"ApiName":"Boolean"}""",
+            SourceJson = """
+            {
+                "ApiKind": "Scalar",
+                "ClrType": null,
+                "ApiName": "Boolean"
+            }
+            """,
             ExpectsReference = true
         },
         new ShapeReadTest
         {
             Name = "Escaped property name still identifies an API reference",
-            SourceJson = """{"ApiK\u0069nd":"Scalar","ApiName":"Boolean"}""",
+            SourceJson = """
+            {
+                "ApiK\u0069nd": "Scalar",
+                "ApiName": "Boolean"
+            }
+            """,
             ExpectsReference = true
         },
         new ShapeReadTest
         {
             Name = "Camel-case reference names follow serializer options",
-            SourceJson = """{"apiKind":"Scalar","apiName":"Boolean","clrType":null}""",
+            SourceJson = """
+            {
+                "apiKind": "Scalar",
+                "apiName": "Boolean",
+                "clrType": null
+            }
+            """,
             Options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -99,12 +121,21 @@ public class ApiTypeExpressionJsonTests(ITestOutputHelper output) : XUnitTests(o
         new ShapeReadTest
         {
             Name = "Unknown nested value leaves an invalid expression",
-            SourceJson = """{"Other":{"Nested":[1,2]}}"""
+            SourceJson = """
+            {
+                "Other": {
+                    "Nested": [
+                        1,
+                        2
+                    ]
+                }
+            }
+            """
         },
         new ShapeReadTest
         {
             Name = "Empty object leaves an invalid expression",
-            SourceJson = "{}"
+            SourceJson = """{}"""
         }
     ];
 
