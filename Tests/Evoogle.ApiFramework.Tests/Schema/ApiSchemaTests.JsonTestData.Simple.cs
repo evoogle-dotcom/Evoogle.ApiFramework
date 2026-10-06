@@ -509,48 +509,66 @@ public partial class ApiSchemaTests
                                 ApiName: nameof(Person.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Person.Id),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Id)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Person.Name),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Name)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Age),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Age),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Age)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Gender),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Enum, ApiName: nameof(Gender), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Gender),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Gender)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Hobbies),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<string>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Hobbies),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Hobbies)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.CompanyId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.CompanyId),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.CompanyId)
+                                )
                             ),
                         ],
                         ApiKeys:
@@ -635,8 +653,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Name",
@@ -645,8 +665,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "Age",
@@ -655,8 +677,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Age",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Age"
+                                }
                             },
                             {
                                 "ApiName": "Gender",
@@ -665,8 +689,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Gender"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Gender",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Gender"
+                                }
                             },
                             {
                                 "ApiName": "Hobbies",
@@ -680,8 +706,10 @@ public partial class ApiSchemaTests
                                     "ClrType": "System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Hobbies",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Hobbies"
+                                }
                             },
                             {
                                 "ApiName": "CompanyId",
@@ -690,8 +718,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Ulid"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "CompanyId",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "CompanyId"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -760,48 +790,66 @@ public partial class ApiSchemaTests
                                 ApiName: nameof(Person.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Person.Id),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Id)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Person.Name),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Name)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Age),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Age),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Age)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Gender),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Enum, ApiName: nameof(Gender), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Gender),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Gender)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Hobbies),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<string>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Hobbies),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Hobbies)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.CompanyId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.CompanyId),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.CompanyId)
+                                )
                             ),
                         ],
                         ApiKeys:
@@ -887,8 +935,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Name",
@@ -897,8 +947,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "Age",
@@ -907,8 +959,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Age",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Age"
+                                }
                             },
                             {
                                 "ApiName": "Gender",
@@ -917,8 +971,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Gender"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Gender",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Gender"
+                                }
                             },
                             {
                                 "ApiName": "Hobbies",
@@ -932,8 +988,10 @@ public partial class ApiSchemaTests
                                     "ClrType": "System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Hobbies",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Hobbies"
+                                }
                             },
                             {
                                 "ApiName": "CompanyId",
@@ -942,8 +1000,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Ulid"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "CompanyId",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "CompanyId"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -1020,32 +1080,44 @@ public partial class ApiSchemaTests
                                 ApiName: nameof(Company.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Company.Id),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Company.Id)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Company.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Company.Name),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Company.Name)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Company.Owner),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(Person), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Company.Owner),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Company.Owner)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Company.Employees),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<Person>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(Person), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Company.Employees),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Company.Employees)
+                                )
                             ),
                         ],
                         ApiKeys:
@@ -1079,48 +1151,66 @@ public partial class ApiSchemaTests
                                 ApiName: nameof(Person.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Person.Id),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Id)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Person.Name),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Name)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Age),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Age),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Age)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Gender),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Enum, ApiName: nameof(Gender), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Gender),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Gender)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Hobbies),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<string>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.Hobbies),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Hobbies)
+                                )
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.CompanyId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
-                                ClrName: nameof(Person.CompanyId),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.CompanyId)
+                                )
                             ),
                         ],
                         ApiKeys:
@@ -1205,8 +1295,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Ulid"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Name",
@@ -1215,8 +1307,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "Owner",
@@ -1225,8 +1319,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Person"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Owner",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Owner"
+                                }
                             },
                             {
                                 "ApiName": "Employees",
@@ -1240,8 +1336,10 @@ public partial class ApiSchemaTests
                                     "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Tests]], System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Employees",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Employees"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -1275,8 +1373,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Name",
@@ -1285,8 +1385,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "Age",
@@ -1295,8 +1397,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Age",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Age"
+                                }
                             },
                             {
                                 "ApiName": "Gender",
@@ -1305,8 +1409,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Gender"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Gender",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Gender"
+                                }
                             },
                             {
                                 "ApiName": "Hobbies",
@@ -1320,8 +1426,10 @@ public partial class ApiSchemaTests
                                     "ClrType": "System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Hobbies",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Hobbies"
+                                }
                             },
                             {
                                 "ApiName": "CompanyId",
@@ -1330,8 +1438,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Ulid"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "CompanyId",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "CompanyId"
+                                }
                             }
                         ],
                         "ApiKeys": [

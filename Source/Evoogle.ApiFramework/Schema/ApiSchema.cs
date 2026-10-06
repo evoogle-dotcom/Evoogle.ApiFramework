@@ -8,8 +8,8 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
@@ -424,22 +424,27 @@ public sealed class ApiSchema : ApiSchemaElement
             );
         }
 
-        void Bind(ApiRelationshipEnd? sourceEnd, ApiRelationshipEnd? targetEnd)
+        void Bind(ApiRelationshipEnd? apiSourceEnd, ApiRelationshipEnd? apiTargetEnd)
         {
-            if (sourceEnd is null || targetEnd is null || sourceEnd.ApiResolvedObjectType is not { } sourceType)
+            if
+            (
+                apiSourceEnd is null ||
+                apiTargetEnd is null ||
+                apiSourceEnd.ApiResolvedObjectType is not { } apiSourceObjectType
+            )
             {
                 return;
             }
 
-            if (!traversalsBySource.TryGetValue(sourceType, out var sourceTraversals))
+            if (!traversalsBySource.TryGetValue(apiSourceObjectType, out var sourceTraversals))
             {
                 sourceTraversals = [];
-                traversalsBySource.Add(sourceType, sourceTraversals);
+                traversalsBySource.Add(apiSourceObjectType, sourceTraversals);
             }
 
-            if (sourceEnd.ApiTraversal is { } traversal)
+            if (apiSourceEnd.ApiTraversal is { } traversal)
             {
-                traversal.BindTargetEnd(targetEnd, context);
+                traversal.BindApiTargetEnd(apiTargetEnd, context);
                 sourceTraversals.Add(traversal);
             }
         }

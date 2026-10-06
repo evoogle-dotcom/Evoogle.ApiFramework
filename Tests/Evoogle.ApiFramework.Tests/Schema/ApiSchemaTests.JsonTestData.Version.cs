@@ -39,8 +39,11 @@ public partial class ApiSchemaTests
                                 ApiName: nameof(Person.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(Person.Id),
-                                ClrMemberKind: ClrMemberKind.Property
+                                ClrValueMember: new ClrMemberReferenceDef
+                                (
+                                    ClrMemberKind.Property,
+                                    nameof(Person.Id)
+                                )
                             )
                         ],
                         ApiVersion: new ApiVersionDefinitionDef(new ApiPropertyReferenceDef(ApiName: null, ClrName: nameof(Person.Id)))
@@ -74,8 +77,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             }
                         ],
                         "ApiKeys": [],

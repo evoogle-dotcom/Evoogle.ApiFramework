@@ -45,7 +45,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     /// <summary>Creates a dependent-end builder from a CLR type.</summary>
     /// <param name="clrObjectType">The dependent CLR object type.</param>
     public ApiRelationshipDependentEndBuilder(Type clrObjectType)
-        : this(new ApiTypeReference (clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType))))
+        : this(new ApiTypeReference(clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType))))
     {
     }
     #endregion

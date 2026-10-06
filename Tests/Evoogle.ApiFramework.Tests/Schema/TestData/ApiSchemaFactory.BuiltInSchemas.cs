@@ -92,8 +92,7 @@ public static partial class ApiSchemaFactory
                 name,
                 expression,
                 required ? ApiTypeModifiers.Required : ApiTypeModifiers.None,
-                name,
-                clrMemberKind),
+                new ClrMemberReference(clrMemberKind, name)),
             extensions);
 
     private static TElement WithExtensions<TElement>

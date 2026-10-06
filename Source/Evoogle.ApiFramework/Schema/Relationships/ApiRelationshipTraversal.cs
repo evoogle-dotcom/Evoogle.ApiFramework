@@ -31,7 +31,7 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
 {
     #region ApiRelationshipTraversal Fields
     private readonly ClrMemberBinding _clrNavigationMemberBinding = new(clrNavigationMember);
-    private ApiRelationshipEnd? _targetEnd;
+    private ApiRelationshipEnd? _apiTargetEnd;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -49,18 +49,24 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
     /// <summary>Gets the optional CLR navigation member reference.</summary>
     public ClrMemberReference? ClrNavigationMember => _clrNavigationMemberBinding.ClrMemberReference;
 
+    /// <summary>Gets whether the referenced CLR navigation member is a property or field, if configured.</summary>
+    public ClrMemberKind? ClrKind => this.ClrNavigationMember?.ClrKind;
+
+    /// <summary>Gets the name of the referenced CLR navigation member, if configured.</summary>
+    public string? ClrName => this.ClrNavigationMember?.ClrName;
+
     /// <summary>Gets the relationship end from which this traversal begins.</summary>
-    public ApiRelationshipEnd SourceEnd => this.Parent as ApiRelationshipEnd
-        ?? throw new ApiSchemaException("A traversal must be owned by a relationship end.");
+    public ApiRelationshipEnd ApiSourceEnd => this.Parent as ApiRelationshipEnd
+        ?? throw new ApiSchemaException($"An {nameof(ApiRelationshipTraversal)} must be owned by an {nameof(ApiRelationshipEnd)}.");
 
     /// <summary>Gets the opposite relationship end after schema compilation.</summary>
-    public ApiRelationshipEnd TargetEnd => this.RequireValue(_targetEnd);
+    public ApiRelationshipEnd ApiTargetEnd => this.RequireValue(_apiTargetEnd);
 
     /// <summary>Gets the source object type after schema compilation.</summary>
-    public ApiObjectType SourceObjectType => this.SourceEnd.ApiObjectType;
+    public ApiObjectType ApiSourceObjectType => this.ApiSourceEnd.ApiObjectType;
 
     /// <summary>Gets the target object type after schema compilation.</summary>
-    public ApiObjectType TargetObjectType => this.TargetEnd.ApiObjectType;
+    public ApiObjectType ApiTargetObjectType => this.ApiTargetEnd.ApiObjectType;
     #endregion
 
     #region ApiRelationshipTraversal Computed Properties
@@ -70,9 +76,9 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
     /// <summary>
     ///     Gets whether one source can reach multiple targets through this traversal.
     /// </summary>
-    public bool IsToMany => this.SourceEnd.ApiRelationship switch
+    public bool IsToMany => this.ApiSourceEnd.ApiRelationship switch
     {
-        ApiRelationshipOneToMany oneToMany => ReferenceEquals(this.SourceEnd, oneToMany.ApiPrincipalEnd),
+        ApiRelationshipOneToMany oneToMany => ReferenceEquals(this.ApiSourceEnd, oneToMany.ApiPrincipalEnd),
         ApiRelationshipManyToMany => true,
         _ => false
     };
@@ -102,19 +108,25 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
     #endregion
 
     #region Binding Methods
-    internal void BindTargetEnd(ApiRelationshipEnd targetEnd, ApiSchemaCompilationContext context)
+    internal void BindApiTargetEnd(ApiRelationshipEnd apiTargetEnd, ApiSchemaCompilationContext context)
     {
-        ArgumentNullException.ThrowIfNull(targetEnd);
+        ArgumentNullException.ThrowIfNull(apiTargetEnd);
         this.ThrowIfFrozen();
-        _targetEnd = targetEnd;
+        _apiTargetEnd = apiTargetEnd;
 
+        this.BindClrNavigationMember(apiTargetEnd, context);
+        this.InitializeClrNavigationAccessor(context.Session.ApiSchemaContext);
+    }
+
+    private void BindClrNavigationMember(ApiRelationshipEnd apiTargetEnd, ApiSchemaCompilationContext context)
+    {
         if (!this.HasClrNavigationMember)
         {
             return;
         }
 
-        if (this.SourceEnd.ApiResolvedObjectType is not { } sourceType ||
-            targetEnd.ApiResolvedObjectType is not { } targetType)
+        if (this.ApiSourceEnd.ApiResolvedObjectType is not { } apiSourceObjectType ||
+            apiTargetEnd.ApiResolvedObjectType is not { } apiTargetObjectType)
         {
             _clrNavigationMemberBinding.ClrMemberReference!.Validate(context, this.ApiPath);
             return;
@@ -122,7 +134,7 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
 
         if (!_clrNavigationMemberBinding.TryResolveReference
         (
-            sourceType.ClrType,
+            apiSourceObjectType.ClrType,
             context,
             "Traversal CLR navigation member reference",
             requiresRead: true,
@@ -139,13 +151,13 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
             (
                 memberType.IsGenericType &&
                     memberType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
-                    memberType.GenericTypeArguments[0] == targetType.ClrType ||
+                    memberType.GenericTypeArguments[0] == apiTargetObjectType.ClrType ||
                 memberType.GetInterfaces().Any(candidate =>
                     candidate.IsGenericType &&
                     candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
-                    candidate.GenericTypeArguments[0] == targetType.ClrType)
+                    candidate.GenericTypeArguments[0] == apiTargetObjectType.ClrType)
             )
-            : memberType == targetType.ClrType;
+            : memberType == apiTargetObjectType.ClrType;
         if (isCompatibleType)
         {
             return;
@@ -154,8 +166,7 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ClrMemberIncompatible;
-        var description = $"CLR navigation member '{this.ClrNavigationMember!.ClrName}' is "
-            + $"incompatible with '{targetType.ClrType}'";
+        var description = $"CLR navigation member '{this.ClrName}' is incompatible with '{apiTargetObjectType.ClrType}'";
         var remediation = "Bind a readable and writable member with the traversal's target and cardinality";
 
         context.AddIssue(apiPath, severity, code, description, remediation);

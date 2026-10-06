@@ -119,6 +119,11 @@ Use `ClrMemberName` when a name can identify either a CLR property or field and 
 property-based name is appropriate only when the value is guaranteed to identify a CLR property
 and cannot identify a field.
 
+Name properties that expose `ClrMemberReference` by the member's domain role. For example,
+`ApiProperty.ClrValueMember` identifies a contained value member, while
+`ApiRelationshipTraversal.ClrNavigationMember` identifies an optional relationship navigation
+member.
+
 Use `Clr` only when the value really is the CLR-side representation. Do not use `Clr` for
 general runtime values, parsed values, API names, or schema concepts.
 

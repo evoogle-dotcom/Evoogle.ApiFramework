@@ -50,7 +50,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
                     ApiPrincipalKeyName = policy.ConvertName(nameof(Relationships.ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)),
                     ApiTraversal = policy.ConvertName
                     (
-                        nameof(Relationships.ApiRelationshipEnd.ApiTraversal)
+                        nameof(ApiRelationshipEnd.ApiTraversal)
                     ),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),

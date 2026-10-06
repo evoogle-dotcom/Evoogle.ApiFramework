@@ -175,12 +175,12 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
 
     private bool ValidateClrKind(ApiSchemaCompilationContext context, string validationApiPath)
     {
-        if (_hasInvalidClrKind || _clrKind is ClrMemberKind clrKind && !Enum.IsDefined(clrKind))
+        if (_clrKind is null || _hasInvalidClrKind || !Enum.IsDefined(_clrKind.Value))
         {
             var apiPath = validationApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind;
-            var description = $"{nameof(this.ClrKind)} must be a valid {nameof(Types.ClrMemberKind)} value";
+            var description = $"{nameof(this.ClrKind)} must be a valid {nameof(ClrMemberKind)} value";
             var remediation = $"Specify a valid {nameof(this.ClrKind)} value";
 
             context.AddIssue(apiPath, severity, code, description, remediation);

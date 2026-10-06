@@ -84,8 +84,7 @@ public static partial class ApiSchemaFactory
         string ApiName,
         ApiTypeExpressionDef ApiTypeExpression,
         ApiTypeModifiers ApiTypeModifiers,
-        string ClrName,
-        ClrMemberKind ClrMemberKind,
+        ClrMemberReferenceDef? ClrValueMember,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
 
@@ -529,10 +528,14 @@ public static partial class ApiSchemaFactory
         var apiName = def.ApiName;
         var apiTypeExpression = BuildApiTypeExpression(def.ApiTypeExpression)!;
         var apiTypeModifiers = def.ApiTypeModifiers;
-        var clrName = def.ClrName;
-        var clrMemberKind = def.ClrMemberKind;
+        var clrValueMember = BuildClrMemberReference(def.ClrValueMember) ?? new ClrMemberReference
+        (
+            clrKind: null,
+            clrName: null!,
+            hasInvalidClrKind: true
+        );
 
-        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName, clrMemberKind);
+        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrValueMember);
 
         AttachExtensions(apiProperty, def);
 

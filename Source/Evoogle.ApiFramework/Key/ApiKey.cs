@@ -9,9 +9,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
-
-using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Key.Internal;
 using Evoogle.ApiFramework.Key.Json;
 using Evoogle.Extensions;

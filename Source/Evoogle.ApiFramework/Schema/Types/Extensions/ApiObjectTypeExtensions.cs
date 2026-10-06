@@ -98,9 +98,16 @@ public static class ApiObjectTypeExtensions
             return apiProperty;
         }
 
-        var availablePropertiesByClrName = string.Join(',', apiObjectType.ApiProperties.OrderBy(p => p.ClrName).Select(p => p.ClrName));
-        var errorMessage = $"{nameof(ApiProperty)} with {nameof(ApiProperty.ClrName)} '{clrName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
-            $"Available {nameof(ApiProperty)} by {nameof(ApiProperty.ClrName)} are: {availablePropertiesByClrName}.";
+        var availablePropertiesByClrName = string.Join
+        (
+            ',',
+            apiObjectType.ApiProperties
+                .OrderBy(static property => property.ClrName)
+                .Select(static property => property.ClrName)
+        );
+        var errorMessage = $"{nameof(ApiProperty)} with {nameof(ClrMemberReference.ClrName)} " +
+            $"'{clrName.SafeToString()}' not found in {apiObjectType.SafeToString()}. Available " +
+            $"{nameof(ApiProperty)} by {nameof(ClrMemberReference.ClrName)} are: {availablePropertiesByClrName}.";
         throw new ApiSchemaException(errorMessage);
     }
     #endregion

@@ -58,7 +58,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
             switch (this.ExpectedApiRelationshipDef, actualApiRelationship)
             {
-                case (ApiRelationshipOneToOneDef expectedRelationshipDef, ApiRelationshipOneToOne actualRelationship) :
+                case (ApiRelationshipOneToOneDef expectedRelationshipDef, ApiRelationshipOneToOne actualRelationship):
                     actualRelationship.ApiKind.Should().Be(ApiRelationshipKind.OneToOne);
                     actualRelationship.ApiDeleteBehavior.Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
 
@@ -70,7 +70,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
                     );
                     break;
 
-                case (ApiRelationshipOneToManyDef expectedRelationshipDef, ApiRelationshipOneToMany actualRelationship) :
+                case (ApiRelationshipOneToManyDef expectedRelationshipDef, ApiRelationshipOneToMany actualRelationship):
                     actualRelationship.ApiKind.Should().Be(ApiRelationshipKind.OneToMany);
                     actualRelationship.ApiDeleteBehavior.Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
 
@@ -82,7 +82,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
                     );
                     break;
 
-                case (ApiRelationshipManyToManyDef expectedRelationshipDef, ApiRelationshipManyToMany actualRelationship) :
+                case (ApiRelationshipManyToManyDef expectedRelationshipDef, ApiRelationshipManyToMany actualRelationship):
                     actualRelationship.ApiKind.Should().Be(ApiRelationshipKind.ManyToMany);
                     actualRelationship.ApiDeleteBehavior.Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
 

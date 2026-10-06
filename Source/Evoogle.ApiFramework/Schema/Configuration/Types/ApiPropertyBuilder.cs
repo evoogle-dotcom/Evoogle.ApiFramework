@@ -222,7 +222,8 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName, ClrMemberKind clrMemberKind)
     {
-        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName, clrMemberKind);
+        var clrValueMember = new ClrMemberReference(clrMemberKind, clrName);
+        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrValueMember);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

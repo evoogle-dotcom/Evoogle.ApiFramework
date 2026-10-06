@@ -383,7 +383,7 @@ public sealed partial class ApiObjectType
             parts: this.ApiProperties,
             partKeySelector: x => x.ClrName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiProperty.ClrName),
+            partKeyPropertyName: $"{nameof(ApiProperty.ClrValueMember)}.{nameof(ClrMemberReference.ClrName)}",
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyClrName,
             session: context.Session,

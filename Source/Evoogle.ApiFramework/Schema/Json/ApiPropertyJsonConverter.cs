@@ -29,8 +29,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         public required string ApiName { get; init; }
         public required string ApiTypeExpression { get; init; }
         public required string ApiTypeModifiers { get; init; }
-        public required string ClrName { get; init; }
-        public required string ClrMemberKind { get; init; }
+        public required string ClrValueMember { get; init; }
         #endregion
     }
 
@@ -53,8 +52,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
                     ApiName = policy.ConvertName(nameof(Types.ApiProperty.ApiName)),
                     ApiTypeExpression = policy.ConvertName(nameof(Types.ApiProperty.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
                     ApiTypeModifiers = policy.ConvertName(nameof(Types.ApiProperty.ApiTypeModifiers)),
-                    ClrName = policy.ConvertName(nameof(Types.ApiProperty.ClrName)),
-                    ClrMemberKind = policy.ConvertName(nameof(Types.ApiProperty.ClrMemberKind)),
+                    ClrValueMember = policy.ConvertName(nameof(Types.ApiProperty.ClrValueMember)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -72,8 +70,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         public string? ApiName { get; set; }
         public ApiTypeExpression? ApiTypeExpression { get; set; }
         public JsonEnumReadState<ApiTypeModifiers>? ApiTypeModifiers { get; set; }
-        public string? ClrName { get; set; }
-        public ClrMemberKind? ClrMemberKind { get; set; }
+        public ClrMemberReference? ClrValueMember { get; set; }
         #endregion
     }
 
@@ -92,10 +89,6 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region Constants
-        private static readonly Type _clrMemberKindType = typeof(ClrMemberKind?);
-        #endregion
-
         #region ApiProperty Fields
         public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
@@ -103,8 +96,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             { propertyNames.ApiProperty.ApiName, HandleApiPropertyApiName },
             { propertyNames.ApiProperty.ApiTypeModifiers, HandleApiPropertyApiTypeModifiers, true },
             { propertyNames.ApiProperty.ApiTypeExpression, HandleApiPropertyApiTypeExpression },
-            { propertyNames.ApiProperty.ClrName, HandleApiPropertyClrName },
-            { propertyNames.ApiProperty.ClrMemberKind, HandleApiPropertyClrMemberKind, true },
+            { propertyNames.ApiProperty.ClrValueMember, HandleApiPropertyClrValueMember },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
@@ -136,24 +128,16 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             context.ReadData.ApiProperty.ApiTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, options);
         }
 
-        private static void HandleApiPropertyClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiPropertyClrValueMember
+        (
+            ref Utf8JsonReader reader,
+            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+        )
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
-            context.ReadData.ApiProperty.ClrName = reader.GetString();
-        }
-
-        private static void HandleApiPropertyClrMemberKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
-        {
-            context.ReadData.ApiProperty ??= new ApiPropertyReadData();
-
-            var options = context.Options;
-            context.ReadData.ApiProperty.ClrMemberKind = _nullableClrMemberKindJsonConverter.Read
-            (
-                ref reader,
-                _clrMemberKindType,
-                options
-            );
+            context.ReadData.ApiProperty.ClrValueMember =
+                JsonSerializer.Deserialize<ClrMemberReference>(ref reader, context.Options);
         }
         #endregion
     }
@@ -162,9 +146,6 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
     private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _nullableApiTypeModifiersJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
-    private static readonly EnumJsonConverter<ClrMemberKind> _clrMemberKindJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ClrMemberKind> _nullableClrMemberKindJsonConverter =
         new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
@@ -206,10 +187,14 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         var apiTypeExpression = readState?.ApiTypeExpression;
         var apiTypeModifiersReadState = readState?.ApiTypeModifiers;
         var apiTypeModifiers = apiTypeModifiersReadState?.Value ?? ApiTypeModifiers.None;
-        var clrName = readState?.ClrName;
-        var clrMemberKind = readState?.ClrMemberKind;
+        var clrValueMember = readState?.ClrValueMember ?? new ClrMemberReference
+        (
+            clrKind: null,
+            clrName: null!,
+            hasInvalidClrKind: true
+        );
 
-        var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrName!, clrMemberKind);
+        var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrValueMember);
 
         if (apiTypeModifiersReadState?.IsInvalid == true || apiTypeModifiersReadState?.IsNull == true)
         {
@@ -247,8 +232,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             WriteApiPropertyApiName(writer, apiProperty, writeContext);
             WriteApiPropertyApiTypeExpression(writer, apiProperty, writeContext);
             WriteApiPropertyApiTypeModifiers(writer, apiProperty, writeContext);
-            WriteApiPropertyClrName(writer, apiProperty, writeContext);
-            WriteApiPropertyClrMemberKind(writer, apiProperty, writeContext);
+            WriteApiPropertyClrValueMember(writer, apiProperty, writeContext);
 
             WriteExtensibleBaseExtensions
             (
@@ -271,10 +255,16 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     private static void WriteApiPropertyApiTypeModifiers(Utf8JsonWriter writer, ApiProperty apiProperty, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiProperty.ApiTypeModifiers, value: apiProperty.ApiTypeModifiers, options: writeContext.Options, converter: _apiTypeModifiersJsonConverter);
 
-    private static void WriteApiPropertyClrName(Utf8JsonWriter writer, ApiProperty apiProperty, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiProperty.ClrName, value: apiProperty.ClrName, options: writeContext.Options);
-
-    private static void WriteApiPropertyClrMemberKind(Utf8JsonWriter writer, ApiProperty apiProperty, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiProperty.ClrMemberKind, value: apiProperty.ClrMemberKind, options: writeContext.Options, converter: _clrMemberKindJsonConverter);
+    private static void WriteApiPropertyClrValueMember
+    (
+        Utf8JsonWriter writer,
+        ApiProperty apiProperty,
+        DefaultWriteContext<PropertyNames> writeContext
+    ) => writer.TryWritePropertyWithSerializer
+    (
+        propertyName: writeContext.PropertyNames.ApiProperty.ClrValueMember,
+        obj: apiProperty.ClrValueMember,
+        options: writeContext.Options
+    );
     #endregion
 }

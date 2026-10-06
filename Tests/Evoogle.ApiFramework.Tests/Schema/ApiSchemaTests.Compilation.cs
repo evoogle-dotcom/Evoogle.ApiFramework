@@ -179,8 +179,10 @@ public partial class ApiSchemaTests
                                     "ApiItemTypeModifiers": "Required",
                                     "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                "ClrName": "Items",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Items"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests"
@@ -227,8 +229,10 @@ public partial class ApiSchemaTests
                                     "ApiItemTypeModifiers": "Required",
                                     "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                "ClrName": "Items",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Items"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests"
@@ -750,8 +754,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "RequiredName",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "RequiredName"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
@@ -776,7 +782,7 @@ public partial class ApiSchemaTests
         // ApiProperty throws if ClrName is invalid
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ClrName)} Is Invalid",
+            Name = $"{nameof(ApiProperty)} Throws If {nameof(ClrMemberReference.ClrName)} Is Invalid",
             SourceJson = """
             {
                 "ApiName": "ApiProperty Throws If ClrName Is Invalid",
@@ -800,8 +806,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": ""
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
@@ -817,8 +825,8 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrName,
-                    description: $"{nameof(ApiProperty.ClrName)} must not be null, empty, or whitespace",
-                    remediation: $"Specify a valid {nameof(ApiProperty.ClrName)} value"
+                    description: $"{nameof(ClrMemberReference.ClrName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ClrMemberReference.ClrName)} value"
                 ),
             ]
         },
@@ -850,8 +858,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Value",
-                                "ClrMemberKind": "Field"
+                                "ClrValueMember": {
+                                    "ClrKind": "Field",
+                                    "ClrName": "Value"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests"
@@ -867,7 +877,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberReferenceUnresolved,
-                    description: $"API property CLR member reference could not resolve CLR field 'Value' on CLR type '{typeof(ClrMemberKindPropertyOnlyType)}'",
+                    description: $"API property CLR value member reference could not resolve CLR field 'Value' on CLR type '{typeof(ClrMemberKindPropertyOnlyType)}'",
                     remediation: "Reference an existing public instance CLR field"
                 ),
             ]
@@ -900,8 +910,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Value",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Value"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindFieldOnlyType, Evoogle.ApiFramework.Tests"
@@ -917,7 +929,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindFieldOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberReferenceUnresolved,
-                    description: $"API property CLR member reference could not resolve CLR property 'Value' on CLR type '{typeof(ClrMemberKindFieldOnlyType)}'",
+                    description: $"API property CLR value member reference could not resolve CLR property 'Value' on CLR type '{typeof(ClrMemberKindFieldOnlyType)}'",
                     remediation: "Reference an existing public instance CLR property"
                 ),
             ]
@@ -950,8 +962,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "NonExistentProperty",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NonExistentProperty"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
@@ -967,7 +981,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"NonExistent\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberReferenceUnresolved,
-                    description: $"API property CLR member reference could not resolve CLR property 'NonExistentProperty' on CLR type '{typeof(ScalarsOnly)}'",
+                    description: $"API property CLR value member reference could not resolve CLR property 'NonExistentProperty' on CLR type '{typeof(ScalarsOnly)}'",
                     remediation: "Reference an existing public instance CLR property"
                 ),
             ]
@@ -990,8 +1004,10 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "RequiredName",
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "RequiredName",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "RequiredName"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
@@ -1045,8 +1061,10 @@ public partial class ApiSchemaTests
                                     "ClrType": "System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "SpanField",
-                                "ClrMemberKind": "Field"
+                                "ClrValueMember": {
+                                    "ClrKind": "Field",
+                                    "ClrName": "SpanField"
+                                }
                             },
                             {
                                 "ApiName": "SpanProperty",
@@ -1060,8 +1078,10 @@ public partial class ApiSchemaTests
                                     "ClrType": "System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "SpanProperty",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "SpanProperty"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests\u002BTypesWithRefStructMembers, Evoogle.ApiFramework.Tests"
@@ -1077,7 +1097,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberIncompatible,
-                    description: $"API property CLR member reference '{nameof(TypesWithRefStructMembers.SpanField)}' has unsupported by-ref-like CLR type '{typeof(Span<byte>).SafeToName()}'",
+                    description: $"API property CLR value member reference '{nameof(TypesWithRefStructMembers.SpanField)}' has unsupported by-ref-like CLR type '{typeof(Span<byte>).SafeToName()}'",
                     remediation: "Bind a CLR member whose value can be boxed and accessed through object"
                 ),
                 new ApiSchemaCompilationIssue
@@ -1085,7 +1105,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberIncompatible,
-                    description: $"API property CLR member reference '{nameof(TypesWithRefStructMembers.SpanProperty)}' has unsupported by-ref-like CLR type '{typeof(Span<byte>).SafeToName()}'",
+                    description: $"API property CLR value member reference '{nameof(TypesWithRefStructMembers.SpanProperty)}' has unsupported by-ref-like CLR type '{typeof(Span<byte>).SafeToName()}'",
                     remediation: "Bind a CLR member whose value can be boxed and accessed through object"
                 ),
             ]
@@ -1112,8 +1132,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "RequiredName",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "RequiredName"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
@@ -1154,8 +1176,10 @@ public partial class ApiSchemaTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "RequiredName",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "RequiredName"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
@@ -1194,8 +1218,10 @@ public partial class ApiSchemaTests
                                 "ApiName": "RequiredName",
                                 "ApiType": {},
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "RequiredName",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "RequiredName"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
@@ -1234,8 +1260,10 @@ public partial class ApiSchemaTests
                                 "ApiName": "RequiredName",
                                 "ApiType": { "ApiKind": "Scalar" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "RequiredName",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "RequiredName"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"
@@ -1284,8 +1312,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Byte"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "PointerField",
-                                "ClrMemberKind": "Field"
+                                "ClrValueMember": {
+                                    "ClrKind": "Field",
+                                    "ClrName": "PointerField"
+                                }
                             },
                             {
                                 "ApiName": "PointerProperty",
@@ -1294,8 +1324,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Byte"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "PointerProperty",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "PointerProperty"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests\u002BTypesWithPointerMembers, Evoogle.ApiFramework.Tests"
@@ -1311,7 +1343,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberInvalidGetter,
-                    description: $"Failed to compile getter for API property CLR member reference '{nameof(TypesWithPointerMembers.PointerField)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
+                    description: $"Failed to compile getter for API property CLR value member reference '{nameof(TypesWithPointerMembers.PointerField)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
                     remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerField)}' is readable and can be used in expression trees"
                 ),
                 new ApiSchemaCompilationIssue
@@ -1319,7 +1351,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberInvalidSetter,
-                    description: $"Failed to compile setter for API property CLR member reference '{nameof(TypesWithPointerMembers.PointerField)}': Type must not be a pointer type (Parameter 'type')",
+                    description: $"Failed to compile setter for API property CLR value member reference '{nameof(TypesWithPointerMembers.PointerField)}': Type must not be a pointer type (Parameter 'type')",
                     remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerField)}' is writable and can be used in expression trees"
                 ),
                 new ApiSchemaCompilationIssue
@@ -1327,7 +1359,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberInvalidGetter,
-                    description: $"Failed to compile getter for API property CLR member reference '{nameof(TypesWithPointerMembers.PointerProperty)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
+                    description: $"Failed to compile getter for API property CLR value member reference '{nameof(TypesWithPointerMembers.PointerProperty)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
                     remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerProperty)}' is readable and can be used in expression trees"
                 ),
                 new ApiSchemaCompilationIssue
@@ -1335,7 +1367,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberInvalidSetter,
-                    description: $"Failed to compile setter for API property CLR member reference '{nameof(TypesWithPointerMembers.PointerProperty)}': Type must not be a pointer type (Parameter 'type')",
+                    description: $"Failed to compile setter for API property CLR value member reference '{nameof(TypesWithPointerMembers.PointerProperty)}': Type must not be a pointer type (Parameter 'type')",
                     remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerProperty)}' is writable and can be used in expression trees"
                 ),
             ]
@@ -1372,8 +1404,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "Name",
@@ -1382,8 +1416,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "NameAlt",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NameAlt"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests"
@@ -1432,8 +1468,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "NameAlias",
@@ -1442,8 +1480,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "String"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyClrNameType, Evoogle.ApiFramework.Tests"
@@ -1459,8 +1499,10 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyClrName,
-                    description: $"Duplicate {nameof(ApiProperty)}.{nameof(ApiProperty.ClrName)} values: 'Name'",
-                    remediation: $"Verify that each {nameof(ApiProperty)} has a unique {nameof(ApiProperty.ClrName)} value"
+                    description: $"Duplicate {nameof(ApiProperty)}.{nameof(ApiProperty.ClrValueMember)}." +
+                        $"{nameof(ClrMemberReference.ClrName)} values: 'Name'",
+                    remediation: $"Verify that each {nameof(ApiProperty)} has a unique " +
+                        $"{nameof(ApiProperty.ClrValueMember)}.{nameof(ClrMemberReference.ClrName)} value"
                 ),
             ]
         },
@@ -1491,8 +1533,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Code",
@@ -1500,8 +1544,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Code",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Code"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -1871,15 +1917,19 @@ public partial class ApiSchemaTests
                                 "ApiName": "Name",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "NameAlt",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "NameAlt",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NameAlt"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests"
@@ -1892,8 +1942,10 @@ public partial class ApiSchemaTests
                                 "ApiName": "Name",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyClrNameType, Evoogle.ApiFramework.Tests"
@@ -1947,15 +1999,19 @@ public partial class ApiSchemaTests
                                 "ApiName": "Name",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "NameAlt",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "NameAlt",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NameAlt"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests"
@@ -1968,15 +2024,19 @@ public partial class ApiSchemaTests
                                 "ApiName": "Name",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "NameAlt",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "NameAlt",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NameAlt"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Tests"
@@ -2123,8 +2183,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -2186,8 +2248,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -2242,8 +2306,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -2306,8 +2372,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -2370,8 +2438,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -2436,8 +2506,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Code",
@@ -2445,8 +2517,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Code",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Code"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -2512,8 +2586,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnedType, Evoogle.ApiFramework.Tests"
@@ -2528,8 +2604,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Item",
@@ -2537,8 +2615,10 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "Owned"
                                 },
-                                "ClrName": "Item",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Item"
+                                }
                             }
                         ],
                         "ApiKeys": [
@@ -2597,7 +2677,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -2611,7 +2691,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2656,7 +2736,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2700,7 +2780,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -2750,7 +2830,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2796,7 +2876,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2842,7 +2922,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -2856,7 +2936,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2912,7 +2992,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -2926,7 +3006,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2974,7 +3054,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -2988,8 +3068,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelAssociation",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalAId", "ClrMemberKind": "Property" },
-                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalBId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
@@ -3034,7 +3114,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3048,8 +3128,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelAssociation",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalAId", "ClrMemberKind": "Property" },
-                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalBId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
@@ -3094,7 +3174,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3145,7 +3225,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3159,7 +3239,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipalB",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3173,8 +3253,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelAssociation",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalAId", "ClrMemberKind": "Property" },
-                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalBId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
@@ -3233,7 +3313,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3247,7 +3327,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipalB",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3261,8 +3341,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelAssociation",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalAId", "ClrMemberKind": "Property" },
-                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalBId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
@@ -3321,7 +3401,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3335,8 +3415,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" },
-                            { "ApiName": "PrincipalId2", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId2", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }},
+                            { "ApiName": "PrincipalId2", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId2" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3390,7 +3470,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3404,7 +3484,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalCode", "ApiType": { "ApiKind": "Scalar", "ApiName": "String" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalCode", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalCode", "ApiType": { "ApiKind": "Scalar", "ApiName": "String" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalCode" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3456,7 +3536,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3470,7 +3550,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3521,8 +3601,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Id", "ClrMemberKind": "Property" },
-                            { "ApiName": "Code", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "Code", "ClrMemberKind": "Property" }
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }},
+                            { "ApiName": "Code", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Code" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3540,7 +3620,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrName": "PrincipalId", "ClrMemberKind": "Property" }
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3577,7 +3657,7 @@ public partial class ApiSchemaTests
         },
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiProperty)} reports an invalid {nameof(ApiProperty.ClrMemberKind)} JSON value",
+            Name = $"{nameof(ApiProperty)} reports an invalid {nameof(ClrMemberReference.ClrKind)} JSON value",
             SourceJson = """
             {
                 "ApiName": "ApiProperty Reports Invalid ClrMemberKind",
@@ -3601,8 +3681,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Value",
-                                "ClrMemberKind": "Unknown"
+                                "ClrValueMember": {
+                                    "ClrKind": "Unknown",
+                                    "ClrName": "Value"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests"
@@ -3625,7 +3707,7 @@ public partial class ApiSchemaTests
         },
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiProperty)} reports a null {nameof(ApiProperty.ClrMemberKind)} JSON value",
+            Name = $"{nameof(ApiProperty)} reports a null {nameof(ClrMemberReference.ClrKind)} JSON value",
             SourceJson = """
             {
                 "ApiName": "ApiProperty Reports Null ClrMemberKind",
@@ -3649,8 +3731,10 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Value",
-                                "ClrMemberKind": null
+                                "ClrValueMember": {
+                                    "ClrKind": null,
+                                    "ClrName": "Value"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests"
@@ -3673,7 +3757,7 @@ public partial class ApiSchemaTests
         },
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiProperty)} reports an omitted {nameof(ApiProperty.ClrMemberKind)} JSON value",
+            Name = $"{nameof(ApiProperty)} reports an omitted {nameof(ClrMemberReference.ClrKind)} JSON value",
             SourceJson = """
             {
                 "ApiName": "ApiProperty Reports Omitted ClrMemberKind",
@@ -3697,7 +3781,9 @@ public partial class ApiSchemaTests
                                     "ApiName": "Int32"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Value"
+                                "ClrValueMember": {
+                                    "ClrName": "Value"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+ClrMemberKindPropertyOnlyType, Evoogle.ApiFramework.Tests"
@@ -3778,8 +3864,10 @@ public partial class ApiSchemaTests
                                 "ApiName": "NullableProp",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "NullableProp",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NullableProp"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.NullabilityMismatch, Evoogle.ApiFramework.Tests"
@@ -3823,8 +3911,10 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "NonNullableProp",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ClrName": "NonNullableProp",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NonNullableProp"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.NullabilityMismatch, Evoogle.ApiFramework.Tests"
@@ -3873,8 +3963,10 @@ public partial class ApiSchemaTests
                                     "ApiItemTypeModifiers": "Required",
                                     "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                "ClrName": "NullableItemsProp",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NullableItemsProp"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.CollectionNullabilityMismatch, Evoogle.ApiFramework.Tests"
@@ -3923,8 +4015,10 @@ public partial class ApiSchemaTests
                                     "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "NonNullableItemsProp",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "NonNullableItemsProp"
+                                }
                             }
                         ],
                         "ClrType": "Evoogle.ApiFramework.TestData.CollectionNullabilityMismatch, Evoogle.ApiFramework.Tests"
@@ -3955,6 +4049,5 @@ public partial class ApiSchemaTests
     [Theory]
     [MemberData(nameof(CompileWarnsTheoryData))]
     public void CompileWarns(IXUnitTest test) => test.Execute(this);
-
     #endregion
 }

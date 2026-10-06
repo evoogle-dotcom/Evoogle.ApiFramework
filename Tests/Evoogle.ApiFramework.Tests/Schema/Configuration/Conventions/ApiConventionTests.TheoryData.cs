@@ -296,8 +296,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "name",
@@ -305,8 +307,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "email",
@@ -314,8 +318,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Email",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Email"
+                                }
                             }
                         ],
                         "ApiKeys": [],
@@ -362,8 +368,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "name",
@@ -371,8 +379,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "EmailAddress",
@@ -380,8 +390,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Email",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Email"
+                                }
                             }
                         ],
                         "ApiKeys": [],
@@ -428,8 +440,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "name",
@@ -437,8 +451,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "EmailAddress",
@@ -446,8 +462,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Email",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Email"
+                                }
                             }
                         ],
                         "ApiKeys": [],
@@ -494,8 +512,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Name",
@@ -503,8 +523,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "EmailAddress",
@@ -512,8 +534,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Email",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Email"
+                                }
                             }
                         ],
                         "ApiKeys": [],
@@ -635,8 +659,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Id",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Id"
+                      }
                     },
                     {
                       "ApiName": "Name",
@@ -644,8 +670,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Name",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Name"
+                      }
                     },
                     {
                       "ApiName": "Email",
@@ -653,8 +681,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "None",
-                      "ClrName": "Email",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Email"
+                      }
                     }
                   ],
                   "ApiKeys": [
@@ -715,8 +745,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Id",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Id"
+                      }
                     },
                     {
                       "ApiName": "Name",
@@ -724,8 +756,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Name",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Name"
+                      }
                     },
                     {
                       "ApiName": "Email",
@@ -733,8 +767,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "None",
-                      "ClrName": "Email",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Email"
+                      }
                     }
                   ],
                   "ApiKeys": [
@@ -795,8 +831,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "OrderItemId",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "OrderItemId"
+                      }
                     },
                     {
                       "ApiName": "Description",
@@ -804,8 +842,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Description",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Description"
+                      }
                     }
                   ],
                   "ApiKeys": [
@@ -867,8 +907,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Id",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Id"
+                      }
                     },
                     {
                       "ApiName": "Name",
@@ -876,8 +918,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Name",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Name"
+                      }
                     },
                     {
                       "ApiName": "Email",
@@ -885,8 +929,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "None",
-                      "ClrName": "Email",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Email"
+                      }
                     }
                   ],
                   "ApiKeys": [],
@@ -934,8 +980,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Id",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Id"
+                      }
                     },
                     {
                       "ApiName": "Name",
@@ -943,8 +991,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Name",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Name"
+                      }
                     },
                     {
                       "ApiName": "email",
@@ -952,8 +1002,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Email",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Email"
+                      }
                     }
                   ],
                   "ApiKeys": [],
@@ -1002,8 +1054,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Name",
@@ -1011,8 +1065,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "Email",
@@ -1020,8 +1076,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Email",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Email"
+                                }
                             }
                         ],
                         "ApiKeys": [],
@@ -1073,8 +1131,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Field"
+                                "ClrValueMember": {
+                                    "ClrKind": "Field",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "Name",
@@ -1082,8 +1142,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Field"
+                                "ClrValueMember": {
+                                    "ClrKind": "Field",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "Count",
@@ -1091,8 +1153,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Count",
-                                "ClrMemberKind": "Field"
+                                "ClrValueMember": {
+                                    "ClrKind": "Field",
+                                    "ClrName": "Count"
+                                }
                             }
                         ],
                         "ApiKeys": [],
@@ -1139,8 +1203,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Id",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
                             },
                             {
                                 "ApiName": "displayName",
@@ -1148,8 +1214,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "Required",
-                                "ClrName": "Name",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
                             },
                             {
                                 "ApiName": "Email",
@@ -1157,8 +1225,10 @@ public partial class ApiConventionTests
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
                                 "ApiTypeModifiers": "None",
-                                "ClrName": "Email",
-                                "ClrMemberKind": "Property"
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Email"
+                                }
                             }
                         ],
                         "ApiKeys": [],
@@ -1219,8 +1289,10 @@ public partial class ApiConventionTests
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
                       "ApiTypeModifiers": "Required",
-                      "ClrName": "Id",
-                      "ClrMemberKind": "Property"
+                      "ClrValueMember": {
+                          "ClrKind": "Property",
+                          "ClrName": "Id"
+                      }
                     }
                   ],
                   "ApiKeys": [],

@@ -23,7 +23,7 @@ following table.
 
 | Enum role | Examples | Omitted | JSON `null` | Unknown name or incompatible token |
 | --- | --- | --- | --- | --- |
-| Required schema metadata | `ApiProperty.ClrMemberKind` | Compilation issue | Compilation issue | Compilation issue |
+| Required schema metadata | `ApiProperty.ClrValueMember.ClrKind` | Compilation issue | Compilation issue | Compilation issue |
 | Defaulted schema setting | `ApiTypeModifiers`, `ApiRelationshipDeleteBehavior`, `ApiSchemaOptions.ApiKeyNullHandling` | Use the documented default | Compilation issue | Compilation issue |
 | Nullable override | `ApiObjectTypeOptions.ApiKeyNullHandling` | Inherit | Inherit | Compilation issue |
 | Conditional reference metadata | `ApiTypeReference.ApiKind` | Allowed for CLR references; otherwise compilation issue | Allowed for CLR references; otherwise compilation issue | Compilation issue |
@@ -69,11 +69,11 @@ supports any of those distinctions must retain the property's presence and parsi
 addition to the nullable enum value. `JsonConverterBase.ReadJsonObject` supports this narrowly:
 the materializer must opt in only the JSON property names whose null values it needs to inspect.
 
-`ApiProperty.ClrMemberKind` is the first use of this policy. It is required metadata whose only
-concrete values are `Property` and `Field`. JSON materialization may hold a nullable backing value;
-schema compilation reports `ClrMemberReferenceInvalidClrKind` when that value is absent or invalid.
-After successful compilation, `ClrMemberKind` is non-null and forms, together with `ClrName`,
-the authoritative CLR member-binding identity.
+`ApiProperty.ClrValueMember.ClrKind` is the first use of this policy. The CLR value member reference
+is required, and its kind has only the concrete values `Property` and `Field`. JSON materialization
+may hold a nullable backing value; schema compilation reports `ClrMemberReferenceInvalidClrKind`
+when that value is absent or invalid. After successful compilation, `ClrKind` is non-null and forms,
+together with `ClrName`, the authoritative CLR member-binding identity.
 
 Do not introduce an `Unknown` enum member or map a conversion failure to `default(TEnum)`. Both
 make an invalid wire value indistinguishable from a potentially meaningful enum value.

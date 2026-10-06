@@ -40,7 +40,7 @@ namespace Evoogle.ApiFramework.Schema.Types;
 public sealed partial class ApiProperty : ApiSchemaElement
 {
     #region ApiProperty Fields
-    private readonly ClrMemberBinding _clrMemberBinding;
+    private readonly ClrMemberBinding _clrValueMemberBinding;
 
     private bool _hasInvalidApiTypeModifiers;
     #endregion
@@ -52,39 +52,21 @@ public sealed partial class ApiProperty : ApiSchemaElement
     /// <param name="apiName">The API name of the property.</param>
     /// <param name="apiTypeExpression">The API type expression of the property.</param>
     /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
-    /// <param name="clrName">The CLR name of the property or field corresponding to this API property.</param>
-    /// <param name="clrMemberKind">The concrete kind of CLR member this API property represents.</param>
+    /// <param name="clrValueMember">The required CLR value member reference.</param>
     public ApiProperty
     (
         string apiName,
         ApiTypeExpression apiTypeExpression,
         ApiTypeModifiers apiTypeModifiers,
-        string clrName,
-        ClrMemberKind clrMemberKind
+        ClrMemberReference clrValueMember
     )
-        : this(apiName, apiTypeExpression, apiTypeModifiers, clrName, (ClrMemberKind?)clrMemberKind)
     {
-    }
+        ArgumentNullException.ThrowIfNull(clrValueMember);
 
-    internal ApiProperty
-    (
-        string apiName,
-        ApiTypeExpression apiTypeExpression,
-        ApiTypeModifiers apiTypeModifiers,
-        string clrName,
-        ClrMemberKind? clrMemberKind
-    )
-    {
         this.ApiName = apiName;
         this.ApiTypeExpression = apiTypeExpression;
         this.ApiTypeModifiers = apiTypeModifiers;
-        var clrMemberReference = new ClrMemberReference
-        (
-            clrMemberKind,
-            clrName,
-            hasInvalidClrKind: clrMemberKind is null
-        );
-        _clrMemberBinding = new ClrMemberBinding(clrMemberReference);
+        _clrValueMemberBinding = new ClrMemberBinding(clrValueMember);
     }
     #endregion
 
@@ -106,15 +88,14 @@ public sealed partial class ApiProperty : ApiSchemaElement
     /// <summary>Gets the modifiers applied to this property (e.g., Required).</summary>
     public ApiTypeModifiers ApiTypeModifiers { get; }
 
-    /// <summary>Gets the CLR name of the member backing this API property.</summary>
-    public string ClrName => _clrMemberBinding.ClrMemberReference!.ClrName;
+    /// <summary>Gets the required CLR value member reference.</summary>
+    public ClrMemberReference ClrValueMember => _clrValueMemberBinding.ClrMemberReference!;
 
-    /// <summary>
-    ///     Gets the authoritative CLR member kind used with <see cref="ClrName"/> to bind this property.
-    ///     <see cref="ClrMemberKind.Property"/> resolves only properties and
-    ///     <see cref="ClrMemberKind.Field"/> resolves only fields.
-    /// </summary>
-    public ClrMemberKind ClrMemberKind => _clrMemberBinding.ClrMemberReference!.ClrKind;
+    /// <summary>Gets whether the referenced CLR value member is a property or field.</summary>
+    public ClrMemberKind ClrKind => this.ClrValueMember.ClrKind;
+
+    /// <summary>Gets the name of the referenced CLR value member.</summary>
+    public string ClrName => this.ClrValueMember.ClrName;
 
     internal ApiTypeExpression ApiTypeExpression { get; }
 
@@ -130,7 +111,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
     internal bool IsResolved => this.ApiTypeExpression?.IsResolved == true;
 
-    internal Type? ClrMemberType => _clrMemberBinding.BoundClrMemberAccessor?.MemberType;
+    internal Type? ClrMemberType => _clrValueMemberBinding.BoundClrMemberAccessor?.MemberType;
     #endregion
 
     #region Object Methods
@@ -140,11 +121,10 @@ public sealed partial class ApiProperty : ApiSchemaElement
         var apiName = this.ApiName.SafeToString();
         var apiTypeExpression = this.ApiTypeExpression.SafeToString();
         var apiTypeModifiers = this.ApiTypeModifiers.SafeToString();
-        var clrName = this.ClrName.SafeToString();
-        var clrMemberKind = _clrMemberBinding.ClrMemberReference!.NullableClrKind.SafeToString();
+        var clrValueMember = this.ClrValueMember.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrMemberKind)}={clrMemberKind}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrValueMember)}={clrValueMember}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -178,8 +158,10 @@ public sealed partial class ApiProperty : ApiSchemaElement
         }
         else
         {
-            _clrMemberBinding.ClrMemberReference!.Validate(context);
+            this.ClrValueMember.Validate(context);
         }
+
+        this.InitializeClrValueAccessor(context.Session.ApiSchemaContext);
     }
 
     private void ValidateApiName(ApiSchemaCompilationContext context)
@@ -235,15 +217,15 @@ public sealed partial class ApiProperty : ApiSchemaElement
         if (clrObjectType is null)
         {
             // The reference remains independently validatable when the parent has no CLR type.
-            _clrMemberBinding.ClrMemberReference!.Validate(context);
+            this.ClrValueMember.Validate(context);
             return;
         }
 
-        if (!_clrMemberBinding.TryResolveReference
+        if (!_clrValueMemberBinding.TryResolveReference
         (
             clrObjectType,
             context,
-            "API property CLR member reference",
+            "API property CLR value member reference",
             requiresRead: false,
             requiresWrite: false
         ))
@@ -251,7 +233,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
             return;
         }
 
-        var clrNullableInfo = _clrMemberBinding.ClrMemberInfo switch
+        var clrNullableInfo = _clrValueMemberBinding.ClrMemberInfo switch
         {
             PropertyInfo clrPropertyInfo => PropertyReflection.GetNullabilityInfo(clrPropertyInfo),
             FieldInfo clrFieldInfo => FieldReflection.GetNullabilityInfo(clrFieldInfo),

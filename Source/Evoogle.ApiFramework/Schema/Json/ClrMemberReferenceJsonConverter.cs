@@ -143,7 +143,9 @@ public sealed class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJs
 
         var clrKind = clrKindReadState?.Value;
         var clrName = readState?.ClrName;
-        var hasInvalidClrKind = clrKindReadState?.IsInvalid == true;
+        var hasInvalidClrKind = clrKind is null ||
+            clrKindReadState?.IsInvalid == true ||
+            clrKindReadState?.IsNull == true;
 
         var clrMemberReference = new ClrMemberReference(clrKind, clrName!, hasInvalidClrKind);
         return clrMemberReference;
