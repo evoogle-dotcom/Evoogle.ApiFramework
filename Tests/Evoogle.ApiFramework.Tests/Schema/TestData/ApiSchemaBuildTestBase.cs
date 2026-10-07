@@ -32,7 +32,7 @@ public abstract class ApiSchemaBuildTestBase : XUnitTest
     #endregion
 
     #region Constructors
-    protected ApiSchemaBuildTestBase() => this.ExcludeMembers = ApiSchemaExcludeMembers.SchemaInitialized;
+    protected ApiSchemaBuildTestBase() => this.ExcludeMembers = ApiSchemaExcludeMembers.CompiledSchema;
     #endregion
 
     #region XUnitTest Methods

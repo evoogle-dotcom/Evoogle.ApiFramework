@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Compilation.Internal;
 
-public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTests(output)
+public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
     private enum DiagnosticPathTestCase

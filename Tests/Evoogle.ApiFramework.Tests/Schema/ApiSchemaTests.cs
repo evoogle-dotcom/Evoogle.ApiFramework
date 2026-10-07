@@ -85,7 +85,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             this.ActualIssues.Should().NotBeNull();
             this.ActualIssues.Should().BeEquivalentTo
             (
-                FullyQualifyInitializationIssues(this.SourceJson, this.ExpectedIssues)
+                FullyQualifyCompilationIssues(this.SourceJson, this.ExpectedIssues)
             );
         }
     }
@@ -127,7 +127,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         #region Constructors
         public JsonDeserializeTest()
         {
-            this.ExcludeMembers = ApiSchemaExcludeMembers.SchemaInitialized;
+            this.ExcludeMembers = ApiSchemaExcludeMembers.CompiledSchema;
         }
         #endregion
 
@@ -141,7 +141,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         #region Constructors
         public JsonRoundtripTest()
         {
-            this.ExcludeMembers = ApiSchemaExcludeMembers.SchemaInitialized;
+            this.ExcludeMembers = ApiSchemaExcludeMembers.CompiledSchema;
         }
         #endregion
 
@@ -241,7 +241,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
     #endregion
 
     #region Implementation Methods
-    private static ApiSchemaCompilationIssue[] FullyQualifyInitializationIssues
+    private static ApiSchemaCompilationIssue[] FullyQualifyCompilationIssues
     (
         string sourceJson,
         IEnumerable<ApiSchemaCompilationIssue> issues

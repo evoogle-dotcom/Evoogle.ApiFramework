@@ -21,7 +21,7 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.PreviousSibling)),
     ];
 
-    public static readonly List<ExcludeMember> SchemaInitialized =
+    public static readonly List<ExcludeMember> CompiledSchema =
     [
         .. _schemaElementRuntimeMembers,
 

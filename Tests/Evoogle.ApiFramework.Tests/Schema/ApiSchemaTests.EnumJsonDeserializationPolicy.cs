@@ -162,7 +162,7 @@ public partial class ApiSchemaTests
     #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] EnumJsonInitializationIssueTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] EnumJsonCompilationIssueTheoryData =>
     [
         new CompilationIssueTest
         {
@@ -299,8 +299,8 @@ public partial class ApiSchemaTests
 
     #region Test Methods
     [Theory]
-    [MemberData(nameof(EnumJsonInitializationIssueTheoryData))]
-    public void EnumJsonInitializationIssues(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(EnumJsonCompilationIssueTheoryData))]
+    public void EnumJsonCompilationIssues(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(EnumJsonDefaultAndInheritanceTheoryData))]

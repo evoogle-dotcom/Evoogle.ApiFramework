@@ -12,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema.Types;
 /// <summary>
 ///     Extension methods for .NET <see cref="Type"/> class.
 /// </summary>
-public static class TypeExtensions
+public static class ClrTypeExtensions
 {
     #region Methods
     /// <summary>
