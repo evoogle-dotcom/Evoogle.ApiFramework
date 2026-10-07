@@ -413,7 +413,9 @@ public sealed class ApiSchema : ApiSchemaElement
             }
         }
 
-        foreach (var apiObjectType in this.ApiObjectTypes)
+        foreach (var apiObjectType in this
+            .SelfAndDescendants(TraversalStrategy.DepthFirst)
+            .OfType<ApiObjectType>())
         {
             apiObjectType.SetRelationshipTraversals
             (

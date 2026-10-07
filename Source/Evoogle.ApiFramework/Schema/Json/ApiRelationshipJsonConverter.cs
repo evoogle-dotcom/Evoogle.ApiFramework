@@ -313,8 +313,18 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKind(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiRelationship.ApiKind, value: relationship.ApiKind, options: writeContext.Options, converter: _kindConverter);
+    private static void WriteApiKind
+    (
+        Utf8JsonWriter writer,
+        ApiRelationship relationship,
+        DefaultWriteContext<PropertyNames> writeContext
+    ) => writer.WritePropertyWithConverter
+    (
+        propertyName: writeContext.PropertyNames.ApiRelationship.ApiKind,
+        value: relationship.ApiKind,
+        options: writeContext.Options,
+        converter: _kindConverter
+    );
 
     private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiRelationship.ApiDeleteBehavior, value: relationship.ApiDeleteBehavior, options: writeContext.Options, converter: _deleteBehaviorConverter);

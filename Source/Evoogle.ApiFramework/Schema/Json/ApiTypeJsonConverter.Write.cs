@@ -125,8 +125,18 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     }
 
     // ApiType
-    private static void WriteApiTypeApiKind(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiType.ApiKind, value: apiType.ApiKind, options: writeContext.Options, converter: _apiTypeKindJsonConverter);
+    private static void WriteApiTypeApiKind
+    (
+        Utf8JsonWriter writer,
+        ApiType apiType,
+        DefaultWriteContext<PropertyNames> writeContext
+    ) => writer.WritePropertyWithConverter
+    (
+        propertyName: writeContext.PropertyNames.ApiType.ApiKind,
+        value: apiType.ApiKind,
+        options: writeContext.Options,
+        converter: _apiTypeKindJsonConverter
+    );
 
     private static void WriteApiTypeClrType(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiType.ClrType, type: apiType.ClrType, options: writeContext.Options, converter: _typeJsonConverter);

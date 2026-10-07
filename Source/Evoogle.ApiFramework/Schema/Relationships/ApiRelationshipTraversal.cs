@@ -125,8 +125,7 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
             return;
         }
 
-        if (this.ApiSourceEnd.ApiResolvedObjectType is not { } apiSourceObjectType ||
-            apiTargetEnd.ApiResolvedObjectType is not { } apiTargetObjectType)
+        if (this.ApiSourceEnd.ApiResolvedObjectType is not { ClrType: not null } apiSourceObjectType)
         {
             _clrNavigationMemberBinding.ClrMemberReference!.Validate(context, this.ApiPath);
             return;
@@ -141,6 +140,11 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
             requiresWrite: true,
             apiPath: this.ApiPath
         ))
+        {
+            return;
+        }
+
+        if (apiTargetEnd.ApiResolvedObjectType is not { ClrType: not null } apiTargetObjectType)
         {
             return;
         }

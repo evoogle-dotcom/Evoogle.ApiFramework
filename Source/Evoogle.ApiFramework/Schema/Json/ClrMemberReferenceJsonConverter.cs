@@ -189,8 +189,18 @@ public sealed class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJs
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteClrMemberReferenceClrKind(Utf8JsonWriter writer, ClrMemberReference clrMemberReference, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ClrMemberReference.ClrKind, value: clrMemberReference.ClrKind, options: writeContext.Options, converter: _clrMemberKindJsonConverter);
+    private static void WriteClrMemberReferenceClrKind
+    (
+        Utf8JsonWriter writer,
+        ClrMemberReference clrMemberReference,
+        DefaultWriteContext<PropertyNames> writeContext
+    ) => writer.WritePropertyWithConverter
+    (
+        propertyName: writeContext.PropertyNames.ClrMemberReference.ClrKind,
+        value: clrMemberReference.ClrKind,
+        options: writeContext.Options,
+        converter: _clrMemberKindJsonConverter
+    );
 
     private static void WriteClrMemberReferenceClrName(Utf8JsonWriter writer, ClrMemberReference clrMemberReference, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ClrMemberReference.ClrName, value: clrMemberReference.ClrName, options: writeContext.Options);

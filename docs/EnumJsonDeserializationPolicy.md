@@ -56,6 +56,12 @@ a CLR type. An inline `ApiTypeExpression` does not contain an `ApiTypeReference`
 
 ## Converter and Materializer Responsibilities
 
+Required enum identities and structural discriminators must always be serialized, including
+zero-valued enum members, regardless of `JsonSerializerOptions.DefaultIgnoreCondition`. Use
+`WritePropertyWithConverter` for these properties. Optional and defaulted enum metadata continue
+to use conditional `TryWritePropertyWithConverter` helpers. Omitting required metadata remains
+an error at the boundary specified in the policy table.
+
 Use `NullableEnumJsonConverter<TEnum>` configured with
 `EnumJsonInvalidValuePolicy.Throw` where the policy requires a `JsonException`, especially for
 structural discriminators. `EnumJsonConverter<TEnum>` retains its existing behavior for backwards
