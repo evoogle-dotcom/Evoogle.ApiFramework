@@ -11,6 +11,7 @@ using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.ApiFramework.Schema.Types.Internal;
+using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Relationships;
 
@@ -82,6 +83,18 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
         ApiRelationshipManyToMany => true,
         _ => false
     };
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var clrNavigationMember = this.ClrNavigationMember.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
+
+        return $"{nameof(ApiRelationshipTraversal)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ClrNavigationMember)}={clrNavigationMember}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+    }
     #endregion
 
     #region ApiSchemaElement Methods

@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Key;
+using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Types;
@@ -108,6 +109,42 @@ public static class ApiObjectTypeExtensions
         var errorMessage = $"{nameof(ApiProperty)} with {nameof(ClrMemberReference.ClrName)} " +
             $"'{clrName.SafeToString()}' not found in {apiObjectType.SafeToString()}. Available " +
             $"{nameof(ApiProperty)} by {nameof(ClrMemberReference.ClrName)} are: {availablePropertiesByClrName}.";
+        throw new ApiSchemaException(errorMessage);
+    }
+
+    /// <summary>
+    ///     Gets an <see cref="ApiRelationshipTraversal"/> by its API name.
+    /// </summary>
+    /// <param name="apiObjectType">The API object type to search.</param>
+    /// <param name="apiName">The API name of the traversal to retrieve.</param>
+    /// <returns>The <see cref="ApiRelationshipTraversal"/> with the specified API name.</returns>
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown if no traversal with the specified API name exists in the object type.
+    ///     The exception message includes a list of all available traversal API names.
+    /// </exception>
+    /// <remarks>
+    ///     This method performs a case-sensitive search for the traversal by its API name.
+    ///     Use <see cref="ApiObjectType.TryGetTraversalByApiName"/> if you prefer non-throwing behavior.
+    /// </remarks>
+    public static ApiRelationshipTraversal GetTraversalByApiName(this ApiObjectType apiObjectType, string apiName)
+    {
+        if (apiObjectType.TryGetTraversalByApiName(apiName, out var traversal))
+        {
+            return traversal;
+        }
+
+        var availableTraversalsByApiName = string.Join
+        (
+            ',',
+            apiObjectType.ApiRelationshipTraversals
+                .OrderBy(static traversal => traversal.ApiName)
+                .Select(static traversal => traversal.ApiName)
+        );
+        var errorMessage =
+            $"{nameof(ApiRelationshipTraversal)} with {nameof(ApiRelationshipTraversal.ApiName)} " +
+            $"'{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. Available " +
+            $"{nameof(ApiRelationshipTraversal)} by {nameof(ApiRelationshipTraversal.ApiName)} are: " +
+            $"{availableTraversalsByApiName}.";
         throw new ApiSchemaException(errorMessage);
     }
     #endregion
