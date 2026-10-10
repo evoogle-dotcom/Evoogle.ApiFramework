@@ -175,6 +175,39 @@ Whenever creating or modifying unit tests:
 
 `[Fact]` is prohibited for unit tests. If a test has only one case, express it as a `[Theory]` with one data row.
 
+### Human-Readable Unit-Test Output
+
+Every new or modified concrete `XUnitTest` must use `this.WriteLine` to expose the important properties of the
+test case.
+
+- During Arrange, write the scenario, relevant inputs, member or API identity, expected result, and expected
+  exception boundary.
+- During Act, write the actual result, success flag, resulting state, and captured exception details when applicable.
+- Prefer concise semantic output that helps a human understand a failure without reading the test implementation.
+- Do not print implementation-only state, secrets, or large payloads already emitted by a shared test base.
+- Theory data must remain the source of case-specific expectations; diagnostic output does not replace assertions.
+
+Follow this pattern, adapting the properties to the behavior under test:
+
+```csharp
+protected override void Arrange()
+{
+    this.WriteLine($"Scenario:           {this.Scenario.SafeToString()}");
+    this.WriteLine($"CLR Member:         {this.ClrMemberName.SafeToString()}");
+    this.WriteLine($"Supplied Value:     {this.SuppliedValue.SafeToString()}");
+    this.WriteLine($"Expected Result:    {this.ExpectedValue.SafeToString()}");
+}
+
+protected override void Act()
+{
+    // Perform the operation.
+
+    this.WriteLine($"Actual Result:      {this.ActualValue.SafeToString()}");
+    this.WriteLine($"Resulting State:    {this.ResultingValue.SafeToString()}");
+    this.WriteLine($"Captured Exception: {this.ActualException?.Message.SafeToString()}");
+}
+```
+
 Place annotations-package tests under:
 
 ```text
@@ -267,6 +300,7 @@ For every new or changed test, also verify:
 3. No `[Fact]` attributes were introduced.
 4. Arrange, Act, and Assert are implemented through the base-class overrides.
 5. Assertions use FluentAssertions.
+6. Every concrete `XUnitTest` uses `this.WriteLine` for the important arranged and observed test properties.
 
 ## Public API Changes
 

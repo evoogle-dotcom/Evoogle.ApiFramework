@@ -25,12 +25,21 @@ Enforce the repository's mandatory unit-test structure:
 - Inputs use the established theory-data pattern and assertions use
   FluentAssertions.
 - Tests live in the project and feature area corresponding to the production type.
+- Every new or modified concrete XUnitTest uses this.WriteLine during Arrange and
+  Act to report the important semantic inputs, expected result or exception
+  boundary, actual result, resulting state, and captured exception details.
+- WriteLine output is concise, helps a human understand a failure without reading
+  the implementation, and does not duplicate large payloads from a shared test
+  base. Diagnostic output supplements theory data and assertions; it does not
+  replace them.
 
 Look for:
 - Untested externally observable behavior, branches, and regression paths.
 - Null, empty, default, boundary, invalid, duplicate, and conflicting inputs.
 - Weak assertions, incorrect exception boundaries, assertion omissions, and tests
   that can pass without exercising the intended behavior.
+- Missing or unhelpful this.WriteLine output, which is a mandatory test-structure
+  violation for every new or modified concrete XUnitTest.
 - Excessive coupling to implementation details instead of public behavior.
 - Schema compilation success, warnings, aggregated errors, fully qualified
   ApiPath diagnostics, one-shot lifecycle behavior, freezing, and failed-build
