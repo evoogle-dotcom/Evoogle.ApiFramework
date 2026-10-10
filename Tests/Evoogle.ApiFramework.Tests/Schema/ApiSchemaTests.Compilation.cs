@@ -3804,6 +3804,170 @@ public partial class ApiSchemaTests
                 ),
             ]
         },
+
+        // Relationship traversal reports its invalid CLR navigation member when the source CLR type is missing
+        new CompileThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipTraversal)} Reports Invalid CLR Navigation Member When Source CLR Type Is Missing",
+            SourceJson = """
+            {
+                "ApiName": "Traversal Invalid Navigation With Missing Source CLR Type",
+                "ApiScalarTypes": [
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
+                    }
+                ],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
+                    {
+                        "ApiKind": "Object",
+                        "ApiName": "Source",
+                        "ApiProperties": [
+                            {
+                                "ApiName": "Id",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
+                            }
+                        ]
+                    },
+                    {
+                        "ApiKind": "Object",
+                        "ApiName": "Target",
+                        "ApiProperties": [
+                            {
+                                "ApiName": "Id",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
+                            }
+                        ],
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
+                    }
+                ],
+                "ApiRelationships": [
+                    {
+                        "ApiKind": "OneToOne",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": { "ApiKind": "Object", "ApiName": "Source" },
+                            "ApiTraversal": {
+                                "ApiName": "Related",
+                                "ClrNavigationMember": { "ClrKind": "42", "ClrName": "Missing" }
+                            }
+                        },
+                        "ApiDependentEnd": {
+                            "ApiObjectType": { "ApiKind": "Object", "ApiName": "Target" }
+                        }
+                    }
+                ]
+            }
+            """,
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiSchemaCompilationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"Source\"]",
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiTypeNullClrType,
+                    description: $"{nameof(ApiObjectType.ClrType)} must not be null",
+                    remediation: $"Specify a valid {nameof(ApiObjectType.ClrType)}"
+                ),
+                new ApiSchemaCompilationIssue
+                (
+                    apiPath: $"{nameof(ApiRelationshipOneToOne)}[\"TestRel\"].{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}.{nameof(ApiRelationshipTraversal)}[\"Related\"]",
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind,
+                    description: $"{nameof(ClrMemberReference.ClrKind)} must be a valid {nameof(ClrMemberKind)} value",
+                    remediation: $"Specify a valid {nameof(ClrMemberReference.ClrKind)} value"
+                ),
+            ]
+        },
+
+        // Relationship traversal resolves its navigation member before a missing target CLR type stops validation
+        new CompileThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipTraversal)} Reports Unresolved Navigation Member When Target CLR Type Is Missing",
+            SourceJson = """
+            {
+                "ApiName": "Traversal Missing Navigation With Missing Target CLR Type",
+                "ApiScalarTypes": [
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
+                    }
+                ],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
+                    {
+                        "ApiKind": "Object",
+                        "ApiName": "Source",
+                        "ApiProperties": [
+                            {
+                                "ApiName": "Id",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
+                            }
+                        ],
+                        "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"
+                    },
+                    {
+                        "ApiKind": "Object",
+                        "ApiName": "Target",
+                        "ApiProperties": [
+                            {
+                                "ApiName": "Id",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
+                            }
+                        ]
+                    }
+                ],
+                "ApiRelationships": [
+                    {
+                        "ApiKind": "OneToOne",
+                        "ApiName": "TestRel",
+                        "ApiPrincipalEnd": {
+                            "ApiObjectType": { "ApiKind": "Object", "ApiName": "Source" },
+                            "ApiTraversal": {
+                                "ApiName": "Related",
+                                "ClrNavigationMember": { "ClrKind": "Property", "ClrName": "Missing" }
+                            }
+                        },
+                        "ApiDependentEnd": {
+                            "ApiObjectType": { "ApiKind": "Object", "ApiName": "Target" }
+                        }
+                    }
+                ]
+            }
+            """,
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiSchemaCompilationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"Target\"]",
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiTypeNullClrType,
+                    description: $"{nameof(ApiObjectType.ClrType)} must not be null",
+                    remediation: $"Specify a valid {nameof(ApiObjectType.ClrType)}"
+                ),
+                new ApiSchemaCompilationIssue
+                (
+                    apiPath: $"{nameof(ApiRelationshipOneToOne)}[\"TestRel\"].{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}.{nameof(ApiRelationshipTraversal)}[\"Related\"]",
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ClrMemberReferenceUnresolved,
+                    description: $"Traversal CLR navigation member reference could not resolve CLR property 'Missing' on CLR type '{typeof(RelPrincipalType)}'",
+                    remediation: "Reference an existing public instance CLR property"
+                ),
+            ]
+        },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] CompileWarnsTheoryData =>
