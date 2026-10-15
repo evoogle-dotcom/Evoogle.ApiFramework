@@ -90,7 +90,7 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
 
                 if (this.ExceptionMessageExpected is not null)
                 {
-                    this.ExceptionActual!.Message.Should().Be(this.ExceptionMessageExpected);
+                    this.ExceptionActual.Message.Should().Be(this.ExceptionMessageExpected);
                 }
 
                 return;

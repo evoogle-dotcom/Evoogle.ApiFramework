@@ -16,7 +16,7 @@ internal static class ApiObjectTypeBuilderExtensions
     {
         foreach (var apiKeyDefinition in apiObjectType.ApiKeys)
         {
-            builder.AddKey(apiKeyDefinition.ApiName!, k =>
+            builder.AddKey(apiKeyDefinition.ApiName, k =>
             {
                 foreach (var keyPath in apiKeyDefinition.ApiKeyPaths)
                 {

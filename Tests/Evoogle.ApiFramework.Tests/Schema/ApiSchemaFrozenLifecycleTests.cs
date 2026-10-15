@@ -234,7 +234,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         protected override void Assert()
         {
             this.Results.Should().OnlyContain(result => result.Schema == null);
-            this.Results![0].Errors.Should().ContainSingle
+            this.Results[0].Errors.Should().ContainSingle
             (
                 issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionUnsupported
             );

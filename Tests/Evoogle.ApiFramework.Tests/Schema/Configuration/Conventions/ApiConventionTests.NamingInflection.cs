@@ -136,7 +136,7 @@ public partial class ApiConventionTests
         {
             this.ApiSchemaActual.Should().NotBeNull();
 
-            var apiSchema = this.ApiSchemaActual!;
+            var apiSchema = this.ApiSchemaActual;
             var people = apiSchema.ApiObjectTypes.Single(x => x.ClrType == typeof(People));
             var personWithId = apiSchema.ApiObjectTypes
                 .Single(x => x.ClrType == typeof(PersonWithId));
@@ -216,7 +216,7 @@ public partial class ApiConventionTests
         {
             this.ApiSchemaActual.Should().NotBeNull();
 
-            var apiSchema = this.ApiSchemaActual!;
+            var apiSchema = this.ApiSchemaActual;
             var people = apiSchema.ApiObjectTypes.Single(x => x.ClrType == typeof(People));
             var personWithId = apiSchema.ApiObjectTypes
                 .Single(x => x.ClrType == typeof(PersonWithId));

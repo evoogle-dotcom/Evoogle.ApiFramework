@@ -61,7 +61,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
         protected override void Assert()
         {
             this.ActualPath.Should().NotBeNull();
-            this.ActualPath!.ApiSegments.Select(static segment =>
+            this.ActualPath.ApiSegments.Select(static segment =>
                 segment.ApiPropertyReference.ClrName)
                 .Should().Equal(this.ExpectedClrMemberNames);
         }
@@ -104,7 +104,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
         protected override void Assert()
         {
             this.ActualException.Should().BeOfType<ArgumentException>();
-            this.ActualException!.Message.Should().Contain("cannot contain a dot");
+            this.ActualException.Message.Should().Contain("cannot contain a dot");
         }
         #endregion
     }
@@ -134,7 +134,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
         protected override void Assert()
         {
             this.ActualException.Should().BeOfType<ArgumentException>();
-            this.ActualException!.Message.Should().Contain("non-empty dot-delimited member names");
+            this.ActualException.Message.Should().Contain("non-empty dot-delimited member names");
         }
         #endregion
     }

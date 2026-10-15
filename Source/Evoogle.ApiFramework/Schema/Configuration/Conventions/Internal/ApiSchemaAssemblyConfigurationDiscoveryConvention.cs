@@ -114,7 +114,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
         {
             builder.Context.AddConfigurationIssue
             (
-                this.CreateIssue
+                CreateIssue
                 (
                     configurationType,
                     ApiSchemaCompilationCode.ApiConfigurationActivationFailed,
@@ -224,7 +224,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
             var configurationTypeName = GetTypeName(configurationType);
             builder.Context.AddConfigurationIssue
             (
-                this.CreateIssue
+                CreateIssue
                 (
                     configurationType,
                     ApiSchemaCompilationCode.ApiConfigurationExecutionFailed,
@@ -237,7 +237,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
         }
     }
 
-    private ApiSchemaCompilationIssue CreateIssue
+    private static ApiSchemaCompilationIssue CreateIssue
     (
         Type configurationType,
         ApiSchemaCompilationCode code,

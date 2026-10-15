@@ -34,7 +34,7 @@ public sealed class ApiVersionAnnotationContractTests(ITestOutputHelper output)
         protected override void Assert()
         {
             this.AttributeUsage.Should().NotBeNull();
-            this.AttributeUsage!.ValidOn.Should().Be
+            this.AttributeUsage.ValidOn.Should().Be
             (
                 AttributeTargets.Class |
                 AttributeTargets.Struct |

@@ -38,7 +38,7 @@ public class ApiTypeExpressionJsonTests(ITestOutputHelper output) : XUnitTests(o
         protected override void Assert()
         {
             this.ActualExpression.Should().NotBeNull();
-            this.ActualExpression!.IsReference.Should().Be(this.ExpectsReference);
+            this.ActualExpression.IsReference.Should().Be(this.ExpectsReference);
             this.ActualExpression.IsInline.Should().Be(this.ExpectsInline);
         }
     }

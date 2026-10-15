@@ -86,12 +86,12 @@ public partial class ApiConventionTests
             if (this.TestCase is AnnotationPrecedenceTestCase.ConventionProperty or
                 AnnotationPrecedenceTestCase.ExplicitProperty)
             {
-                this.ApiSchemaActual!.ApiObjectTypes.Single().ApiProperties.Single().ApiName
+                this.ApiSchemaActual.ApiObjectTypes.Single().ApiProperties.Single().ApiName
                     .Should().Be(this.ApiNameExpected);
                 return;
             }
 
-            this.ApiSchemaActual!.ApiEnumTypes.Single().ApiEnumValues.Single().ApiName
+            this.ApiSchemaActual.ApiEnumTypes.Single().ApiEnumValues.Single().ApiName
                 .Should().Be(this.ApiNameExpected);
         }
         #endregion

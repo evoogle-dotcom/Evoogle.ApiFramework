@@ -41,7 +41,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         protected override void Assert()
         {
             this.ActualConstructors.Should().ContainSingle();
-            this.ActualConstructors![0].GetParameters().Should().BeEmpty();
+            this.ActualConstructors[0].GetParameters().Should().BeEmpty();
         }
         #endregion
     }
@@ -69,11 +69,11 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         protected override void Assert()
         {
             this.ActualProperty.Should().NotBeNull();
-            this.ActualProperty!.GetMethod.Should().NotBeNull();
+            this.ActualProperty.GetMethod.Should().NotBeNull();
 
             var setter = this.ActualProperty.GetSetMethod(nonPublic: true);
             setter.Should().NotBeNull();
-            setter!.ReturnParameter
+            setter.ReturnParameter
                 .GetRequiredCustomModifiers()
                 .Should()
                 .Contain(typeof(IsExternalInit));
@@ -104,7 +104,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         protected override void Assert()
         {
             this.ActualProperty.Should().NotBeNull();
-            this.ActualProperty!
+            this.ActualProperty
                 .GetCustomAttribute<RequiredMemberAttribute>()
                 .Should()
                 .NotBeNull();
@@ -137,7 +137,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.ActualProperty.Should().NotBeNull();
 
             var nullabilityContext = new NullabilityInfoContext();
-            nullabilityContext.Create(this.ActualProperty!).ReadState
+            nullabilityContext.Create(this.ActualProperty).ReadState
                 .Should()
                 .Be(NullabilityState.Nullable);
         }
@@ -179,7 +179,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.ActualException.Should().NotBeNull();
             this.ActualException.Should().BeAssignableTo<ArgumentException>();
 
-            var argumentException = (ArgumentException)this.ActualException!;
+            var argumentException = (ArgumentException)this.ActualException;
             argumentException.ParamName.Should().Be("apiName");
         }
         #endregion

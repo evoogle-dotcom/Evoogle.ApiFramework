@@ -263,13 +263,13 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
             switch (this.ConfigurationKind)
             {
                 case ConfigurationKind.Object:
-                    this.ClrTypeActual.Should().Be(typeof(ConfigurationObject));
+                    this.ClrTypeActual.Should().Be<ConfigurationObject>();
                     break;
                 case ConfigurationKind.Scalar:
-                    this.ClrTypeActual.Should().Be(typeof(ConfigurationScalar));
+                    this.ClrTypeActual.Should().Be<ConfigurationScalar>();
                     break;
                 case ConfigurationKind.Enum:
-                    this.ClrTypeActual.Should().Be(typeof(ConfigurationEnum));
+                    this.ClrTypeActual.Should().Be<ConfigurationEnum>();
                     break;
                 case ConfigurationKind.OneToOne:
                     this.ApiNameActual.Should().Be("ConfigurationOneToOne");
@@ -445,7 +445,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         protected override void Assert()
         {
             this.ApiSchemaActual.Should().NotBeNull();
-            this.ApiSchemaActual!.ApiRelationships.Should().ContainSingle();
+            this.ApiSchemaActual.ApiRelationships.Should().ContainSingle();
             this.ApiSchemaActual.ApiRelationships.Single().ApiName.Should().Be(this.ApiNameExpected);
             this.ConfigureCountActual.Should().Be(1);
         }
@@ -654,7 +654,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         protected override void Assert()
         {
             this.ExceptionActual.Should().BeOfType<ArgumentNullException>();
-            ((ArgumentNullException)this.ExceptionActual!).ParamName.Should().Be("configuration");
+            ((ArgumentNullException)this.ExceptionActual).ParamName.Should().Be("configuration");
         }
     }
 
@@ -694,7 +694,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         protected override void Assert()
         {
             this.ExceptionActual.Should().BeOfType<ArgumentException>();
-            ((ArgumentException)this.ExceptionActual!).ParamName.Should().Be("apiName");
+            ((ArgumentException)this.ExceptionActual).ParamName.Should().Be("apiName");
         }
     }
     #endregion

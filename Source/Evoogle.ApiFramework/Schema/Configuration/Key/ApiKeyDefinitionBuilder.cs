@@ -241,7 +241,7 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
         return _state.KeyPathBuilders.Any(p =>
             p.ApiRootObjectTypeReference == apiRootObjectTypeReference &&
             p.SegmentBuilders.All(s => s.ApiPropertyReference.IsClrNamedReference) &&
-            p.SegmentBuilders.Select(s => s.ApiPropertyReference.ClrName!)
+            p.SegmentBuilders.Select(s => s.ApiPropertyReference.ClrName)
                 .SequenceEqual(names, ClrNameComparer.Instance));
     }
 

@@ -35,7 +35,7 @@ public class ApiKeyPathClrPathParserTests(ITestOutputHelper output) : XUnitTests
         protected override void Assert()
         {
             this.ActualResult.Should().NotBeNull();
-            this.ActualResult!.ClrMemberNames.Should().Equal(this.ExpectedClrMemberNames);
+            this.ActualResult.ClrMemberNames.Should().Equal(this.ExpectedClrMemberNames);
             this.ActualResult.IsValid.Should().Be(this.ExpectedIsValid);
             this.ActualResult.ValidationMessage.Should().Be(this.ExpectedIsValid ? null :
                 "CLR paths must contain one or more non-empty dot-delimited member names.");

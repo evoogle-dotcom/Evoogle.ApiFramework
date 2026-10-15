@@ -264,7 +264,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Payment)
                 .AddProperty(p => p.Total)
                 .AddKey("PK_Order", p => p.Id)
-                .WithRepositoryVersion(typeof(long)))
+                .WithRepositoryVersion<long>())
 
             .AddObject<OrderLine>(o => o
                 .AddProperty(p => p.OrderId)
@@ -367,7 +367,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Description)
                 .AddKey("PK_KeyNestedPart", p => p.Id)
-                .WithRepositoryVersion(typeof(Guid)))
+                .WithRepositoryVersion<Guid>())
 
             .AddObject<KeyNestedComposite>(o => o
                 .AddProperty(p => p.NestedPart)

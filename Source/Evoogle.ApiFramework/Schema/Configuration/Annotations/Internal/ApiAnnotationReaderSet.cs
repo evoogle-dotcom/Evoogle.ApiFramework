@@ -242,7 +242,7 @@ internal sealed class ApiAnnotationReaderSet
                 (
                     clrMember,
                     clrMemberKind,
-                    clrNullabilityInfo!
+                    clrNullabilityInfo
                 );
             }
             catch (Exception exception)
@@ -1088,7 +1088,7 @@ internal sealed class ApiAnnotationReaderSet
                 continue;
             }
 
-            if (!Enum.IsDefined(typeof(ApiSchemaCompilationCode), diagnostic.Code))
+            if (!Enum.IsDefined(diagnostic.Code))
             {
                 this.AddInvalidContributionIssue
                 (

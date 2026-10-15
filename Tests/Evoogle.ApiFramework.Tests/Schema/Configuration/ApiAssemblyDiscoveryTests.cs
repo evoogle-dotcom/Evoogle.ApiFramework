@@ -77,7 +77,7 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
         protected override void Assert()
         {
             this.ExceptionActual.Should().NotBeNull();
-            this.ExceptionActual!.Errors.Should().Contain
+            this.ExceptionActual.Errors.Should().Contain
             (
                 issue => issue.Code == ApiSchemaCompilationCode.ApiAssemblyDiscoveryFailed &&
                     issue.Severity == ApiSchemaCompilationSeverity.Error &&
@@ -112,7 +112,7 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
         {
             this.ExceptionExpected = new ReflectionTypeLoadException
             (
-                [typeof(AssemblyLoadableCandidate), null!],
+                [typeof(AssemblyLoadableCandidate), null],
                 [new TypeLoadException("Assembly type could not be loaded.")]
             );
 
@@ -127,7 +127,7 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
         protected override void Assert()
         {
             this.ScanActual.Should().NotBeNull();
-            this.ScanActual!.Types.Should().Equal(typeof(AssemblyLoadableCandidate));
+            this.ScanActual.Types.Should().Equal(typeof(AssemblyLoadableCandidate));
 
             this.ScanActual.Issues.Should().ContainSingle();
             var issue = this.ScanActual.Issues.Single();

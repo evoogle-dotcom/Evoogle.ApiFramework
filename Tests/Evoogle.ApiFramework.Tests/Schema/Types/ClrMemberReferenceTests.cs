@@ -25,10 +25,13 @@ public class ClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(outp
         public required ClrMemberReference Lhs { get; init; }
         public required ClrMemberReference Rhs { get; init; }
         public required bool ExpectedEquality { get; init; }
+        public bool RequiresDistinctInstances { get; init; }
         #endregion
 
         #region Calculated Properties
         private bool ActualEquality { get; set; }
+        private bool[]? ActualEqualities { get; set; }
+        private int ActualSetCount { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -38,17 +41,39 @@ public class ClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(outp
             this.WriteLine($"RHS: {this.Rhs.SafeToString()}");
             this.WriteLine();
             this.WriteLine($"Expected Equality: {this.ExpectedEquality}");
+            this.WriteLine($"Requires Distinct Instances: {this.RequiresDistinctInstances}");
         }
 
         protected override void Act()
         {
             this.ActualEquality = this.Lhs == this.Rhs;
+            this.ActualEqualities =
+            [
+                this.ActualEquality,
+                this.Rhs == this.Lhs,
+                !(this.Lhs != this.Rhs),
+                !(this.Rhs != this.Lhs),
+                this.Lhs.Equals(this.Rhs),
+                this.Rhs.Equals(this.Lhs),
+                this.Lhs.Equals((object)this.Rhs),
+                this.Rhs.Equals((object)this.Lhs)
+            ];
+            this.ActualSetCount = new HashSet<ClrMemberReference> { this.Lhs, this.Rhs }.Count;
             this.WriteLine($"Actual Equality:   {this.ActualEquality}");
+            this.WriteLine($"Equality Entry Points: {string.Join(", ", this.ActualEqualities)}");
+            this.WriteLine($"HashSet Count: {this.ActualSetCount}; Expected: {(this.ExpectedEquality ? 1 : 2)}");
+            this.WriteLine($"Hashes: {this.Lhs.GetHashCode()}, {this.Rhs.GetHashCode()}");
         }
 
         protected override void Assert()
         {
             this.ActualEquality.Should().Be(this.ExpectedEquality);
+            this.ActualEqualities.Should().OnlyContain(isEqual => isEqual == this.ExpectedEquality);
+            this.ActualSetCount.Should().Be(this.ExpectedEquality ? 1 : 2);
+            if (this.RequiresDistinctInstances)
+            {
+                this.Lhs.Should().NotBeSameAs(this.Rhs);
+            }
             if (this.ExpectedEquality)
             {
                 this.Lhs.GetHashCode().Should().Be(this.Rhs.GetHashCode());
@@ -144,6 +169,18 @@ public class ClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(outp
             Rhs = _clrVALUEPropertyReference,
             ExpectedEquality = false,
         },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] DistinctInstanceEqualityTheoryData =>
+    [
+        .. Enum.GetValues<ClrMemberKind>().Select(clrKind => (TheoryDataRow<IXUnitTest>)new EqualityTest
+        {
+            Name = $"Distinct {clrKind} references use value equality",
+            Lhs = new ClrMemberReference(clrKind, "Value"),
+            Rhs = new ClrMemberReference(clrKind, "Value"),
+            ExpectedEquality = true,
+            RequiresDistinctInstances = true
+        })
     ];
 
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
@@ -297,6 +334,10 @@ public class ClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(outp
     #endregion
 
     #region Test Methods
+    [Theory]
+    [MemberData(nameof(DistinctInstanceEqualityTheoryData))]
+    public void EqualClrMemberReferencesUseValueEqualityAcrossDistinctInstances(IXUnitTest test) => test.Execute(this);
+
     [Theory]
     [MemberData(nameof(EqualityTheoryData))]
     public void Equality(IXUnitTest test) => test.Execute(this);

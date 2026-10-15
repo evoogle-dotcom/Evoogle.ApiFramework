@@ -101,7 +101,7 @@ public partial class ApiConventionTests
         {
             this.ApiSchemaActual.Should().NotBeNull();
 
-            var apiSchema = this.ApiSchemaActual!;
+            var apiSchema = this.ApiSchemaActual;
             var expected = this.Style switch
             {
                 BuiltInNamingStyle.CamelCase => new NamingExpectation

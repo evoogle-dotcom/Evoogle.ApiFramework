@@ -51,7 +51,7 @@ public static class ApiObjectTypeBuilderVersionExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
-        builder.WithRepositoryVersion(typeof(TVersion), configure);
+        builder.WithRepositoryVersion<TVersion>(configure);
         return builder;
     }
     #endregion

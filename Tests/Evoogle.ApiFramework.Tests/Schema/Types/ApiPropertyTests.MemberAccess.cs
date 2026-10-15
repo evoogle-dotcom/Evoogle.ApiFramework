@@ -14,22 +14,6 @@ namespace Evoogle.ApiFramework.Schema.Types;
 public partial class ApiPropertyTests
 {
     #region Member Access Test Types
-    private enum MemberAccessOperation
-    {
-        GetValueUsesSchemaTypeCoercion,
-        SetValueUsesSchemaTypeCoercion,
-        GetValueRejectsNullTarget,
-        SetValueRejectsNullTarget,
-        GetValueWrapsClrMemberFailure,
-        SetValueWrapsClrMemberFailure,
-        TryGetValueReturnsFalseForNullTarget,
-        TryGetValueReturnsFalseForClrMemberFailure,
-        TryGetValueReturnsFalseForCoercionFailure,
-        TrySetValueReturnsFalseForClrMemberFailure,
-        TrySetValueReturnsFalseForCoercionFailure,
-        UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary
-    }
-
     private enum MemberAccessOverload
     {
         Object,
@@ -44,422 +28,273 @@ public partial class ApiPropertyTests
 
     private sealed class MemberAccessSource
     {
-        private long _throwingSet = 7;
-
+        #region Fields and Properties
         public long Number { get; set; } = 7;
-
         public long NumberField = 7;
-
-        public string Text { get; set; } = "invalid";
-
-        public long ThrowingGet
-        {
-            get => throw new InvalidOperationException("Getter failure.");
-            set => _throwingSet = value;
-        }
-
-        public long ThrowingSet
-        {
-            get => _throwingSet;
-            set => throw new InvalidOperationException("Setter failure.");
-        }
+        public MemberAccessTarget? Related { get; set; }
+        public MemberAccessTarget? RelatedField;
+        #endregion
     }
 
-    private sealed class MemberAccessTest : XUnitTest
+    private sealed class MemberAccessTarget
+    {
+        #region Properties
+        public long Id { get; set; }
+        #endregion
+    }
+
+    private sealed class CompiledMemberAccessTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ClrMemberKind ClrKind { get; init; }
-
-        public required string ClrName { get; init; }
-
-        public required MemberAccessOperation Operation { get; init; }
-
-        public required MemberAccessOverload Overload { get; init; }
-
         public required MemberAccessSurface Surface { get; init; }
+        public required MemberAccessOverload Overload { get; init; }
+        public required ClrMemberKind ClrKind { get; init; }
+        public required object InitialMemberValue { get; init; }
+        public required object ExpectedInitialRead { get; init; }
+        public required object SuppliedValue { get; init; }
+        public required object ExpectedMemberValue { get; init; }
         #endregion
 
         #region Calculated Properties
-        private object? ActualValue { get; set; }
-
-        private Exception? ActualException { get; set; }
-
-        private long? ActualMemberValue { get; set; }
-
-        private bool? ActualSuccess { get; set; }
-
-        private ApiProperty? ApiProperty { get; set; }
-
-        private ApiRelationshipTraversal? ApiTraversal { get; set; }
-
+        private ApiProperty? Property { get; set; }
+        private ApiRelationshipTraversal? Traversal { get; set; }
         private MemberAccessSource? ClrObject { get; set; }
+        private object? ActualInitialRead { get; set; }
+        private object? ActualRead { get; set; }
+        private object? ActualMemberValue { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var isUnbound = this.Operation == MemberAccessOperation.UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary;
-
-            (this.ApiProperty, this.ApiTraversal) = CreateMemberAccessSurface
-            (
-                this.Surface,
-                this.ClrKind,
-                this.ClrName,
-                isUnbound
-            );
+            (this.Property, this.Traversal) = CreateCompiledMemberAccessSurface(this.Surface, this.ClrKind, false);
             this.ClrObject = new MemberAccessSource();
+            if (this.Surface == MemberAccessSurface.Property)
+            {
+                this.ClrObject.Number = (long)this.InitialMemberValue;
+                this.ClrObject.NumberField = (long)this.InitialMemberValue;
+            }
+            else
+            {
+                this.ClrObject.Related = (MemberAccessTarget)this.InitialMemberValue;
+                this.ClrObject.RelatedField = (MemberAccessTarget)this.InitialMemberValue;
+            }
 
-            this.WriteLine($"Scenario:                    {this.Operation.SafeToString()}");
-            this.WriteLine($"Member Surface:              {this.Surface.SafeToString()}");
-            this.WriteLine($"CLR Member Kind:             {this.ClrKind.SafeToString()}");
-            this.WriteLine($"CLR Member Name:             {this.ClrName.SafeToString()}");
-            this.WriteLine($"Overload:                    {this.Overload.SafeToString()}");
-            this.WriteLine($"Source CLR Type:             {typeof(MemberAccessSource).SafeToName()}");
-            this.WriteLine($"Initial CLR Member Value:    7");
-            this.WriteLine($"Supplied Value:              {GetSuppliedValue(this.Operation).SafeToString()}");
-            this.WriteLine($"Requested Output Type:       {GetRequestedOutputType(this.Operation, this.Overload).SafeToString()}");
-
-            var expectedExceptionBoundary = GetExpectedExceptionBoundary(this.Operation, this.Surface);
-            this.WriteLine($"Expected Exception Boundary: {expectedExceptionBoundary.SafeToString()}");
-
-            this.WriteLine();
+            this.WriteLine($"Surface: {this.Surface}; CLR Kind: {this.ClrKind}; Overload: {this.Overload}");
+            this.WriteLine($"Initial Member: {this.InitialMemberValue.SafeToString()}; " +
+                $"Supplied: {this.SuppliedValue.SafeToString()}");
+            this.WriteLine($"Expected Read: {this.ExpectedInitialRead.SafeToString()}; " +
+                $"Expected Member: {this.ExpectedMemberValue.SafeToString()}; Expected Boundary: none");
         }
 
         protected override void Act()
         {
-            switch (this.Operation)
+            if (this.Surface == MemberAccessSurface.Property)
             {
-                case MemberAccessOperation.GetValueUsesSchemaTypeCoercion:
-                    this.ActualValue = this.GetValue(this.ClrObject!, typeof(string));
-                    break;
-                case MemberAccessOperation.SetValueUsesSchemaTypeCoercion:
-                    this.SetValue(this.ClrObject!, "42");
-                    this.ActualMemberValue = this.GetMemberValue();
-                    break;
-                case MemberAccessOperation.GetValueRejectsNullTarget:
-                    this.ActualException = Record.Exception(() => this.GetValue(clrObject: null, typeof(string)));
-                    break;
-                case MemberAccessOperation.SetValueRejectsNullTarget:
-                    this.ActualException = Record.Exception(() => this.SetValue(clrObject: null, "42"));
-                    break;
-                case MemberAccessOperation.GetValueWrapsClrMemberFailure:
-                    this.ActualException = Record.Exception(() => this.GetValue(this.ClrObject!, typeof(long)));
-                    break;
-                case MemberAccessOperation.SetValueWrapsClrMemberFailure:
-                    this.ActualException = Record.Exception(() => this.SetValue(this.ClrObject!, 42L));
-                    this.ActualMemberValue = this.ClrObject!.ThrowingSet;
-                    break;
-                case MemberAccessOperation.TryGetValueReturnsFalseForNullTarget:
-                    this.ActualSuccess = this.TryGetValue(clrObject: null, out var nullTargetValue);
-                    this.ActualValue = nullTargetValue;
-                    break;
-                case MemberAccessOperation.TryGetValueReturnsFalseForClrMemberFailure:
-                case MemberAccessOperation.TryGetValueReturnsFalseForCoercionFailure:
-                    this.ActualSuccess = this.TryGetValue(this.ClrObject, out var clrValue);
-                    this.ActualValue = clrValue;
-                    break;
-                case MemberAccessOperation.TrySetValueReturnsFalseForClrMemberFailure:
-                    this.ActualSuccess = this.TrySetValue(this.ClrObject, 42L);
-                    this.ActualMemberValue = this.ClrObject!.ThrowingSet;
-                    break;
-                case MemberAccessOperation.TrySetValueReturnsFalseForCoercionFailure:
-                    this.ActualSuccess = this.TrySetValue(this.ClrObject, "invalid");
-                    this.ActualMemberValue = this.GetMemberValue();
-                    break;
-                case MemberAccessOperation.UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary:
-                    this.ActualException = Record.Exception(() => this.GetValue(this.ClrObject!, typeof(long)));
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unknown member access operation: {this.Operation}");
+                if (this.Overload == MemberAccessOverload.Object)
+                {
+                    this.ActualInitialRead = this.Property!.GetValue(this.ClrObject!, typeof(string));
+                    this.Property.SetValue(this.ClrObject!, this.SuppliedValue);
+                    this.ActualRead = this.Property.GetValue(this.ClrObject!);
+                }
+                else
+                {
+                    this.ActualInitialRead = this.Property!.GetValue<MemberAccessSource, string>(this.ClrObject!);
+                    this.Property.SetValue(this.ClrObject!, (string)this.SuppliedValue);
+                    this.ActualRead = this.Property.GetValue<MemberAccessSource, long>(this.ClrObject!);
+                }
+
+                this.ActualMemberValue = this.ClrKind == ClrMemberKind.Property
+                    ? this.ClrObject!.Number : this.ClrObject!.NumberField;
+            }
+            else
+            {
+                if (this.Overload == MemberAccessOverload.Object)
+                {
+                    this.ActualInitialRead = this.Traversal!.GetValue(this.ClrObject!);
+                    this.Traversal.SetValue(this.ClrObject!, this.SuppliedValue);
+                    this.ActualRead = this.Traversal.GetValue(this.ClrObject!);
+                }
+                else
+                {
+                    this.ActualInitialRead = this.Traversal!
+                        .GetValue<MemberAccessSource, MemberAccessTarget>(this.ClrObject!);
+                    this.Traversal.SetValue(
+                        this.ClrObject!, (MemberAccessTarget)this.SuppliedValue);
+                    this.ActualRead = this.Traversal.GetValue<MemberAccessSource, MemberAccessTarget>(this.ClrObject!);
+                }
+
+                this.ActualMemberValue = this.ClrKind == ClrMemberKind.Property
+                    ? this.ClrObject!.Related : this.ClrObject!.RelatedField;
             }
 
-            this.WriteLine($"Actual Success:           {this.ActualSuccess.SafeToString()}");
-            this.WriteLine($"Actual Return Value:      {this.ActualValue.SafeToString()}");
-            this.WriteLine($"Resulting Member Value:   {this.ActualMemberValue.SafeToString()}");
-            this.WriteLine($"Actual Exception Type:    {this.ActualException?.GetType().SafeToName()}");
-
-            var actualExceptionMessage = this.ActualException?.Message;
-            this.WriteLine($"Actual Exception Message: {actualExceptionMessage.SafeToString()}");
-            this.WriteLine($"Root Exception:           {GetRootExceptionDescription(this.ActualException).SafeToString()}");
-            this.WriteLine();
+            this.WriteLine($"Initial Read: {this.ActualInitialRead.SafeToString()}; " +
+                $"Final Read: {this.ActualRead.SafeToString()}; CLR State: {this.ActualMemberValue.SafeToString()}");
         }
 
         protected override void Assert()
         {
-            switch (this.Operation)
-            {
-                case MemberAccessOperation.GetValueUsesSchemaTypeCoercion:
-                    this.ActualValue.Should().Be("7");
-                    break;
-                case MemberAccessOperation.SetValueUsesSchemaTypeCoercion:
-                    this.ActualMemberValue.Should().Be(42);
-                    break;
-                case MemberAccessOperation.GetValueRejectsNullTarget:
-                case MemberAccessOperation.SetValueRejectsNullTarget:
-                    this.ActualException.Should().BeOfType<ArgumentNullException>();
-                    break;
-                case MemberAccessOperation.GetValueWrapsClrMemberFailure:
-                    this.AssertWrappedClrMemberFailure("get", "Getter failure.");
-                    break;
-                case MemberAccessOperation.SetValueWrapsClrMemberFailure:
-                    this.AssertWrappedClrMemberFailure("set", "Setter failure.");
-                    this.ActualMemberValue.Should().Be(7);
-                    break;
-                case MemberAccessOperation.TryGetValueReturnsFalseForNullTarget:
-                case MemberAccessOperation.TryGetValueReturnsFalseForClrMemberFailure:
-                case MemberAccessOperation.TryGetValueReturnsFalseForCoercionFailure:
-                    this.ActualSuccess.Should().BeFalse();
-                    if (this.Overload == MemberAccessOverload.Object)
-                    {
-                        this.ActualValue.Should().BeNull();
-                    }
-                    else
-                    {
-                        this.ActualValue.Should().Be(default(long));
-                    }
-
-                    break;
-                case MemberAccessOperation.TrySetValueReturnsFalseForClrMemberFailure:
-                case MemberAccessOperation.TrySetValueReturnsFalseForCoercionFailure:
-                    this.ActualSuccess.Should().BeFalse();
-                    this.ActualMemberValue.Should().Be(7);
-                    break;
-                case MemberAccessOperation.UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary:
-                    var exception = this.ActualException.Should().BeOfType<ApiSchemaException>().Which;
-                    exception.Message.Should().Contain(this.Surface == MemberAccessSurface.Property
-                        ? "no compiled getter available"
-                        : "Failed to get value for traversal");
-                    if (this.Surface == MemberAccessSurface.Property)
-                    {
-                        exception.InnerException.Should().BeNull();
-                    }
-                    else
-                    {
-                        exception.InnerException.Should().BeOfType<ApiSchemaException>();
-                    }
-
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unknown member access operation: {this.Operation}");
-            }
-        }
-        #endregion
-
-        #region Assertion Methods
-        private void AssertWrappedClrMemberFailure(string operation, string rootMessage)
-        {
-            var exception = this.ActualException.Should().BeOfType<ApiSchemaException>().Which;
-            exception.Message.Should().Contain($"Failed to {operation} value");
-            exception.Message.Should().Contain(this.ClrName);
-            exception.Message.Should().Contain(typeof(MemberAccessSource).Name);
-            exception.InnerException.Should().NotBeNull();
-            exception.GetBaseException().Should().BeOfType<InvalidOperationException>()
-                .Which.Message.Should().Be(rootMessage);
-        }
-        #endregion
-
-        #region Member Access Methods
-        private object? GetValue(MemberAccessSource? clrObject, Type clrValueType)
-        {
-            if (this.Overload == MemberAccessOverload.Object)
-            {
-                return this.Surface == MemberAccessSurface.Property
-                    ? this.ApiProperty!.GetValue(clrObject!, clrValueType)
-                    : this.ApiTraversal!.GetValue(clrObject!, clrValueType);
-            }
-
-            return this.Surface == MemberAccessSurface.Property
-                ? this.ApiProperty!.GetValue<MemberAccessSource, string>(clrObject!)
-                : this.ApiTraversal!.GetValue<MemberAccessSource, string>(clrObject!);
-        }
-
-        private long GetMemberValue() => this.ClrKind == ClrMemberKind.Property
-            ? this.ClrObject!.Number
-            : this.ClrObject!.NumberField;
-
-        private void SetValue<TValue>(MemberAccessSource? clrObject, TValue clrValue)
-        {
-            if (this.Overload == MemberAccessOverload.Object)
-            {
-                if (this.Surface == MemberAccessSurface.Property)
-                {
-                    this.ApiProperty!.SetValue(clrObject!, clrValue);
-                }
-                else
-                {
-                    this.ApiTraversal!.SetValue(clrObject!, clrValue);
-                }
-
-                return;
-            }
-
             if (this.Surface == MemberAccessSurface.Property)
             {
-                this.ApiProperty!.SetValue(clrObject!, clrValue);
+                this.ActualInitialRead.Should().Be(this.ExpectedInitialRead);
+                this.ActualRead.Should().Be(this.ExpectedMemberValue);
+                this.ActualMemberValue.Should().Be(this.ExpectedMemberValue);
             }
             else
             {
-                this.ApiTraversal!.SetValue(clrObject!, clrValue);
+                this.ActualInitialRead.Should().BeSameAs(this.ExpectedInitialRead);
+                this.ActualRead.Should().BeSameAs(this.ExpectedMemberValue);
+                this.ActualMemberValue.Should().BeSameAs(this.ExpectedMemberValue);
             }
         }
+        #endregion
+    }
 
-        private bool TryGetValue(MemberAccessSource? clrObject, out object? clrValue)
+    private sealed class MemberAccessBoundaryTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required MemberAccessSurface Surface { get; init; }
+        public required bool IsUnbound { get; init; }
+        public required bool IsSet { get; init; }
+        public required Type ExpectedExceptionType { get; init; }
+        public required Type? ExpectedInnerExceptionType { get; init; }
+        public required string[] ExpectedMessageFragments { get; init; }
+        public required long ExpectedMemberValue { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiProperty? Property { get; set; }
+        private ApiRelationshipTraversal? Traversal { get; set; }
+        private MemberAccessSource? ClrObject { get; set; }
+        private Exception? ActualException { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
         {
-            if (this.Overload == MemberAccessOverload.Object)
-            {
-                return this.Surface == MemberAccessSurface.Property
-                    ? this.ApiProperty!.TryGetValue(clrObject, out clrValue, typeof(long))
-                    : this.ApiTraversal!.TryGetValue(clrObject, out clrValue, typeof(long));
-            }
-
-            long propertyValue;
-            var isSuccess = this.Surface == MemberAccessSurface.Property
-                ? this.ApiProperty!.TryGetValue(clrObject, out propertyValue)
-                : this.ApiTraversal!.TryGetValue(clrObject, out propertyValue);
-            clrValue = propertyValue;
-            return isSuccess;
+            (this.Property, this.Traversal) = CreateCompiledMemberAccessSurface(
+                this.Surface, ClrMemberKind.Property, this.IsUnbound);
+            this.ClrObject = new MemberAccessSource();
+            this.WriteLine($"Surface: {this.Surface}; Unbound: {this.IsUnbound}; Set: {this.IsSet}");
+            this.WriteLine($"Expected Boundary: {this.ExpectedExceptionType.Name}; " +
+                $"Inner: {this.ExpectedInnerExceptionType?.Name}; CLR State: {this.ExpectedMemberValue}");
         }
 
-        private bool TrySetValue<TValue>(MemberAccessSource? clrObject, TValue clrValue)
+        protected override void Act()
         {
-            if (this.Overload == MemberAccessOverload.Object)
+            var target = this.IsUnbound ? this.ClrObject : null;
+            try
             {
-                return this.Surface == MemberAccessSurface.Property
-                    ? this.ApiProperty!.TrySetValue(clrObject, (object?)clrValue)
-                    : this.ApiTraversal!.TrySetValue(clrObject, (object?)clrValue);
+                if (this.IsSet)
+                {
+                    if (this.Surface == MemberAccessSurface.Property)
+                    {
+                        this.Property!.SetValue((object)target!, 42L);
+                    }
+                    else
+                    {
+                        this.Traversal!.SetValue((object)target!, new MemberAccessTarget { Id = 42 });
+                    }
+                }
+                else if (this.Surface == MemberAccessSurface.Property)
+                {
+                    this.Property!.GetValue((object)target!);
+                }
+                else
+                {
+                    this.Traversal!.GetValue((object)target!);
+                }
+            }
+            catch (Exception exception)
+            {
+                this.ActualException = exception;
             }
 
-            if (this.Surface == MemberAccessSurface.Property)
+            this.WriteLine($"Target: {target.SafeToString()}; CLR State: {this.ClrObject!.Number}");
+            this.WriteLine($"Captured Exception: {this.ActualException.SafeToString()}");
+        }
+
+        protected override void Assert()
+        {
+            this.ActualException.Should().BeOfType(this.ExpectedExceptionType);
+            foreach (var fragment in this.ExpectedMessageFragments)
             {
-                return this.ApiProperty!.TrySetValue(clrObject, clrValue);
+                this.ActualException!.Message.Should().Contain(fragment);
             }
 
-            return this.ApiTraversal!.TrySetValue(clrObject, clrValue);
+            if (this.ExpectedInnerExceptionType is null)
+            {
+                this.ActualException!.InnerException.Should().BeNull();
+            }
+            else
+            {
+                this.ActualException!.InnerException.Should().BeOfType(this.ExpectedInnerExceptionType);
+            }
+
+            this.ClrObject!.Number.Should().Be(this.ExpectedMemberValue);
         }
         #endregion
     }
     #endregion
 
     #region Member Access Theory Data
-    public static TheoryDataRow<IXUnitTest>[] GetValueUsesSchemaTypeCoercionTheoryData =>
-        CreateMemberAndOverloadTheoryData(MemberAccessOperation.GetValueUsesSchemaTypeCoercion);
-
-    public static TheoryDataRow<IXUnitTest>[] SetValueUsesSchemaTypeCoercionTheoryData =>
-        CreateMemberAndOverloadTheoryData(MemberAccessOperation.SetValueUsesSchemaTypeCoercion);
+    public static TheoryDataRow<IXUnitTest>[] CompiledMemberAccessTheoryData =>
+    [
+        .. from surface in Enum.GetValues<MemberAccessSurface>()
+           from clrKind in Enum.GetValues<ClrMemberKind>()
+           from overload in Enum.GetValues<MemberAccessOverload>()
+           let initialTarget = new MemberAccessTarget { Id = 7 }
+           let suppliedTarget = new MemberAccessTarget { Id = 42 }
+           select (TheoryDataRow<IXUnitTest>)new CompiledMemberAccessTest
+           {
+               Name = $"Compiled {surface}; {clrKind}; {overload}",
+               Surface = surface, ClrKind = clrKind, Overload = overload,
+               InitialMemberValue = surface == MemberAccessSurface.Property ? 7L : initialTarget,
+               ExpectedInitialRead = surface == MemberAccessSurface.Property ? "7" : initialTarget,
+               SuppliedValue = surface == MemberAccessSurface.Property ? "42" : suppliedTarget,
+               ExpectedMemberValue = surface == MemberAccessSurface.Property ? 42L : suppliedTarget
+           }
+    ];
 
     public static TheoryDataRow<IXUnitTest>[] MemberAccessRejectsNullTargetTheoryData =>
     [
         .. from surface in Enum.GetValues<MemberAccessSurface>()
-           from overload in Enum.GetValues<MemberAccessOverload>()
-           from operation in new[]
+           from isSet in new[] { false, true }
+           select (TheoryDataRow<IXUnitTest>)new MemberAccessBoundaryTest
            {
-               MemberAccessOperation.GetValueRejectsNullTarget,
-               MemberAccessOperation.SetValueRejectsNullTarget
+               Name = $"{surface}; Set={isSet}; null object target",
+               Surface = surface, IsUnbound = false, IsSet = isSet,
+               ExpectedExceptionType = typeof(ArgumentNullException), ExpectedInnerExceptionType = null,
+               ExpectedMessageFragments = ["clrObject"], ExpectedMemberValue = 7
            }
-           select CreateMemberAccessTest
-           (
-               operation,
-               surface,
-               overload,
-               ClrMemberKind.Property,
-               nameof(MemberAccessSource.Number)
-           )
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] MemberAccessWrapsClrMemberFailureTheoryData =>
-    [
-        .. from surface in Enum.GetValues<MemberAccessSurface>()
-           from operation in new[]
-           {
-               MemberAccessOperation.GetValueWrapsClrMemberFailure,
-               MemberAccessOperation.SetValueWrapsClrMemberFailure
-           }
-           let clrName = operation == MemberAccessOperation.GetValueWrapsClrMemberFailure
-               ? nameof(MemberAccessSource.ThrowingGet)
-               : nameof(MemberAccessSource.ThrowingSet)
-           select CreateMemberAccessTest
-           (
-               operation,
-               surface,
-               MemberAccessOverload.Object,
-               ClrMemberKind.Property,
-               clrName
-           )
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] TryGetValueReturnsFalseWhenAccessFailsTheoryData =>
-    [
-        .. from surface in Enum.GetValues<MemberAccessSurface>()
-           from overload in Enum.GetValues<MemberAccessOverload>()
-           from operation in new[]
-           {
-               MemberAccessOperation.TryGetValueReturnsFalseForNullTarget,
-               MemberAccessOperation.TryGetValueReturnsFalseForClrMemberFailure,
-               MemberAccessOperation.TryGetValueReturnsFalseForCoercionFailure
-           }
-           let clrName = operation switch
-           {
-               MemberAccessOperation.TryGetValueReturnsFalseForClrMemberFailure =>
-                   nameof(MemberAccessSource.ThrowingGet),
-               MemberAccessOperation.TryGetValueReturnsFalseForCoercionFailure => nameof(MemberAccessSource.Text),
-               _ => nameof(MemberAccessSource.Number)
-           }
-           select CreateMemberAccessTest(operation, surface, overload, ClrMemberKind.Property, clrName)
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] TrySetValueReturnsFalseWithoutMutatingWhenAccessFailsTheoryData =>
-    [
-        .. from surface in Enum.GetValues<MemberAccessSurface>()
-           from overload in Enum.GetValues<MemberAccessOverload>()
-           from operation in new[]
-           {
-               MemberAccessOperation.TrySetValueReturnsFalseForClrMemberFailure,
-               MemberAccessOperation.TrySetValueReturnsFalseForCoercionFailure
-           }
-           let clrName = operation == MemberAccessOperation.TrySetValueReturnsFalseForClrMemberFailure
-               ? nameof(MemberAccessSource.ThrowingSet)
-               : nameof(MemberAccessSource.Number)
-           select CreateMemberAccessTest(operation, surface, overload, ClrMemberKind.Property, clrName)
     ];
 
     public static TheoryDataRow<IXUnitTest>[] UnboundMemberAccessUsesSurfaceSpecificExceptionBoundaryTheoryData =>
     [
-        .. from surface in Enum.GetValues<MemberAccessSurface>()
-           select CreateMemberAccessTest
-           (
-               MemberAccessOperation.UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary,
-               surface,
-               MemberAccessOverload.Object,
-               ClrMemberKind.Property,
-               nameof(MemberAccessSource.Number)
-           )
+        .. Enum.GetValues<MemberAccessSurface>().Select(surface => (TheoryDataRow<IXUnitTest>)
+            new MemberAccessBoundaryTest
+            {
+                Name = $"Compiled {surface} with no bound accessor",
+                Surface = surface, IsUnbound = true, IsSet = false,
+                ExpectedExceptionType = typeof(ApiSchemaException),
+                ExpectedInnerExceptionType = surface == MemberAccessSurface.Property
+                    ? null : typeof(ApiSchemaException),
+                ExpectedMessageFragments = surface == MemberAccessSurface.Property
+                    ? ["property 'Number'", "no compiled getter available"]
+                    : ["traversal 'Related'", "<unbound>", "Failed to get value"],
+                ExpectedMemberValue = 7
+            })
     ];
     #endregion
 
     #region Member Access Test Methods
     [Theory]
-    [MemberData(nameof(GetValueUsesSchemaTypeCoercionTheoryData))]
-    public void GetValueUsesSchemaTypeCoercion(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(SetValueUsesSchemaTypeCoercionTheoryData))]
-    public void SetValueUsesSchemaTypeCoercion(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(CompiledMemberAccessTheoryData))]
+    public void CompileWiresPropertyAndTraversalMemberAccessors(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MemberAccessRejectsNullTargetTheoryData))]
     public void MemberAccessRejectsNullTarget(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(MemberAccessWrapsClrMemberFailureTheoryData))]
-    public void MemberAccessWrapsClrMemberFailure(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(TryGetValueReturnsFalseWhenAccessFailsTheoryData))]
-    public void TryGetValueReturnsFalseWhenAccessFails(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(TrySetValueReturnsFalseWithoutMutatingWhenAccessFailsTheoryData))]
-    public void TrySetValueReturnsFalseWithoutMutatingWhenAccessFails(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(UnboundMemberAccessUsesSurfaceSpecificExceptionBoundaryTheoryData))]
@@ -467,150 +302,42 @@ public partial class ApiPropertyTests
     #endregion
 
     #region Member Access Factory Methods
-    private static TheoryDataRow<IXUnitTest>[] CreateMemberAndOverloadTheoryData(MemberAccessOperation operation) =>
-    [
-        .. from surface in Enum.GetValues<MemberAccessSurface>()
-           from clrMember in new[]
-           {
-               (ClrMemberKind.Property, nameof(MemberAccessSource.Number)),
-               (ClrMemberKind.Field, nameof(MemberAccessSource.NumberField))
-           }
-           from overload in Enum.GetValues<MemberAccessOverload>()
-           select CreateMemberAccessTest(operation, surface, overload, clrMember.Item1, clrMember.Item2)
-    ];
-
-    private static MemberAccessTest CreateMemberAccessTest
-    (
-        MemberAccessOperation operation,
-        MemberAccessSurface surface,
-        MemberAccessOverload overload,
-        ClrMemberKind clrKind,
-        string clrName
-    ) => new()
+    private static (ApiProperty? Property, ApiRelationshipTraversal? Traversal) CreateCompiledMemberAccessSurface(
+        MemberAccessSurface surface, ClrMemberKind clrKind, bool isUnbound)
     {
-        Name = $"{surface}; {clrKind}; {overload}; {operation}",
-        Operation = operation,
-        Surface = surface,
-        Overload = overload,
-        ClrKind = clrKind,
-        ClrName = clrName
-    };
-
-    private static (ApiProperty? ApiProperty, ApiRelationshipTraversal? ApiTraversal) CreateMemberAccessSurface
-    (
-        MemberAccessSurface surface,
-        ClrMemberKind clrKind,
-        string clrName,
-        bool isUnbound
-    )
-    {
-        var clrMemberType = clrName == nameof(MemberAccessSource.Text) ? typeof(string) : typeof(long);
-        var scalarType = new ApiScalarType(clrMemberType.Name, clrMemberType);
+        var scalar = new ApiScalarType("Int64", typeof(long));
+        var numberMember = clrKind == ClrMemberKind.Property ? "Number" : "NumberField";
+        var property = new ApiProperty("Value", new ApiTypeExpression(new ApiTypeReference(typeof(long))),
+            ApiTypeModifiers.Required, new ClrMemberReference(clrKind, numberMember));
+        var source = new ApiObjectType("Source", null, [property], null, null,
+            isUnbound && surface == MemberAccessSurface.Property ? null! : typeof(MemberAccessSource));
+        ApiSchema schema;
+        ApiRelationshipTraversal? traversal = null;
         if (surface == MemberAccessSurface.Property)
         {
-            var property = new ApiProperty
-            (
-                "Value",
-                new ApiTypeExpression(new ApiTypeReference(clrMemberType)),
-                ApiTypeModifiers.Required,
-                new ClrMemberReference(clrKind, clrName)
-            );
-            var objectType = new ApiObjectType
-            (
-                "Source",
-                null,
-                [property],
-                null,
-                null,
-                isUnbound ? null! : typeof(MemberAccessSource)
-            );
-            var schema = new ApiSchema("MemberAccess", null, null, [scalarType], null, [objectType], null);
-            var result = ApiSchemaCompiler.Compile(schema);
-            if (!isUnbound)
-            {
-                result.ThrowIfInvalid();
-            }
-
-            return (property, null);
+            schema = new ApiSchema("MemberAccess", null, null, [scalar], null, [source], null);
         }
-
-        var clrNavigationMember = isUnbound ? null : new ClrMemberReference(clrKind, clrName);
-        var traversal = new ApiRelationshipTraversal("Related", clrNavigationMember);
-        var sourceType = new ApiObjectType("Source", null, null, null, null, typeof(MemberAccessSource));
-        var targetType = new ApiObjectType("Target", null, null, null, null, clrMemberType);
-        var relationship = new ApiRelationshipOneToOne
-        (
-            "SourceTarget",
-            new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(MemberAccessSource)), traversal),
-            new ApiRelationshipDependentEnd(new ApiTypeReference(clrMemberType))
-        );
-        var traversalSchema = new ApiSchema
-        (
-            "MemberAccess",
-            null,
-            null,
-            null,
-            null,
-            [sourceType, targetType],
-            [relationship]
-        );
-        ApiSchemaCompiler.Compile(traversalSchema).ThrowIfInvalid();
-        return (null, traversal);
-    }
-
-    private static string GetExpectedExceptionBoundary
-    (
-        MemberAccessOperation operation,
-        MemberAccessSurface surface
-    ) => operation switch
-    {
-        MemberAccessOperation.GetValueRejectsNullTarget or
-        MemberAccessOperation.SetValueRejectsNullTarget => nameof(ArgumentNullException),
-        MemberAccessOperation.GetValueWrapsClrMemberFailure or
-        MemberAccessOperation.SetValueWrapsClrMemberFailure => nameof(ApiSchemaException),
-        MemberAccessOperation.UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary =>
-            surface == MemberAccessSurface.Property
-                ? $"{nameof(ApiSchemaException)} (direct)"
-                : $"{nameof(ApiSchemaException)} (contextual outer and unavailable-accessor inner)",
-        _ => "none"
-    };
-
-    private static string GetRequestedOutputType
-    (
-        MemberAccessOperation operation,
-        MemberAccessOverload overload
-    ) => operation switch
-    {
-        MemberAccessOperation.GetValueUsesSchemaTypeCoercion => typeof(string).SafeToName(),
-        MemberAccessOperation.TryGetValueReturnsFalseForNullTarget or
-        MemberAccessOperation.TryGetValueReturnsFalseForClrMemberFailure or
-        MemberAccessOperation.TryGetValueReturnsFalseForCoercionFailure => typeof(long).SafeToName(),
-        MemberAccessOperation.GetValueRejectsNullTarget or
-        MemberAccessOperation.GetValueWrapsClrMemberFailure or
-        MemberAccessOperation.UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary =>
-            (overload == MemberAccessOverload.Object ? typeof(long) : typeof(string)).SafeToName(),
-        _ => "<none>"
-    };
-
-    private static string GetSuppliedValue(MemberAccessOperation operation) => operation switch
-    {
-        MemberAccessOperation.SetValueUsesSchemaTypeCoercion or
-        MemberAccessOperation.SetValueRejectsNullTarget => "42 (String)",
-        MemberAccessOperation.SetValueWrapsClrMemberFailure or
-        MemberAccessOperation.TrySetValueReturnsFalseForClrMemberFailure => "42 (Int64)",
-        MemberAccessOperation.TrySetValueReturnsFalseForCoercionFailure => "invalid (String)",
-        _ => "<none>"
-    };
-
-    private static string GetRootExceptionDescription(Exception? exception)
-    {
-        if (exception is null)
+        else
         {
-            return "<none>";
+            var navigationMember = clrKind == ClrMemberKind.Property ? "Related" : "RelatedField";
+            traversal = new ApiRelationshipTraversal("Related", isUnbound
+                ? null : new ClrMemberReference(clrKind, navigationMember));
+            var targetProperty = new ApiProperty("Id", new ApiTypeExpression(new ApiTypeReference(typeof(long))),
+                ApiTypeModifiers.Required, new ClrMemberReference(ClrMemberKind.Property, "Id"));
+            var target = new ApiObjectType("Target", null, [targetProperty], null, null, typeof(MemberAccessTarget));
+            var relationship = new ApiRelationshipOneToOne("SourceTarget",
+                new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(MemberAccessSource)), traversal),
+                new ApiRelationshipDependentEnd(new ApiTypeReference(typeof(MemberAccessTarget))));
+            schema = new ApiSchema("MemberAccess", null, null, [scalar], null, [source, target], [relationship]);
         }
 
-        var rootException = exception.GetBaseException();
-        return $"{rootException.GetType().SafeToName()}: {rootException.Message}";
+        var result = ApiSchemaCompiler.Compile(schema);
+        if (!isUnbound || surface == MemberAccessSurface.Traversal)
+        {
+            result.ThrowIfInvalid();
+        }
+
+        return surface == MemberAccessSurface.Property ? (property, null) : (null, traversal);
     }
     #endregion
 }

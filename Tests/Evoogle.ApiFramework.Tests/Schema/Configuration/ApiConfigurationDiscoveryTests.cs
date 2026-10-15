@@ -500,7 +500,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             this.ReturnedSameBuilder.Should().BeTrue();
             this.ApiSchemaActual.Should().NotBeNull();
 
-            this.ApiSchemaActual!.ApiObjectTypes.Should().HaveCount(4);
+            this.ApiSchemaActual.ApiObjectTypes.Should().HaveCount(4);
             this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredObject");
             this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredPrincipal");
             this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredDependent");
@@ -556,7 +556,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         protected override void Assert()
         {
             this.ExceptionActual.Should().NotBeNull();
-            this.ExceptionActual!.ParamName.Should().Be
+            this.ExceptionActual.ParamName.Should().Be
             (
                 this.ScanKind == NullScanKind.ExplicitAssembly
                     ? "assembly"
@@ -592,7 +592,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         protected override void Assert()
         {
             this.ApiSchemaActual.Should().NotBeNull();
-            this.ApiSchemaActual!.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "EligibleObject");
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "EligibleObject");
             this.ObservedTypes.Should().Contain(typeof(EligibleConfiguration));
             this.ObservedTypes.Should().NotContain(typeof(AbstractConfiguration));
             this.ObservedTypes.Should().NotContain(typeof(StructConfiguration));
@@ -672,11 +672,11 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         {
             this.ApiSchemaActual.Should().NotBeNull();
             GenericObjectDiscoveryConfiguration.ConfigureCount.Should().Be(1);
-            GenericObjectDiscoveryConfiguration.BuilderType.Should().Be(typeof(ApiObjectTypeBuilder<BridgeObject>));
+            GenericObjectDiscoveryConfiguration.BuilderType.Should().Be<ApiObjectTypeBuilder<BridgeObject>>();
             GenericScalarDiscoveryConfiguration.ConfigureCount.Should().Be(1);
-            GenericScalarDiscoveryConfiguration.BuilderType.Should().Be(typeof(ApiScalarTypeBuilder<BridgeScalar>));
+            GenericScalarDiscoveryConfiguration.BuilderType.Should().Be<ApiScalarTypeBuilder<BridgeScalar>>();
             GenericEnumDiscoveryConfiguration.ConfigureCount.Should().Be(1);
-            GenericEnumDiscoveryConfiguration.BuilderType.Should().Be(typeof(ApiEnumTypeBuilder<BridgeEnum>));
+            GenericEnumDiscoveryConfiguration.BuilderType.Should().Be<ApiEnumTypeBuilder<BridgeEnum>>();
         }
     }
 
@@ -715,7 +715,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             this.ApiSchemaActual.Should().NotBeNull();
             MultiRoleDiscoveryConfiguration.ConstructorCount.Should().Be(1);
             MultiRoleDiscoveryConfiguration.AppliedRoles.Should().Equal("Object", "OneToOne");
-            this.ApiSchemaActual!.ApiRelationships.Should().ContainSingle
+            this.ApiSchemaActual.ApiRelationships.Should().ContainSingle
             (
                 x => x.ApiName == "MultiRoleRelationship"
             );
@@ -769,8 +769,8 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                     issue.ApiPath ==
                     (
                         this.FailureKind == ConfigurationFailureKind.Configure
-                            ? typeof(FailingRoleDiscoveryConfiguration).FullName!
-                            : typeof(IdentityFailureConfiguration).FullName!
+                            ? typeof(FailingRoleDiscoveryConfiguration).FullName
+                            : typeof(IdentityFailureConfiguration).FullName
                     )
             );
 
@@ -830,7 +830,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         protected override void Assert()
         {
             this.ApiSchemaActual.Should().NotBeNull();
-            this.ApiSchemaActual!.ApiObjectTypes.Should().BeEmpty();
+            this.ApiSchemaActual.ApiObjectTypes.Should().BeEmpty();
             this.ApiSchemaActual.ApiScalarTypes.Should().BeEmpty();
             this.ApiSchemaActual.ApiEnumTypes.Should().BeEmpty();
             this.ApiSchemaActual.ApiRelationships.Should().BeEmpty();
@@ -878,7 +878,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         protected override void Assert()
         {
             this.ApiSchemaActual.Should().NotBeNull();
-            this.ApiSchemaActual!.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DuplicateObject");
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DuplicateObject");
             ADuplicateObjectConfiguration.AppliedConfigurations.Should().Equal("First", "Second");
             this.RepeatedConfigureCountActual.Should().Be(2);
         }
@@ -904,7 +904,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         protected override void Assert()
         {
             this.ApiSchemaActual.Should().NotBeNull();
-            this.ApiSchemaActual!.ApiObjectTypes.Should().ContainSingle
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle
             (
                 x => x.ApiName == "ExplicitName"
             );

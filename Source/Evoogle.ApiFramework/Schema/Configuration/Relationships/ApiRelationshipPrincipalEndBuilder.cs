@@ -28,7 +28,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
     private readonly ApiTypeReference _apiObjectTypeReference = apiObjectTypeReference ??
         throw new ArgumentNullException(nameof(apiObjectTypeReference));
     private readonly ApiRelationshipPrincipalEndState _state = new();
-    private ApiRelationshipTraversal? _traversal;
+    private ApiRelationshipTraversalState? _traversalState;
     private ApiConfigurationSource? _traversalSource;
     #endregion
 
@@ -107,7 +107,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
         var source = _configurationSourceScope.CurrentSource;
         if (_traversalSource is null || source >= _traversalSource.Value)
         {
-            _traversal = new ApiRelationshipTraversal(apiName, clrNavigationMember);
+            _traversalState = new ApiRelationshipTraversalState(apiName, clrNavigationMember);
             _traversalSource = source;
         }
         return this;
@@ -150,7 +150,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
         var end = new ApiRelationshipPrincipalEnd
         (
             _apiObjectTypeReference,
-            _traversal,
+            _traversalState?.Build(),
             _state.PrincipalKeyName
         );
 

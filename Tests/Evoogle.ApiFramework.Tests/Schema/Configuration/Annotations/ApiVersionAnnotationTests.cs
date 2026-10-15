@@ -85,7 +85,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         protected override void Assert()
         {
             this.VersionDefinition.Should().NotBeNull();
-            this.VersionDefinition!.ClrType.Should().Be(this.ClrTypeExpected);
+            this.VersionDefinition.ClrType.Should().Be(this.ClrTypeExpected);
             this.VersionDefinition.ApiPropertyReference?.ClrName.Should()
                 .Be(this.ClrMemberNameExpected);
             this.MaterializedVersion.HasValue.Should().BeTrue();
@@ -176,7 +176,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         protected override void Assert()
         {
             this.VersionDefinition.Should().NotBeNull();
-            this.VersionDefinition!.ClrType.Should().Be(this.ClrTypeExpected);
+            this.VersionDefinition.ClrType.Should().Be(this.ClrTypeExpected);
             this.VersionDefinition.ApiPropertyReference?.ClrName.Should()
                 .Be(this.ClrMemberNameExpected);
         }
@@ -262,7 +262,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         protected override void Assert()
         {
             this.Result.Should().NotBeNull();
-            this.Result!.Schema.Should().BeNull();
+            this.Result.Schema.Should().BeNull();
             this.Result.Errors.Should().Contain
             (
                 issue => issue.Code == this.CompilationCodeExpected
@@ -315,7 +315,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         protected override void Assert()
         {
             this.Result.Should().NotBeNull();
-            this.Result!.Schema.Should().BeNull();
+            this.Result.Schema.Should().BeNull();
             this.Result.Errors.Should().Contain
             (
                 issue => issue.Code == this.CompilationCodeExpected
@@ -355,9 +355,9 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         {
             this.FirstResult.Should().NotBeNull();
             this.SecondResult.Should().NotBeNull();
-            this.SecondResult!.Errors.Select(ToIssueSignature).Should().Equal
+            this.SecondResult.Errors.Select(ToIssueSignature).Should().Equal
             (
-                this.FirstResult!.Errors.Select(ToIssueSignature)
+                this.FirstResult.Errors.Select(ToIssueSignature)
             );
         }
         #endregion

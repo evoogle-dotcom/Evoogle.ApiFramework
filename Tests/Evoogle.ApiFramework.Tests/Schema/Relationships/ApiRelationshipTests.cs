@@ -52,7 +52,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
         {
             this.ActualApiRelationship.Should().NotBeNull();
 
-            var actualApiRelationship = this.ActualApiRelationship!;
+            var actualApiRelationship = this.ActualApiRelationship;
 
             actualApiRelationship.ApiName.Should().Be(this.ExpectedApiRelationshipDef.ApiName);
 
