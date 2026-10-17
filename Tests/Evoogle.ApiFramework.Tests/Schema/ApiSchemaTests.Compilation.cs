@@ -3968,6 +3968,59 @@ public partial class ApiSchemaTests
                 ),
             ]
         },
+
+        // ApiObjectType throws if the canonical key is not declared
+        new CompileThrowsTest
+        {
+            Name = $"{nameof(ApiObjectType)} Throws If Canonical Key Is Not Declared",
+            SourceJson = """
+            {
+                "ApiName": "ApiObjectType Throws If Canonical Key Is Not Declared",
+                "ApiScalarTypes": [
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
+                    }
+                ],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
+                    {
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOneScalarPart",
+                        "ApiProperties": [
+                            {
+                                "ApiName": "Id",
+                                "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
+                                "ApiTypeModifiers": "Required",
+                                "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
+                            }
+                        ],
+                        "ApiKeys": [
+                            {
+                                "ApiName": "PK_KeyOneScalarPart",
+                                "ApiKeyPaths": [ { "ClrPath": "Id" } ]
+                            }
+                        ],
+                        "ApiCanonicalKey": "Unknown",
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOneScalarPart, Evoogle.ApiFramework.Tests"
+                    }
+                ]
+            }
+            """,
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiSchemaCompilationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"KeyOneScalarPart\"]",
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiObjectTypeUnresolvedCanonicalKey,
+                    description: "Canonical key 'Unknown' is not declared by object type 'KeyOneScalarPart'",
+                    remediation: "Select the API name of a key declared in this object's ApiKeys collection"
+                ),
+            ]
+        },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] CompileWarnsTheoryData =>

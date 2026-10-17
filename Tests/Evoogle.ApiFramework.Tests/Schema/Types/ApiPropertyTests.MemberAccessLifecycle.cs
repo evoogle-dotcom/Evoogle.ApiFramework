@@ -66,15 +66,15 @@ public partial class ApiPropertyTests
             {
                 var clrName = this.ClrKind == ClrMemberKind.Property ? "Number" : "NumberField";
                 this.Property = CreateLifecycleProperty("Value", clrName, this.ClrKind);
-                var source = new ApiObjectType(apiName: "Source", apiOptions: null, apiProperties: [this.Property], apiKeys: null, apiVersion: null, clrObjectType: typeof(StructValueSource));
+                var source = new ApiObjectType(apiName: "Source", apiOptions: null, apiProperties: [this.Property], apiKeys: null, apiCanonicalKeyName: null, apiVersion: null, clrObjectType: typeof(StructValueSource));
                 schema = new ApiSchema(apiName: "StructAccess", apiVersion: null, apiOptions: null, apiScalarTypes: [scalar], apiEnumTypes: null, apiObjectTypes: [source], apiRelationships: null);
             }
             else
             {
                 var clrName = this.ClrKind == ClrMemberKind.Property ? "Related" : "RelatedField";
                 this.Traversal = new ApiRelationshipTraversal(apiName: "Related", clrNavigationMember: new ClrMemberReference(this.ClrKind, clrName));
-                var source = new ApiObjectType(apiName: "Source", apiOptions: null, apiProperties: [CreateLifecycleProperty("Id", "Id", ClrMemberKind.Property)], apiKeys: null, apiVersion: null, clrObjectType: typeof(StructNavigationSource));
-                var target = new ApiObjectType(apiName: "Target", apiOptions: null, apiProperties: [CreateLifecycleProperty("Id", "Id", ClrMemberKind.Property)], apiKeys: null, apiVersion: null, clrObjectType: typeof(MemberAccessTarget));
+                var source = new ApiObjectType(apiName: "Source", apiOptions: null, apiProperties: [CreateLifecycleProperty("Id", "Id", ClrMemberKind.Property)], apiKeys: null, apiCanonicalKeyName: null, apiVersion: null, clrObjectType: typeof(StructNavigationSource));
+                var target = new ApiObjectType(apiName: "Target", apiOptions: null, apiProperties: [CreateLifecycleProperty("Id", "Id", ClrMemberKind.Property)], apiKeys: null, apiCanonicalKeyName: null, apiVersion: null, clrObjectType: typeof(MemberAccessTarget));
                 var relationship = new ApiRelationshipOneToOne
                 (
                     apiName: "SourceTarget",

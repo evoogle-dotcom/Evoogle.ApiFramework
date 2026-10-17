@@ -62,6 +62,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var apiOptions = context.ReadData.ApiObjectType?.ApiOptions;
         var apiProperties = context.ReadData.ApiObjectType?.ApiProperties;
         var apiKeys = context.ReadData.ApiObjectType?.ApiKeys;
+        var apiCanonicalKeyName = context.ReadData.ApiObjectType?.ApiCanonicalKeyName;
         var apiVersion = context.ReadData.ApiObjectType?.ApiVersion;
         var clrType = context.ReadData.ApiType?.ClrType;
 
@@ -71,6 +72,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             apiOptions,
             apiProperties,
             apiKeys,
+            apiCanonicalKeyName,
             apiVersion,
             clrType!
         );

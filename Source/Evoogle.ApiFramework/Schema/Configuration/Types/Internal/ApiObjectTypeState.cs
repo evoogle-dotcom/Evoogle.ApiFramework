@@ -18,6 +18,10 @@ internal sealed class ApiObjectTypeState
     #region Properties
     internal List<ApiKeyDefinitionBuilder> KeyBuilders { get; } = [];
 
+    internal string? CanonicalKeyName { get; set; }
+
+    internal ApiConfigurationSource? CanonicalKeyConfigurationSource { get; set; }
+
     internal List<ApiPropertyBuilder> PropertyBuilders { get; } = [];
 
     internal Action<ApiObjectTypeOptionsBuilder>? OptionsConfiguration { get; set; }

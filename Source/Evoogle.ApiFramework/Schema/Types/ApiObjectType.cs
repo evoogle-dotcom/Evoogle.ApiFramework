@@ -28,6 +28,7 @@ namespace Evoogle.ApiFramework.Schema.Types;
 /// <param name="apiKeys">
 ///     The collection of named API key definitions defined for this object type.
 /// </param>
+/// <param name="apiCanonicalKeyName">The optional API name of the canonical key, resolved during compilation.</param>
 /// <param name="apiVersion">The optional version metadata for this object type.</param>
 /// <param name="clrObjectType">The CLR type representing this API object.</param>
 public sealed partial class ApiObjectType
@@ -36,6 +37,7 @@ public sealed partial class ApiObjectType
     ApiObjectTypeOptions? apiOptions,
     IEnumerable<ApiProperty>? apiProperties,
     IEnumerable<ApiNamedKeyDefinition>? apiKeys,
+    string? apiCanonicalKeyName,
     ApiVersionDefinition? apiVersion,
     Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType), IApiKeyPathRootProvider
@@ -43,6 +45,8 @@ public sealed partial class ApiObjectType
     #region ApiObjectType Fields
     private FrozenDictionary<string, ApiNamedKeyDefinition>? _apiKeyApiNameLookup = null;
     private ImmutableArray<string> _apiKeyApiNames = [];
+
+    private readonly string? _apiCanonicalKeyName = apiCanonicalKeyName;
 
     private FrozenDictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private FrozenDictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
@@ -67,6 +71,10 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObjectType Properties
+    /// <summary>Gets the canonical key resolved during compilation, or null when none is designated.</summary>
+    /// <remarks>This is a non-owning reference to an existing definition in <see cref="ApiKeys"/>.</remarks>
+    public ApiNamedKeyDefinition? ApiCanonicalKey { get; private set; }
+
     /// <summary>Gets the immutable snapshot of named key definitions for the object type.</summary>
     public ImmutableArray<ApiNamedKeyDefinition> ApiKeys { get; } =
         [.. apiKeys.EmptyIfNull().Where(x => x is not null)];
@@ -114,6 +122,8 @@ public sealed partial class ApiObjectType
 
     /// <summary>Gets the relationship traversals exposed from this object type.</summary>
     public ImmutableArray<ApiRelationshipTraversal> ApiRelationshipTraversals => _apiRelationshipTraversals;
+
+    internal string? ApiCanonicalKeyName => _apiCanonicalKeyName;
 
     private FrozenDictionary<string, ApiNamedKeyDefinition> ApiKeyApiNameLookup => this.RequireValue(_apiKeyApiNameLookup);
 
@@ -185,6 +195,7 @@ public sealed partial class ApiObjectType
 
         this.ValidateApiOptions(context);
         this.BuildLookupDictionaries(context);
+        this.ResolveCanonicalKey(context);
         this.CompileApiProperties(context);
     }
 
@@ -392,6 +403,28 @@ public sealed partial class ApiObjectType
         );
     }
 
+    private void ResolveCanonicalKey(ApiSchemaCompilationContext context)
+    {
+        if (_apiCanonicalKeyName is null)
+        {
+            return;
+        }
+
+        if (this.TryGetKeyByApiName(_apiCanonicalKeyName, out var apiKey))
+        {
+            this.ApiCanonicalKey = apiKey;
+            return;
+        }
+
+        var apiPath = this.ApiPath;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiObjectTypeUnresolvedCanonicalKey;
+        var description = $"Canonical key '{_apiCanonicalKeyName}' is not declared by object type '{this.ApiName}'";
+        var remediation = "Select the API name of a key declared in this object's ApiKeys collection";
+
+        context.AddIssue(apiPath, severity, code, description, remediation);
+    }
+
     private void CompileApiKeys(ApiSchemaCompilationContext context)
     {
         if (this.ApiKeys.Length == 0)
@@ -417,7 +450,6 @@ public sealed partial class ApiObjectType
             var severity = ApiSchemaCompilationSeverity.Warning;
             var code = ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties;
             var description = $"{nameof(this.ApiProperties)} is null or empty";
-
             var remediation = $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"{this.ApiName}\"]";
 
             context.AddIssue(severity, code, description, remediation);

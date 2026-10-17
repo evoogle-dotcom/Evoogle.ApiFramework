@@ -59,6 +59,8 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         public ApiObjectTypeOptions? ApiOptions { get; set; }
         public List<ApiProperty>? ApiProperties { get; set; }
         public List<ApiNamedKeyDefinition>? ApiKeys { get; set; }
+        public string? ApiCanonicalKeyName { get; set; }
+        public bool HasApiCanonicalKey { get; set; }
         public ApiVersionDefinition? ApiVersion { get; set; }
         public bool HasApiVersion { get; set; }
         #endregion
@@ -111,6 +113,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             { propertyNames.ApiObjectType.ApiOptions, HandleApiObjectTypeApiOptions },
             { propertyNames.ApiObjectType.ApiProperties, HandleApiObjectTypeApiProperties },
             { propertyNames.ApiObjectType.ApiKeys, HandleApiObjectTypeApiKeys },
+            { propertyNames.ApiObjectType.ApiCanonicalKey, HandleApiObjectTypeApiCanonicalKey, true },
             { propertyNames.ApiObjectType.ApiVersion, HandleApiObjectTypeApiVersion },
 
             // ApiType Property Handlers
@@ -171,6 +174,28 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiObjectType Methods
+        private static void HandleApiObjectTypeApiCanonicalKey
+        (
+            ref Utf8JsonReader reader,
+            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+        )
+        {
+            context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
+            var readData = context.ReadData.ApiObjectType;
+            if (readData.HasApiCanonicalKey)
+            {
+                throw new JsonException($"Duplicate {nameof(ApiObjectType.ApiCanonicalKey)} JSON member.");
+            }
+
+            if (reader.TokenType is not (JsonTokenType.String or JsonTokenType.Null))
+            {
+                throw new JsonException($"{nameof(ApiObjectType.ApiCanonicalKey)} must be a key API name or null.");
+            }
+
+            readData.HasApiCanonicalKey = true;
+            readData.ApiCanonicalKeyName = reader.GetString();
+        }
+
         private static void HandleApiObjectTypeApiKeys(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();

@@ -75,6 +75,7 @@ public static partial class ApiSchemaFactory
         ApiKeyNullHandling? ApiKeyNullHandling = null,
         List<ApiPropertyDef>? ApiProperties = null,
         List<ApiKeyDefinitionDef>? ApiKeys = null,
+        string? ApiCanonicalKeyName = null,
         ApiVersionDefinitionDef? ApiVersion = null,
         List<Type>? ExtensionTypes = null
     ) : ApiNamedTypeDef(ApiName, ClrType, ExtensionTypes);
@@ -486,6 +487,7 @@ public static partial class ApiSchemaFactory
         var apiOptions = BuildApiObjectTypeOptions(def);
         var apiProperties = def.ApiProperties?.Select(BuildApiProperty);
         var apiKeys = def.ApiKeys?.Select(BuildApiNamedKeyDefinition);
+        var apiCanonicalKeyName = def.ApiCanonicalKeyName;
         var apiVersionDefinition = def.ApiVersion is not null
             ? BuildApiVersionDefinition(def.ApiVersion)
             : null;
@@ -497,6 +499,7 @@ public static partial class ApiSchemaFactory
             apiOptions,
             apiProperties,
             apiKeys,
+            apiCanonicalKeyName,
             apiVersionDefinition,
             clrType
         );

@@ -14,6 +14,11 @@ internal static class ApiObjectTypeBuilderExtensions
     #region Methods
     public static void ConfigureKeys(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
     {
+        if (apiObjectType.ApiCanonicalKey is { } canonicalKey)
+        {
+            builder.WithCanonicalKey(canonicalKey.ApiName);
+        }
+
         foreach (var apiKeyDefinition in apiObjectType.ApiKeys)
         {
             builder.AddKey(apiKeyDefinition.ApiName, k =>

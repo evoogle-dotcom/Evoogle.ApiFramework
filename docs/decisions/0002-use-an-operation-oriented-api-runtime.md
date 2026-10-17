@@ -111,6 +111,45 @@ ApiOperation
 Providers translate between canonical framework representations and external protocol
 representations. They do not execute repositories or redefine standard semantics.
 
+## Canonical Object Keys
+
+Accepted on 2026-10-16 as the first schema foundation for the `CustomerById` runtime slice.
+
+An `ApiObjectType` may explicitly designate one of its existing `ApiNamedKeyDefinition` instances
+as its canonical key. All named keys remain valid identities for lookup; the canonical designation
+selects the consistent key used for returned references, relationship assembly, and execution caches.
+This designation belongs to the schema rather than a service repository binding, so clients,
+services, and providers share the same choice.
+
+`ApiObjectType.ApiCanonicalKey` is a nullable, resolved, non-owning reference to a key in `ApiKeys`.
+`WithCanonicalKey(string apiName)` selects that key during builder configuration and may precede
+its declaration. Repeated configuration at the same precedence replaces the prior selection.
+Schema compilation resolves the name using the standard ordinal API-name comparer and reports
+an unresolved designation as a compilation error. JSON represents `ApiCanonicalKey` by its key
+API name, not by duplicating the key definition. Omitted or null designations remain valid; no
+canonical key is inferred from the first or only key.
+
+The selected definition uses its existing materialization behavior to produce an `ApiKey` from
+a POCO. Where the object type is already known, that value is sufficient. Heterogeneous execution
+caches must retain object-type context, but a public `ApiObjectIdentity` type and a separate
+`Identity` namespace are deferred until a concrete public contract requires them. Object version
+remains separate from identity.
+
+Service bindings that require canonical identity will reject object types without a designation.
+A source may retrieve through an alternate named key; the runtime then materializes the returned
+object's canonical key. Canonical-key selection does not itself make an object queryable or mutable,
+and does not alter relationship principal-key selection or inference.
+
+A future opt-in convention may select the first configured key at convention precedence. Such a
+convention would produce the same compiled designation and must not override explicit configuration.
+It is not part of this initial implementation.
+
+The first executable milestone is `CustomerById(id)` with a required, non-null input and nullable
+customer output, projecting `Id` and `Name`. Absence produces successful null data. The existing
+multi-level query and command scenario remains the full alpha acceptance target. New runtime
+namespaces will be reviewed as their contracts become concrete; `Runtime/Service` is the provisional
+home for service execution.
+
 ## Operation Compilation
 
 Operation construction follows a publication lifecycle analogous to schema compilation:

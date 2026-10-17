@@ -233,7 +233,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Owner)
             .AddProperty(c => c.Employees)
             .AddKey("PK_Company_Id", c => c.AddPath(p => p.Id))
-            .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name));
+            .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name))
+            .WithCanonicalKey("AK_Company_Name");
 
         return builder;
     }
@@ -248,7 +249,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Owner, p => p.AsOptional())
             .AddProperty(c => c.Employees, p => p.AsOptional())
             .AddKey("PK_Company_Id", c => c.AddPath(p => p.Id))
-            .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name));
+            .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name))
+            .WithCanonicalKey("AK_Company_Name");
 
         return builder;
     }
@@ -260,7 +262,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Id)
             .AddProperty(c => c.Name)
             .AddKey("PK_KeyOneScalarPart", c => c.AddPath(p => p.Id))
-            .AddKey("AK_KeyOneScalarPart", c => c.AddPath(p => p.Name));
+            .AddKey("AK_KeyOneScalarPart", c => c.AddPath(p => p.Name))
+            .WithCanonicalKey("AK_KeyOneScalarPart");
 
         return builder;
     }

@@ -447,6 +447,7 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
             apiOptions: null,
             apiProperties: conflict == ConflictKind.DuplicateTraversalName ? [CreateIdProperty()] : [CreateIdProperty(), contained],
             apiKeys: null,
+            apiCanonicalKeyName: null,
             apiVersion: null,
             clrObjectType: typeof(Source)
         );
@@ -506,6 +507,7 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
         apiOptions: null,
         apiProperties: [CreateIdProperty()],
         apiKeys: null,
+        apiCanonicalKeyName: null,
         apiVersion: null,
         clrObjectType: clrType
     );

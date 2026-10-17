@@ -160,6 +160,138 @@ public partial class ApiSchemaTests
             """
         },
 
+        // ApiSchema With Key Schema And Canonical Key (KeyOneScalarPart)
+        new ApiSchemaJsonTestCase
+        {
+            Name = $"{nameof(ApiSchema)} With Key Schema And Canonical Key ({nameof(KeyOneScalarPart)})",
+            FactoryArgument = new ApiSchemaDef
+            (
+                ApiName: $"{nameof(ApiSchema)} With Key Schema And Canonical Key ({nameof(KeyOneScalarPart)})",
+                ApiNamedTypes:
+                [
+                    new ApiScalarTypeDef(ApiName: nameof(Int32), ClrType: typeof(int)),
+                    new ApiScalarTypeDef(ApiName: nameof(String), ClrType: typeof(string)),
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(KeyOneScalarPart),
+                        ClrType: typeof(KeyOneScalarPart),
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(KeyOneScalarPart.Id),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrValueMember: new ClrMemberReferenceDef(ClrMemberKind.Property, nameof(KeyOneScalarPart.Id))
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(KeyOneScalarPart.Name),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrValueMember: new ClrMemberReferenceDef(ClrMemberKind.Property, nameof(KeyOneScalarPart.Name))
+                            )
+                        ],
+                        ApiKeys:
+                        [
+                            new ApiKeyDefinitionDef
+                            (
+                                ApiName: "PK_KeyOneScalarPart",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiSegments: [new ApiKeyPathSegmentDef(ApiPropertyReference: new ApiPropertyReferenceDef(ApiName: null, ClrName: nameof(KeyOneScalarPart.Id)))])
+                                ]
+                            ),
+                            new ApiKeyDefinitionDef
+                            (
+                                ApiName: "AK_KeyOneScalarPart",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiSegments: [new ApiKeyPathSegmentDef(ApiPropertyReference: new ApiPropertyReferenceDef(ApiName: null, ClrName: nameof(KeyOneScalarPart.Name)))])
+                                ]
+                            )
+                        ],
+                        ApiCanonicalKeyName: "AK_KeyOneScalarPart"
+                    )
+                ]
+            ),
+            Json = """
+            {
+                "ApiName": "ApiSchema With Key Schema And Canonical Key (KeyOneScalarPart)",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                },
+                "ApiScalarTypes": [
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
+                    },
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
+                    }
+                ],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [
+                    {
+                        "ApiKind": "Object",
+                        "ApiName": "KeyOneScalarPart",
+                        "ApiProperties": [
+                            {
+                                "ApiName": "Id",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "Int32"
+                                },
+                                "ApiTypeModifiers": "Required",
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Id"
+                                }
+                            },
+                            {
+                                "ApiName": "Name",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
+                                },
+                                "ApiTypeModifiers": "Required",
+                                "ClrValueMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Name"
+                                }
+                            }
+                        ],
+                        "ApiKeys": [
+                            {
+                                "ApiName": "PK_KeyOneScalarPart",
+                                "ApiKeyPaths": [
+                                    {
+                                        "ClrPath": "Id"
+                                    }
+                                ]
+                            },
+                            {
+                                "ApiName": "AK_KeyOneScalarPart",
+                                "ApiKeyPaths": [
+                                    {
+                                        "ClrPath": "Name"
+                                    }
+                                ]
+                            }
+                        ],
+                        "ApiCanonicalKey": "AK_KeyOneScalarPart",
+                        "ClrType": "Evoogle.ApiFramework.TestData.KeyOneScalarPart, Evoogle.ApiFramework.Tests"
+                    }
+                ],
+                "ApiRelationships": []
+            }
+            """
+        },
+
         // ApiSchema With Key Schema (KeyTwoScalarPartComposite)
         new ApiSchemaJsonTestCase
         {

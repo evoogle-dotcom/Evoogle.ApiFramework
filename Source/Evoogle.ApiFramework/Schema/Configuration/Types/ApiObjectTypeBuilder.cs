@@ -79,6 +79,24 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     #endregion
 
     #region With Methods
+    /// <summary>Selects an existing named key as the object's canonical identity key.</summary>
+    /// <param name="apiName">The key API name, resolved during schema compilation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder WithCanonicalKey(string apiName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+
+        var configurationSource = this.Context.CurrentConfigurationSource;
+        if (_state.CanonicalKeyConfigurationSource > configurationSource)
+        {
+            return this;
+        }
+
+        _state.CanonicalKeyName = apiName;
+        _state.CanonicalKeyConfigurationSource = configurationSource;
+        return this;
+    }
+
     /// <summary>
     ///     Resets the object type options to their schema-wide defaults.
     /// </summary>
@@ -195,6 +213,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             apiOptions,
             apiProperties,
             apiKeys,
+            _state.CanonicalKeyName,
             apiVersionDefinition,
             clrObjectType
         );

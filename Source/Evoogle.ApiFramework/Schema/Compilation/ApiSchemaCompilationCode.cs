@@ -70,44 +70,6 @@ public enum ApiSchemaCompilationCode
     ApiAssemblyDiscoveryFailed,
     #endregion
 
-    #region ClrMemberReference Compilation Codes
-    /// <summary>
-    ///     A CLR member reference has an invalid CLR kind.
-    /// </summary>
-    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_KIND")]
-    ClrMemberReferenceInvalidClrKind,
-
-    /// <summary>
-    ///     A CLR member reference has an invalid CLR name.
-    /// </summary>
-    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_INVALID_CLR_NAME")]
-    ClrMemberReferenceInvalidClrName,
-
-    /// <summary>
-    ///     A CLR member reference could not resolve its property or field.
-    /// </summary>
-    [EnumMember(Value = "API_CLR_MEMBER_REFERENCE_UNRESOLVED")]
-    ClrMemberReferenceUnresolved,
-
-    /// <summary>
-    ///     A resolved CLR member is incompatible with its schema role.
-    /// </summary>
-    [EnumMember(Value = "API_CLR_MEMBER_INCOMPATIBLE")]
-    ClrMemberIncompatible,
-
-    /// <summary>
-    ///     A CLR member getter could not be created or is invalid.
-    /// </summary>
-    [EnumMember(Value = "API_CLR_MEMBER_INVALID_GETTER")]
-    ClrMemberInvalidGetter,
-
-    /// <summary>
-    ///     A CLR member setter could not be created or is invalid.
-    /// </summary>
-    [EnumMember(Value = "API_CLR_MEMBER_INVALID_SETTER")]
-    ClrMemberInvalidSetter,
-    #endregion
-
     #region ApiCollectionType Compilation Codes
     /// <summary>
     ///     The collection type's item type expression is null.
@@ -302,6 +264,10 @@ public enum ApiSchemaCompilationCode
     /// </summary>
     [EnumMember(Value = "API_OBJECT_TYPE_INVALID_API_KEY_NULL_HANDLING")]
     ApiObjectTypeInvalidApiKeyNullHandling,
+
+    /// <summary>The canonical-key designation does not resolve to a key declared by the object type.</summary>
+    [EnumMember(Value = "API_OBJECT_TYPE_UNRESOLVED_CANONICAL_KEY")]
+    ApiObjectTypeUnresolvedCanonicalKey,
     #endregion
 
     #region ApiProperty Compilation Codes
@@ -641,5 +607,43 @@ public enum ApiSchemaCompilationCode
     /// <summary>The property-backed version refers to an optional API property.</summary>
     [EnumMember(Value = "API_VERSION_DEFINITION_OPTIONAL_PROPERTY")]
     ApiVersionDefinitionOptionalProperty,
+    #endregion
+
+    #region ClrMemberReference Compilation Codes
+    /// <summary>
+    ///     A CLR member reference has an invalid CLR kind.
+    /// </summary>
+    [EnumMember(Value = "CLR_MEMBER_REFERENCE_INVALID_CLR_KIND")]
+    ClrMemberReferenceInvalidClrKind,
+
+    /// <summary>
+    ///     A CLR member reference has an invalid CLR name.
+    /// </summary>
+    [EnumMember(Value = "CLR_MEMBER_REFERENCE_INVALID_CLR_NAME")]
+    ClrMemberReferenceInvalidClrName,
+
+    /// <summary>
+    ///     A CLR member reference could not resolve its property or field.
+    /// </summary>
+    [EnumMember(Value = "CLR_MEMBER_REFERENCE_UNRESOLVED")]
+    ClrMemberReferenceUnresolved,
+
+    /// <summary>
+    ///     A resolved CLR member is incompatible with its schema role.
+    /// </summary>
+    [EnumMember(Value = "CLR_MEMBER_INCOMPATIBLE")]
+    ClrMemberIncompatible,
+
+    /// <summary>
+    ///     A CLR member getter could not be created or is invalid.
+    /// </summary>
+    [EnumMember(Value = "CLR_MEMBER_INVALID_GETTER")]
+    ClrMemberInvalidGetter,
+
+    /// <summary>
+    ///     A CLR member setter could not be created or is invalid.
+    /// </summary>
+    [EnumMember(Value = "CLR_MEMBER_INVALID_SETTER")]
+    ClrMemberInvalidSetter,
     #endregion
 }

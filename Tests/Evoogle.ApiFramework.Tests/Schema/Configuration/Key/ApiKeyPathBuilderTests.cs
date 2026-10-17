@@ -235,6 +235,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
                 [nestedProperty],
                 [new ApiNamedKeyDefinition("Primary", [this.ActualPath])],
                 null,
+                null,
                 typeof(RootObject)
             );
             var nestedType = new ApiObjectType
@@ -242,6 +243,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
                 nameof(NestedObject),
                 null,
                 [identifierProperty],
+                null,
                 null,
                 null,
                 typeof(NestedObject)

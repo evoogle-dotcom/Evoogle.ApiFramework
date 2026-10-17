@@ -348,7 +348,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Name)
                 .AddKey("PK_KeyOneScalarPart", p => p.Id)
-                .AddKey("AK_KeyOneScalarPart", p => p.Name))
+                .AddKey("AK_KeyOneScalarPart", p => p.Name)
+                .WithCanonicalKey("AK_KeyOneScalarPart"))
 
             .AddObject<KeyTwoScalarPartComposite>(o => o
                 .AddProperty(p => p.Id1)
@@ -448,7 +449,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Hobbies)
                 .AddProperty(p => p.CompanyId)
                 .AddKey("PK_Person_Id", p => p.Id)
-                .AddKey("AK_Person_Name", p => p.Name))
+                .AddKey("AK_Person_Name", p => p.Name)
+                .WithCanonicalKey("PK_Person_Id"))
 
             .AddObject<Company>(o => o
                 .WithOptions(opt => opt.ThrowOnNullKeyPart())
@@ -457,7 +459,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Owner)
                 .AddProperty(p => p.Employees)
                 .AddKey("PK_Company_Id", p => p.Id)
-                .AddKey("AK_Company_Name", p => p.Name));
+                .AddKey("AK_Company_Name", p => p.Name)
+                .WithCanonicalKey("AK_Company_Name"));
 
         return builder;
     }

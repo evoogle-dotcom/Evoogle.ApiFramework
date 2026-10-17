@@ -45,8 +45,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             collection: apiEnumValues,
             state: writeContext,
             options: writeContext.Options,
-            writeItem: static (writer, item, state) =>
-                writer.TryWriteWithSerializer(obj: item, options: state.Options)
+            writeItem: static (writer, item, state) => writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
 
@@ -63,8 +62,12 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         WriteApiObjectTypeApiOptions(writer, apiObjectType, writeContext);
         WriteApiObjectTypeApiProperties(writer, apiObjectType, writeContext);
         WriteApiObjectTypeApiKeys(writer, apiObjectType, writeContext);
+        WriteApiObjectTypeApiCanonicalKey(writer, apiObjectType, writeContext);
         WriteApiObjectTypeApiVersion(writer, apiObjectType, writeContext);
     }
+
+    private static void WriteApiObjectTypeApiCanonicalKey(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiObjectType.ApiCanonicalKey, value: apiObjectType.ApiCanonicalKeyName, options: writeContext.Options);
 
     private static void WriteApiObjectTypeApiKeys(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
     {
@@ -86,21 +89,6 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     private static void WriteApiObjectTypeApiOptions(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiObjectType.ApiOptions, obj: apiObjectType.ApiOptions, options: writeContext.Options);
 
-    private static void WriteApiObjectTypeApiVersion
-    (
-        Utf8JsonWriter writer,
-        ApiObjectType apiObjectType,
-        DefaultWriteContext<PropertyNames> writeContext
-    )
-    {
-        writer.TryWritePropertyWithSerializer
-        (
-            writeContext.PropertyNames.ApiObjectType.ApiVersion,
-            apiObjectType.ApiVersion,
-            writeContext.Options
-        );
-    }
-
     private static void WriteApiObjectTypeApiProperties(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
     {
         var propertyName = writeContext.PropertyNames.ApiObjectType.ApiProperties;
@@ -117,6 +105,9 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
                 writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
+
+    private static void WriteApiObjectTypeApiVersion(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiObjectType.ApiVersion, obj: apiObjectType.ApiVersion, options: writeContext.Options);
 
     // ApiScalarType
     private static void WriteApiScalarType(Utf8JsonWriter writer, ApiScalarType apiScalarType, DefaultWriteContext<PropertyNames> writeContext)

@@ -93,6 +93,13 @@ Schema-wide options can be overridden on individual object types:
 `Build()` compiles, validates, freezes, and returns the schema. A returned schema is immutable and
 safe for concurrent runtime reads.
 
+An object type can explicitly select one of its named keys with `WithCanonicalKey("CustomerId")`.
+After compilation, `ApiObjectType.ApiCanonicalKey` references that existing definition and can use
+its normal `MaterializeKey` operation. Selection may precede key declaration; an unknown name is a
+schema compilation error. No key is selected implicitly, even when only one key exists. Schema JSON
+stores `ApiCanonicalKey` as the selected key's API name. Canonical identity does not imply query or
+mutation support and does not change relationship principal-key inference.
+
 Each `ApiObjectType` may expose one optional `ApiVersion` member whose value is an
 `ApiVersionDefinition`. A property-backed definition references an existing required scalar
 `ApiProperty`; a repository-backed definition has no CLR member.

@@ -67,6 +67,13 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     #endregion
 
     #region With Methods
+    /// <inheritdoc cref="ApiObjectTypeBuilder.WithCanonicalKey"/>
+    public new ApiObjectTypeBuilder<TObject> WithCanonicalKey(string apiName)
+    {
+        base.WithCanonicalKey(apiName);
+        return this;
+    }
+
     /// <inheritdoc cref="ApiNamedTypeBuilder{TBuilder}.WithName"/>
     public new ApiObjectTypeBuilder<TObject> WithName(string apiName)
     {
