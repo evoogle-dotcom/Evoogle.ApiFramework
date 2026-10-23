@@ -9,6 +9,7 @@ using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 using Evoogle.ApiFramework.Schema.Relationships;
@@ -115,36 +116,23 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     #endregion
 
-    #region AddScalar Methods
-    /// <summary>
-    ///     Adds a scalar type to the schema using an inline configuration action.
-    /// </summary>
-    /// <param name="clrType">The CLR scalar type.</param>
-    /// <param name="configure">Optional callback to configure the added scalar type.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddScalar(Type clrType, Action<ApiScalarTypeBuilder>? configure = null)
-    {
-        ArgumentNullException.ThrowIfNull(clrType);
+    #region AddQuerySource Methods
+    /// <summary>Adds or configures a named query source independently of object-type registration.</summary>
+    /// <param name="apiName">The query source API name.</param>
+    /// <param name="configure">The source configuration.</param>
+    /// <returns>The current schema builder.</returns>
+    public ApiSchemaBuilder AddQuerySource(string apiName, Action<ApiQuerySourceBuilder> configure)
+        => this.AddQuerySourceCore(apiName, configure, _context.CurrentConfigurationSource);
 
-        var builder = _context.GetOrAddScalarTypeBuilder(clrType);
-
-        configure?.Invoke(builder);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds a scalar type to the schema using a self-identifying implementation of
-    ///     <see cref="IApiScalarTypeConfiguration"/>.
-    /// </summary>
-    /// <param name="configuration">The configuration implementation.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddScalar(IApiScalarTypeConfiguration configuration)
+    /// <summary>Adds or configures a query source using a self-identifying configuration.</summary>
+    /// <param name="configuration">The query source configuration.</param>
+    /// <returns>The current schema builder.</returns>
+    public ApiSchemaBuilder AddQuerySource(IApiQuerySourceConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        return this.AddScalar(configuration.ClrType, configuration.Configure);
+        return this.AddQuerySource(configuration.ApiName, configuration.Configure);
     }
-
     #endregion
 
     #region AddRelationship Methods
@@ -245,6 +233,61 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
             configuration.ApiName,
             builder => configuration.Configure(builder)
         );
+    }
+    #endregion
+
+    #region AddScalar Methods
+    /// <summary>
+    ///     Adds a scalar type to the schema using an inline configuration action.
+    /// </summary>
+    /// <param name="clrType">The CLR scalar type.</param>
+    /// <param name="configure">Optional callback to configure the added scalar type.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddScalar(Type clrType, Action<ApiScalarTypeBuilder>? configure = null)
+    {
+        ArgumentNullException.ThrowIfNull(clrType);
+
+        var builder = _context.GetOrAddScalarTypeBuilder(clrType);
+
+        configure?.Invoke(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a scalar type to the schema using a self-identifying implementation of
+    ///     <see cref="IApiScalarTypeConfiguration"/>.
+    /// </summary>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddScalar(IApiScalarTypeConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        return this.AddScalar(configuration.ClrType, configuration.Configure);
+    }
+
+    #endregion
+
+    #region Internal Query Source Configuration Methods
+    /// <summary>Adds or configures a query source at the supplied precedence.</summary>
+    internal ApiSchemaBuilder AddQuerySourceCore
+    (
+        string apiName,
+        Action<ApiQuerySourceBuilder> configure,
+        ApiConfigurationSource source
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddQuerySourceBuilder(apiName, source);
+        _context.ApplyConfiguration
+        (
+            source,
+            () => builder.ApplyConfiguration(source, () => configure(builder))
+        );
+
+        return this;
     }
     #endregion
 
@@ -625,12 +668,13 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var apiName = _state.ApiName!;
         var apiVersion = _state.ApiVersion;
         var apiOptions = this.BuildOptions();
-
         var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
         var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
-        var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build()).ToArray();
-        this.RemoveDiscoveredNavigationProperties(apiRelationships);
         var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
+        var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build());
+        var apiQuerySources = _context.ApiQuerySourceBuilders.Select(b => b.Build());
+
+        this.RemoveDiscoveredNavigationProperties(apiRelationships);
 
         var apiSchema = new ApiSchema
         (
@@ -640,12 +684,13 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
             apiScalarTypes,
             apiEnumTypes,
             apiObjectTypes,
-            apiRelationships
+            apiRelationships,
+            apiQuerySources
         );
 
         // Add any extensions that were configured.
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             apiSchema.AttachExtensions(extensions);
         }
@@ -662,10 +707,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         {
             var ends = relationship switch
             {
-                ApiRelationshipOneTo oneTo =>
-                    new ApiRelationshipEnd[] { oneTo.ApiPrincipalEnd, oneTo.ApiDependentEnd },
-                ApiRelationshipManyToMany manyToMany =>
-                    [manyToMany.ApiPrincipalEndA, manyToMany.ApiPrincipalEndB],
+                ApiRelationshipOneTo oneTo => new ApiRelationshipEnd[] { oneTo.ApiPrincipalEnd, oneTo.ApiDependentEnd },
+                ApiRelationshipManyToMany manyToMany => [manyToMany.ApiPrincipalEndA, manyToMany.ApiPrincipalEndB],
                 _ => []
             };
 
@@ -680,18 +723,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
                 {
                     foreach (var objectBuilder in _context.ApiObjectTypeBuilders)
                     {
-                        if (end.ApiObjectTypeReference.ClrType == objectBuilder.ClrType ||
-                            (end.ApiObjectTypeReference.ApiName is { } apiName &&
-                                ApiNameComparer.Instance.Equals
-                                (
-                                    apiName,
-                                    objectBuilder.ConfiguredApiName
-                                )))
+                        var matchesClrType = end.ApiObjectTypeReference.ClrType == objectBuilder.ClrType;
+                        var matchesApiName = end.ApiObjectTypeReference.ApiName is { } apiName && ApiNameComparer.Instance.Equals(apiName, objectBuilder.ConfiguredApiName);
+
+                        if (matchesClrType || matchesApiName)
                         {
-                            objectBuilder.RemoveConventionPropertyByClrName
-                            (
-                                clrNavigationMember.ClrName
-                            );
+                            objectBuilder.RemoveConventionPropertyByClrName(clrNavigationMember.ClrName);
                         }
                     }
                 }

@@ -175,6 +175,28 @@ Whenever creating or modifying unit tests:
 
 `[Fact]` is prohibited for unit tests. If a test has only one case, express it as a `[Theory]` with one data row.
 
+### Serializable Theory Data and Test Factories
+
+Every concrete `XUnitTest` supplied through theory data must support JSON
+serialization and deserialization so test discovery and the test viewer can
+enumerate and execute individual cases.
+
+- Do not use `Func<...>` or `Action<...>` properties for case-specific test inputs.
+- Use `Expression<Func<...>>` or `Expression<Action<...>>` with the applicable
+  JSON converter from `Evoogle.XUnit.Json`.
+- Expressions must call public static methods on a factory class marked with
+  `[DynamicLinqType]` from `System.Linq.Dynamic.Core.CustomTypeProviders`.
+- Place the factory in a companion `<TestClass>.Factory.cs` file and keep
+  configuration callbacks and complex construction inside its methods.
+- Compile and invoke expressions during the appropriate Arrange or Act override.
+- Local delegates and callbacks inside factory methods are permitted; they are
+  not serialized theory-data properties.
+- Inspect existing factory-based tests before introducing this pattern, and
+  verify that affected theory rows survive an `XUnitTestSerializer` round trip.
+
+See `Tests/Evoogle.ApiFramework.Tests/Schema/Configuration/Query/ApiQuerySourceBuilderTests.cs`
+and its companion `ApiQuerySourceBuilderTests.Factory.cs` for an example.
+
 ### Human-Readable Unit-Test Output
 
 Every new or modified concrete `XUnitTest` must use `this.WriteLine` to expose the important properties of the
@@ -183,27 +205,40 @@ test case.
 - During Arrange, write the scenario, relevant inputs, member or API identity, expected result, and expected
   exception boundary.
 - During Act, write the actual result, success flag, resulting state, and captured exception details when applicable.
+- Organize output into logical chunks, such as scenario and identity, inputs, expectations, observed results,
+  and exception details. Separate chunks with a blank output line emitted by `this.WriteLine()`.
+- Within each chunk, use a two-column layout: a descriptive label followed by a colon in the left column,
+  and its value in the right column. Pad labels with spaces so every value in that chunk starts at the
+  same position. Keep the right column left-aligned; do not right-align values or numbers.
 - Prefer concise semantic output that helps a human understand a failure without reading the test implementation.
 - Do not print implementation-only state, secrets, or large payloads already emitted by a shared test base.
 - Theory data must remain the source of case-specific expectations; diagnostic output does not replace assertions.
 
-Follow this pattern, adapting the properties to the behavior under test:
+Follow this pattern, adapting the properties and logical chunks to the behavior under test:
 
 ```csharp
 protected override void Arrange()
 {
-    this.WriteLine($"Scenario:           {this.Scenario.SafeToString()}");
-    this.WriteLine($"CLR Member:         {this.ClrMemberName.SafeToString()}");
-    this.WriteLine($"Supplied Value:     {this.SuppliedValue.SafeToString()}");
+    this.WriteLine($"Scenario:   {this.Scenario.SafeToString()}");
+    this.WriteLine($"CLR Member: {this.ClrMemberName.SafeToString()}");
+    this.WriteLine();
+
+    this.WriteLine($"Supplied Value: {this.SuppliedValue.SafeToString()}");
+    this.WriteLine();
+
     this.WriteLine($"Expected Result:    {this.ExpectedValue.SafeToString()}");
+    this.WriteLine($"Expected Exception: {this.ExpectedExceptionType.SafeToString()}");
 }
 
 protected override void Act()
 {
     // Perform the operation.
 
-    this.WriteLine($"Actual Result:      {this.ActualValue.SafeToString()}");
-    this.WriteLine($"Resulting State:    {this.ResultingValue.SafeToString()}");
+    this.WriteLine();
+    this.WriteLine($"Actual Result:   {this.ActualValue.SafeToString()}");
+    this.WriteLine($"Resulting State: {this.ResultingValue.SafeToString()}");
+    this.WriteLine();
+
     this.WriteLine($"Captured Exception: {this.ActualException?.Message.SafeToString()}");
 }
 ```

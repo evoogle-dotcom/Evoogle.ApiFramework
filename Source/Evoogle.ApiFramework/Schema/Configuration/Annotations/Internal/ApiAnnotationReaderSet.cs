@@ -298,11 +298,11 @@ internal sealed class ApiAnnotationReaderSet
                                     {
                                         if ((modifiers & ApiTypeModifiers.Required) != 0)
                                         {
-                                            builder.Required();
+                                            builder.AsNonNullable();
                                         }
                                         else
                                         {
-                                            builder.Optional();
+                                            builder.AsNullable();
                                         }
                                     }
                                 );

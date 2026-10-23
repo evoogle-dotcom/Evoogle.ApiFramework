@@ -71,7 +71,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
     public ApiRelationshipAssociationBuilder WithForeignKeyA(Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyBuilderASource == null || source >= _state.ForeignKeyBuilderASource.Value)
+        if (source >= _state.ForeignKeyBuilderASource)
         {
             _state.ForeignKeyBuilderA ??= this.CreateForeignKeyBuilder();
             configure?.Invoke(_state.ForeignKeyBuilderA);
@@ -89,7 +89,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
     public ApiRelationshipAssociationBuilder WithForeignKeyB(Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyBuilderBSource == null || source >= _state.ForeignKeyBuilderBSource.Value)
+        if (source >= _state.ForeignKeyBuilderBSource)
         {
             _state.ForeignKeyBuilderB ??= this.CreateForeignKeyBuilder();
             configure?.Invoke(_state.ForeignKeyBuilderB);
@@ -122,7 +122,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyBuilderASource == null || source >= _state.ForeignKeyBuilderASource.Value)
+        if (source >= _state.ForeignKeyBuilderASource)
         {
             _state.ForeignKeyBuilderA = builder;
             _state.ForeignKeyBuilderASource = source;
@@ -137,7 +137,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyBuilderBSource == null || source >= _state.ForeignKeyBuilderBSource.Value)
+        if (source >= _state.ForeignKeyBuilderBSource)
         {
             _state.ForeignKeyBuilderB = builder;
             _state.ForeignKeyBuilderBSource = source;
@@ -155,12 +155,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
         if
         (
             builder._state.ForeignKeyBuilderA != null &&
-            builder._state.ForeignKeyBuilderASource != null &&
-            (
-                _state.ForeignKeyBuilderASource == null ||
-                builder._state.ForeignKeyBuilderASource.Value >=
-                    _state.ForeignKeyBuilderASource.Value
-            )
+            builder._state.ForeignKeyBuilderASource >= _state.ForeignKeyBuilderASource
         )
         {
             _state.ForeignKeyBuilderA = builder._state.ForeignKeyBuilderA;
@@ -170,12 +165,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
         if
         (
             builder._state.ForeignKeyBuilderB != null &&
-            builder._state.ForeignKeyBuilderBSource != null &&
-            (
-                _state.ForeignKeyBuilderBSource == null ||
-                builder._state.ForeignKeyBuilderBSource.Value >=
-                    _state.ForeignKeyBuilderBSource.Value
-            )
+            builder._state.ForeignKeyBuilderBSource >= _state.ForeignKeyBuilderBSource
         )
         {
             _state.ForeignKeyBuilderB = builder._state.ForeignKeyBuilderB;
@@ -203,7 +193,7 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
             : new ApiRelationshipAssociation(_apiObjectTypeReference);
 
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             apiRelationshipAssociation.AttachExtensions(extensions);
         }

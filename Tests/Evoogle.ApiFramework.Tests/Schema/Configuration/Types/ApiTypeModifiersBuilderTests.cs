@@ -14,8 +14,8 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
     private class BuildTest : XUnitTest
     {
         #region User Supplied Properties
-        public bool? UseRequired { get; init; }
-        public bool? UseOptional { get; init; }
+        public bool? UsesNonNullable { get; init; }
+        public bool? UsesNullable { get; init; }
         public ApiTypeModifiers Expected { get; init; }
         #endregion
 
@@ -26,8 +26,10 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"UseRequired: {this.UseRequired}");
-            this.WriteLine($"UseOptional: {this.UseOptional}");
+            this.WriteLine($"Scenario: {this.Name}");
+            this.WriteLine();
+            this.WriteLine($"Uses Non-Nullable: {this.UsesNonNullable}");
+            this.WriteLine($"Uses Nullable:     {this.UsesNullable}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.Expected}");
         }
@@ -35,16 +37,17 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
         protected override void Act()
         {
             var builder = new ApiTypeModifiersBuilder();
-            if (this.UseRequired == true)
+            if (this.UsesNonNullable == true)
             {
-                builder.Required();
+                builder.AsNonNullable();
             }
-            if (this.UseOptional == true)
+            if (this.UsesNullable == true)
             {
-                builder.Optional();
+                builder.AsNullable();
             }
             this.Actual = builder.Build();
-            this.WriteLine($"Actual:   {this.Actual}");
+            this.WriteLine();
+            this.WriteLine($"Actual: {this.Actual}");
         }
 
         protected override void Assert() => this.Actual.Should().Be(this.Expected);
@@ -61,15 +64,15 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
         },
         new BuildTest
         {
-            Name = "UseRequired sets flag",
-            UseRequired = true,
+            Name = "AsNonNullable sets the Required flag",
+            UsesNonNullable = true,
             Expected = ApiTypeModifiers.Required
         },
         new BuildTest
         {
-            Name = "UseOptional clears flag",
-            UseRequired = true,
-            UseOptional = true,
+            Name = "AsNullable clears the Required flag",
+            UsesNonNullable = true,
+            UsesNullable = true,
             Expected = ApiTypeModifiers.None
         }
     ];

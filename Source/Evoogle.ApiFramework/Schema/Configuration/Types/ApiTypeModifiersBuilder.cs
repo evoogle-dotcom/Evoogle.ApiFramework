@@ -19,20 +19,20 @@ public sealed class ApiTypeModifiersBuilder(ApiTypeModifiers modifiers = ApiType
 
     #region Builder Methods
     /// <summary>
-    ///     Marks the API type as required.
+    ///     Marks the API type as non-nullable.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiTypeModifiersBuilder Required()
+    public ApiTypeModifiersBuilder AsNonNullable()
     {
         _state.Modifiers |= ApiTypeModifiers.Required;
         return this;
     }
 
     /// <summary>
-    ///     Marks the API type as optional.
+    ///     Marks the API type as nullable.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiTypeModifiersBuilder Optional()
+    public ApiTypeModifiersBuilder AsNullable()
     {
         _state.Modifiers &= ~ApiTypeModifiers.Required;
         return this;

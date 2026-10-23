@@ -67,8 +67,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         (
             _endsState.PrincipalEndA != null &&
             _endsState.PrincipalEndA.ApiObjectTypeReference == apiPrincipalTypeReference &&
-            _endsState.PrincipalEndASource != null &&
-            source < _endsState.PrincipalEndASource.Value
+            source < _endsState.PrincipalEndASource
         )
         {
             if (configure != null)
@@ -83,7 +82,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
             return this;
         }
 
-        if (_endsState.PrincipalEndASource != null && source < _endsState.PrincipalEndASource.Value)
+        if (source < _endsState.PrincipalEndASource)
         {
             return this;
         }
@@ -160,8 +159,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         (
             _endsState.PrincipalEndB != null &&
             _endsState.PrincipalEndB.ApiObjectTypeReference == apiPrincipalTypeReference &&
-            _endsState.PrincipalEndBSource != null &&
-            source < _endsState.PrincipalEndBSource.Value
+            source < _endsState.PrincipalEndBSource
         )
         {
             if (configure != null)
@@ -176,7 +174,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
             return this;
         }
 
-        if (_endsState.PrincipalEndBSource != null && source < _endsState.PrincipalEndBSource.Value)
+        if (source < _endsState.PrincipalEndBSource)
         {
             return this;
         }
@@ -262,7 +260,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
                 _endsState.Association.ApplyConfiguration(source, () => configure(_endsState.Association));
             }
 
-            if (_endsState.AssociationSource == null || source >= _endsState.AssociationSource.Value)
+            if (source >= _endsState.AssociationSource)
             {
                 _endsState.AssociationSource = source;
             }
@@ -274,8 +272,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         (
             _endsState.Association != null &&
             _endsState.Association.ApiObjectTypeReference == apiAssociationTypeReference &&
-            _endsState.AssociationSource != null &&
-            source < _endsState.AssociationSource.Value
+            source < _endsState.AssociationSource
         )
         {
             if (configure != null)
@@ -290,7 +287,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
             return this;
         }
 
-        if (_endsState.AssociationSource != null && source < _endsState.AssociationSource.Value)
+        if (source < _endsState.AssociationSource)
         {
             return this;
         }
@@ -341,7 +338,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         );
 
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             relationship.AttachExtensions(extensions);
         }
@@ -363,15 +360,14 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         (
             _endsState.Association != null &&
             _endsState.Association.ApiObjectTypeReference == builder.ApiObjectTypeReference &&
-            _endsState.AssociationSource != null &&
-            source < _endsState.AssociationSource.Value
+            source < _endsState.AssociationSource
         )
         {
             _endsState.Association.MergeConfigurationFrom(builder);
             return this;
         }
 
-        if (_endsState.AssociationSource == null || source >= _endsState.AssociationSource.Value)
+        if (source >= _endsState.AssociationSource)
         {
             _endsState.Association = builder;
             _endsState.AssociationSource = source;

@@ -155,7 +155,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.KeyOneScalarPart, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -287,7 +288,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.KeyOneScalarPart, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -444,7 +446,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.KeyTwoScalarPartComposite, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -638,7 +641,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.KeyThreeScalarPartComposite, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -854,7 +858,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.KeyNestedComposite, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -1186,7 +1191,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -2039,7 +2045,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.KeyTwoScalarPartComposite, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },

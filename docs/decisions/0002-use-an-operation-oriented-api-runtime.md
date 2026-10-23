@@ -94,6 +94,37 @@ exists.
 
 ### Operation model
 
+#### Query source declarations and binding
+
+On 2026-10-17, the schema naming family was settled as `ApiQuerySource` and
+`ApiQuerySourceParameter`, without a `Definition` suffix. A compiled `ApiQuery` binds to a
+source; source metadata does not itself materialize an operation. Authored parameter bindings,
+expressions, and projection contribute to the compiled query. Operation-owned `ApiQueryParameter`
+declarations are separate from schema-owned source parameters, with shared semantics but no common
+public base type or shared parameter implementation initially. A source input may bind to a literal
+or an operation parameter; the two parameter families do not imply a one-to-one correspondence.
+
+Query-source metadata lives in `Schema/Query`, builders in `Schema/Configuration/Query`, and
+converters in the existing `Schema/Json` area. Sources own their parameter declarations and any
+inline type declarations; references to registered schema types remain non-owning. Schema root
+lookups use ordinal, case-sensitive source names. Source parameter names are unique within a source.
+
+`ApiQuerySource` presents its constructor parameters and properties in input-to-output order after
+`ApiName`: `ApiInputParameters`, `ApiOutputType`, `ApiOutputTypeModifiers`, and `ApiOutputComposition`.
+The JSON representation follows the same naming and ordering. `ApiInputParameters` owns the input
+declarations; `ApiOutputType` and `ApiOutputTypeModifiers` describe output type and nullability.
+Each parameter declares `ApiType`, `ApiTypeModifiers`, and `ApiRequiresArgument`; argument presence
+and nullability are independent. Defaults are deferred. `ApiOutputComposition` uses
+`ApiQueryComposition` flags for projection, filtering, ordering, and offset pagination; the last
+three require collection output. Declaring permission does not implement execution support.
+
+The `CustomerById` source accepts a supplied, non-null `Int32` argument named `id`, produces a
+nullable `Customer`, and permits projection. The source has no repository, key lookup mapping,
+or execution delegate; those belong to a later service binding. Future operation compilation
+will enforce source composition permissions and bind authored inputs to these declarations.
+
+#### Compiled operations
+
 `ApiOperation` is the immutable, normalized, schema-bound canonical IR produced by operation
 compilation. Mutable authoring state is separate.
 

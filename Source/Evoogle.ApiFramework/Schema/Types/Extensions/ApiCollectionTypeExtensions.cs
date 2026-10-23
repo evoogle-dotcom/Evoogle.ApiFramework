@@ -12,21 +12,23 @@ public static class ApiCollectionTypeExtensions
 {
     #region Extension Methods
     /// <summary>
-    ///     Determines whether the items in the <see cref="ApiCollectionType"/> are required.
+    ///     Determines whether the items in the <see cref="ApiCollectionType"/> are non-nullable.
     /// </summary>
     /// <param name="apiCollectionType">The <see cref="ApiCollectionType"/> instance.</param>
     /// <returns>
     ///     <c>true</c> if the <see cref="ApiCollectionType.ApiItemTypeModifiers"/> has the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
     /// </returns>
-    public static bool IsItemRequired(this ApiCollectionType apiCollectionType) => apiCollectionType.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    public static bool IsItemNonNullable(this ApiCollectionType apiCollectionType)
+        => apiCollectionType.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
     /// <summary>
-    ///     Determines whether the items in the <see cref="ApiCollectionType"/> are optional.
+    ///     Determines whether the items in the <see cref="ApiCollectionType"/> are nullable.
     /// </summary>
     /// <param name="apiCollectionType">The <see cref="ApiCollectionType"/> instance.</param>
     /// <returns>
     ///     <c>true</c> if the <see cref="ApiCollectionType.ApiItemTypeModifiers"/> does not have the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
     /// </returns>
-    public static bool IsItemOptional(this ApiCollectionType apiCollectionType) => !apiCollectionType.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    public static bool IsItemNullable(this ApiCollectionType apiCollectionType)
+        => !apiCollectionType.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
     #endregion
 }

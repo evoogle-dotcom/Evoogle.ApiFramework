@@ -262,7 +262,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         var path = new ApiKeyPath(_state.ApiRootObjectTypeReference, segments);
 
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             path.AttachExtensions(extensions);
         }

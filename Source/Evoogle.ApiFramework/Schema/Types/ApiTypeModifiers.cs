@@ -6,7 +6,7 @@
 namespace Evoogle.ApiFramework.Schema.Types;
 
 /// <summary>
-///     Represents modifiers that affect the behavior or constraints of an API type (e.g., required/optional).
+///     Represents modifiers that affect the behavior or constraints of an API type (e.g., nullability).
 /// </summary>
 [Flags]
 public enum ApiTypeModifiers
@@ -15,7 +15,7 @@ public enum ApiTypeModifiers
     /// <summary>Represents that the API type has no modifiers.</summary>
     None = 0,
 
-    /// <summary>Represents the API instance (of API type) is required and will always be non-null.</summary>
+    /// <summary>Specifies that an API value must be non-null; does not require its presence in an input.</summary>
     Required = 1,
     #endregion
 }

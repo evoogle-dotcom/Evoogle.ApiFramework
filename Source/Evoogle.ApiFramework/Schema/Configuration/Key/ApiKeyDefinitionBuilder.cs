@@ -201,11 +201,13 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
     /// <summary>Gets the API name currently configured on this key definition builder.</summary>
     internal string? ApiName => _state.ApiName;
 
+    /// <summary>Gets the highest source supplied when registering this key, initially convention precedence.</summary>
     internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
 
+    /// <summary>Retains the highest source supplied when creating or reusing the key registration.</summary>
     internal void SetRegistrationSource(ApiConfigurationSource source)
     {
-        if (source > _state.RegistrationSource)
+        if (source >= _state.RegistrationSource)
         {
             _state.RegistrationSource = source;
         }
@@ -294,7 +296,7 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
         ArgumentNullException.ThrowIfNull(keyDefinition);
 
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             keyDefinition.AttachExtensions(extensions);
         }

@@ -19,8 +19,8 @@ internal sealed class ApiRelationshipAssociationState
 
     internal ApiKeyDefinitionBuilder? ForeignKeyBuilderB { get; set; }
 
-    internal ApiConfigurationSource? ForeignKeyBuilderASource { get; set; }
+    internal ApiConfigurationSource ForeignKeyBuilderASource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal ApiConfigurationSource? ForeignKeyBuilderBSource { get; set; }
+    internal ApiConfigurationSource ForeignKeyBuilderBSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

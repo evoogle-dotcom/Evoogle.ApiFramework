@@ -22,12 +22,12 @@ internal sealed class ApiRelationshipEndsState
 
     internal ApiRelationshipAssociationBuilder? Association { get; set; }
 
-    internal ApiConfigurationSource? AssociationSource { get; set; }
+    internal ApiConfigurationSource AssociationSource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal ApiConfigurationSource? PrincipalEndASource { get; set; }
+    internal ApiConfigurationSource PrincipalEndASource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal ApiConfigurationSource? PrincipalEndBSource { get; set; }
+    internal ApiConfigurationSource PrincipalEndBSource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal ApiConfigurationSource? DependentEndSource { get; set; }
+    internal ApiConfigurationSource DependentEndSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

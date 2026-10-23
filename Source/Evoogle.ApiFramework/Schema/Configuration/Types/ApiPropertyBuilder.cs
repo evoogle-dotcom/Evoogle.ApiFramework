@@ -65,8 +65,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     internal bool IsConventionOnly => this.IsConventionDiscovered &&
         _state.ApiNameSource == ApiConfigurationSource.Convention &&
-        (_state.ModifiersSource is null ||
-            _state.ModifiersSource == ApiConfigurationSource.Convention) &&
+        _state.ModifiersSource == ApiConfigurationSource.Convention &&
         this.BuildExtensions() is null;
     #endregion
 
@@ -202,7 +201,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     private ApiPropertyBuilder SetModifiers(Action<ApiTypeModifiersBuilder> configure, ApiConfigurationSource source)
     {
-        if (_state.ModifiersSource == null || source >= _state.ModifiersSource.Value)
+        if (source >= _state.ModifiersSource)
         {
             _state.Modifiers = configure;
             _state.ModifiersSource = source;
@@ -226,7 +225,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
         var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrValueMember);
 
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             apiProperty.AttachExtensions(extensions);
         }

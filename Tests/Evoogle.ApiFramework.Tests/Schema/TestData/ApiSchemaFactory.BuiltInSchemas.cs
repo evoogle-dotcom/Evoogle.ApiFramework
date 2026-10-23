@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.ApiFramework.TestData;
 
@@ -122,8 +123,48 @@ public static partial class ApiSchemaFactory
         public static ApiTypeExpression ListOf<TClr>(bool required) => ApiTypeExpression.ListOf<TClr>(required ? ApiTypeModifiers.Required : ApiTypeModifiers.None);
     }
 
-    // Relationship Presets
+    // Query Source Presets
+    private static ApiQuerySource QS
+    (
+        string name,
+        IEnumerable<ApiQuerySourceParameter>? inputParameters,
+        ApiTypeExpression outputTypeExpression,
+        ApiTypeModifiers outputTypeModifiers = ApiTypeModifiers.None,
+        ApiQueryComposition outputComposition = ApiQueryComposition.None,
+        OrderedDictionary<Type, object>? extensions = null
+    ) => WithExtensions
+    (
+        new ApiQuerySource
+        (
+            name,
+            inputParameters,
+            outputTypeExpression,
+            outputTypeModifiers,
+            outputComposition
+        ),
+        extensions
+    );
 
+    private static ApiQuerySourceParameter QSP
+    (
+        string name,
+        ApiTypeExpression typeExpression,
+        ApiTypeModifiers typeModifiers = ApiTypeModifiers.Required,
+        bool requiresArgument = true,
+        OrderedDictionary<Type, object>? extensions = null
+    ) => WithExtensions
+    (
+        new ApiQuerySourceParameter
+        (
+            name,
+            typeExpression,
+            typeModifiers,
+            requiresArgument
+        ),
+        extensions
+    );
+
+    // Relationship Presets
     private static ApiRelationshipOneToMany R1M(string name, ApiRelationshipPrincipalEnd principal, ApiRelationshipDependentEnd dependent, ApiRelationshipDeleteBehavior deleteBehavior = ApiRelationshipOneToMany.DefaultDeleteBehavior)
         => new(name, principal, dependent, deleteBehavior);
 
@@ -503,7 +544,100 @@ public static partial class ApiSchemaFactory
             categoryToCategory, categoryToDigitalProduct, categoryToPhysicalProduct, digitalProductToTag, physicalProductToTag
         };
 
-        // 7) Assemble schema
+        // 7) Query Sources
+        var querySources = new List<ApiQuerySource>
+        {
+            QS
+            (
+                name: "CountOrders",
+                inputParameters: [],
+                outputTypeExpression: TE.ClrRef<int>(),
+                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputComposition: ApiQueryComposition.None
+            ),
+            QS
+            (
+                name: "GetCustomerById",
+                inputParameters:
+                [
+                    QSP
+                    (
+                        name: "id",
+                        typeExpression: TE.ClrRef<Ulid>(),
+                        typeModifiers: ApiTypeModifiers.Required,
+                        requiresArgument: true
+                    )
+                ],
+                outputTypeExpression: TE.ClrRef<Customer>(),
+                outputTypeModifiers: ApiTypeModifiers.None,
+                outputComposition: ApiQueryComposition.Projection
+            ),
+            QS
+            (
+                name: "GetOrderTotal",
+                inputParameters:
+                [
+                    QSP
+                    (
+                        name: "orderId",
+                        typeExpression: TE.ClrRef<Ulid>(),
+                        typeModifiers: ApiTypeModifiers.Required,
+                        requiresArgument: true
+                    )
+                ],
+                outputTypeExpression: TE.ClrRef<Money>(),
+                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputComposition: ApiQueryComposition.None
+            ),
+            QS
+            (
+                name: "ListCategories",
+                inputParameters: [],
+                outputTypeExpression: TE.ListOf<Category>(required: true),
+                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputComposition: ApiQueryComposition.Filtering | ApiQueryComposition.Ordering
+            ),
+            QS
+            (
+                name: "SearchCustomers",
+                inputParameters:
+                [
+                    QSP(name: "name", typeExpression: TE.ClrRef<string>()),
+                    QSP
+                    (
+                        name: "status",
+                        typeExpression: TE.ClrRef<OrderStatus>(),
+                        typeModifiers: ApiTypeModifiers.Required,
+                        requiresArgument: true
+                    )
+                ],
+                outputTypeExpression: TE.ListOf<Customer>(required: true),
+                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputComposition:
+                    ApiQueryComposition.Projection
+                    | ApiQueryComposition.Filtering
+                    | ApiQueryComposition.Ordering
+                    | ApiQueryComposition.OffsetPagination
+            ),
+            QS
+            (
+                name: "SearchOrders",
+                inputParameters:
+                [
+                    QSP(name: "status", typeExpression: TE.ClrRef<OrderStatus>()),
+                    QSP(name: "minimumTotal", typeExpression: TE.ClrRef<decimal>())
+                ],
+                outputTypeExpression: TE.ListOf<Order>(required: true),
+                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputComposition:
+                    ApiQueryComposition.Projection
+                    | ApiQueryComposition.Filtering
+                    | ApiQueryComposition.Ordering
+                    | ApiQueryComposition.OffsetPagination
+            )
+        };
+
+        // 8) Assemble schema
         var schema = CreateFrozenSchema
         (
             apiName: name,
@@ -512,7 +646,8 @@ public static partial class ApiSchemaFactory
             apiScalarTypes: scalars,
             apiEnumTypes: enums,
             apiObjectTypes: objects,
-            apiRelationships: relationships
+            apiRelationships: relationships,
+            apiQuerySources: querySources
         );
 
         return schema;

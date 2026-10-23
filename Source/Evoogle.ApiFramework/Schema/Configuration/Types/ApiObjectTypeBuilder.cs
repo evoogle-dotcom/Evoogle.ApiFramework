@@ -205,6 +205,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             ? _state.KeyBuilders.Select(b => b.BuildNamed())
             : null;
 
+        var apiCanonicalKeyName = _state.CanonicalKeyName;
+
         var apiVersionDefinition = _state.VersionBuilder?.Build();
 
         var apiObjectType = new ApiObjectType
@@ -213,14 +215,14 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             apiOptions,
             apiProperties,
             apiKeys,
-            _state.CanonicalKeyName,
+            apiCanonicalKeyName,
             apiVersionDefinition,
             clrObjectType
         );
 
         // Add any extensions that were configured.
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             apiObjectType.AttachExtensions(extensions);
         }
@@ -248,6 +250,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     protected void AddKeyBuilderCore(ApiKeyDefinitionBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        builder.SetRegistrationSource(this.Context.CurrentConfigurationSource);
         _state.KeyBuilders.Add(builder);
     }
 
@@ -272,6 +275,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             ApiNameComparer.Instance.Equals(builder.ApiName, apiName));
         if (existing != null)
         {
+            existing.SetRegistrationSource(registrationSource);
             return existing;
         }
 
@@ -385,6 +389,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             ApiNameComparer.Instance.Equals(b.ApiName, apiKeyName));
         if (existing != null)
         {
+            existing.SetRegistrationSource(this.Context.CurrentConfigurationSource);
+
             // Guard against convention + annotation both adding the same path.
             var apiRootObjectTypeReference = clrRootType == this.ClrType
                 ? null

@@ -414,7 +414,8 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
             apiScalarTypes: [new ApiScalarType(apiName: "Int64", clrScalarType: typeof(long))],
             apiEnumTypes: null,
             apiObjectTypes: kind == ApiRelationshipKind.ManyToMany ? [source, target, CreateObjectType(apiName: "Association", clrType: typeof(Association))] : [source, target],
-            apiRelationships: [relationship]
+            apiRelationships: [relationship],
+            apiQuerySources: null
         );
     }
 
@@ -497,7 +498,8 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
             apiScalarTypes: [new ApiScalarType(apiName: "Int64", clrScalarType: typeof(long))],
             apiEnumTypes: null,
             apiObjectTypes: [source, CreateObjectType(apiName: "Target", clrType: typeof(Target))],
-            apiRelationships: relationships
+            apiRelationships: relationships,
+            apiQuerySources: null
         );
     }
 

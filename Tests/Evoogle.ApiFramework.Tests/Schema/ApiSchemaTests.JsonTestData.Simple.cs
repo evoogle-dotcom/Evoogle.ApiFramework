@@ -39,7 +39,8 @@ public partial class ApiSchemaTests
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -62,7 +63,8 @@ public partial class ApiSchemaTests
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -99,7 +101,8 @@ public partial class ApiSchemaTests
                 ],
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -137,7 +140,8 @@ public partial class ApiSchemaTests
                 ],
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -176,6 +180,7 @@ public partial class ApiSchemaTests
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
                 "ApiRelationships": [],
+                "ApiQuerySources": [],
                 "Extensions": {
                     "Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests": {
                         "Count": 42
@@ -227,7 +232,8 @@ public partial class ApiSchemaTests
                 ],
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -284,7 +290,8 @@ public partial class ApiSchemaTests
                 ],
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -343,6 +350,7 @@ public partial class ApiSchemaTests
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
                 "ApiRelationships": [],
+                "ApiQuerySources": [],
                 "Extensions": {
                     "Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests": {
                         "Count": 42
@@ -404,7 +412,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 "ApiObjectTypes": [],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -460,6 +469,7 @@ public partial class ApiSchemaTests
                 ],
                 "ApiObjectTypes": [],
                 "ApiRelationships": [],
+                "ApiQuerySources": [],
                 "Extensions": {
                     "Evoogle.ApiFramework.TestData.ProtobufExtension, Evoogle.ApiFramework.Tests": {
                         "Edition": 2024
@@ -745,7 +755,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -1028,6 +1039,7 @@ public partial class ApiSchemaTests
                     }
                 ],
                 "ApiRelationships": [],
+                "ApiQuerySources": [],
                 "Extensions": {
                     "Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests": {
                         "Count": 42
@@ -1465,7 +1477,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },

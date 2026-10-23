@@ -44,18 +44,17 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
 
         #region Factory Methods
-        public static PropertyNames Create(JsonNamingPolicy policy)
-            => new()
+        public static PropertyNames Create(JsonNamingPolicy policy) => new()
+        {
+            ApiProperty = new ApiPropertyPropertyNames
             {
-                ApiProperty = new ApiPropertyPropertyNames
-                {
-                    ApiName = policy.ConvertName(nameof(Types.ApiProperty.ApiName)),
-                    ApiTypeExpression = policy.ConvertName(nameof(Types.ApiProperty.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
-                    ApiTypeModifiers = policy.ConvertName(nameof(Types.ApiProperty.ApiTypeModifiers)),
-                    ClrValueMember = policy.ConvertName(nameof(Types.ApiProperty.ClrValueMember)),
-                },
-                ExtensibleBase = GetExtensiblePropertyNames(policy),
-            };
+                ApiName = policy.ConvertName(nameof(Types.ApiProperty.ApiName)),
+                ApiTypeExpression = policy.ConvertName(nameof(Types.ApiProperty.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
+                ApiTypeModifiers = policy.ConvertName(nameof(Types.ApiProperty.ApiTypeModifiers)),
+                ClrValueMember = policy.ConvertName(nameof(Types.ApiProperty.ClrValueMember)),
+            },
+            ExtensibleBase = GetExtensiblePropertyNames(policy),
+        };
         #endregion
     }
     #endregion

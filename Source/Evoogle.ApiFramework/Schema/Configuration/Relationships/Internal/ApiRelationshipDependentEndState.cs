@@ -17,6 +17,6 @@ internal sealed class ApiRelationshipDependentEndState
     #region Properties
     internal ApiKeyDefinitionBuilder? ForeignKeyBuilder { get; set; }
 
-    internal ApiConfigurationSource? ForeignKeyBuilderSource { get; set; }
+    internal ApiConfigurationSource ForeignKeyBuilderSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

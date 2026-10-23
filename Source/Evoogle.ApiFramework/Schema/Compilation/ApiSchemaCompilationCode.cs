@@ -318,6 +318,56 @@ public enum ApiSchemaCompilationCode
     ApiPropertyReferenceInvalidForm,
     #endregion
 
+    #region ApiQuerySource Compilation Codes
+    /// <summary>
+    ///     The query source has an invalid API name.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_API_NAME")]
+    ApiQuerySourceInvalidApiName,
+
+    /// <summary>
+    ///     Multiple parameters of one source have the same API name.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_DUPLICATE_PARAMETER_API_NAME")]
+    ApiQuerySourceDuplicateParameterApiName,
+
+    /// <summary>
+    ///     The query source output type is missing or unresolved.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_UNRESOLVED_OUTPUT_TYPE")]
+    ApiQuerySourceUnresolvedOutputType,
+
+    /// <summary>
+    ///     The query source output type modifiers are invalid.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_OUTPUT_TYPE_MODIFIERS")]
+    ApiQuerySourceInvalidOutputTypeModifiers,
+
+    /// <summary>
+    ///     The allowed composition is invalid or incompatible with the output type.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_COMPOSITION")]
+    ApiQuerySourceInvalidComposition,
+
+    /// <summary>
+    ///     The query source parameter has an invalid API name.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_API_NAME")]
+    ApiQuerySourceParameterInvalidApiName,
+
+    /// <summary>
+    ///     The query source parameter type is missing or unresolved.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_UNRESOLVED_TYPE")]
+    ApiQuerySourceParameterUnresolvedType,
+
+    /// <summary>
+    ///     The query source parameter type modifiers are invalid.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_TYPE_MODIFIERS")]
+    ApiQuerySourceParameterInvalidTypeModifiers,
+    #endregion
+
     #region ApiRelationship Compilation Codes
     /// <summary>
     ///     The relationship's API name is null, empty, or whitespace.
@@ -499,6 +549,12 @@ public enum ApiSchemaCompilationCode
     /// </summary>
     [EnumMember(Value = "API_SCHEMA_DUPLICATE_OBJECT_TYPE_CLR_TYPE")]
     ApiSchemaDuplicateObjectTypeClrType,
+
+    /// <summary>
+    ///     Multiple query sources have the same API name.
+    /// </summary>
+    [EnumMember(Value = "API_SCHEMA_DUPLICATE_QUERY_SOURCE_API_NAME")]
+    ApiSchemaDuplicateQuerySourceApiName,
 
     /// <summary>
     ///     Multiple relationships have the same API name.

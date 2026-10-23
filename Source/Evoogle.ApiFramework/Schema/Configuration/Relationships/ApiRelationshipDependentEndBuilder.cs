@@ -29,7 +29,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
         throw new ArgumentNullException(nameof(apiObjectTypeReference));
     private readonly ApiRelationshipDependentEndState _state = new();
     private ApiRelationshipTraversalState? _traversalState;
-    private ApiConfigurationSource? _traversalSource;
+    private ApiConfigurationSource _traversalSource = ApiConfigurationSource.Convention;
     #endregion
 
     #region Properties
@@ -105,7 +105,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
         var source = this.CurrentConfigurationSource;
-        if (_traversalSource is null || source >= _traversalSource.Value)
+        if (source >= _traversalSource)
         {
             _traversalState = new ApiRelationshipTraversalState(apiName, clrNavigationMember);
             _traversalSource = source;
@@ -123,7 +123,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     public ApiRelationshipDependentEndBuilder WithForeignKey(Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyBuilderSource == null || source >= _state.ForeignKeyBuilderSource.Value)
+        if (source >= _state.ForeignKeyBuilderSource)
         {
             _state.ForeignKeyBuilder ??= this.CreateForeignKeyBuilder();
             configure?.Invoke(_state.ForeignKeyBuilder);
@@ -156,7 +156,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyBuilderSource == null || source >= _state.ForeignKeyBuilderSource.Value)
+        if (source >= _state.ForeignKeyBuilderSource)
         {
             _state.ForeignKeyBuilder = builder;
             _state.ForeignKeyBuilderSource = source;
@@ -171,8 +171,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        if (builder._traversalState is not null && builder._traversalSource is not null &&
-            (_traversalSource is null || builder._traversalSource.Value >= _traversalSource.Value))
+        if (builder._traversalState is not null && builder._traversalSource >= _traversalSource)
         {
             _traversalState = builder._traversalState;
             _traversalSource = builder._traversalSource;
@@ -181,11 +180,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
         if
         (
             builder._state.ForeignKeyBuilder != null &&
-            builder._state.ForeignKeyBuilderSource != null &&
-            (
-                _state.ForeignKeyBuilderSource == null ||
-                builder._state.ForeignKeyBuilderSource.Value >= _state.ForeignKeyBuilderSource.Value
-            )
+            builder._state.ForeignKeyBuilderSource >= _state.ForeignKeyBuilderSource
         )
         {
             _state.ForeignKeyBuilder = builder._state.ForeignKeyBuilder;
@@ -215,7 +210,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
         );
 
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             end.AttachExtensions(extensions);
         }

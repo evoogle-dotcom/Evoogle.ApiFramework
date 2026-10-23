@@ -14,6 +14,7 @@ using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.ApiFramework.Schema.Key;
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Extensions;
@@ -49,6 +50,8 @@ public sealed class ApiSchema : ApiSchemaElement
 
     private FrozenDictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
 
+    private FrozenDictionary<string, ApiQuerySource>? _apiQuerySourceApiNameLookup = null;
+
     private int _compilationState;
     #endregion
 
@@ -77,6 +80,9 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <summary>Gets the immutable snapshot of relationships declared within this schema.</summary>
     public ImmutableArray<ApiRelationship> ApiRelationships { get; }
 
+    /// <summary>Gets the named query sources explicitly declared by this schema.</summary>
+    public ImmutableArray<ApiQuerySource> ApiQuerySources { get; }
+
     private FrozenDictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.RequireValue(_apiNamedTypeApiNameLookup);
     private FrozenDictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.RequireValue(_apiNamedTypeClrTypeLookup);
 
@@ -91,6 +97,7 @@ public sealed class ApiSchema : ApiSchemaElement
 
     private FrozenDictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.RequireValue(_apiRelationshipApiNameLookup);
 
+    private FrozenDictionary<string, ApiQuerySource> ApiQuerySourceApiNameLookup => this.RequireValue(_apiQuerySourceApiNameLookup);
     #endregion
 
     #region Constructors
@@ -104,6 +111,7 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <param name="apiEnumTypes">The collection of enum types to include in the API schema.</param>
     /// <param name="apiObjectTypes">The collection of object types to include in the API schema.</param>
     /// <param name="apiRelationships">The collection of relationships to include in the API schema.</param>
+    /// <param name="apiQuerySources">The collection of query sources to include in the API schema.</param>
     internal ApiSchema
     (
         string apiName,
@@ -112,7 +120,8 @@ public sealed class ApiSchema : ApiSchemaElement
         IEnumerable<ApiScalarType>? apiScalarTypes,
         IEnumerable<ApiEnumType>? apiEnumTypes,
         IEnumerable<ApiObjectType>? apiObjectTypes,
-        IEnumerable<ApiRelationship>? apiRelationships
+        IEnumerable<ApiRelationship>? apiRelationships,
+        IEnumerable<ApiQuerySource>? apiQuerySources
     )
     {
         // Compile the API name.
@@ -137,6 +146,9 @@ public sealed class ApiSchema : ApiSchemaElement
 
         // Compile the collection of API relationships.
         this.ApiRelationships = [.. apiRelationships.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
+
+        // Compile the collection of API query sources.
+        this.ApiQuerySources = [.. apiQuerySources.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
     }
 
     /// <summary>
@@ -147,15 +159,26 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <param name="apiOptions">The options used to configure this API schema. If null, the default options are used.</param>
     /// <param name="apiNamedTypes">The collection of API named types to include in the API schema.</param>
     /// <param name="apiRelationships">The optional collection of relationships to include in the API schema.</param>
+    /// <param name="apiQuerySources">The collection of query sources to include in the API schema.</param>
     internal ApiSchema
     (
         string apiName,
         string? apiVersion,
         ApiSchemaOptions? apiOptions,
         IEnumerable<ApiNamedType>? apiNamedTypes,
-        IEnumerable<ApiRelationship>? apiRelationships
+        IEnumerable<ApiRelationship>? apiRelationships,
+        IEnumerable<ApiQuerySource>? apiQuerySources
+    ) : this
+    (
+        apiName,
+        apiVersion,
+        apiOptions,
+        apiNamedTypes?.OfType<ApiScalarType>(),
+        apiNamedTypes?.OfType<ApiEnumType>(),
+        apiNamedTypes?.OfType<ApiObjectType>(),
+        apiRelationships,
+        apiQuerySources
     )
-        : this(apiName, apiVersion, apiOptions, apiNamedTypes?.OfType<ApiScalarType>(), apiNamedTypes?.OfType<ApiEnumType>(), apiNamedTypes?.OfType<ApiObjectType>(), apiRelationships)
     { }
     #endregion
 
@@ -178,9 +201,10 @@ public sealed class ApiSchema : ApiSchemaElement
         var apiEnumTypesCount = this.ApiEnumTypes.Length.SafeToString();
         var apiObjectTypesCount = this.ApiObjectTypes.Length.SafeToString();
         var apiRelationshipsCount = this.ApiRelationships.Length.SafeToString();
+        var apiQuerySourcesCount = this.ApiQuerySources.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiSchema)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiVersion)}={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ApiScalarTypes)}Count={apiScalarTypesCount}, {nameof(this.ApiEnumTypes)}Count={apiEnumTypesCount}, {nameof(this.ApiObjectTypes)}Count={apiObjectTypesCount}, {nameof(this.ApiRelationships)}Count={apiRelationshipsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiSchema)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiVersion)}={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ApiScalarTypes)}Count={apiScalarTypesCount}, {nameof(this.ApiEnumTypes)}Count={apiEnumTypesCount}, {nameof(this.ApiObjectTypes)}Count={apiObjectTypesCount}, {nameof(this.ApiRelationships)}Count={apiRelationshipsCount}, {nameof(this.ApiQuerySources)}Count={apiQuerySourcesCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -239,6 +263,11 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <returns><see langword="true"/> if a relationship with the given API name was found; otherwise <see langword="false"/>.</returns>
     public bool TryGetRelationshipByApiName(string apiName, [NotNullWhen(true)] out ApiRelationship? apiRelationship) => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out apiRelationship);
 
+    /// <summary>Attempts to retrieve a query source by its ordinal, case-sensitive API name.</summary>
+    /// <param name="apiName">The query source API name.</param>
+    /// <param name="apiQuerySource">The matching source, or <see langword="null"/> if not found.</param>
+    /// <returns><see langword="true"/> if a query source with the given API name was found; otherwise <see langword="false"/>.</returns>
+    public bool TryGetQuerySourceByApiName(string apiName, [NotNullWhen(true)] out ApiQuerySource? apiQuerySource) => this.ApiQuerySourceApiNameLookup.TryGetValue(apiName, out apiQuerySource);
     #endregion
 
     #region ApiSchemaElement Methods
@@ -275,6 +304,11 @@ public sealed class ApiSchema : ApiSchemaElement
         {
             yield return apiRelationship;
         }
+
+        foreach (var apiQuerySource in this.ApiQuerySources)
+        {
+            yield return apiQuerySource;
+        }
     }
 
     /// <inheritdoc/>
@@ -302,6 +336,9 @@ public sealed class ApiSchema : ApiSchemaElement
 
         // Phase 5: Compile relationships.
         this.CompileApiRelationships(context);
+
+        // Phase 6: Compile query sources.
+        this.CompileApiQuerySources(context);
     }
     #endregion
 
@@ -391,6 +428,14 @@ public sealed class ApiSchema : ApiSchemaElement
 
         this.BindRelationshipTraversals(context);
         this.PopulateRelationshipCrossReferences();
+    }
+
+    private void CompileApiQuerySources(ApiSchemaCompilationContext context)
+    {
+        foreach (var apiQuerySource in this.ApiQuerySources)
+        {
+            apiQuerySource.Compile(context);
+        }
     }
 
     private void BindRelationshipTraversals(ApiSchemaCompilationContext context)
@@ -577,6 +622,19 @@ public sealed class ApiSchema : ApiSchemaElement
             session: context.Session,
             keyComparer: ApiNameComparer.Instance,
             lookupDictionary: out _apiRelationshipApiNameLookup
+        );
+
+        ApiSchemaCompilationLookup.BuildLookupDictionary
+        (
+            parts: this.ApiQuerySources,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: ApiSchemaNameValidation.IsNameValid,
+            partKeyPropertyName: nameof(ApiQuerySource.ApiName),
+            apiPath: this.ApiPath,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateQuerySourceApiName,
+            session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
+            lookupDictionary: out _apiQuerySourceApiNameLookup
         );
     }
 

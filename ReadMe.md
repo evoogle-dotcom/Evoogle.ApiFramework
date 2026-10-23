@@ -47,13 +47,14 @@ Use `ApiSchemaBuilder` when defining schemas in code. The fluent API is designed
 
 - Register scalar, enum, and object CLR types with `AddScalar<T>()`, `AddEnum<T>()`, and `AddObject<T>()`.
 - Prefer expression-based overloads such as `AddProperty(c => c.Name)` and `AddKey("PK_Customer", c => c.Id)` so CLR member names are refactor-safe.
-- Use `WithVersion(c => c.Version)` for a required property-backed version, or
+- Use `WithVersion(c => c.Version)` for a non-nullable property-backed version, or
   `WithRepositoryVersion<TVersion>()` when repository metadata supplies it.
 - With default annotations enabled, apply `[ApiVersion]` to a property or field for a
   property-backed version, or apply `[ApiVersion(ClrType = typeof(TVersion))]` to an object type
   for a repository-backed version. Member annotations must omit `ClrType`, and the annotation does
   not register the scalar or property.
-- Use `AddRequiredProperty` or `AddOptionalProperty` only when the API contract should override CLR nullable reference type inference.
+- Use `AddProperty` to infer nullability from CLR members; use `AsNullable()` or `AsNonNullable()`
+  in its configuration callback to override it explicitly.
 - Configure larger schemas with `IApiObjectTypeConfiguration<T>` and relationship configuration classes when inline lambdas become too large.
 - Use relationship shortcuts for common cases, or the full relationship builders when you need named principal keys, composite keys, or extensions.
 
@@ -85,7 +86,7 @@ Schema-wide options can be overridden on individual object types:
 
 ```csharp
 .AddObject<Customer>(o => o
-    .WithOptions(options => options.UseDefaultOnNullKeyPart())
+    .WithOptions(options => options.UseEmptyKeyOnNullKeyPart())
     .AddProperty(c => c.Id)
     .AddKey("PK_Customer", c => c.Id))
 ```
@@ -101,7 +102,7 @@ stores `ApiCanonicalKey` as the selected key's API name. Canonical identity does
 mutation support and does not change relationship principal-key inference.
 
 Each `ApiObjectType` may expose one optional `ApiVersion` member whose value is an
-`ApiVersionDefinition`. A property-backed definition references an existing required scalar
+`ApiVersionDefinition`. A property-backed definition references an existing non-nullable scalar
 `ApiProperty`; a repository-backed definition has no CLR member.
 `ApiVersion` is an opaque equality token whose exact CLR representation matters. Strings use
 ordinal equality, and recognized binary values are defensively copied.
@@ -186,6 +187,116 @@ the application reference used to replace a schema remain the caller's synchroni
 responsibility.
 
 Fluent builder methods are stricter because they are explicit authoring APIs. A builder method may fail fast with standard argument exceptions when the method call itself violates its parameter contract, such as passing a `null` callback, `null` configuration object, `null` `Type`, blank name, invalid expression, or invalid extension metadata. Those precondition failures are treated as programmer errors and are separate from schema compilation diagnostics.
+
+## Builder Configuration Sources
+
+All stored builder configuration sources are non-nullable `ApiConfigurationSource` values.
+Defaults and untouched settings start at `Convention`; constructors that receive a configured
+value and its actual source retain that source. Optional configuration is represented by its
+value, such as a null builder, reference, or delegate. There is no separate unconfigured source.
+
+Precedence is `Convention < DataAnnotation < Explicit`. Accept a setting when the incoming
+source is greater than or equal to its stored source, updating the value and source together:
+
+```csharp
+if (source >= _state.ModifiersSource)
+{
+    _state.ApiTypeModifiers = apiTypeModifiers;
+    _state.ModifiersSource = source;
+}
+```
+
+Later settings at equal precedence win. Repeated registrations retain the highest source,
+including when an existing builder is reused. An unregistered builder's registration source
+starts at `Convention`; its owning registration path records the actual source. Merging an
+optional setting requires an incoming value as well as sufficient precedence, so an absent
+traversal or foreign key does not erase an existing configuration.
+
+`ApiConfigurationSourceScope` describes the operation currently executing. It starts at
+`Explicit` so ordinary fluent calls are explicit configuration. A convention or annotation
+callback temporarily changes the active source, then restores the previous source in `finally`,
+including when the callback throws. Stored state sources describe retained configuration and
+are updated only when the corresponding setting or registration is accepted.
+
+## Query Source Declarations
+
+Register query sources explicitly; registering an object type does not expose it for querying.
+For example, after registering `Customer` and the `Int32` scalar type:
+
+```csharp
+builder.AddQuerySource("CustomerById", source => source
+    .AddInputParameter<int>("id")
+    .WithOutput<Customer>());
+```
+
+The output is nullable by default, parameters require supplied non-null arguments by default,
+and source composition defaults to projection. `WithRequiredArgument()` and `WithOptionalArgument()`
+control whether an argument must be supplied. `AsNullable()` and `AsNonNullable()`
+independently control whether its supplied value may be null. `WithModifiers(...)` remains available
+for explicit type modifiers.
+
+`WithOutputComposition(...)` replaces the permitted operations; it does not execute them.
+Filtering, ordering, and offset pagination require collection output, configured with
+`WithCollectionOutput<TItem>()`. Collection and item nullability are independent:
+
+```csharp
+builder.AddQuerySource("Orders", source => source
+    .AddInputParameter<OrderStatus>("status", parameter => parameter
+        .WithOptionalArgument()
+        .AsNonNullable())
+    .WithCollectionOutput<Order>(
+        apiCollectionTypeModifiers: ApiTypeModifiers.Required,
+        apiItemTypeModifiers: ApiTypeModifiers.Required)
+    .WithOutputComposition(ApiQueryComposition.Projection | ApiQueryComposition.Filtering));
+```
+
+Repeated `AddQuerySource` calls with the same API name configure one source builder. Repeated
+`AddInputParameter` calls with the same parameter API name and equal type reference configure
+one parameter builder. A type-reference change at equal or higher precedence replaces that
+parameter's settings and extensions in its original position; a lower-precedence type change
+is ignored. Type-reference equality compares the declaration, so CLR-backed and API-named
+references are distinct even when they resolve to the same schema type.
+
+Configuration precedence is convention, then data annotation, then explicit configuration;
+later settings at the same precedence win. Output type, collection item configuration, and
+output nullability form one declaration, while output composition is configured separately.
+Parameter nullability and argument presence are also configured separately. The builders
+provide precedence support for future query-source conventions and annotation readers.
+Extensions follow the existing builder behavior: the last registration for an extension type wins.
+
+Reusable source configurations implement `IApiQuerySourceConfiguration` from
+`Evoogle.ApiFramework.Schema.Configuration.Query`:
+
+```csharp
+public sealed class CustomerByIdConfiguration : IApiQuerySourceConfiguration
+{
+    public string ApiName => "CustomerById";
+
+    public void Configure(ApiQuerySourceBuilder builder) => builder
+        .AddInputParameter<int>("id")
+        .WithOutput<Customer>();
+}
+```
+
+Register an instance with `builder.AddQuerySource(new CustomerByIdConfiguration())`, or use
+`builder.UseConfigurationsFromAssembly(typeof(CustomerByIdConfiguration).Assembly)` to discover
+public implementations with public parameterless constructors. Discovered configurations run
+at explicit precedence. Referenced schema types must still be registered.
+
+The builders have public constructors; `ApiQuerySourceParameterBuilder` accepts either an
+`ApiTypeReference` or a CLR `Type` alongside its API name. `AddInputParameter`, `WithOutput`,
+and `WithCollectionOutput` also accept CLR `Type` arguments as alternatives to their generic
+overloads. Typed `AddQuerySourceExtension` and `AddParameterExtension` methods attach schema
+extension metadata. Each schema build creates independent source, parameter, and inline-type
+instances from the retained builder configuration.
+
+`ApiSchema.ApiQuerySources` and each source's `ApiInputParameters` are immutable schema-owned collections.
+Use `GetQuerySourceByApiName` / `TryGetQuerySourceByApiName` and the corresponding
+`GetParameterByApiName` / `TryGetParameterByApiName` methods for ordinal, case-sensitive lookups.
+Schema JSON preserves declarations and omits `ApiQuerySources` when no sources are declared.
+These declarations establish schema contracts; operation compilation, argument preparation,
+service bindings, and repository execution are subsequent runtime work. An operation **binds**
+to a source; the source does not itself materialize a query.
 
 ## Naming Conventions
 

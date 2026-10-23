@@ -8,6 +8,7 @@ using System.Reflection;
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 
@@ -159,6 +160,17 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
             );
         }
 
+        if (configuration is IApiQuerySourceConfiguration querySourceConfiguration)
+        {
+            this.ApplyConfigurationRole
+            (
+                builder,
+                configurationType,
+                "query source",
+                () => builder.AddQuerySource(querySourceConfiguration)
+            );
+        }
+
         if (configuration is IApiRelationshipOneToOneConfiguration oneToOneConfiguration)
         {
             this.ApplyConfigurationRole
@@ -195,12 +207,14 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
 
     private static bool HasConfigurationRole(Type configurationType)
     {
-        return typeof(IApiObjectTypeConfiguration).IsAssignableFrom(configurationType) ||
-            typeof(IApiScalarTypeConfiguration).IsAssignableFrom(configurationType) ||
+        return
             typeof(IApiEnumTypeConfiguration).IsAssignableFrom(configurationType) ||
+            typeof(IApiObjectTypeConfiguration).IsAssignableFrom(configurationType) ||
+            typeof(IApiQuerySourceConfiguration).IsAssignableFrom(configurationType) ||
             typeof(IApiRelationshipOneToOneConfiguration).IsAssignableFrom(configurationType) ||
             typeof(IApiRelationshipOneToManyConfiguration).IsAssignableFrom(configurationType) ||
-            typeof(IApiRelationshipManyToManyConfiguration).IsAssignableFrom(configurationType);
+            typeof(IApiRelationshipManyToManyConfiguration).IsAssignableFrom(configurationType) ||
+            typeof(IApiScalarTypeConfiguration).IsAssignableFrom(configurationType);
     }
 
     private void ApplyConfigurationRole

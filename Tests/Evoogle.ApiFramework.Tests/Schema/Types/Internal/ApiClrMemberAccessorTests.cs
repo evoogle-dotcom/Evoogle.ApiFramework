@@ -110,7 +110,7 @@ public partial class ApiClrMemberAccessorTests(ITestOutputHelper output) : XUnit
             var isUnbound = this.Operation == MemberAccessOperation.UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary;
 
             var memberInfo = this.ClrKind == ClrMemberKind.Property ? (System.Reflection.MemberInfo)typeof(MemberAccessSource).GetProperty(this.ClrName)! : typeof(MemberAccessSource).GetField(this.ClrName)!;
-            var schema = new ApiSchema("MemberAccess", null, null, null, null, null, null);
+            var schema = new ApiSchema("MemberAccess", null, null, null, null, null, null, null);
             var description = this.Surface == MemberAccessSurface.Property
                 ? ApiClrMemberAccessDescription.ForProperty(this.ClrName)
                 : ApiClrMemberAccessDescription.ForTraversal("Related", this.ClrName);

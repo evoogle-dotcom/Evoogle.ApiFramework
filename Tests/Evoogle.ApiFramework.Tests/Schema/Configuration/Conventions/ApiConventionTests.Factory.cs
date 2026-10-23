@@ -255,7 +255,7 @@ public static class ApiConventionTestsFactory
             .AddObject<PersonWithId>(x => x
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Name)
-                .AddProperty("email", "Email", p => p.WithModifiers(m => m.Required())))
+                .AddProperty("email", "Email", p => p.WithModifiers(m => m.AsNonNullable())))
             .UsePropertyNullabilityModifiers()
             .Build();
 

@@ -360,7 +360,8 @@ public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitT
             apiVersion: null,
             apiOptions: null,
             apiNamedTypes: [],
-            apiRelationships: []
+            apiRelationships: [],
+            apiQuerySources: []
         );
 
         ApiSchemaCompiler.Compile(schema).ThrowIfInvalid();

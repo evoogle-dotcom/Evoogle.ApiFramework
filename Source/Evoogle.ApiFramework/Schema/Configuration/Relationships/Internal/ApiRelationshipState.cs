@@ -16,8 +16,8 @@ internal sealed class ApiRelationshipState(ApiRelationshipDeleteBehavior default
     #region Properties
     internal ApiRelationshipDeleteBehavior DeleteBehavior { get; set; } = defaultDeleteBehavior;
 
-    internal ApiConfigurationSource? DeleteBehaviorSource { get; set; }
+    internal ApiConfigurationSource DeleteBehaviorSource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal ApiConfigurationSource? RegistrationSource { get; set; }
+    internal ApiConfigurationSource RegistrationSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

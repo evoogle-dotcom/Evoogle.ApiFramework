@@ -58,7 +58,7 @@ internal static class ApiObjectTypeBuilderExtensions
                             break;
 
                         default:
-                            optionsBuilder.UseDefaultOnNullKeyPart();
+                            optionsBuilder.UseEmptyKeyOnNullKeyPart();
                             break;
                     }
                 }

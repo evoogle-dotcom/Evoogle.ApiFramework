@@ -103,11 +103,11 @@ public sealed partial class ApiProperty : ApiSchemaElement
     #endregion
 
     #region ApiProperty Computed Properties
-    /// <summary>Gets a value indicating whether this property is optional (not required).</summary>
-    public bool IsOptional => !this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    /// <summary>Gets a value indicating whether this property permits a null value.</summary>
+    public bool IsNullable => !this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
-    /// <summary>Gets a value indicating whether this property is required.</summary>
-    public bool IsRequired => this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    /// <summary>Gets a value indicating whether this property prohibits a null value.</summary>
+    public bool IsNonNullable => this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
     internal bool IsResolved => this.ApiTypeExpression?.IsResolved == true;
 
@@ -250,69 +250,95 @@ public sealed partial class ApiProperty : ApiSchemaElement
     private void ValidateNullabilityMismatch(ApiSchemaCompilationContext context, MemberNullableInfo clrNullableInfo, string clrMemberName)
     {
         // Skip if nullability cannot be determined (defensive guard for types from assemblies without NRT)
-        if (clrNullableInfo.Nullability == MemberNullability.Unknown)
+        var isClrNullabilityUnknown = clrNullableInfo.Nullability == MemberNullability.Unknown;
+        if (isClrNullabilityUnknown)
         {
             return;
         }
 
-        // Required + CLR Nullable: API contract demands a value but CLR type permits null
-        if (this.IsRequired && clrNullableInfo.Nullability == MemberNullability.Nullable)
+        // Non-nullable API property backed by a nullable CLR member.
+        var isApiPropertyNonNullable = this.IsNonNullable;
+        var isClrMemberNullable = clrNullableInfo.Nullability == MemberNullability.Nullable;
+        var hasNonNullableApiPropertyWithNullableClrMember = isApiPropertyNonNullable && isClrMemberNullable;
+
+        if (hasNonNullableApiPropertyWithNullableClrMember)
         {
+            var apiPath = context.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Warning;
             var code = ApiSchemaCompilationCode.ApiPropertyRequiredNullableMismatch;
-            var description = $"CLR member '{clrMemberName}' is nullable but property '{this.ApiName}' is declared Required";
-            var remediation = $"Change CLR member '{clrMemberName}' to a non-nullable type, or change property '{this.ApiName}' to Optional";
+            var description = $"CLR member '{clrMemberName}' is nullable but property '{this.ApiName}' is declared non-nullable";
+            var remediation = $"Change CLR member '{clrMemberName}' to a non-nullable type, or change property '{this.ApiName}' to nullable";
 
-            context.AddIssue(severity, code, description, remediation);
+            context.AddIssue(apiPath, severity, code, description, remediation);
             return;
         }
 
-        // Optional + CLR NonNullable (reference types only): absent optional value may assign null
-        // to a CLR member that cannot hold it. Value types are excluded: absent value → default, never null.
-        if (this.IsOptional && clrNullableInfo.Nullability == MemberNullability.NonNullable && !clrNullableInfo.MemberType.IsValueType)
+        // Nullable API property backed by a non-nullable CLR reference member may assign null
+        // to a member that cannot hold it. Value types retain the existing default-value handling.
+        var isApiPropertyNullable = this.IsNullable;
+        var isClrMemberNonNullable = clrNullableInfo.Nullability == MemberNullability.NonNullable;
+        var isClrMemberReferenceType = !clrNullableInfo.MemberType.IsValueType;
+        var hasNullableApiPropertyWithNonNullableClrReferenceMember = isApiPropertyNullable && isClrMemberNonNullable && isClrMemberReferenceType;
+
+        if (hasNullableApiPropertyWithNonNullableClrReferenceMember)
         {
+            var apiPath = context.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Warning;
             var code = ApiSchemaCompilationCode.ApiPropertyOptionalNonNullableMismatch;
-            var description = $"CLR member '{clrMemberName}' is non-nullable but property '{this.ApiName}' is declared Optional";
-            var remediation = $"Change CLR member '{clrMemberName}' to a nullable reference type, or change property '{this.ApiName}' to Required";
+            var description = $"CLR member '{clrMemberName}' is non-nullable but property '{this.ApiName}' is declared nullable";
+            var remediation = $"Change CLR member '{clrMemberName}' to a nullable reference type, or change property '{this.ApiName}' to non-nullable";
 
-            context.AddIssue(severity, code, description, remediation);
+            context.AddIssue(apiPath, severity, code, description, remediation);
         }
 
         // Check collection item nullability against ApiCollectionType.ApiItemTypeModifiers
-        if (clrNullableInfo.CollectionChain.Count > 0 && this.ApiType is ApiCollectionType apiCollectionType)
+        var hasClrCollectionElements = clrNullableInfo.CollectionChain.Count > 0;
+
+        if (hasClrCollectionElements && this.ApiType is ApiCollectionType apiCollectionType)
         {
             var itemNullability = clrNullableInfo.CollectionChain[0].ElementNullability;
             var itemElementType = clrNullableInfo.CollectionChain[0].ElementType;
 
             // Skip if item nullability cannot be determined
-            if (itemNullability == MemberNullability.Unknown)
+            var isClrItemNullabilityUnknown = itemNullability == MemberNullability.Unknown;
+            if (isClrItemNullabilityUnknown)
             {
                 return;
             }
 
-            // Item Required + CLR element Nullable: API contract demands a value but CLR element permits null
-            if (apiCollectionType.IsItemRequired && itemNullability == MemberNullability.Nullable)
+            // Non-nullable API items backed by nullable CLR elements.
+            var isApiItemNonNullable = apiCollectionType.IsItemNonNullable;
+            var isClrItemNullable = itemNullability == MemberNullability.Nullable;
+            var hasNonNullableApiItemWithNullableClrElement = isApiItemNonNullable && isClrItemNullable;
+
+            if (hasNonNullableApiItemWithNullableClrElement)
             {
+                var apiPath = context.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Warning;
                 var code = ApiSchemaCompilationCode.ApiCollectionItemRequiredNullableMismatch;
-                var description = $"CLR collection element in '{clrMemberName}' is nullable but item is declared Required";
-                var remediation = $"Change the CLR element type in '{clrMemberName}' to non-nullable, or change the item modifier to Optional";
+                var description = $"CLR collection element in '{clrMemberName}' is nullable but item is declared non-nullable";
+                var remediation = $"Change the CLR element type in '{clrMemberName}' to non-nullable, or change the item modifier to nullable";
 
-                context.AddIssue(severity, code, description, remediation);
+                context.AddIssue(apiPath, severity, code, description, remediation);
                 return;
             }
 
-            // Item Optional + CLR element NonNullable (reference types only): absent item may assign null
-            // to a CLR element that cannot hold it. Value types are excluded: absent item → default, never null.
-            if (apiCollectionType.IsItemOptional && itemNullability == MemberNullability.NonNullable && !itemElementType.IsValueType)
+            // Nullable API items backed by non-nullable CLR reference elements may assign null
+            // to elements that cannot hold it. Value types retain the existing default-value handling.
+            var isApiItemNullable = apiCollectionType.IsItemNullable;
+            var isClrItemNonNullable = itemNullability == MemberNullability.NonNullable;
+            var isClrItemReferenceType = !itemElementType.IsValueType;
+            var hasNullableApiItemWithNonNullableClrReferenceElement = isApiItemNullable && isClrItemNonNullable && isClrItemReferenceType;
+
+            if (hasNullableApiItemWithNonNullableClrReferenceElement)
             {
+                var apiPath = context.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Warning;
                 var code = ApiSchemaCompilationCode.ApiCollectionItemOptionalNonNullableMismatch;
-                var description = $"CLR collection element in '{clrMemberName}' is non-nullable but item is declared Optional";
-                var remediation = $"Change the CLR element type in '{clrMemberName}' to a nullable reference type, or change the item modifier to Required";
+                var description = $"CLR collection element in '{clrMemberName}' is non-nullable but item is declared nullable";
+                var remediation = $"Change the CLR element type in '{clrMemberName}' to a nullable reference type, or change the item modifier to non-nullable";
 
-                context.AddIssue(severity, code, description, remediation);
+                context.AddIssue(apiPath, severity, code, description, remediation);
             }
         }
     }

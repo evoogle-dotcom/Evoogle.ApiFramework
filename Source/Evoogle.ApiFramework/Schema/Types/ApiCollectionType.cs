@@ -54,11 +54,11 @@ public sealed class ApiCollectionType
     #endregion
 
     #region ApiCollectionType Computed Properties
-    /// <summary>Gets a value indicating whether this item type is optional (not required).</summary>
-    public bool IsItemOptional => !this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    /// <summary>Gets a value indicating whether collection items permit null values.</summary>
+    public bool IsItemNullable => !this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
-    /// <summary>Gets a value indicating whether this item type is required.</summary>
-    public bool IsItemRequired => this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    /// <summary>Gets a value indicating whether collection items prohibit null values.</summary>
+    public bool IsItemNonNullable => this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
     internal bool IsItemTypeResolved => this.ApiItemTypeExpression.IsResolved;
     #endregion

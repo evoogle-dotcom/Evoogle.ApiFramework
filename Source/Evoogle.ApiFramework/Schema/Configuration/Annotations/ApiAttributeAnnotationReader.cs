@@ -192,9 +192,9 @@ public sealed class ApiAttributeAnnotationReader :
             return [];
         }
 
-        var modifiers = attr.IsRequired
+        var modifiers = attr.IsNonNullable
             ? ApiTypeModifiers.Required
-            : attr.IsOptional ? ApiTypeModifiers.None : (ApiTypeModifiers?)null;
+            : attr.IsNullable ? ApiTypeModifiers.None : (ApiTypeModifiers?)null;
 
         return [new(attr.ApiName, modifiers)];
     }

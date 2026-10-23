@@ -20,7 +20,7 @@ internal sealed class ApiObjectTypeState
 
     internal string? CanonicalKeyName { get; set; }
 
-    internal ApiConfigurationSource? CanonicalKeyConfigurationSource { get; set; }
+    internal ApiConfigurationSource CanonicalKeyConfigurationSource { get; set; } = ApiConfigurationSource.Convention;
 
     internal List<ApiPropertyBuilder> PropertyBuilders { get; } = [];
 
@@ -28,6 +28,6 @@ internal sealed class ApiObjectTypeState
 
     internal ApiVersionDefinitionBuilder? VersionBuilder { get; set; }
 
-    internal ApiConfigurationSource? VersionConfigurationSource { get; set; }
+    internal ApiConfigurationSource VersionConfigurationSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

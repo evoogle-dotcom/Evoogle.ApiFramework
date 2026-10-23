@@ -20,7 +20,7 @@
 internal sealed class AnnotationsOnlyPoco
 {
     [ApiKey]
-    [ApiProperty(ApiName = "id", IsRequired = true)]
+    [ApiProperty(ApiName = "id", IsNonNullable = true)]
     public int Id { get; set; }
 
     [ApiVersion]

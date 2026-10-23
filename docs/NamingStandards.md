@@ -34,6 +34,15 @@ Use the `Definition` suffix for CLR metadata type identities and related type fa
 include `ApiKeyDefinition`, `ApiNamedKeyDefinition`, `ApiVersionDefinition`, their builders, and
 their JSON converters.
 
+Query-source metadata uses the `ApiQuerySource` family, including `ApiQuerySourceParameter`,
+without a `Definition` suffix. `Source` identifies a named producer to which a query operation
+binds. The operation-side family uses `ApiQuery` and `ApiQueryParameter`; source declarations
+and operation parameters are separate concepts with separate ownership and lifecycles.
+Query sources use `ApiInputParameters`, `ApiOutputType`, `ApiOutputTypeModifiers`, and
+`ApiOutputComposition`, in that order after `ApiName`, for both the API and serialized properties.
+Use **binding** for connecting an operation to a query source and its parameter declarations.
+Reserve **materialization** for producing actual values or objects, such as an `ApiKey` from a POCO.
+
 When the containing type already establishes the metadata context, name members and serialized
 properties by their concise domain role. Use `ApiObjectType.ApiKeys`,
 `ApiObjectType.ApiVersion`, `ApiRelationshipDependentEnd.ApiForeignKey`, and
@@ -193,6 +202,24 @@ Do not rename user-defined data to satisfy terminology preferences. For example,
 consumer are data, not framework member names.
 
 ## JSON and Documentation Names
+
+### Nullability and Argument Presence
+
+Use `Nullable` and `NonNullable` for value constraints, including `AsNullable()`,
+`AsNonNullable()`, `IsNullable`, and `IsNonNullable`. Use `IsItemNullable` and
+`IsItemNonNullable` for collection item predicates. Property builders infer nullability
+from CLR members through `AddProperty`; explicit overrides use the property builder's
+nullability methods.
+
+Reserve required/optional terminology for argument presence, such as `ApiRequiresArgument`,
+`WithRequiredArgument()`, and `WithOptionalArgument()`. The existing
+`ApiTypeModifiers.Required` flag continues to mean non-nullability; its name and
+serialized representation are retained pending a separate type-modifier redesign.
+
+Use `UseEmptyKeyOnNullKeyPart()` for the builder policy that emits `ApiKey.Empty`
+for an affected key path.
+
+### Serialized and Documented Members
 
 Serialized property names should normally match the public API property names, including
 `Api` and `Clr` casing. Use a different JSON name only for an intentional compatibility or

@@ -37,16 +37,16 @@ public partial class ApiAnnotationTests
     {
         public Guid Id { get; set; }
 
-        [ApiProperty(ApiName = "display_name", IsRequired = true)]
+        [ApiProperty(ApiName = "display_name", IsNonNullable = true)]
         public string? Name { get; set; }
 
         [ApiIgnore]
         public string InternalTag { get; set; } = string.Empty;
 
-        [ApiProperty(IsOptional = true)]
+        [ApiProperty(IsNullable = true)]
         public string NonNullableButOptional { get; set; } = string.Empty;
 
-        [ApiProperty(IsRequired = true, IsOptional = true)]
+        [ApiProperty(IsNonNullable = true, IsNullable = true)]
         public string? RequiredWins { get; set; }
     }
     #endregion
@@ -221,7 +221,7 @@ public partial class ApiAnnotationTests
     #region Test Domain Types — Field and Many-to-Many Attributes
     public class FieldAnnotationsType
     {
-        [ApiProperty(ApiName = "field_code", IsRequired = true)]
+        [ApiProperty(ApiName = "field_code", IsNonNullable = true)]
         [ApiKey(ApiName = "FieldKey")]
         public Guid Code;
 

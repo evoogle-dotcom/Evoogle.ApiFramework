@@ -88,7 +88,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder.Build();
     }
 
-    public static ApiObjectType BuildFromSimpleApiSchemaTheScalarsOnlyTypeWithAddRequiredOrOptionalProperty()
+    public static ApiObjectType BuildFromSimpleApiSchemaTheScalarsOnlyTypeWithExplicitNullability()
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheScalarsOnlyTypeWithAddRequiredOrOptionalPropertyBuilder(ctx);
@@ -104,7 +104,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder.Build();
     }
 
-    public static ApiObjectType BuildFromSimpleApiSchemaTheCompanyTypeWithConfigureRequiredOrOptionalProperty()
+    public static ApiObjectType BuildFromSimpleApiSchemaTheCompanyTypeWithConfiguredNullability()
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheCompanyTypeWithConfigureRequiredOrOptionalPropertyBuilder(ctx);
@@ -213,12 +213,12 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         var builder = new ApiObjectTypeBuilder<ScalarsOnly>(ctx)
             .WithName(nameof(ScalarsOnly))
             .WithOptions(o => o.ThrowOnNullKeyPart())
-            .AddRequiredProperty(c => c.RequiredName)
-            .AddRequiredProperty(c => c.RequiredNumber)
-            .AddRequiredProperty(c => c.RequiredPredicate)
-            .AddOptionalProperty(c => c.OptionalName)
-            .AddOptionalProperty(c => c.OptionalNumber)
-            .AddOptionalProperty(c => c.OptionalPredicate);
+            .AddProperty(c => c.RequiredName, property => property.AsNonNullable())
+            .AddProperty(c => c.RequiredNumber, property => property.AsNonNullable())
+            .AddProperty(c => c.RequiredPredicate, property => property.AsNonNullable())
+            .AddProperty(c => c.OptionalName, property => property.AsNullable())
+            .AddProperty(c => c.OptionalNumber, property => property.AsNullable())
+            .AddProperty(c => c.OptionalPredicate, property => property.AsNullable());
 
         return builder;
     }
@@ -244,10 +244,10 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         var builder = new ApiObjectTypeBuilder<Company>(ctx)
             .WithName(nameof(Company))
             .WithOptions(o => o.ThrowOnNullKeyPart())
-            .AddProperty(c => c.Id, p => p.AsRequired())
-            .AddProperty(c => c.Name, p => p.AsRequired())
-            .AddProperty(c => c.Owner, p => p.AsOptional())
-            .AddProperty(c => c.Employees, p => p.AsOptional())
+            .AddProperty(c => c.Id, p => p.AsNonNullable())
+            .AddProperty(c => c.Name, p => p.AsNonNullable())
+            .AddProperty(c => c.Owner, p => p.AsNullable())
+            .AddProperty(c => c.Employees, p => p.AsNullable())
             .AddKey("PK_Company_Id", c => c.AddPath(p => p.Id))
             .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name))
             .WithCanonicalKey("AK_Company_Name");

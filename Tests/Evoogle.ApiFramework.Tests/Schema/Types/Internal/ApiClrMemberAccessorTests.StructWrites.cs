@@ -90,7 +90,7 @@ public partial class ApiClrMemberAccessorTests
                 ? this.ClrKind == ClrMemberKind.Property ? "Number" : "NumberField"
                 : this.ClrKind == ClrMemberKind.Property ? "Related" : "RelatedField";
             var memberInfo = this.ClrKind == ClrMemberKind.Property ? (System.Reflection.MemberInfo)sourceClrType.GetProperty(clrName)! : sourceClrType.GetField(clrName)!;
-            var schema = new ApiSchema("StructAccess", null, null, null, null, null, null);
+            var schema = new ApiSchema("StructAccess", null, null, null, null, null, null, null);
             var description = this.Surface == MemberAccessSurface.Property
                 ? ApiClrMemberAccessDescription.ForProperty(clrName)
                 : ApiClrMemberAccessDescription.ForTraversal("Related", clrName);

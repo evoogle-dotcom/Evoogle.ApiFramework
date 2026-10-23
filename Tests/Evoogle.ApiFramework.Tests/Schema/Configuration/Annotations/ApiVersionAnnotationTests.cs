@@ -156,12 +156,12 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                         )),
                 PrecedenceCase.ExplicitOverAnnotation => builder
                     .AddObject<AnnotatedPrecedenceType>(objectType => objectType
-                        .AddRequiredProperty(x => x.Version)
+                        .AddProperty(x => x.Version, property => property.AsNonNullable())
                         .WithRepositoryVersion<Guid>())
                     .UseDefaultAnnotations(),
                 PrecedenceCase.AnnotationOverConvention => builder
                     .AddObject<AnnotatedPrecedenceType>(objectType => objectType
-                        .AddRequiredProperty(x => x.Version))
+                        .AddProperty(x => x.Version, property => property.AsNonNullable()))
                     .UseDefaultAnnotations()
                     .UseConventions(conventions => conventions.AddConvention
                     (
@@ -227,23 +227,23 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                     .UseDefaultAnnotations(),
                 InvalidCase.MultipleMembers => builder
                     .AddObject<MultipleMemberVersions>(objectType => objectType
-                        .AddRequiredProperty(x => x.First)
-                        .AddRequiredProperty(x => x.Second))
+                        .AddProperty(x => x.First, property => property.AsNonNullable())
+                        .AddProperty(x => x.Second, property => property.AsNonNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.TypeAndMember => builder
                     .AddObject<TypeAndMemberVersions>(objectType => objectType
-                        .AddRequiredProperty(x => x.Version))
+                        .AddProperty(x => x.Version, property => property.AsNonNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.MissingProperty => builder
                     .AddObject<MissingPropertyVersion>()
                     .UseDefaultAnnotations(),
                 InvalidCase.OptionalProperty => builder
                     .AddObject<OptionalPropertyVersion>(objectType => objectType
-                        .AddOptionalProperty(x => x.Version))
+                        .AddProperty(x => x.Version, property => property.AsNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.MemberClrTypeSpecified => builder
                     .AddObject<MemberClrTypeSpecifiedVersion>(objectType => objectType
-                        .AddRequiredProperty(x => x.Version))
+                        .AddProperty(x => x.Version, property => property.AsNonNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.NullableRepositoryType => builder
                     .AddObject<NullableRepositoryVersion>()
@@ -251,7 +251,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                 InvalidCase.UnregisteredScalar => new ApiSchemaBuilder()
                     .WithName("Test")
                     .AddObject<UnregisteredScalarVersion>(objectType => objectType
-                        .AddRequiredProperty(x => x.Version))
+                        .AddProperty(x => x.Version, property => property.AsNonNullable()))
                     .UseDefaultAnnotations(),
                 _ => throw new InvalidOperationException($"Unknown test case: {this.TestCase}")
             };
@@ -579,8 +579,8 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
     )
     {
         builder
-            .AddRequiredProperty(x => x.First)
-            .AddRequiredProperty(x => x.Second);
+            .AddProperty(x => x.First, property => property.AsNonNullable())
+            .AddProperty(x => x.Second, property => property.AsNonNullable());
     }
 
     private static

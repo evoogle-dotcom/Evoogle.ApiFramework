@@ -43,6 +43,12 @@ public enum ApiSchemaElementKind
     /// <summary>Represents an <see cref="ApiProperty"/>.</summary>
     Property,
 
+    /// <summary>Represents a schema query source.</summary>
+    QuerySource,
+
+    /// <summary>Represents an input declaration owned by a schema query source.</summary>
+    QuerySourceParameter,
+
     /// <summary>Represents an <see cref="ApiRelationshipAssociation"/>.</summary>
     RelationshipAssociation,
 
@@ -71,6 +77,6 @@ public enum ApiSchemaElementKind
     Schema,
 
     /// <summary>Represents an <see cref="ApiVersionDefinition"/>.</summary>
-    VersionDefinition
+    VersionDefinition,
     #endregion
 }

@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.Extension;
 
@@ -21,6 +22,7 @@ public static partial class ApiSchemaFactory
         ApiKeyNullHandling? ApiKeyNullHandling = null,
         List<ApiTypeDef>? ApiNamedTypes = null,
         List<ApiRelationshipDef>? ApiRelationships = null,
+        List<ApiQuerySourceDef>? ApiQuerySources = null,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
 
@@ -138,6 +140,26 @@ public static partial class ApiSchemaFactory
     public record ApiKeyPathSegmentDef
     (
         ApiPropertyReferenceDef ApiPropertyReference,
+        List<Type>? ExtensionTypes = null
+    ) : ApiSchemaElementDef(ExtensionTypes);
+
+    // Query Sources
+    public record ApiQuerySourceDef
+    (
+        string ApiName,
+        List<ApiQuerySourceParameterDef> ApiInputParameters,
+        ApiTypeExpressionDef ApiOutputTypeExpression,
+        ApiTypeModifiers ApiOutputTypeModifiers,
+        ApiQueryComposition ApiOutputComposition,
+        List<Type>? ExtensionTypes = null
+    ) : ApiSchemaElementDef(ExtensionTypes);
+
+    public record ApiQuerySourceParameterDef
+    (
+        string ApiName,
+        ApiTypeExpressionDef ApiTypeExpression,
+        ApiTypeModifiers ApiTypeModifiers,
+        bool ApiRequiresArgument,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
 
@@ -259,6 +281,12 @@ public static partial class ApiSchemaFactory
             .Cast<ApiRelationship>()
             .ToList();
 
+        var apiQuerySources = (apiSchemaDef.ApiQuerySources ?? [])
+            .Select(BuildApiQuerySource)
+            .Where(q => q != null)
+            .Cast<ApiQuerySource>()
+            .ToList();
+
         var extensionTypeAndInstances = BuildExtensionInstances(apiSchemaDef.ExtensionTypes);
 
         return CreateFrozenSchema
@@ -268,6 +296,7 @@ public static partial class ApiSchemaFactory
             apiVersion,
             apiOptions,
             apiRelationships,
+            apiQuerySources,
             extensionTypeAndInstances
         );
     }
@@ -410,10 +439,20 @@ public static partial class ApiSchemaFactory
         string? apiVersion = null,
         ApiSchemaOptions? apiOptions = null,
         IEnumerable<ApiRelationship>? apiRelationships = null,
+        IEnumerable<ApiQuerySource>? apiQuerySources = null,
         IEnumerable<(Type ExtensionType, object ExtensionInstance)>? extensionTypeAndInstances = null
     )
     {
-        var apiSchema = new ApiSchema(apiName, apiVersion, apiOptions, apiNamedTypes, apiRelationships);
+        var apiSchema = new ApiSchema
+        (
+            apiName,
+            apiVersion,
+            apiOptions,
+            apiNamedTypes,
+            apiRelationships,
+            apiQuerySources
+        );
+
         if (extensionTypeAndInstances is not null)
         {
             foreach (var (extensionType, extensionInstance) in extensionTypeAndInstances)
@@ -435,7 +474,8 @@ public static partial class ApiSchemaFactory
         IEnumerable<ApiObjectType>? apiObjectTypes,
         string? apiVersion = null,
         ApiSchemaOptions? apiOptions = null,
-        IEnumerable<ApiRelationship>? apiRelationships = null
+        IEnumerable<ApiRelationship>? apiRelationships = null,
+        IEnumerable<ApiQuerySource>? apiQuerySources = null
     )
     {
         var apiSchema = new ApiSchema
@@ -446,8 +486,10 @@ public static partial class ApiSchemaFactory
             apiScalarTypes,
             apiEnumTypes,
             apiObjectTypes,
-            apiRelationships
+            apiRelationships,
+            apiQuerySources
         );
+
         var result = ApiSchemaCompiler.Compile(apiSchema);
         result.ThrowIfInvalid();
         return result.Schema!;
@@ -590,6 +632,49 @@ public static partial class ApiSchemaFactory
         AttachExtensions(apiKeyPathSegment, def);
 
         return apiKeyPathSegment;
+    }
+
+    // Query Sources
+    private static ApiQuerySource BuildApiQuerySource(ApiQuerySourceDef def)
+    {
+        var apiName = def.ApiName;
+        var apiInputParameters = def.ApiInputParameters.Select(BuildApiQuerySourceParameter);
+        var apiOutputTypeExpression = BuildApiTypeExpression(def.ApiOutputTypeExpression)!;
+        var apiOutputTypeModifiers = def.ApiOutputTypeModifiers;
+        var apiOutputComposition = def.ApiOutputComposition;
+
+        var apiQuerySource = new ApiQuerySource
+        (
+            apiName,
+            apiInputParameters,
+            apiOutputTypeExpression,
+            apiOutputTypeModifiers,
+            apiOutputComposition
+        );
+
+        AttachExtensions(apiQuerySource, def);
+
+        return apiQuerySource;
+    }
+
+    private static ApiQuerySourceParameter BuildApiQuerySourceParameter(ApiQuerySourceParameterDef def)
+    {
+        var apiName = def.ApiName;
+        var apiTypeExpression = BuildApiTypeExpression(def.ApiTypeExpression)!;
+        var apiTypeModifiers = def.ApiTypeModifiers;
+        var apiRequiresArgument = def.ApiRequiresArgument;
+
+        var apiQuerySourceParameter = new ApiQuerySourceParameter
+        (
+            apiName,
+            apiTypeExpression,
+            apiTypeModifiers,
+            apiRequiresArgument
+        );
+
+        AttachExtensions(apiQuerySourceParameter, def);
+
+        return apiQuerySourceParameter;
     }
 
     // Relationships

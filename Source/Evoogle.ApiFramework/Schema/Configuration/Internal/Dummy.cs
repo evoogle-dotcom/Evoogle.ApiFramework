@@ -5,9 +5,12 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Key;
+using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 using Evoogle.ApiFramework.Schema.Key;
+using Evoogle.ApiFramework.Schema.Query;
+using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
@@ -464,10 +467,10 @@ internal static class Dummy
             builder
                 .WithName("Customer")
                 .WithOptions(o => o.ThrowOnNullKeyPart())
-                .AddRequiredProperty(c => c.Id)
-                .AddRequiredProperty(c => c.Name)
-                .AddOptionalProperty(c => c.Email)
-                .AddRequiredProperty(c => c.Orders)
+                .AddProperty(c => c.Id, property => property.AsNonNullable())
+                .AddProperty(c => c.Name, property => property.AsNonNullable())
+                .AddProperty(c => c.Email, property => property.AsNullable())
+                .AddProperty(c => c.Orders, property => property.AsNonNullable())
                 .AddKey("PrimaryKey", c => c.Id)                       // shorthand: single expression
                 .AddKey("AlternateKey", c => c.Country.Code);          // shorthand: navigated expression
         }
@@ -540,7 +543,7 @@ internal static class Dummy
             .WithVersion("v1")
             .WithDefaultOptions()
             .WithOptions(o => o
-                .UseDefaultOnNullKeyPart()
+                .UseEmptyKeyOnNullKeyPart()
                 .ThrowOnNullKeyPart())
             .AddScalar<EmailAddress>(x => x
                 .WithName("EmailAddress"))
@@ -553,10 +556,10 @@ internal static class Dummy
                 .WithName("Customer")
                 .WithOptions(o => o
                     .ThrowOnNullKeyPart())
-                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddPropertyExtension(new VisibleMetadata { IsVisible = true }))
-                .AddProperty("Email", "Email", p => p.WithModifiers(m => m.Optional()))
-                .AddProperty("Orders", "Orders", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Id", "Id", p => p.AsNonNullable())
+                .AddProperty("Name", "Name", p => p.AsNonNullable().AddPropertyExtension(new VisibleMetadata { IsVisible = true }))
+                .AddProperty("Email", "Email", p => p.AsNullable())
+                .AddProperty("Orders", "Orders", p => p.AsNonNullable())
                 .AddKey("PrimaryKey", b => b
                     .AddPath(typeof(Customer), "Id"))
                 .AddKey("AlternateKey", b => b
@@ -564,19 +567,19 @@ internal static class Dummy
             .AddObject<Order>(x => x
                 .WithName("Order")
                 .WithDefaultOptions()
-                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Status", "Status", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Total", "Total", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("CustomerId", "CustomerId", p => p.WithModifiers(m => m.Optional()))
-                .AddProperty("Customer", "Customer", p => p.WithModifiers(m => m.Optional())))
+                .AddProperty("Id", "Id", p => p.AsNonNullable())
+                .AddProperty("Status", "Status", p => p.AsNonNullable())
+                .AddProperty("Total", "Total", p => p.AsNonNullable())
+                .AddProperty("CustomerId", "CustomerId", p => p.AsNullable())
+                .AddProperty("Customer", "Customer", p => p.AsNullable()))
             .AddObject<OrderItem>(x => x
                 .WithName("OrderItem")
                 .WithDefaultOptions()
-                .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("LineItemNumber", "LineItemNumber", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("ProductName", "ProductName", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Quantity", "Quantity", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("UnitPrice", "UnitPrice", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("OrderId", "OrderId", p => p.AsNonNullable())
+                .AddProperty("LineItemNumber", "LineItemNumber", p => p.AsNonNullable())
+                .AddProperty("ProductName", "ProductName", p => p.AsNonNullable())
+                .AddProperty("Quantity", "Quantity", p => p.AsNonNullable())
+                .AddProperty("UnitPrice", "UnitPrice", p => p.AsNonNullable())
                 .AddKey("PrimaryKey", b => b
                     .AddPath(typeof(OrderItem), ["OrderId"], p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
                     .AddPath(typeof(OrderItem), "LineItemNumber"))
@@ -595,25 +598,25 @@ internal static class Dummy
             .AddObject(new OrderConfiguration())
             .AddObject<CustomerProfile>(x => x
                 .WithName("CustomerProfile")
-                .AddProperty("Biography", "Biography", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Biography", "Biography", p => p.AsNonNullable())
                 .AddKey("PrimaryKey", b => b
                     .AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId")))
             .AddObject<Product>(x => x
                 .WithName("Product")
-                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Id", "Id", p => p.AsNonNullable())
+                .AddProperty("Name", "Name", p => p.AsNonNullable())
                 .AddKey("PrimaryKey", b => b
                     .AddPath(typeof(Product), "Id")))
             .AddObject<Tag>(x => x
                 .WithName("Tag")
-                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Id", "Id", p => p.AsNonNullable())
+                .AddProperty("Name", "Name", p => p.AsNonNullable())
                 .AddKey("PrimaryKey", b => b
                     .AddPath(typeof(Tag), "Id")))
             .AddObject<ProductTag>(x => x
                 .WithName("ProductTag")
-                .AddProperty("ProductId", "ProductId", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("TagId", "TagId", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("ProductId", "ProductId", p => p.AsNonNullable())
+                .AddProperty("TagId", "TagId", p => p.AsNonNullable())
                 .AddKey("PrimaryKey", b => b
                     .AddPath(typeof(ProductTag), "ProductId")
                     .AddPath(typeof(ProductTag), "TagId")))
@@ -689,6 +692,35 @@ internal static class Dummy
                     )
                     .AddRelationshipExtension(new VisibleMetadata { IsVisible = true })
             )
+            // Query source — single output by type reference; parameter added by type reference.
+            .AddQuerySource("CustomerById", s => s
+                .AddInputParameter("id", new ApiTypeReference(typeof(int)), p => p
+                    .AsNonNullable()
+                    .WithRequiredArgument()
+                    .AddQuerySourceParameterExtension(typeof(VisibleMetadata), new VisibleMetadata { IsVisible = true }))
+                .WithOutput(new ApiTypeReference(typeof(Customer)), ApiTypeModifiers.None)
+                .WithOutputComposition(ApiQueryComposition.Projection)
+                .AddQuerySourceExtension(typeof(VisibleMetadata), new VisibleMetadata { IsVisible = true }))
+            // Query source — CLR type output with multiple parameters configured by CLR type.
+            .AddQuerySource("OrderByStatus", s => s
+                .AddInputParameter<OrderStatus>("status", p => p
+                    .AsNullable()
+                    .WithOptionalArgument())
+                .AddInputParameter<int>("customerId")
+                .WithOutput<Order>(ApiTypeModifiers.Required)
+                .WithOutputComposition(ApiQueryComposition.None))
+            // Query source — collection output by CLR item type with combined composition flags.
+            .AddQuerySource("Orders", s => s
+                .AddInputParameter<OrderStatus>("status", p => p
+                    .WithOptionalArgument()
+                    .AsNonNullable())
+                .WithCollectionOutput<Order>(apiCollectionTypeModifiers: ApiTypeModifiers.Required, apiItemTypeModifiers: ApiTypeModifiers.Required)
+                .WithOutputComposition(
+                    ApiQueryComposition.Projection
+                    | ApiQueryComposition.Filtering
+                    | ApiQueryComposition.Ordering
+                    | ApiQueryComposition.OffsetPagination)
+                .AddQuerySourceExtension(new VisibleMetadata { IsVisible = true }))
             .AddSchemaExtension(new VisibleMetadata { IsVisible = true })
             .Build();
     }
@@ -711,19 +743,19 @@ internal static class Dummy
             .AddObject<Customer>(new CustomerConfigurationGeneric())
             .AddObject<Order>(x => x
                 .WithName("Order")
-                .AddProperty(o => o.Id, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(o => o.Status, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(o => o.Total, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(o => o.CustomerId, p => p.WithModifiers(m => m.Optional()))
-                .AddProperty(o => o.Customer, p => p.WithModifiers(m => m.Optional()))
+                .AddProperty(o => o.Id, p => p.AsNonNullable())
+                .AddProperty(o => o.Status, p => p.AsNonNullable())
+                .AddProperty(o => o.Total, p => p.AsNonNullable())
+                .AddProperty(o => o.CustomerId, p => p.AsNullable())
+                .AddProperty(o => o.Customer, p => p.AsNullable())
                 .AddKey("PrimaryKey", o => o.Id))                          // shorthand: single expression
             .AddObject<OrderItem>(x => x
                 .WithName("OrderItem")
-                .AddProperty(oi => oi.OrderId, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(oi => oi.LineItemNumber, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(oi => oi.ProductName, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(oi => oi.Quantity, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(oi => oi.UnitPrice, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(oi => oi.OrderId, p => p.AsNonNullable())
+                .AddProperty(oi => oi.LineItemNumber, p => p.AsNonNullable())
+                .AddProperty(oi => oi.ProductName, p => p.AsNonNullable())
+                .AddProperty(oi => oi.Quantity, p => p.AsNonNullable())
+                .AddProperty(oi => oi.UnitPrice, p => p.AsNonNullable())
                 .AddKey("PrimaryKey", b => b                               // composite: builder required
                     .AddPath(oi => oi.OrderId)
                     .AddPath(oi => oi.LineItemNumber))
@@ -732,23 +764,23 @@ internal static class Dummy
                     .AddPath(oi => oi.LineItemNumber)))
             .AddObject<CustomerProfile>(x => x
                 .WithName("CustomerProfile")
-                .AddProperty(cp => cp.CustomerRef, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(cp => cp.Biography, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(cp => cp.CustomerRef, p => p.AsNonNullable())
+                .AddProperty(cp => cp.Biography, p => p.AsNonNullable())
                 .AddKey("PrimaryKey", cp => cp.CustomerRef.CustomerId))    // shorthand: navigated expression
             .AddObject<Product>(x => x
                 .WithName("Product")
-                .AddProperty(p => p.Id, cfg => cfg.WithModifiers(m => m.Required()))
-                .AddProperty(p => p.Name, cfg => cfg.WithModifiers(m => m.Required()))
+                .AddProperty(p => p.Id, cfg => cfg.AsNonNullable())
+                .AddProperty(p => p.Name, cfg => cfg.AsNonNullable())
                 .AddKey("PrimaryKey", p => p.Id))                          // shorthand: single expression
             .AddObject<Tag>(x => x
                 .WithName("Tag")
-                .AddProperty(t => t.Id, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(t => t.Name, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(t => t.Id, p => p.AsNonNullable())
+                .AddProperty(t => t.Name, p => p.AsNonNullable())
                 .AddKey("PrimaryKey", t => t.Id))                          // shorthand: single expression
             .AddObject<ProductTag>(x => x
                 .WithName("ProductTag")
-                .AddProperty(pt => pt.ProductId, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(pt => pt.TagId, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(pt => pt.ProductId, p => p.AsNonNullable())
+                .AddProperty(pt => pt.TagId, p => p.AsNonNullable())
                 .AddKey("PrimaryKey", b => b                               // composite: builder required
                     .AddPath(pt => pt.ProductId)
                     .AddPath(pt => pt.TagId)))
@@ -776,6 +808,34 @@ internal static class Dummy
                 .WithAssociation<ProductTag>(a => a
                     .WithForeignKeyA(p => p.ProductId)                      // shorthand: single expression
                     .WithForeignKeyB(p => p.TagId)))                        // shorthand: single expression
+            .AddQuerySource("CustomerById", s => s
+                .AddInputParameter<int>("id", p => p
+                    .AsNonNullable()
+                    .WithRequiredArgument()
+                    .AddParameterExtension(new VisibleMetadata { IsVisible = true }))
+                .WithOutput<Customer>()
+                .WithOutputComposition(ApiQueryComposition.Projection)
+                .AddQuerySourceExtension(new VisibleMetadata { IsVisible = true }))
+            .AddQuerySource("OrderByStatus", s => s
+                .AddInputParameter<OrderStatus>("status", p => p
+                    .AsNullable()
+                    .WithOptionalArgument())
+                .AddInputParameter<int>("customerId")
+                .WithOutput<Order>(ApiTypeModifiers.Required)
+                .WithOutputComposition(ApiQueryComposition.None))
+            .AddQuerySource("Orders", s => s
+                .AddInputParameter<OrderStatus>("status", p => p
+                    .WithOptionalArgument()
+                    .AsNonNullable())
+                .WithCollectionOutput<Order>(
+                    apiCollectionTypeModifiers: ApiTypeModifiers.Required,
+                    apiItemTypeModifiers: ApiTypeModifiers.Required)
+                .WithOutputComposition(
+                    ApiQueryComposition.Projection
+                    | ApiQueryComposition.Filtering
+                    | ApiQueryComposition.Ordering
+                    | ApiQueryComposition.OffsetPagination)
+                .AddQuerySourceExtension(new VisibleMetadata { IsVisible = true }))
             .Build();
     }
 
@@ -800,11 +860,11 @@ internal static class Dummy
         public Guid Id { get; set; }
 
         /// <summary>Gets or sets the customer's display name.</summary>
-        [ApiProperty(ApiName = "displayName", IsRequired = true)]
+        [ApiProperty(ApiName = "displayName", IsNonNullable = true)]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>Gets or sets the optional customer email address (string variant for schema simplicity).</summary>
-        [ApiProperty(IsOptional = true)]
+        [ApiProperty(IsNullable = true)]
         public string? Email { get; set; }
 
         /// <summary>Internal tracking tag excluded from the API schema.</summary>

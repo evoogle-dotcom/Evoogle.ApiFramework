@@ -12,21 +12,23 @@ public static class ApiPropertyExtensions
 {
     #region Extension Methods
     /// <summary>
-    ///     Determines whether the <see cref="ApiProperty"/> is marked as required.
+    ///     Determines whether the <see cref="ApiProperty"/> is non-nullable.
     /// </summary>
     /// <param name="apiProperty">The <see cref="ApiProperty"/> instance.</param>
     /// <returns>
     ///     <c>true</c> if the <see cref="ApiProperty.ApiTypeModifiers"/> has the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
     /// </returns>
-    public static bool IsRequired(this ApiProperty apiProperty) => apiProperty.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    public static bool IsNonNullable(this ApiProperty apiProperty)
+        => apiProperty.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
     /// <summary>
-    ///     Determines whether the <see cref="ApiProperty"/> is marked as optional.
+    ///     Determines whether the <see cref="ApiProperty"/> is nullable.
     /// </summary>
     /// <param name="apiProperty">The <see cref="ApiProperty"/> instance.</param>
     /// <returns>
     ///     <c>true</c> if the <see cref="ApiProperty.ApiTypeModifiers"/> does not have the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
     /// </returns>
-    public static bool IsOptional(this ApiProperty apiProperty) => !apiProperty.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    public static bool IsNullable(this ApiProperty apiProperty)
+        => !apiProperty.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
     #endregion
 }

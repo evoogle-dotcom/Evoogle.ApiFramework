@@ -363,7 +363,7 @@ public class ClrMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
     #region Factory Methods
     private static ApiSchemaCompilationContext CreateContext()
     {
-        var schema = new ApiSchema("Binding", null, null, null, null, null, null);
+        var schema = new ApiSchema("Binding", null, null, null, null, null, null, null);
         var session = new ApiSchemaCompilationSession(schema, new ApiSchemaContext(schema));
         return new ApiSchemaCompilationContext(session, schema, default, _contextApiPath);
     }

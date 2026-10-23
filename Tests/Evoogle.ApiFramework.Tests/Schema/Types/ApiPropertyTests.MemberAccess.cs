@@ -315,7 +315,7 @@ public partial class ApiPropertyTests
         ApiRelationshipTraversal? traversal = null;
         if (surface == MemberAccessSurface.Property)
         {
-            schema = new ApiSchema("MemberAccess", null, null, [scalar], null, [source], null);
+            schema = new ApiSchema("MemberAccess", null, null, [scalar], null, [source], null, null);
         }
         else
         {
@@ -328,7 +328,7 @@ public partial class ApiPropertyTests
             var relationship = new ApiRelationshipOneToOne("SourceTarget",
                 new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(MemberAccessSource)), traversal),
                 new ApiRelationshipDependentEnd(new ApiTypeReference(typeof(MemberAccessTarget))));
-            schema = new ApiSchema("MemberAccess", null, null, [scalar], null, [source, target], [relationship]);
+            schema = new ApiSchema("MemberAccess", null, null, [scalar], null, [source, target], [relationship], null);
         }
 
         var result = ApiSchemaCompiler.Compile(schema);

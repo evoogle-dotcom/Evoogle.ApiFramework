@@ -4,7 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Linq.Dynamic.Core.CustomTypeProviders;
-
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 
@@ -287,7 +287,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             // Relationships
             .AddOneToManyRelationship("REL_Customer_Order_1toN", r => r
                 .From<Customer>()
-                .To<Order>(de => de.WithForeignKey(p => p.Id)))
+                .To<Order>(de => de.WithForeignKey(p => p.Customer.Id)))
 
             .AddOneToOneRelationship("REL_Customer_Profile_1to1", r => r
                 .From<Customer>()
@@ -326,7 +326,56 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .And<Tag>("PK_Tag")
                 .WithAssociation<PhysicalProductTag>(a => a
                     .WithForeignKeyA(p => p.PhysicalProductId)
-                    .WithForeignKeyB(p => p.TagId)));
+                    .WithForeignKeyB(p => p.TagId)))
+
+            // Query Sources
+            .AddQuerySource("SearchCustomers", s => s
+                .AddInputParameter<string>("name")
+                .AddInputParameter<OrderStatus>("status", p => p
+                    .WithRequiredArgument()
+                    .AsNonNullable())
+                .WithCollectionOutput<Customer>(
+                    apiCollectionTypeModifiers: ApiTypeModifiers.Required,
+                    apiItemTypeModifiers: ApiTypeModifiers.Required)
+                .WithOutputComposition(ApiQueryComposition.Projection
+                    | ApiQueryComposition.Filtering
+                    | ApiQueryComposition.Ordering
+                    | ApiQueryComposition.OffsetPagination))
+
+            .AddQuerySource("GetCustomerById", s => s
+                .AddInputParameter<Ulid>("id", p => p
+                    .WithRequiredArgument()
+                    .AsNonNullable())
+                .WithOutput<Customer>()
+                .WithOutputComposition(ApiQueryComposition.Projection))
+
+            .AddQuerySource("CountOrders", s => s
+                .WithOutput<int>(ApiTypeModifiers.Required)
+                .WithOutputComposition(ApiQueryComposition.None))
+
+            .AddQuerySource("GetOrderTotal", s => s
+                .AddInputParameter<Ulid>("orderId", p => p
+                    .WithRequiredArgument()
+                    .AsNonNullable())
+                .WithOutput<Money>(ApiTypeModifiers.Required)
+                .WithOutputComposition(ApiQueryComposition.None))
+
+            .AddQuerySource("ListCategories", s => s
+                .WithCollectionOutput<Category>(
+                    apiCollectionTypeModifiers: ApiTypeModifiers.Required,
+                    apiItemTypeModifiers: ApiTypeModifiers.Required)
+                .WithOutputComposition(ApiQueryComposition.Filtering | ApiQueryComposition.Ordering))
+
+            .AddQuerySource("SearchOrders", s => s
+                .AddInputParameter<OrderStatus>("status")
+                .AddInputParameter<decimal>("minimumTotal")
+                .WithCollectionOutput<Order>(
+                    apiCollectionTypeModifiers: ApiTypeModifiers.Required,
+                    apiItemTypeModifiers: ApiTypeModifiers.Required)
+                .WithOutputComposition(ApiQueryComposition.Projection
+                    | ApiQueryComposition.Filtering
+                    | ApiQueryComposition.Ordering
+                    | ApiQueryComposition.OffsetPagination));
 
         return builder;
     }

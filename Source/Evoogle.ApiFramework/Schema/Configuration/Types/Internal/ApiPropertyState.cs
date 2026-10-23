@@ -20,6 +20,6 @@ internal sealed class ApiPropertyState(string apiName, ApiConfigurationSource ap
 
     internal Action<ApiTypeModifiersBuilder>? Modifiers { get; set; }
 
-    internal ApiConfigurationSource? ModifiersSource { get; set; }
+    internal ApiConfigurationSource ModifiersSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

@@ -32,7 +32,15 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
 
         #region XUnitTest Methods
         protected override void Arrange()
-        { }
+        {
+            this.WriteLine($"Scenario:   {this.Name}");
+            this.WriteLine($"CLR Member: {nameof(VersionedObject)}.{nameof(VersionedObject.Version)}");
+            this.WriteLine();
+            this.WriteLine($"Uses API Name Reference: {this.UsesApiNameReference}");
+            this.WriteLine($"Uses Repository Version: {this.ReplaceWithRepositoryVersion}");
+            this.WriteLine();
+            this.WriteLine("Expected Exception: None");
+        }
 
         protected override void Act()
         {
@@ -41,7 +49,7 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
                 new ApiSchemaBuilderContext()
             )
                 .WithName(nameof(VersionedObject))
-                .AddRequiredProperty(x => x.Version);
+                .AddProperty(x => x.Version, property => property.AsNonNullable());
 
             if (this.UsesApiNameReference)
             {
@@ -77,10 +85,14 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
                     new ApiScalarType("Int64", typeof(long)),
                     objectType
                 ],
-                apiRelationships: null
+                apiRelationships: null,
+                apiQuerySources: null
             );
             ApiSchemaCompiler.Compile(schema).ThrowIfInvalid();
             this.Actual = objectType;
+            this.WriteLine();
+            this.WriteLine($"Actual Version CLR Type: {objectType.ApiVersion?.ClrType}");
+            this.WriteLine($"Actual Version Member:   {objectType.ApiVersion?.ApiPropertyReference}");
         }
 
         protected override void Assert()

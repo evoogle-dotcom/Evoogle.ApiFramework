@@ -30,10 +30,11 @@ public sealed class ApiSchemaOptionsBuilder()
     }
 
     /// <summary>
-    ///     Configures key null handling to use the default key value behavior when a key path segment is null or cannot be resolved during key construction, rather than throwing.
+    ///     Configures key null handling to emit <see cref="Evoogle.ApiFramework.Key.ApiKey.Empty"/>
+    ///     for the affected path when a segment is null or cannot be resolved during key construction.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaOptionsBuilder UseDefaultOnNullKeyPart()
+    public ApiSchemaOptionsBuilder UseEmptyKeyOnNullKeyPart()
     {
         _state.ApiKeyNullHandling = ApiKeyNullHandling.UseDefaultOnNull;
         return this;

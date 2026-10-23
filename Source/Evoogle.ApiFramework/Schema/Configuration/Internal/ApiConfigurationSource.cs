@@ -9,6 +9,13 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
 ///     This API may change or be removed in future releases.
 /// </summary>
+/// <remarks>
+///     Builder states store non-nullable sources initialized to <see cref="Convention"/>, unless a constructor
+///     supplies the source with an initial value. Optional configuration is represented by the value itself.
+///     Accept a setting when its incoming source is greater than or equal to the stored source, updating both
+///     the value and source together. Registrations retain the highest source supplied on creation or reuse.
+///     Callback scopes default to <see cref="Explicit"/> because they describe the operation currently executing.
+/// </remarks>
 internal enum ApiConfigurationSource
 {
     /// <summary>

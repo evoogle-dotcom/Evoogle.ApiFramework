@@ -70,7 +70,7 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
         where TBuilder : ApiRelationshipBuilder
     {
         var source = this.CurrentConfigurationSource;
-        if (_state.DeleteBehaviorSource == null || source >= _state.DeleteBehaviorSource.Value)
+        if (source >= _state.DeleteBehaviorSource)
         {
             _state.DeleteBehavior = apiDeleteBehavior;
             _state.DeleteBehaviorSource = source;
@@ -96,8 +96,7 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
         _configurationSourceScope.CurrentSource;
 
     /// <summary>Gets the highest-precedence source that registered this relationship.</summary>
-    internal ApiConfigurationSource RegistrationSource =>
-        _state.RegistrationSource ?? ApiConfigurationSource.Explicit;
+    internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
 
     /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
     internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
@@ -105,7 +104,7 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     /// <summary>Records the source that registered this relationship.</summary>
     internal void SetRegistrationSource(ApiConfigurationSource source)
     {
-        if (_state.RegistrationSource == null || source > _state.RegistrationSource.Value)
+        if (source >= _state.RegistrationSource)
         {
             _state.RegistrationSource = source;
         }

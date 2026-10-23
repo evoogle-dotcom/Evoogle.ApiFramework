@@ -121,10 +121,12 @@ public partial class ApiObjectTypeBuilderTests
         },
         new BuildTestGeneric
         {
-            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type with explicitly add required/optional properties",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type" +
+                " with explicit property nullability",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
-            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromSimpleApiSchemaTheScalarsOnlyTypeWithAddRequiredOrOptionalProperty()
+            ApiTypeActualBuildExpression = static () =>
+                ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromSimpleApiSchemaTheScalarsOnlyTypeWithExplicitNullability()
         },
 
         // Simple API Schema
@@ -145,10 +147,12 @@ public partial class ApiObjectTypeBuilderTests
         },
         new BuildTestGeneric
         {
-            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Company)}' API object type with explicitly configuring required/optional properties",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Company)}' API object type" +
+                " with configured property nullability",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
-            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromSimpleApiSchemaTheCompanyTypeWithConfigureRequiredOrOptionalProperty(),
+            ApiTypeActualBuildExpression = static () =>
+                ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromSimpleApiSchemaTheCompanyTypeWithConfiguredNullability(),
         },
 
         // Key API Schema

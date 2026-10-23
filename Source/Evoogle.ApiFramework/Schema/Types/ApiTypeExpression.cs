@@ -9,6 +9,7 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Types;
@@ -71,6 +72,20 @@ public sealed class ApiTypeExpression
         context,
         ApiSchemaCompilationCode.ApiCollectionTypeUnresolvedItemType,
         nameof(ApiCollectionType.ApiItemType)
+    );
+
+    internal void ResolveForQuerySource(ApiSchemaCompilationContext context) => this.Resolve
+    (
+        context,
+        ApiSchemaCompilationCode.ApiQuerySourceUnresolvedOutputType,
+        nameof(ApiQuerySource.ApiOutputType)
+    );
+
+    internal void ResolveForQuerySourceParameter(ApiSchemaCompilationContext context) => this.Resolve
+    (
+        context,
+        ApiSchemaCompilationCode.ApiQuerySourceParameterUnresolvedType,
+        nameof(ApiQuerySourceParameter.ApiType)
     );
 
     internal void ResolveForProperty(ApiSchemaCompilationContext context) => this.Resolve

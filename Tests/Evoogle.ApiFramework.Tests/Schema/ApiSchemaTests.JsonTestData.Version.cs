@@ -90,7 +90,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         },
@@ -143,7 +144,8 @@ public partial class ApiSchemaTests
                         "ClrType": "Evoogle.ApiFramework.TestData.Empty, Evoogle.ApiFramework.Tests"
                     }
                 ],
-                "ApiRelationships": []
+                "ApiRelationships": [],
+                "ApiQuerySources": []
             }
             """
         }

@@ -31,10 +31,10 @@ internal sealed class ApiPropertyNullabilityModifierConvention : IApiPropertyCon
         switch (context.ClrMemberNullableInfo.Nullability)
         {
             case MemberNullability.NonNullable:
-                builder.SetModifiersConvention(static m => m.Required());
+                builder.SetModifiersConvention(static m => m.AsNonNullable());
                 break;
             case MemberNullability.Nullable:
-                builder.SetModifiersConvention(static m => m.Optional());
+                builder.SetModifiersConvention(static m => m.AsNullable());
                 break;
             default:
                 // MemberNullability.Unknown — no inference possible; leave as-is.

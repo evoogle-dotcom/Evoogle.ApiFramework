@@ -15,6 +15,7 @@ public partial class ApiSchemaTests
             .Union(KeyJsonTestCases)
             .Union(VersionJsonTestCases)
             .Union(RelationshipJsonTestCases)
+            .Union(QuerySourceJsonTestCases)
             .Select(c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
             {
                 Name = c.Name,

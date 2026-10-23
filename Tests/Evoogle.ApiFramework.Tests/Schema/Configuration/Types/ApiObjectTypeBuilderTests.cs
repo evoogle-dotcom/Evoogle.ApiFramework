@@ -142,11 +142,11 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
         #endregion
     }
 
-    private class BuildWithAddRequiredOrOptionalPropertyTest : BuildTest
+    private class BuildWithExplicitPropertyNullabilityTest : BuildTest
     {
         #region Constructors
         [SetsRequiredMembers]
-        public BuildWithAddRequiredOrOptionalPropertyTest()
+        public BuildWithExplicitPropertyNullabilityTest()
         {
             this.Name = nameof(BuildTest);
         }
@@ -169,29 +169,28 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             {
                 var apiPropertyName = apiProperty.ApiName;
                 var clrMemberName = apiProperty.ClrName;
-                var isRequired = apiProperty.IsRequired;
 
                 if (apiPropertyName == clrMemberName)
                 {
                     var name = apiPropertyName;
-                    if (isRequired)
+                    if (apiProperty.IsNonNullable)
                     {
-                        builder.AddRequiredProperty(name);
+                        builder.AddProperty(name, property => property.AsNonNullable());
                     }
                     else
                     {
-                        builder.AddOptionalProperty(name);
+                        builder.AddProperty(name, property => property.AsNullable());
                     }
                 }
                 else
                 {
-                    if (isRequired)
+                    if (apiProperty.IsNonNullable)
                     {
-                        builder.AddRequiredProperty(apiPropertyName, clrMemberName);
+                        builder.AddProperty(apiPropertyName, clrMemberName, property => property.AsNonNullable());
                     }
                     else
                     {
-                        builder.AddOptionalProperty(apiPropertyName, clrMemberName);
+                        builder.AddProperty(apiPropertyName, clrMemberName, property => property.AsNullable());
                     }
                 }
             }
@@ -207,11 +206,11 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
         #endregion
     }
 
-    private class BuildWithConfigureAsRequiredOrOptionalPropertyTest : BuildTest
+    private class BuildWithConfiguredPropertyNullabilityTest : BuildTest
     {
         #region Constructors
         [SetsRequiredMembers]
-        public BuildWithConfigureAsRequiredOrOptionalPropertyTest()
+        public BuildWithConfiguredPropertyNullabilityTest()
         {
             this.Name = nameof(BuildTest);
         }
@@ -234,29 +233,28 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             {
                 var apiPropertyName = apiProperty.ApiName;
                 var clrMemberName = apiProperty.ClrName;
-                var isRequired = apiProperty.IsRequired;
 
                 if (apiPropertyName == clrMemberName)
                 {
                     var name = apiPropertyName;
-                    if (isRequired)
+                    if (apiProperty.IsNonNullable)
                     {
-                        builder.AddProperty(name, x => x.AsRequired());
+                        builder.AddProperty(name, x => x.AsNonNullable());
                     }
                     else
                     {
-                        builder.AddProperty(name, x => x.AsOptional());
+                        builder.AddProperty(name, x => x.AsNullable());
                     }
                 }
                 else
                 {
-                    if (isRequired)
+                    if (apiProperty.IsNonNullable)
                     {
-                        builder.AddProperty(apiPropertyName, clrMemberName, x => x.AsRequired());
+                        builder.AddProperty(apiPropertyName, clrMemberName, x => x.AsNonNullable());
                     }
                     else
                     {
-                        builder.AddProperty(apiPropertyName, clrMemberName, x => x.AsOptional());
+                        builder.AddProperty(apiPropertyName, clrMemberName, x => x.AsNullable());
                     }
                 }
             }
@@ -322,9 +320,10 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             ApiExtensionType1 = typeof(GraphQlExtension),
             ApiExtensionType2 = typeof(JsonApiExtension),
         },
-        new BuildWithAddRequiredOrOptionalPropertyTest
+        new BuildWithExplicitPropertyNullabilityTest
         {
-            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type with explicitly add required/optional properties",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type" +
+                " with explicit property nullability",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
         },
@@ -344,9 +343,10 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             ApiObjectTypeName = nameof(Company),
             ApiExtensionType1 = typeof(GraphQlExtension),
         },
-        new BuildWithConfigureAsRequiredOrOptionalPropertyTest
+        new BuildWithConfiguredPropertyNullabilityTest
         {
-            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Company)}' API object type with explicitly configuring required/optional properties",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Company)}' API object type" +
+                " with configured property nullability",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
         },

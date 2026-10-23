@@ -256,6 +256,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
                 [new ApiScalarType("Int32", typeof(int))],
                 null,
                 [rootType, nestedType],
+                null,
                 null
             );
 

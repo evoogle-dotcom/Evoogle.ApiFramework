@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Extensions;
@@ -190,6 +191,25 @@ public static class ApiSchemaExtensions
         return apiSchema.GetObjectTypeByClrType(clrObjectType);
     }
 
+    /// <summary>Gets a declared query source by its API name.</summary>
+    /// <param name="apiSchema">The compiled schema.</param>
+    /// <param name="apiName">The query source API name.</param>
+    /// <returns>The resolved query source.</returns>
+    /// <exception cref="ApiSchemaException">No matching query source exists.</exception>
+    public static ApiQuerySource GetQuerySourceByApiName(this ApiSchema apiSchema, string apiName)
+    {
+        if (apiSchema.TryGetQuerySourceByApiName(apiName, out var source))
+        {
+            return source;
+        }
+
+        var availableQuerySourcesByApiName = string.Join(", ", apiSchema.ApiQuerySources.OrderBy(t => t.ApiName).Select(t => t.ApiName));
+        var errorMessage =
+            $"{nameof(ApiQuerySource)} with {nameof(ApiQuerySource.ApiName)} '{apiName}' not found in {apiSchema.SafeToString()}. " +
+            $"Available {nameof(ApiQuerySource)} by {nameof(ApiQuerySource.ApiName)} are: {availableQuerySourcesByApiName}.";
+        throw new ApiSchemaException(errorMessage);
+    }
+
     /// <summary>
     ///     Gets an <see cref="ApiRelationship"/> by its API name.
     /// </summary>
@@ -206,7 +226,7 @@ public static class ApiSchemaExtensions
 
         var availableRelationshipsByApiName = string.Join(", ", apiSchema.ApiRelationships.OrderBy(t => t.ApiName).Select(t => t.ApiName));
         var errorMessage =
-            $"{nameof(ApiRelationship)} with {nameof(ApiNamedType.ApiName)} '{apiName}' not found in {apiSchema.SafeToString()}. " +
+            $"{nameof(ApiRelationship)} with {nameof(ApiRelationship.ApiName)} '{apiName}' not found in {apiSchema.SafeToString()}. " +
             $"Available {nameof(ApiRelationship)} by {nameof(ApiRelationship.ApiName)} are: {availableRelationshipsByApiName}.";
         throw new ApiSchemaException(errorMessage);
     }

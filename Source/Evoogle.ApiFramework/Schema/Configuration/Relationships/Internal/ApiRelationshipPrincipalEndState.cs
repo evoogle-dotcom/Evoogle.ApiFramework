@@ -16,6 +16,6 @@ internal sealed class ApiRelationshipPrincipalEndState
     #region Properties
     internal string? PrincipalKeyName { get; set; }
 
-    internal ApiConfigurationSource? PrincipalKeyNameSource { get; set; }
+    internal ApiConfigurationSource PrincipalKeyNameSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

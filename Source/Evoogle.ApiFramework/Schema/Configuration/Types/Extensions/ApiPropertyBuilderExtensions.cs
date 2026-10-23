@@ -26,26 +26,26 @@ public static class ApiPropertyBuilderExtensions
     }
 
     /// <summary>
-    ///     Marks this property as required, overriding any nullability-inferred modifier.
+    ///     Marks this property as non-nullable, overriding any nullability-inferred modifier.
     /// </summary>
     /// <param name="builder">The property builder to configure.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiPropertyBuilder AsRequired(this ApiPropertyBuilder builder)
+    public static ApiPropertyBuilder AsNonNullable(this ApiPropertyBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.WithModifiers(m => m.Required());
+        return builder.WithModifiers(m => m.AsNonNullable());
     }
 
     /// <summary>
-    ///     Marks this property as optional, overriding any nullability-inferred modifier.
+    ///     Marks this property as nullable, overriding any nullability-inferred modifier.
     /// </summary>
     /// <param name="builder">The property builder to configure.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiPropertyBuilder AsOptional(this ApiPropertyBuilder builder)
+    public static ApiPropertyBuilder AsNullable(this ApiPropertyBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.WithModifiers(m => m.Optional());
+        return builder.WithModifiers(m => m.AsNullable());
     }
 }

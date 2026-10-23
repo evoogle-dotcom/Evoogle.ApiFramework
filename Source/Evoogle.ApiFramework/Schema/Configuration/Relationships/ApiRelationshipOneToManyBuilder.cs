@@ -65,8 +65,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         (
             _endsState.PrincipalEndA != null &&
             _endsState.PrincipalEndA.ApiObjectTypeReference == apiPrincipalTypeReference &&
-            _endsState.PrincipalEndASource != null &&
-            source < _endsState.PrincipalEndASource.Value
+            source < _endsState.PrincipalEndASource
         )
         {
             if (configure != null)
@@ -81,7 +80,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
             return this;
         }
 
-        if (_endsState.PrincipalEndASource != null && source < _endsState.PrincipalEndASource.Value)
+        if (source < _endsState.PrincipalEndASource)
         {
             return this;
         }
@@ -165,7 +164,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
                 _endsState.DependentEnd.ApplyConfiguration(source, () => configure(_endsState.DependentEnd));
             }
 
-            if (_endsState.DependentEndSource == null || source >= _endsState.DependentEndSource.Value)
+            if (source >= _endsState.DependentEndSource)
             {
                 _endsState.DependentEndSource = source;
             }
@@ -177,8 +176,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         (
             _endsState.DependentEnd != null &&
             _endsState.DependentEnd.ApiObjectTypeReference == apiDependentTypeReference &&
-            _endsState.DependentEndSource != null &&
-            source < _endsState.DependentEndSource.Value
+            source < _endsState.DependentEndSource
         )
         {
             if (configure != null)
@@ -193,7 +191,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
             return this;
         }
 
-        if (_endsState.DependentEndSource != null && source < _endsState.DependentEndSource.Value)
+        if (source < _endsState.DependentEndSource)
         {
             return this;
         }
@@ -244,7 +242,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         );
 
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             relationship.AttachExtensions(extensions);
         }
@@ -266,15 +264,14 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         (
             _endsState.DependentEnd != null &&
             _endsState.DependentEnd.ApiObjectTypeReference == builder.ApiObjectTypeReference &&
-            _endsState.DependentEndSource != null &&
-            source < _endsState.DependentEndSource.Value
+            source < _endsState.DependentEndSource
         )
         {
             _endsState.DependentEnd.MergeConfigurationFrom(builder);
             return this;
         }
 
-        if (_endsState.DependentEndSource == null || source >= _endsState.DependentEndSource.Value)
+        if (source >= _endsState.DependentEndSource)
         {
             _endsState.DependentEnd = builder;
             _endsState.DependentEndSource = source;

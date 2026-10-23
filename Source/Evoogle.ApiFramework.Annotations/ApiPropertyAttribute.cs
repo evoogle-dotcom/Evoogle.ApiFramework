@@ -6,7 +6,7 @@
 namespace Evoogle.ApiFramework;
 
 /// <summary>
-///     Overrides the API name or required/optional modifier for a CLR property or field.
+///     Overrides the API name or nullability for a CLR property or field.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
@@ -23,17 +23,19 @@ public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
     }
 
     /// <summary>
-    ///     When <c>true</c>, forces the property to be required regardless of CLR nullability.
-    ///     Takes precedence over <see cref="IsOptional"/>.
-    ///     When both <see cref="IsRequired"/> and <see cref="IsOptional"/> are <c>false</c> the modifier is left to convention inference.
+    ///     When <c>true</c>, forces the property to be non-nullable regardless of CLR nullability.
+    ///     Takes precedence over <see cref="IsNullable"/>.
+    ///     When both <see cref="IsNonNullable"/> and <see cref="IsNullable"/> are <c>false</c>,
+    ///     nullability is left to convention inference.
     /// </summary>
-    public bool IsRequired { get; init; }
+    public bool IsNonNullable { get; init; }
 
     /// <summary>
-    ///     When <c>true</c>, forces the property to be optional regardless of CLR nullability.
-    ///     Ignored when <see cref="IsRequired"/> is also <c>true</c>.
-    ///     When both <see cref="IsRequired"/> and <see cref="IsOptional"/> are <c>false</c> the modifier is left to convention inference.
+    ///     When <c>true</c>, forces the property to be nullable regardless of CLR nullability.
+    ///     Ignored when <see cref="IsNonNullable"/> is also <c>true</c>.
+    ///     When both <see cref="IsNonNullable"/> and <see cref="IsNullable"/> are <c>false</c>,
+    ///     nullability is left to convention inference.
     /// </summary>
-    public bool IsOptional { get; init; }
+    public bool IsNullable { get; init; }
     #endregion
 }

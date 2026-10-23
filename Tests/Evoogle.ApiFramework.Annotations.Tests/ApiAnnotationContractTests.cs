@@ -60,11 +60,19 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"AnnotationType: {this.AnnotationType}");
-            this.WriteLine($"PropertyName: {this.PropertyName}");
+            this.WriteLine($"Annotation Type: {this.AnnotationType}");
+            this.WriteLine($"Property Name:   {this.PropertyName}");
+            this.WriteLine();
+            this.WriteLine("Expected Setter: Init-only");
         }
 
-        protected override void Act() => this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
+        protected override void Act()
+        {
+            this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
+            this.WriteLine();
+            this.WriteLine($"Actual Property: {this.ActualProperty}");
+            this.WriteLine($"Actual Setter:   {this.ActualProperty?.GetSetMethod(nonPublic: true)}");
+        }
 
         protected override void Assert()
         {
@@ -323,15 +331,15 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         },
         new AnnotationPropertyInitTest
         {
-            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.IsRequired)} uses init",
+            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.IsNonNullable)} uses init",
             AnnotationType = typeof(ApiPropertyAttribute),
-            PropertyName = nameof(ApiPropertyAttribute.IsRequired)
+            PropertyName = nameof(ApiPropertyAttribute.IsNonNullable)
         },
         new AnnotationPropertyInitTest
         {
-            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.IsOptional)} uses init",
+            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.IsNullable)} uses init",
             AnnotationType = typeof(ApiPropertyAttribute),
-            PropertyName = nameof(ApiPropertyAttribute.IsOptional)
+            PropertyName = nameof(ApiPropertyAttribute.IsNullable)
         },
         new AnnotationPropertyInitTest
         {
@@ -1034,7 +1042,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
     private sealed class AnnotatedPoco
     {
         [ApiKey]
-        [ApiProperty(ApiName = "id", IsRequired = true)]
+        [ApiProperty(ApiName = "id", IsNonNullable = true)]
         public int Id { get; set; }
 
         [ApiIgnore]

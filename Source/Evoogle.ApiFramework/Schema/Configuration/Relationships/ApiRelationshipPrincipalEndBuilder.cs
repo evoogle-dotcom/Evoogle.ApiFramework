@@ -29,7 +29,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
         throw new ArgumentNullException(nameof(apiObjectTypeReference));
     private readonly ApiRelationshipPrincipalEndState _state = new();
     private ApiRelationshipTraversalState? _traversalState;
-    private ApiConfigurationSource? _traversalSource;
+    private ApiConfigurationSource _traversalSource = ApiConfigurationSource.Convention;
     #endregion
 
     #region Properties
@@ -105,7 +105,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
         var source = _configurationSourceScope.CurrentSource;
-        if (_traversalSource is null || source >= _traversalSource.Value)
+        if (source >= _traversalSource)
         {
             _traversalState = new ApiRelationshipTraversalState(apiName, clrNavigationMember);
             _traversalSource = source;
@@ -126,7 +126,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
         ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName, nameof(apiPrincipalKeyName));
 
         var source = _configurationSourceScope.CurrentSource;
-        if (_state.PrincipalKeyNameSource == null || source >= _state.PrincipalKeyNameSource.Value)
+        if (source >= _state.PrincipalKeyNameSource)
         {
             _state.PrincipalKeyName = apiPrincipalKeyName;
             _state.PrincipalKeyNameSource = source;
@@ -155,7 +155,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
         );
 
         var extensions = this.BuildExtensions();
-        if (extensions != null)
+        if (extensions is not null)
         {
             end.AttachExtensions(extensions);
         }

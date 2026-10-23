@@ -444,7 +444,8 @@ public partial class ApiSchemaTests
                         },
                         "ApiDeleteBehavior": "Delete"
                     }
-                ]
+                ],
+                "ApiQuerySources": []
             }
             """
         },
@@ -1212,7 +1213,8 @@ public partial class ApiSchemaTests
                         },
                         "ApiDeleteBehavior": "Delete"
                     }
-                ]
+                ],
+                "ApiQuerySources": []
             }
             """
         },
@@ -1613,7 +1615,8 @@ public partial class ApiSchemaTests
                         },
                         "ApiDeleteBehavior": "Delete"
                     }
-                ]
+                ],
+                "ApiQuerySources": []
             }
             """
         }

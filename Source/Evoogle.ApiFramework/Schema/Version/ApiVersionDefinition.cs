@@ -17,7 +17,7 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema.Version;
 
 /// <summary>
-///     Describes the single scalar version token associated with an <see cref="ApiObjectType"/>.
+///     Defines a single scalar version token associated with an <see cref="ApiObjectType"/>.
 /// </summary>
 /// <remarks>
 ///     A property-backed version is configured with an API property reference and can be materialized
@@ -309,14 +309,15 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
             return;
         }
 
-        if (apiProperty.IsOptional)
+        if (apiProperty.IsNullable)
         {
+            var apiPath = context.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiVersionDefinitionOptionalProperty;
-            var description = $"Version property '{apiProperty.ApiName}' is optional";
-            var remediation = "Configure the version property as required";
+            var description = $"Version property '{apiProperty.ApiName}' is nullable";
+            var remediation = "Configure the version property as non-nullable";
 
-            context.AddIssue(severity, code, description, remediation);
+            context.AddIssue(apiPath, severity, code, description, remediation);
             return;
         }
 

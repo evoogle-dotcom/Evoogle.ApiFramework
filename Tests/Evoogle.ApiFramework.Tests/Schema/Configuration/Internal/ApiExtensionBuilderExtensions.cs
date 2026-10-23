@@ -3,7 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Version;
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Version;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
@@ -66,6 +68,24 @@ internal static class ApiExtensionBuilderExtensions
         foreach (var extension in extensions)
         {
             builder.AddPropertyExtension(extension.Key, extension.Value);
+        }
+    }
+
+    public static void ConfigureExtensions(this ApiQuerySourceBuilder builder, ApiQuerySource apiQuerySource)
+    {
+        var extensions = apiQuerySource.Extensions;
+        foreach (var extension in extensions)
+        {
+            builder.AddQuerySourceExtension(extension.Key, extension.Value);
+        }
+    }
+
+    public static void ConfigureExtensions(this ApiQuerySourceParameterBuilder builder, ApiQuerySourceParameter apiQuerySourceParameter)
+    {
+        var extensions = apiQuerySourceParameter.Extensions;
+        foreach (var extension in extensions)
+        {
+            builder.AddQuerySourceParameterExtension(extension.Key, extension.Value);
         }
     }
 

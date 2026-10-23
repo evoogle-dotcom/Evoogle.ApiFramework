@@ -9,6 +9,7 @@ using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Configuration;
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.Extension;
 using Evoogle.NTree;
 using Evoogle.XUnit;
@@ -22,39 +23,52 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
     #region Test Types
     private enum FrozenStatus
     {
+        #region Values
         Active = 1
+        #endregion
     }
 
     private sealed class FrozenEntity
     {
+        #region Properties
         public int Id { get; set; }
+        #endregion
     }
 
     private sealed class EmptyEntity;
 
     private sealed class SnapshotExtension : IApiSchemaExtension
     {
+        #region Properties
         public int Value { get; set; }
+        #endregion
 
+        #region IApiSchemaExtension Methods
         public IApiSchemaExtension CreateFrozenSnapshot() => new SnapshotExtension
         {
             Value = this.Value
         };
+        #endregion
     }
 
     private sealed class FailingExtension : IApiSchemaExtension
     {
+        #region IApiSchemaExtension Methods
         public IApiSchemaExtension CreateFrozenSnapshot() =>
             throw new InvalidOperationException("Snapshot failure.");
+        #endregion
     }
 
     private sealed class ReusingExtension : IApiSchemaExtension
     {
+        #region IApiSchemaExtension Methods
         public IApiSchemaExtension CreateFrozenSnapshot() => this;
+        #endregion
     }
 
     private sealed class PublicSurfaceTest : XUnitTest
     {
+        #region XUnitTest Methods
         protected override void Arrange()
         { }
 
@@ -77,10 +91,12 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             typeof(ApiSchemaOptions).IsSealed.Should().BeTrue();
             typeof(ApiObjectTypeOptions).IsSealed.Should().BeTrue();
         }
+        #endregion
     }
 
     private sealed class BuildResultTest : XUnitTest
     {
+        #region Calculated Properties
         private ApiSchemaCompilationResult? ErrorResult { get; set; }
 
         private ApiSchemaCompilationResult? SuccessResult { get; set; }
@@ -88,7 +104,9 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         private ApiSchemaCompilationResult? WarningResult { get; set; }
 
         private ApiSchemaCompilationException? Exception { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         { }
 
@@ -138,16 +156,20 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                 issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidName
             );
         }
+        #endregion
     }
 
     private sealed class RepeatedBuildTest : XUnitTest
     {
+        #region Calculated Properties
         private SnapshotExtension? ExtensionSource { get; set; }
 
         private ApiSchema? FirstSchema { get; set; }
 
         private ApiSchema? SecondSchema { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange() => this.ExtensionSource = new SnapshotExtension { Value = 42 };
 
         protected override void Act()
@@ -206,12 +228,16 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             detach.Should().Throw<InvalidOperationException>();
             modify.Should().Throw<InvalidOperationException>();
         }
+        #endregion
     }
 
     private sealed class InvalidExtensionTest : XUnitTest
     {
+        #region Calculated Properties
         private ApiSchemaCompilationResult[]? Results { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         { }
 
@@ -247,10 +273,16 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                 issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionInvalidSnapshot
             );
         }
+        #endregion
     }
 
     private sealed class FrozenLookupAndConcurrencyTest : XUnitTest
     {
+        #region User Supplied Properties
+        public required int ExpectedLookupCount { get; init; }
+        #endregion
+
+        #region Calculated Properties
         private ApiSchema? Schema { get; set; }
 
         private ApiSchema? ReplacementSchema { get; set; }
@@ -260,18 +292,25 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         private bool? ConcurrentReadsSucceeded { get; set; }
 
         private ApiSchemaElement[]? OriginalElements { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
             this.Schema = CreateBuilder("Concurrent")
                 .AddSchemaExtension(new SnapshotExtension { Value = 42 })
+                .AddQuerySource("EntityById", source => source.WithOutput<FrozenEntity>().AddInputParameter<int>("id"))
                 .Build();
             this.LookupFields =
             [
                 .. GetLookupFields(typeof(ApiSchema)),
                 .. GetLookupFields(typeof(ApiObjectType)),
-                .. GetLookupFields(typeof(ApiEnumType))
+                .. GetLookupFields(typeof(ApiEnumType)),
+                .. GetLookupFields(typeof(ApiQuerySource))
             ];
+            this.WriteLine($"Scenario: {this.Name}; expected frozen lookup count: {this.ExpectedLookupCount}");
+            this.WriteLine("Concurrent reads: 32 workers, 100 iterations; source EntityById, parameter id");
+            this.WriteLine("Expected concurrent success: true; expected exception: none");
         }
 
         protected override void Act()
@@ -319,9 +358,12 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                                 var keyMatches = materializedKey.IsComposite;
                                 var traversalMatches = traversed.SequenceEqual(this.OriginalElements);
                                 var serializedSuccessfully = serialized.Length > 0;
+                                var sourceFound = schema.TryGetQuerySourceByApiName("EntityById", out var source)
+                                    && source.TryGetParameterByApiName("id", out var parameter)
+                                    && parameter.ApiType.ClrType == typeof(int);
 
                                 if (!typeFound || !relationshipFound || !extensionFound || !keyMatches ||
-                                    !traversalMatches || !serializedSuccessfully)
+                                    !traversalMatches || !serializedSuccessfully || !sourceFound)
                                 {
                                     throw new InvalidOperationException
                                     (
@@ -336,11 +378,14 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                 )
             ).GetAwaiter().GetResult().All(result => result);
             this.ReplacementSchema = replacementTask.GetAwaiter().GetResult();
+            this.WriteLine($"Actual lookup count: {this.LookupFields!.Length}");
+            this.WriteLine($"Concurrent reads succeeded: {this.ConcurrentReadsSucceeded}");
+            this.WriteLine($"Replacement schema: {this.ReplacementSchema.ApiName}");
         }
 
         protected override void Assert()
         {
-            this.LookupFields.Should().HaveCount(16);
+            this.LookupFields.Should().HaveCount(this.ExpectedLookupCount);
             this.LookupFields.Should().OnlyContain
             (
                 field => field.FieldType.IsGenericType &&
@@ -350,6 +395,11 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             foreach (var field in GetLookupFields(typeof(ApiSchema)))
             {
                 field.GetValue(this.Schema).Should().NotBeNull();
+            }
+
+            foreach (var field in GetLookupFields(typeof(ApiQuerySource)))
+            {
+                field.GetValue(this.Schema!.GetQuerySourceByApiName("EntityById")).Should().NotBeNull();
             }
 
             var objectType = this.Schema!.ApiObjectTypes.First(type => type.ApiKeys.Length > 0);
@@ -370,12 +420,15 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             this.ReplacementSchema.Should().NotBeSameAs(this.Schema);
             this.Schema.SelfAndDescendants(TraversalStrategy.DepthFirst).Should().Equal(this.OriginalElements!);
         }
+        #endregion
 
+        #region Implementation Methods
         private static FieldInfo[] GetLookupFields(Type type) =>
         [
             .. type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Where(field => field.Name.EndsWith("Lookup", StringComparison.Ordinal))
         ];
+        #endregion
     }
     #endregion
 
@@ -386,7 +439,11 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         new BuildResultTest { Name = "Build Results Publish Only Valid Frozen Schemas" },
         new RepeatedBuildTest { Name = "Repeated Builder Builds Produce Independent Frozen Graphs" },
         new InvalidExtensionTest { Name = "Invalid Extension Snapshots Produce Build Diagnostics" },
-        new FrozenLookupAndConcurrencyTest { Name = "Frozen Lookup Tables Support Concurrent Runtime Reads" }
+        new FrozenLookupAndConcurrencyTest
+        {
+            Name = "Frozen Lookup Tables Support Concurrent Runtime Reads",
+            ExpectedLookupCount = 18
+        }
     ];
     #endregion
 

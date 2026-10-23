@@ -4,6 +4,7 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 using Evoogle.Logging;
@@ -23,8 +24,8 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     private readonly Dictionary<Type, ApiScalarTypeBuilder> _apiScalarTypeBuilders = [];
     private readonly Dictionary<Type, ApiEnumTypeBuilder> _apiEnumTypeBuilders = [];
     private readonly Dictionary<Type, ApiObjectTypeBuilder> _apiObjectTypeBuilders = [];
-    private readonly Dictionary<string, ApiRelationshipBuilder> _apiRelationshipBuilders =
-        new(ApiNameComparer.Instance);
+    private readonly Dictionary<string, ApiRelationshipBuilder> _apiRelationshipBuilders = new(ApiNameComparer.Instance);
+    private readonly Dictionary<string, ApiQuerySourceBuilder> _apiQuerySourceBuilders = new(ApiNameComparer.Instance);
 
     private readonly Queue<ApiObjectTypeBuilder> _pendingObjectBuilders = new();
     private readonly Queue<ApiScalarTypeBuilder> _pendingScalarBuilders = new();
@@ -43,6 +44,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     internal IEnumerable<ApiEnumTypeBuilder> ApiEnumTypeBuilders => _apiEnumTypeBuilders.Values;
     internal IEnumerable<ApiObjectTypeBuilder> ApiObjectTypeBuilders => _apiObjectTypeBuilders.Values;
     internal IEnumerable<ApiRelationshipBuilder> ApiRelationshipBuilders => _apiRelationshipBuilders.Values;
+    internal IEnumerable<ApiQuerySourceBuilder> ApiQuerySourceBuilders => _apiQuerySourceBuilders.Values;
     internal IReadOnlyList<ApiSchemaCompilationIssue> ConfigurationIssues => _configurationIssues;
 
     /// <summary>Gets the source associated with the active configuration callback.</summary>
@@ -165,6 +167,25 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
             this,
             _pendingScalarBuilders
         );
+
+    /// <summary>Gets existing or adds new <see cref="ApiQuerySourceBuilder"/> for the specified API name.</summary>
+    /// <param name="apiName">The schema-unique API name of the query source.</param>
+    /// <returns>The corresponding <see cref="ApiQuerySourceBuilder"/>.</returns>
+    internal ApiQuerySourceBuilder GetOrAddQuerySourceBuilder(string apiName)
+        => this.GetOrAddQuerySourceBuilder(apiName, this.CurrentConfigurationSource);
+
+    /// <summary>Gets or adds a query source builder at the supplied configuration source.</summary>
+    internal ApiQuerySourceBuilder GetOrAddQuerySourceBuilder(string apiName, ApiConfigurationSource source)
+    {
+        if (!_apiQuerySourceBuilders.TryGetValue(apiName, out var builder))
+        {
+            builder = new ApiQuerySourceBuilder(apiName);
+            _apiQuerySourceBuilders[apiName] = builder;
+        }
+
+        builder.SetRegistrationSource(source);
+        return builder;
+    }
 
     /// <summary>
     ///     Gets existing or adds new <see cref="ApiRelationshipOneToOneBuilder"/> for the specified API name.

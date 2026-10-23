@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration;
 using Evoogle.Extensions;
+using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
 
@@ -143,6 +144,49 @@ public class ApiSchemaKindFluentRoundTripBuildTest : ApiSchemaBuildTestBase
                 }),
                 _ => throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipKind)}: {apiKind.SafeToString()}"),
             };
+        }
+
+        var apiQuerySources = this.ApiSchemaExpected!.ApiQuerySources;
+        foreach (var apiQuerySource in apiQuerySources)
+        {
+            var apiName = apiQuerySource.ApiName;
+            var apiInputParameters = apiQuerySource.ApiInputParameters;
+            var apiOutputType = apiQuerySource.ApiOutputType;
+            var apiOutputTypeModifiers = apiQuerySource.ApiOutputTypeModifiers;
+            var apiOutputComposition = apiQuerySource.ApiOutputComposition;
+
+            builder = builder.AddQuerySource(apiName, x =>
+            {
+                foreach (var apiInputParameter in apiInputParameters)
+                {
+                    var apiName = apiInputParameter.ApiName;
+                    var apiTypeModifiers = apiInputParameter.ApiTypeModifiers;
+                    var apiRequiresArgument = apiInputParameter.ApiRequiresArgument;
+                    var clrType = apiInputParameter.ApiType.ClrType;
+
+                    x.AddInputParameter(apiName, clrType, p => p
+                        .WithModifiers(apiTypeModifiers)
+                        .WithRequiredArgument(apiRequiresArgument)
+                        .ConfigureExtensions(apiInputParameter));
+                }
+
+                if (apiOutputType.IsCollectionType())
+                {
+                    var apiCollectionType = (ApiCollectionType)apiOutputType;
+                    var clrOutputItemType = apiCollectionType.ApiItemType.ClrType;
+                    var apiOutputItemTypeModifiers = apiCollectionType.ApiItemTypeModifiers;
+
+                    x.WithCollectionOutput(clrOutputItemType, apiOutputTypeModifiers, apiOutputItemTypeModifiers);
+                }
+                else
+                {
+                    var clrOutputType = apiQuerySource.ApiOutputType.ClrType;
+                    x.WithOutput(clrOutputType, apiOutputTypeModifiers);
+                }
+
+                x.WithOutputComposition(apiOutputComposition);
+                x.ConfigureExtensions(apiQuerySource);
+            });
         }
 
         builder.ConfigureExtensions(this.ApiSchemaExpected!);
