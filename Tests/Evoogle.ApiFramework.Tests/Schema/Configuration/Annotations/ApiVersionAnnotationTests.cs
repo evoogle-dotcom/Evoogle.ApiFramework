@@ -519,7 +519,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Member annotation does not register its scalar type",
             TestCase = InvalidCase.UnregisteredScalar,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiPropertyUnresolvedType
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiPropertyTypeReferenceUnresolved
         }
     ];
 

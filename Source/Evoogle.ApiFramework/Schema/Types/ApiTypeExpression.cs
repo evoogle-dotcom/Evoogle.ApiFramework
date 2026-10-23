@@ -70,28 +70,28 @@ public sealed class ApiTypeExpression
     internal void ResolveForCollection(ApiSchemaCompilationContext context) => this.Resolve
     (
         context,
-        ApiSchemaCompilationCode.ApiCollectionTypeUnresolvedItemType,
+        ApiSchemaCompilationCode.ApiCollectionTypeItemTypeReferenceUnresolved,
         nameof(ApiCollectionType.ApiItemType)
     );
 
     internal void ResolveForQuerySource(ApiSchemaCompilationContext context) => this.Resolve
     (
         context,
-        ApiSchemaCompilationCode.ApiQuerySourceUnresolvedOutputType,
+        ApiSchemaCompilationCode.ApiQuerySourceOutputTypeReferenceUnresolved,
         nameof(ApiQuerySource.ApiOutputType)
     );
 
     internal void ResolveForQuerySourceParameter(ApiSchemaCompilationContext context) => this.Resolve
     (
         context,
-        ApiSchemaCompilationCode.ApiQuerySourceParameterUnresolvedType,
+        ApiSchemaCompilationCode.ApiQuerySourceParameterTypeReferenceUnresolved,
         nameof(ApiQuerySourceParameter.ApiType)
     );
 
     internal void ResolveForProperty(ApiSchemaCompilationContext context) => this.Resolve
     (
         context,
-        ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
+        ApiSchemaCompilationCode.ApiPropertyTypeReferenceUnresolved,
         nameof(ApiProperty.ApiType)
     );
 

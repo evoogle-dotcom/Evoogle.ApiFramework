@@ -197,12 +197,13 @@ public sealed partial class ApiProperty : ApiSchemaElement
     {
         if (this.ApiTypeExpression is null)
         {
+            var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyNullType;
-            var description = $"{nameof(this.ApiType)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiPropertyTypeUnspecified;
+            var description = $"{nameof(this.ApiType)} was not specified";
             var remediation = $"Specify a valid {nameof(this.ApiType)}";
 
-            context.AddIssue(severity, code, description, remediation);
+            context.AddIssue(apiPath, severity, code, description, remediation);
             return;
         }
 

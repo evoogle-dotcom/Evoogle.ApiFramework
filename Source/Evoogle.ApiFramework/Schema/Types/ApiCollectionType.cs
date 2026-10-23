@@ -107,12 +107,13 @@ public sealed class ApiCollectionType
     {
         if (this.ApiItemTypeExpression is null)
         {
+            var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiCollectionTypeNullItemType;
-            var description = $"{nameof(this.ApiItemType)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiCollectionTypeItemTypeUnspecified;
+            var description = $"{nameof(this.ApiItemType)} was not specified";
             var remediation = $"Specify a valid {nameof(this.ApiItemType)}";
 
-            context.AddIssue(severity, code, description, remediation);
+            context.AddIssue(apiPath, severity, code, description, remediation);
             return;
         }
 

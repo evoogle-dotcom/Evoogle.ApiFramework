@@ -113,16 +113,15 @@ public sealed class ApiQuerySourceParameter
         {
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiQuerySourceParameterUnresolvedType;
-            var description = $"{nameof(this.ApiType)} is missing";
+            var code = ApiSchemaCompilationCode.ApiQuerySourceParameterTypeUnspecified;
+            var description = $"{nameof(this.ApiType)} was not specified";
             var remediation = $"Specify a valid {nameof(this.ApiType)}";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
+            return;
         }
-        else
-        {
-            this.ApiTypeExpression.ResolveForQuerySourceParameter(context);
-        }
+
+        this.ApiTypeExpression.ResolveForQuerySourceParameter(context);
     }
 
     private void ValidateApiName(ApiSchemaCompilationContext context)

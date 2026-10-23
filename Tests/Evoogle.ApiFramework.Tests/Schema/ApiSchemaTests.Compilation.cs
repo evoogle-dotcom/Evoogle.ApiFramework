@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -197,8 +198,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiCollectionTypeNullItemType,
-                    description: $"{nameof(ApiCollectionType.ApiItemType)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiCollectionTypeItemTypeUnspecified,
+                    description: $"{nameof(ApiCollectionType.ApiItemType)} was not specified",
                     remediation: $"Specify a valid {nameof(ApiCollectionType.ApiItemType)}"
                 ),
             ]
@@ -247,7 +248,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiCollectionTypeUnresolvedItemType,
+                    code: ApiSchemaCompilationCode.ApiCollectionTypeItemTypeReferenceUnresolved,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeReference.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeReference.ApiName)}='String'",
                     remediation: $"Verify that a compatible type is declared in the schema for {nameof(ApiTypeReference.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeReference.ApiName)}='String'"
                 ),
@@ -1022,8 +1023,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyNullType,
-                    description: $"{nameof(ApiProperty.ApiType)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiPropertyTypeUnspecified,
+                    description: $"{nameof(ApiProperty.ApiType)} was not specified",
                     remediation: $"Specify a valid {nameof(ApiProperty.ApiType)}"
                 ),
             ]
@@ -1150,7 +1151,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
+                    code: ApiSchemaCompilationCode.ApiPropertyTypeReferenceUnresolved,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeReference.ApiKind)}='Scalar' and {nameof(ApiTypeReference.ApiName)}='String'",
                     remediation: $"Verify that a compatible type is declared in the schema for {nameof(ApiTypeReference.ApiKind)}='Scalar' and {nameof(ApiTypeReference.ApiName)}='String'"
                 ),
@@ -1194,7 +1195,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
+                    code: ApiSchemaCompilationCode.ApiPropertyTypeReferenceUnresolved,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeReference.ClrType)}='{nameof(String)}'",
                     remediation: $"Verify that a compatible type is declared in the schema for {nameof(ApiTypeReference.ClrType)}='{nameof(String)}'"
                 ),
@@ -2653,6 +2654,88 @@ public partial class ApiSchemaTests
                     description: $"Terminal segment member 'Item' must resolve to a scalar type; found '{nameof(ApiObjectType)}'",
                     remediation: "Change the terminal member to a scalar-typed member or remove "
                         + "extra navigation segments"
+                ),
+            ]
+        },
+
+        //
+        // ApiQuerySource Compilation Tests
+        //
+
+        // ApiQuerySource throws if the output type is not specified
+        new CompileThrowsTest
+        {
+            Name = $"{nameof(ApiQuerySource)} Throws If {nameof(ApiQuerySource.ApiOutputType)} Is Unspecified",
+            SourceJson = """
+            {
+                "ApiName": "ApiQuerySource Throws If ApiOutputType Is Unspecified",
+                "ApiScalarTypes": [],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [],
+                "ApiQuerySources": [
+                    {
+                        "ApiName": "SearchNames",
+                        "ApiInputParameters": []
+                    }
+                ]
+            }
+            """,
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiSchemaCompilationIssue
+                (
+                    apiPath: $"{nameof(ApiQuerySource)}[\"SearchNames\"]",
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiQuerySourceOutputTypeUnspecified,
+                    description: $"{nameof(ApiQuerySource.ApiOutputType)} was not specified",
+                    remediation: $"Specify a valid {nameof(ApiQuerySource.ApiOutputType)}"
+                ),
+            ]
+        },
+
+        // ApiQuerySourceParameter throws if the type is not specified
+        new CompileThrowsTest
+        {
+            Name = $"{nameof(ApiQuerySourceParameter)} Throws If {nameof(ApiQuerySourceParameter.ApiType)} Is Unspecified",
+            SourceJson = """
+            {
+                "ApiName": "ApiQuerySourceParameter Throws If ApiType Is Unspecified",
+                "ApiScalarTypes": [
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
+                    }
+                ],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [],
+                "ApiQuerySources": [
+                    {
+                        "ApiName": "SearchNames",
+                        "ApiInputParameters": [
+                            {
+                                "ApiName": "searchTerm"
+                            }
+                        ],
+                        "ApiOutputType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
+                        }
+                    }
+                ]
+            }
+            """,
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiSchemaCompilationIssue
+                (
+                    apiPath: $"{nameof(ApiQuerySource)}[\"SearchNames\"].{nameof(ApiQuerySourceParameter)}[\"searchTerm\"]",
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiQuerySourceParameterTypeUnspecified,
+                    description: $"{nameof(ApiQuerySourceParameter.ApiType)} was not specified",
+                    remediation: $"Specify a valid {nameof(ApiQuerySourceParameter.ApiType)}"
                 ),
             ]
         },

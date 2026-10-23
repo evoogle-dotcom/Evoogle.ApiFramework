@@ -143,16 +143,15 @@ public sealed class ApiQuerySource
         {
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiQuerySourceUnresolvedOutputType;
-            var description = $"{nameof(this.ApiOutputType)} is missing";
+            var code = ApiSchemaCompilationCode.ApiQuerySourceOutputTypeUnspecified;
+            var description = $"{nameof(this.ApiOutputType)} was not specified";
             var remediation = $"Specify a valid {nameof(this.ApiOutputType)}";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
+            return;
         }
-        else
-        {
-            this.ApiOutputTypeExpression.ResolveForQuerySource(context);
-        }
+
+        this.ApiOutputTypeExpression.ResolveForQuerySource(context);
     }
 
     private void ValidateApiOutputComposition(ApiSchemaCompilationContext context)

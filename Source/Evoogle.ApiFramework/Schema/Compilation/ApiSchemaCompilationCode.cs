@@ -72,16 +72,16 @@ public enum ApiSchemaCompilationCode
 
     #region ApiCollectionType Compilation Codes
     /// <summary>
-    ///     The collection type's item type expression is null.
+    ///     The collection type's item type was not specified, either in the JSON or by the builder.
     /// </summary>
-    [EnumMember(Value = "API_COLLECTION_TYPE_NULL_ITEM_TYPE")]
-    ApiCollectionTypeNullItemType,
+    [EnumMember(Value = "API_COLLECTION_TYPE_ITEM_TYPE_UNSPECIFIED")]
+    ApiCollectionTypeItemTypeUnspecified,
 
     /// <summary>
-    ///     The collection type's item type expression could not be resolved to a valid API type.
+    ///     The collection type's item type reference could not be resolved to a declared API type.
     /// </summary>
-    [EnumMember(Value = "API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE")]
-    ApiCollectionTypeUnresolvedItemType,
+    [EnumMember(Value = "API_COLLECTION_TYPE_ITEM_TYPE_REFERENCE_UNRESOLVED")]
+    ApiCollectionTypeItemTypeReferenceUnresolved,
 
     /// <summary>
     ///     The collection type's item type modifiers could not be read from schema JSON.
@@ -284,16 +284,16 @@ public enum ApiSchemaCompilationCode
     ApiPropertyInvalidApiTypeModifiers,
 
     /// <summary>
-    ///     The property's type expression is null.
+    ///     The property's type was not specified, either in the JSON or by the builder.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_NULL_TYPE")]
-    ApiPropertyNullType,
+    [EnumMember(Value = "API_PROPERTY_TYPE_UNSPECIFIED")]
+    ApiPropertyTypeUnspecified,
 
     /// <summary>
-    ///     The property's type expression could not be resolved to a valid API type.
+    ///     The property's type reference could not be resolved to a declared API type.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_UNRESOLVED_TYPE")]
-    ApiPropertyUnresolvedType,
+    [EnumMember(Value = "API_PROPERTY_TYPE_REFERENCE_UNRESOLVED")]
+    ApiPropertyTypeReferenceUnresolved,
 
     /// <summary>
     ///     The property is declared Required but the CLR member is nullable.
@@ -332,10 +332,16 @@ public enum ApiSchemaCompilationCode
     ApiQuerySourceDuplicateParameterApiName,
 
     /// <summary>
-    ///     The query source output type is missing or unresolved.
+    ///     The query source output type was not specified, either in the JSON or by the builder.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_UNRESOLVED_OUTPUT_TYPE")]
-    ApiQuerySourceUnresolvedOutputType,
+    [EnumMember(Value = "API_QUERY_SOURCE_OUTPUT_TYPE_UNSPECIFIED")]
+    ApiQuerySourceOutputTypeUnspecified,
+
+    /// <summary>
+    ///     The query source output type reference could not be resolved to a declared API type.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_OUTPUT_TYPE_REFERENCE_UNRESOLVED")]
+    ApiQuerySourceOutputTypeReferenceUnresolved,
 
     /// <summary>
     ///     The query source output type modifiers are invalid.
@@ -356,10 +362,16 @@ public enum ApiSchemaCompilationCode
     ApiQuerySourceParameterInvalidApiName,
 
     /// <summary>
-    ///     The query source parameter type is missing or unresolved.
+    ///     The query source parameter type was not specified, either in the JSON or by the builder.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_UNRESOLVED_TYPE")]
-    ApiQuerySourceParameterUnresolvedType,
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_TYPE_UNSPECIFIED")]
+    ApiQuerySourceParameterTypeUnspecified,
+
+    /// <summary>
+    ///     The query source parameter type reference could not be resolved to a declared API type.
+    /// </summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_TYPE_REFERENCE_UNRESOLVED")]
+    ApiQuerySourceParameterTypeReferenceUnresolved,
 
     /// <summary>
     ///     The query source parameter type modifiers are invalid.
