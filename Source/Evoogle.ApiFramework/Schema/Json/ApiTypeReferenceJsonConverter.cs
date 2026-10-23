@@ -17,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema.Json;
 ///     Converts <see cref="ApiTypeReference"/> instances to and from JSON.
 /// </summary>
 /// <param name="logger">The optional serialization logger.</param>
-public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonConverter>? logger)
+public class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonConverter>? logger)
     : JsonConverterBase<ApiTypeReference>(logger)
 {
     #region Property Types
@@ -73,7 +73,7 @@ public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonCo
     /// <summary>
     ///     Captures the overall data read from JSON for a single type reference instance.
     /// </summary>
-    private class ReadState
+    private class ReadData
     {
         #region Properties
         public ApiTypeReferenceReadData? ApiTypeReference { get; set; }
@@ -81,12 +81,12 @@ public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonCo
     }
 
     /// <summary>
-    ///     Provides JSON property handlers that populate <see cref="ReadState"/> during deserialization.
+    ///     Provides JSON property handlers that populate <see cref="ReadData"/> during deserialization.
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiTypeReference Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
             { propertyNames.ApiTypeReference.ApiKind, HandleApiTypeReferenceApiKind, true },
             { propertyNames.ApiTypeReference.ApiName, HandleApiTypeReferenceApiName },
@@ -95,23 +95,23 @@ public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonCo
         #endregion
 
         #region ApiTypeReference Methods
-        private static void HandleApiTypeReferenceApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiTypeReferenceApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiTypeReference ??= new ApiTypeReferenceReadData();
 
-            var readData = context.ReadData.ApiTypeReference;
-            readData.ApiKind ??= new JsonEnumReadState<ApiTypeKind>();
-            readData.ApiKind.Read(ref reader, context.Options, _nullableApiTypeKindJsonConverter);
+            var apiTypeReferenceReadData = context.ReadData.ApiTypeReference;
+            apiTypeReferenceReadData.ApiKind ??= new JsonEnumReadState<ApiTypeKind>();
+            apiTypeReferenceReadData.ApiKind.Read(ref reader, context.Options, _nullableApiTypeKindJsonConverter);
         }
 
-        private static void HandleApiTypeReferenceApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiTypeReferenceApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiTypeReference ??= new ApiTypeReferenceReadData();
 
             context.ReadData.ApiTypeReference.ApiName = reader.GetString();
         }
 
-        private static void HandleApiTypeReferenceClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiTypeReferenceClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiTypeReference ??= new ApiTypeReferenceReadData();
 
@@ -140,7 +140,7 @@ public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonCo
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -160,13 +160,13 @@ public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonCo
     /// <inheritdoc/>
     protected override ApiTypeReference? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData.ApiTypeReference;
-        var apiKindReadState = readState?.ApiKind;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiTypeReferenceReadData = readContext.ReadData.ApiTypeReference;
+        var apiKindReadState = apiTypeReferenceReadData?.ApiKind;
 
         var apiKind = apiKindReadState?.Value;
-        var apiName = readState?.ApiName;
-        var clrType = readState?.ClrType;
+        var apiName = apiTypeReferenceReadData?.ApiName;
+        var clrType = apiTypeReferenceReadData?.ClrType;
         var hasInvalidApiKind = apiKindReadState?.IsInvalid == true;
 
         var apiTypeReference = new ApiTypeReference(apiKind, apiName, clrType, hasInvalidApiKind);
@@ -176,7 +176,7 @@ public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonCo
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject

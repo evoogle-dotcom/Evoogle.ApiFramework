@@ -56,7 +56,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
         #endregion
     }
 
-    private class ReadState : ExtensibleReadData
+    private class ReadData : ExtensibleReadData
     {
         #region Properties
         public ApiKeyPathSegmentReadData? ApiKeyPathSegment { get; set; }
@@ -66,7 +66,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiKeyPathSegment Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiKeyPathSegment Property Handlers
             {
@@ -75,7 +75,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
             },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
         #endregion
 
@@ -83,7 +83,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
         private static void HandleApiKeyPathSegmentApiPropertyReference
         (
             ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+            DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context
         )
         {
             context.ReadData.ApiKeyPathSegment ??= new ApiKeyPathSegmentReadData();
@@ -105,7 +105,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -125,10 +125,10 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     /// <inheritdoc/>
     protected override ApiKeyPathSegment? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData.ApiKeyPathSegment;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiKeyPathSegmentReadData = readContext.ReadData.ApiKeyPathSegment;
 
-        var apiPropertyReference = readState?.ApiPropertyReference ?? throw new JsonException
+        var apiPropertyReference = apiKeyPathSegmentReadData?.ApiPropertyReference ?? throw new JsonException
         (
             $"An {nameof(ApiKeyPathSegment)} requires an {nameof(ApiPropertyReference)}."
         );
@@ -143,7 +143,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);

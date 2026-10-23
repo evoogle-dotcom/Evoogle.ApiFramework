@@ -19,44 +19,80 @@ namespace Evoogle.ApiFramework.Schema.Json;
 public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter>? logger) : JsonConverterBase<ApiSchemaOptions>(logger)
 {
     #region Property Types
-    private readonly record struct PropertyNames
+    /// <summary>
+    ///     Stores the resolved JSON property names for an <see cref="ApiSchemaOptions"/> under a given naming policy.
+    /// </summary>
+    private readonly record struct ApiSchemaOptionsPropertyNames
     {
         #region Immutable Properties
         public required string ApiKeyNullHandling { get; init; }
+        #endregion
+    }
+
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
+    private readonly record struct PropertyNames
+    {
+        #region Immutable Properties
+        public required ApiSchemaOptionsPropertyNames ApiSchemaOptions { get; init; }
         #endregion
 
         #region Factory Methods
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ApiKeyNullHandling = policy.ConvertName(nameof(ApiSchemaOptions.ApiKeyNullHandling)),
+                ApiSchemaOptions = new ApiSchemaOptionsPropertyNames
+                {
+                    ApiKeyNullHandling = policy.ConvertName(nameof(Schema.ApiSchemaOptions.ApiKeyNullHandling)),
+                },
             };
         #endregion
     }
     #endregion
 
     #region Read Types
-    private class ReadState
+    /// <summary>
+    ///     Temporary storage used while reading options members from JSON.
+    /// </summary>
+    private class ApiSchemaOptionsReadData
     {
         #region Properties
         public JsonEnumReadState<ApiKeyNullHandling>? ApiKeyNullHandling { get; set; }
         #endregion
     }
 
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiSchemaOptions"/> during deserialization.
+    /// </summary>
+    private class ReadData
+    {
+        #region Properties
+        public ApiSchemaOptionsReadData? ApiSchemaOptions { get; set; }
+        #endregion
+    }
+
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        #region ApiSchemaOptions Fields
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiKeyNullHandling, HandleApiKeyNullHandling, true },
+            // ApiSchemaOptions Property Handlers
+            { propertyNames.ApiSchemaOptions.ApiKeyNullHandling, HandleApiSchemaOptionsApiKeyNullHandling, true },
         };
         #endregion
 
-        #region Methods
-        private static void HandleApiKeyNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        #region ApiSchemaOptions Methods
+        private static void HandleApiSchemaOptionsApiKeyNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiKeyNullHandling ??= new JsonEnumReadState<ApiKeyNullHandling>();
-            context.ReadData.ApiKeyNullHandling.Read(ref reader, context.Options, _nullableApiKeyNullHandlingJsonConverter);
+            context.ReadData.ApiSchemaOptions ??= new ApiSchemaOptionsReadData();
+
+            var apiSchemaOptionsReadData = context.ReadData.ApiSchemaOptions;
+            apiSchemaOptionsReadData.ApiKeyNullHandling ??= new JsonEnumReadState<ApiKeyNullHandling>();
+            apiSchemaOptionsReadData.ApiKeyNullHandling.Read(ref reader, context.Options, _nullableApiKeyNullHandlingJsonConverter);
         }
         #endregion
     }
@@ -79,7 +115,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -99,10 +135,10 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     /// <inheritdoc/>
     protected override ApiSchemaOptions? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiSchemaOptionsReadData = readContext.ReadData.ApiSchemaOptions;
 
-        var apiKeyNullHandlingReadState = readState.ApiKeyNullHandling;
+        var apiKeyNullHandlingReadState = apiSchemaOptionsReadData?.ApiKeyNullHandling;
         var apiKeyNullHandling = apiKeyNullHandlingReadState?.Value ?? ApiSchemaOptions.Default.ApiKeyNullHandling;
 
         var apiSchemaOptions = new ApiSchemaOptions()
@@ -118,7 +154,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject
@@ -137,13 +173,13 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         writer.WriteJsonObject(state: (apiSchemaOptions, writeContext), writeObject: static (writer, state) =>
         {
             var (apiSchemaOptions, writeContext) = state;
-            WriteApiKeyNullHandling(writer, apiSchemaOptions, writeContext);
+            WriteApiSchemaOptionsApiKeyNullHandling(writer, apiSchemaOptions, writeContext);
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKeyNullHandling(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiKeyNullHandling, value: apiSchemaOptions.ApiKeyNullHandling, options: writeContext.Options, converter: _apiKeyNullHandlingJsonConverter);
+    private static void WriteApiSchemaOptionsApiKeyNullHandling(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiSchemaOptions.ApiKeyNullHandling, value: apiSchemaOptions.ApiKeyNullHandling, options: writeContext.Options, converter: _apiKeyNullHandlingJsonConverter);
     #endregion
 }

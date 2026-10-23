@@ -17,68 +17,102 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     : JsonConverterBase<ApiVersionDefinition>(logger)
 {
     #region Property Types
-    private readonly record struct PropertyNames
+    /// <summary>
+    ///     Stores the resolved JSON property names for an <see cref="ApiVersionDefinition"/> under a given naming policy.
+    /// </summary>
+    private readonly record struct ApiVersionDefinitionPropertyNames
     {
+        #region Immutable Properties
         public required string ApiPropertyReference { get; init; }
         public required string ClrType { get; init; }
-        public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
+        #endregion
+    }
 
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
+    private readonly record struct PropertyNames
+    {
+        #region Immutable Properties
+        public required ApiVersionDefinitionPropertyNames ApiVersionDefinition { get; init; }
+        public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
+        #endregion
+
+        #region Factory Methods
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ApiPropertyReference = policy.ConvertName(nameof(ApiVersionDefinition.ApiProperty)), // Mapping property name from ApiPropertyReference to ApiProperty by design
-                ClrType = policy.ConvertName(nameof(ApiVersionDefinition.ClrType)),
-                ExtensibleBase = GetExtensiblePropertyNames(policy)
+                ApiVersionDefinition = new ApiVersionDefinitionPropertyNames
+                {
+                    ApiPropertyReference = policy.ConvertName(nameof(Schema.Version.ApiVersionDefinition.ApiProperty)), // Mapping property name from ApiPropertyReference to ApiProperty by design
+                    ClrType = policy.ConvertName(nameof(Schema.Version.ApiVersionDefinition.ClrType)),
+                },
+                ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
+        #endregion
     }
     #endregion
 
     #region Read Types
-    private sealed class ReadState : ExtensibleReadData
+    /// <summary>
+    ///     Temporary storage used while reading version definition members from JSON.
+    /// </summary>
+    private class ApiVersionDefinitionReadData
     {
+        #region Properties
         public bool HasApiPropertyReference { get; set; }
         public bool HasClrType { get; set; }
         public ApiPropertyReference? ApiPropertyReference { get; set; }
         public Type? ClrType { get; set; }
+        #endregion
     }
 
-    private sealed class ReadHandlers(PropertyNames propertyNames)
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiVersionDefinition"/> during deserialization.
+    /// </summary>
+    private class ReadData : ExtensibleReadData
     {
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        #region Properties
+        public ApiVersionDefinitionReadData? ApiVersionDefinition { get; set; }
+        #endregion
+    }
+
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
+    private class ReadHandlers(PropertyNames propertyNames)
+    {
+        #region ApiVersionDefinition Fields
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiPropertyReference, HandleApiPropertyReference },
-            { propertyNames.ClrType, HandleClrType },
-            {
-                propertyNames.ExtensibleBase.Extensions,
-                CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>()
-            }
+            // ApiVersionDefinition Property Handlers
+            { propertyNames.ApiVersionDefinition.ApiPropertyReference, HandleApiVersionDefinitionApiPropertyReference },
+            { propertyNames.ApiVersionDefinition.ClrType, HandleApiVersionDefinitionClrType },
+
+            // ExtensibleBase Property Handlers
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
+        #endregion
 
-        private static void HandleApiPropertyReference
-        (
-            ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
-        )
+        #region ApiVersionDefinition Methods
+        private static void HandleApiVersionDefinitionApiPropertyReference(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.HasApiPropertyReference = true;
-            context.ReadData.ApiPropertyReference =
-                JsonSerializer.Deserialize<ApiPropertyReference>(ref reader, context.Options);
+            context.ReadData.ApiVersionDefinition ??= new ApiVersionDefinitionReadData();
+
+            var apiVersionDefinitionReadData = context.ReadData.ApiVersionDefinition;
+            apiVersionDefinitionReadData.HasApiPropertyReference = true;
+            apiVersionDefinitionReadData.ApiPropertyReference = JsonSerializer.Deserialize<ApiPropertyReference>(ref reader, context.Options);
         }
 
-        private static void HandleClrType
-        (
-            ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
-        )
+        private static void HandleApiVersionDefinitionClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.HasClrType = true;
-            context.ReadData.ClrType = _typeJsonConverter.Read
-            (
-                ref reader,
-                typeof(Type),
-                context.Options
-            );
+            context.ReadData.ApiVersionDefinition ??= new ApiVersionDefinitionReadData();
+
+            var apiVersionDefinitionReadData = context.ReadData.ApiVersionDefinition;
+            apiVersionDefinitionReadData.HasClrType = true;
+            apiVersionDefinitionReadData.ClrType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
+        #endregion
     }
     #endregion
 
@@ -87,47 +121,46 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     #endregion
 
     #region Constructors
-    /// <summary>Parameterless constructor for use by the JSON converter attribute.</summary>
+    /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
     public ApiVersionDefinitionJsonConverter()
         : this(null)
-    { }
+    {
+    }
     #endregion
 
-    #region JsonConverterBase Methods
+    #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
-    protected override IReadContext CreateReadContext
-    (
-        ILogger logger,
-        JsonSerializerOptions options
-    )
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
-        (
-            logger,
-            options,
-            buildPropertyNames: PropertyNames.Create,
-            buildReadHandlers: names => new ReadHandlers(names)
-        );
+    protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+            (
+                logger,
+                options,
+                buildPropertyNames: PropertyNames.Create,
+                buildReadHandlers: names => new ReadHandlers(names)
+            );
 
     /// <inheritdoc/>
-    protected override IWriteContext CreateWriteContext
-    (
-        ILogger logger,
-        JsonSerializerOptions options
-    ) => CreateDefaultWriteContext(logger, options, buildPropertyNames: PropertyNames.Create);
+    protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
+        => CreateDefaultWriteContext
+            (
+                logger,
+                options,
+                buildPropertyNames: PropertyNames.Create
+            );
 
     /// <inheritdoc/>
     protected override ApiVersionDefinition? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readData = readContext.ReadData;
-        if (readData.HasClrType == readData.HasApiPropertyReference)
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiVersionDefinitionReadData = readContext.ReadData.ApiVersionDefinition ?? new ApiVersionDefinitionReadData();
+        if (apiVersionDefinitionReadData.HasClrType == apiVersionDefinitionReadData.HasApiPropertyReference)
         {
             throw new JsonException($"An {nameof(ApiVersionDefinition)} must contain exactly one "
                 + $"of {nameof(ApiVersionDefinition.ClrType)} or "
                 + $"{nameof(ApiVersionDefinition.ApiPropertyReference)}.");
         }
 
-        if (readData.HasApiPropertyReference && readData.ApiPropertyReference is null)
+        if (apiVersionDefinitionReadData.HasApiPropertyReference && apiVersionDefinitionReadData.ApiPropertyReference is null)
         {
             throw new JsonException
             (
@@ -135,35 +168,38 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
             );
         }
 
-        var value = readData.HasApiPropertyReference
-            ? new ApiVersionDefinition(readData.ApiPropertyReference!)
-            : new ApiVersionDefinition(readData.ClrType!);
+        var apiVersionDefinition = apiVersionDefinitionReadData.HasApiPropertyReference
+            ? new ApiVersionDefinition(apiVersionDefinitionReadData.ApiPropertyReference!)
+            : new ApiVersionDefinition(apiVersionDefinitionReadData.ClrType!);
 
-        AttachExtensions(value, readContext.ReadData.Extensions);
-        return value;
+        AttachExtensions(apiVersionDefinition, readContext.ReadData.Extensions);
+        return apiVersionDefinition;
     }
 
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        ReadJsonObject(ref reader, readContext, readContext.ReadHandlers.PropertyHandlers);
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var handlers = readContext.ReadHandlers.PropertyHandlers;
+
+        ReadJsonObject
+        (
+            ref reader,
+            readContext,
+            handlers
+        );
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore
-    (
-        Utf8JsonWriter writer,
-        ApiVersionDefinition apiVersionDefinition,
-        IWriteContext context
-    )
+    protected override void WriteCore(Utf8JsonWriter writer, ApiVersionDefinition apiVersionDefinition, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
+
         writer.WriteJsonObject(state: (apiVersionDefinition, writeContext), writeObject: static (writer, state) =>
         {
             var (apiVersionDefinition, writeContext) = state;
-            WriteApiPropertyReference(writer, apiVersionDefinition, writeContext);
-            WriteClrType(writer, apiVersionDefinition, writeContext);
+            WriteApiVersionDefinitionApiPropertyReference(writer, apiVersionDefinition, writeContext);
+            WriteApiVersionDefinitionClrType(writer, apiVersionDefinition, writeContext);
 
             WriteExtensibleBaseExtensions
             (
@@ -177,23 +213,14 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiPropertyReference
-    (
-        Utf8JsonWriter writer,
-        ApiVersionDefinition apiVersionDefinition,
-        DefaultWriteContext<PropertyNames> writeContext
-    ) => writer.TryWritePropertyWithSerializer
-    (
-        propertyName: writeContext.PropertyNames.ApiPropertyReference,
-        obj: apiVersionDefinition.ApiPropertyReference,
-        options: writeContext.Options
-    );
+    private static void WriteApiVersionDefinitionApiPropertyReference(Utf8JsonWriter writer, ApiVersionDefinition apiVersionDefinition, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiVersionDefinition.ApiPropertyReference, obj: apiVersionDefinition.ApiPropertyReference, options: writeContext.Options);
 
-    private static void WriteClrType(Utf8JsonWriter writer, ApiVersionDefinition apiVersionDefinition, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiVersionDefinitionClrType(Utf8JsonWriter writer, ApiVersionDefinition apiVersionDefinition, DefaultWriteContext<PropertyNames> writeContext)
     {
         if (!apiVersionDefinition.IsPropertyBacked)
         {
-            writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ClrType, type: apiVersionDefinition.ClrRepositoryType, options: writeContext.Options, converter: _typeJsonConverter);
+            writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiVersionDefinition.ClrType, type: apiVersionDefinition.ClrRepositoryType, options: writeContext.Options, converter: _typeJsonConverter);
         }
     }
     #endregion

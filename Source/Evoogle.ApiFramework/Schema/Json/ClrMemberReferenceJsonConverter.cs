@@ -17,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema.Json;
 ///     Converts <see cref="ClrMemberReference"/> instances to and from JSON.
 /// </summary>
 /// <param name="logger">The optional serialization logger.</param>
-public sealed class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJsonConverter>? logger)
+public class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJsonConverter>? logger)
     : JsonConverterBase<ClrMemberReference>(logger)
 {
     #region Property Types
@@ -70,7 +70,7 @@ public sealed class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJs
     /// <summary>
     ///     Captures the overall data read from JSON for a single CLR member reference instance.
     /// </summary>
-    private class ReadState
+    private class ReadData
     {
         #region Properties
         public ClrMemberReferenceReadData? ClrMemberReference { get; set; }
@@ -78,12 +78,12 @@ public sealed class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJs
     }
 
     /// <summary>
-    ///     Provides JSON property handlers that populate <see cref="ReadState"/> during deserialization.
+    ///     Provides JSON property handlers that populate <see cref="ReadData"/> during deserialization.
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ClrMemberReference Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
             { propertyNames.ClrMemberReference.ClrKind, HandleClrMemberReferenceClrKind },
             { propertyNames.ClrMemberReference.ClrName, HandleClrMemberReferenceClrName },
@@ -91,16 +91,16 @@ public sealed class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJs
         #endregion
 
         #region ClrMemberReference Methods
-        private static void HandleClrMemberReferenceClrKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleClrMemberReferenceClrKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ClrMemberReference ??= new ClrMemberReferenceReadData();
 
-            var readData = context.ReadData.ClrMemberReference;
-            readData.ClrKind ??= new JsonEnumReadState<ClrMemberKind>();
-            readData.ClrKind.Read(ref reader, context.Options, _nullableClrMemberKindJsonConverter);
+            var clrMemberReferenceReadData = context.ReadData.ClrMemberReference;
+            clrMemberReferenceReadData.ClrKind ??= new JsonEnumReadState<ClrMemberKind>();
+            clrMemberReferenceReadData.ClrKind.Read(ref reader, context.Options, _nullableClrMemberKindJsonConverter);
         }
 
-        private static void HandleClrMemberReferenceClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleClrMemberReferenceClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ClrMemberReference ??= new ClrMemberReferenceReadData();
 
@@ -126,30 +126,13 @@ public sealed class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJs
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
                 buildReadHandlers: names => new ReadHandlers(names)
             );
-
-    /// <inheritdoc/>
-    protected override ClrMemberReference? CreateValue(IReadContext context)
-    {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData.ClrMemberReference;
-        var clrKindReadState = readState?.ClrKind;
-
-        var clrKind = clrKindReadState?.Value;
-        var clrName = readState?.ClrName;
-        var hasInvalidClrKind = clrKind is null ||
-            clrKindReadState?.IsInvalid == true ||
-            clrKindReadState?.IsNull == true;
-
-        var clrMemberReference = new ClrMemberReference(clrKind, clrName!, hasInvalidClrKind);
-        return clrMemberReference;
-    }
 
     /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
@@ -161,9 +144,26 @@ public sealed class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJs
             );
 
     /// <inheritdoc/>
+    protected override ClrMemberReference? CreateValue(IReadContext context)
+    {
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var clrMemberReferenceReadData = readContext.ReadData.ClrMemberReference;
+        var clrKindReadState = clrMemberReferenceReadData?.ClrKind;
+
+        var clrKind = clrKindReadState?.Value;
+        var clrName = clrMemberReferenceReadData?.ClrName;
+        var hasInvalidClrKind = clrKind is null ||
+            clrKindReadState?.IsInvalid == true ||
+            clrKindReadState?.IsNull == true;
+
+        var clrMemberReference = new ClrMemberReference(clrKind, clrName!, hasInvalidClrKind);
+        return clrMemberReference;
+    }
+
+    /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject

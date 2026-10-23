@@ -22,23 +22,41 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     : JsonConverterBase<ApiRelationshipAssociation>(logger)
 {
     #region Property Types
+    /// <summary>
+    ///     Stores the resolved JSON property names for the <see cref="ApiRelationshipElement"/> members under a given
+    ///     naming policy.
+    /// </summary>
     private readonly record struct ApiRelationshipElementPropertyNames
     {
+        #region Immutable Properties
         public required string ApiObjectTypeReference { get; init; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Stores the resolved JSON property names for the <see cref="ApiRelationshipAssociation"/> members under a
+    ///     given naming policy.
+    /// </summary>
     private readonly record struct ApiRelationshipAssociationPropertyNames
     {
+        #region Immutable Properties
         public required string ApiForeignKeyA { get; init; }
         public required string ApiForeignKeyB { get; init; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
     private readonly record struct PropertyNames
     {
+        #region Immutable Properties
         public required ApiRelationshipElementPropertyNames ApiRelationshipElement { get; init; }
         public required ApiRelationshipAssociationPropertyNames ApiRelationshipAssociation { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
+        #endregion
 
+        #region Factory Methods
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
@@ -53,55 +71,90 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
+        #endregion
     }
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Temporary storage used while reading relationship element members from JSON.
+    /// </summary>
     private class ApiRelationshipElementReadData
     {
+        #region Properties
         public ApiTypeReference? ApiObjectTypeReference { get; set; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Temporary storage used while reading relationship association members from JSON.
+    /// </summary>
     private class ApiRelationshipAssociationReadData
     {
+        #region Properties
         public ApiKeyDefinition? ApiForeignKeyA { get; set; }
         public ApiKeyDefinition? ApiForeignKeyB { get; set; }
+        #endregion
     }
 
-    private class ReadState : ExtensibleReadData
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiRelationshipAssociation"/> during deserialization.
+    /// </summary>
+    private class ReadData : ExtensibleReadData
     {
+        #region Properties
         public ApiRelationshipElementReadData? ApiRelationshipElement { get; set; }
         public ApiRelationshipAssociationReadData? ApiRelationshipAssociation { get; set; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        #region ApiRelationshipElement Fields
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiRelationshipElement.ApiObjectTypeReference, HandleApiObjectTypeReference },
-            { propertyNames.ApiRelationshipAssociation.ApiForeignKeyA, HandleApiForeignKeyA },
-            { propertyNames.ApiRelationshipAssociation.ApiForeignKeyB, HandleApiForeignKeyB },
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
-        };
+            // ApiRelationshipElement Property Handlers
+            { propertyNames.ApiRelationshipElement.ApiObjectTypeReference, HandleApiRelationshipElementApiObjectTypeReference },
 
-        private static void HandleApiObjectTypeReference(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+            // ApiRelationshipAssociation Property Handlers
+            { propertyNames.ApiRelationshipAssociation.ApiForeignKeyA, HandleApiRelationshipAssociationApiForeignKeyA },
+            { propertyNames.ApiRelationshipAssociation.ApiForeignKeyB, HandleApiRelationshipAssociationApiForeignKeyB },
+
+            // ExtensibleBase Property Handlers
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
+        };
+        #endregion
+
+        #region ApiRelationshipElement Methods
+        private static void HandleApiRelationshipElementApiObjectTypeReference(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipElement ??= new ApiRelationshipElementReadData();
+
             context.ReadData.ApiRelationshipElement.ApiObjectTypeReference =
                 JsonSerializer.Deserialize<ApiTypeReference>(ref reader, context.Options);
         }
+        #endregion
 
-        private static void HandleApiForeignKeyA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        #region ApiRelationshipAssociation Methods
+        private static void HandleApiRelationshipAssociationApiForeignKeyA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipAssociation ??= new ApiRelationshipAssociationReadData();
-            context.ReadData.ApiRelationshipAssociation.ApiForeignKeyA = JsonSerializer.Deserialize<ApiKeyDefinition>(ref reader, context.Options);
+
+            context.ReadData.ApiRelationshipAssociation.ApiForeignKeyA =
+                JsonSerializer.Deserialize<ApiKeyDefinition>(ref reader, context.Options);
         }
 
-        private static void HandleApiForeignKeyB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiRelationshipAssociationApiForeignKeyB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipAssociation ??= new ApiRelationshipAssociationReadData();
-            context.ReadData.ApiRelationshipAssociation.ApiForeignKeyB = JsonSerializer.Deserialize<ApiKeyDefinition>(ref reader, context.Options);
+
+            context.ReadData.ApiRelationshipAssociation.ApiForeignKeyB =
+                JsonSerializer.Deserialize<ApiKeyDefinition>(ref reader, context.Options);
         }
+        #endregion
     }
     #endregion
 
@@ -116,7 +169,7 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -126,12 +179,17 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
 
     /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultWriteContext(logger, options, buildPropertyNames: PropertyNames.Create);
+        => CreateDefaultWriteContext
+            (
+                logger,
+                options,
+                buildPropertyNames: PropertyNames.Create
+            );
 
     /// <inheritdoc/>
     protected override ApiRelationshipAssociation? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
 
         var apiObjectTypeReference = readContext.ReadData.ApiRelationshipElement?.ApiObjectTypeReference;
         var apiForeignKeyA = readContext.ReadData.ApiRelationshipAssociation?.ApiForeignKeyA;
@@ -148,7 +206,7 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         ReadJsonObject(ref reader, readContext, readContext.ReadHandlers.PropertyHandlers);
     }
 
@@ -160,9 +218,9 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
         writer.WriteJsonObject(state: (apiRelationshipAssociation, writeContext), writeObject: static (writer, state) =>
         {
             var (apiRelationshipAssociation, writeContext) = state;
-            WriteApiObjectTypeReference(writer, apiRelationshipAssociation, writeContext);
-            WriteApiForeignKeyA(writer, apiRelationshipAssociation, writeContext);
-            WriteApiForeignKeyB(writer, apiRelationshipAssociation, writeContext);
+            WriteApiRelationshipElementApiObjectTypeReference(writer, apiRelationshipAssociation, writeContext);
+            WriteApiRelationshipAssociationApiForeignKeyA(writer, apiRelationshipAssociation, writeContext);
+            WriteApiRelationshipAssociationApiForeignKeyB(writer, apiRelationshipAssociation, writeContext);
 
             WriteExtensibleBaseExtensions
             (
@@ -176,18 +234,13 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiObjectTypeReference(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithSerializer
-        (
-            propertyName: writeContext.PropertyNames.ApiRelationshipElement.ApiObjectTypeReference,
-            obj: apiRelationshipAssociation.ApiObjectTypeReference,
-            options: writeContext.Options
-        );
+    private static void WriteApiRelationshipElementApiObjectTypeReference(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipElement.ApiObjectTypeReference, obj: apiRelationshipAssociation.ApiObjectTypeReference, options: writeContext.Options);
 
-    private static void WriteApiForeignKeyA(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiRelationshipAssociationApiForeignKeyA(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyA, obj: apiRelationshipAssociation.HasForeignKeys ? apiRelationshipAssociation.ApiForeignKeyA : null, options: writeContext.Options);
 
-    private static void WriteApiForeignKeyB(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiRelationshipAssociationApiForeignKeyB(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyB, obj: apiRelationshipAssociation.HasForeignKeys ? apiRelationshipAssociation.ApiForeignKeyB : null, options: writeContext.Options);
     #endregion
 }

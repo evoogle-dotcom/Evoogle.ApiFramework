@@ -24,6 +24,9 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
     : JsonConverterBase<ApiNamedKeyDefinition>(logger)
 {
     #region Property Types
+    /// <summary>
+    ///     Stores the resolved JSON property names for an <see cref="ApiNamedKeyDefinition"/> under a given naming policy.
+    /// </summary>
     private readonly record struct ApiNamedKeyDefinitionPropertyNames
     {
         #region Immutable Properties
@@ -31,6 +34,9 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
         #endregion
     }
 
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -55,6 +61,9 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Temporary storage used while reading named key members from JSON.
+    /// </summary>
     private class ApiNamedKeyDefinitionReadData
     {
         #region Properties
@@ -62,7 +71,10 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
         #endregion
     }
 
-    private class ReadState : ExtensibleReadData
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiNamedKeyDefinition"/> during deserialization.
+    /// </summary>
+    private class ReadData : ExtensibleReadData
     {
         #region Properties
         public ApiKeyDefinitionJsonConverterCore.ReadData? ApiKeyDefinition { get; set; }
@@ -70,10 +82,13 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
         #endregion
     }
 
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiNamedKeyDefinition Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiNamedKeyDefinition Property Handlers
             { propertyNames.ApiNamedKeyDefinition.ApiName, HandleApiNamedKeyDefinitionApiName },
@@ -84,7 +99,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
             // ExtensibleBase Property Handlers
             {
                 propertyNames.ExtensibleBase.Extensions,
-                CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>()
+                CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>()
             },
         };
         #endregion
@@ -93,7 +108,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
         private static void HandleApiNamedKeyDefinitionApiName
         (
             ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+            DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context
         )
         {
             context.ReadData.ApiNamedKeyDefinition ??= new ApiNamedKeyDefinitionReadData();
@@ -103,7 +118,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
         private static void HandleApiKeyDefinitionApiKeyPaths
         (
             ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+            DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context
         )
         {
             context.ReadData.ApiKeyDefinition ??= new ApiKeyDefinitionJsonConverterCore.ReadData();
@@ -115,7 +130,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
         private static void HandleApiKeyDefinitionApiKeyPathsArrayItem
         (
             ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+            DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context
         )
         {
             ApiKeyDefinitionJsonConverterCore.ReadApiKeyPath
@@ -139,10 +154,10 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
     }
     #endregion
 
-    #region JsonConverterBase Methods
+    #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -151,11 +166,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
             );
 
     /// <inheritdoc/>
-    protected override IWriteContext CreateWriteContext
-    (
-        ILogger logger,
-        JsonSerializerOptions options
-    )
+    protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultWriteContext
             (
                 logger,
@@ -166,10 +177,10 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
     /// <inheritdoc/>
     protected override ApiNamedKeyDefinition? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData.ApiNamedKeyDefinition;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiNamedKeyDefinitionReadData = readContext.ReadData.ApiNamedKeyDefinition;
 
-        var apiName = readState?.ApiName;
+        var apiName = apiNamedKeyDefinitionReadData?.ApiName;
         var apiKeyPaths = readContext.ReadData.ApiKeyDefinition?.ApiKeyPaths;
 
         var apiNamedKeyDefinition = new ApiNamedKeyDefinition(apiName!, apiKeyPaths!);
@@ -183,7 +194,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);
@@ -197,8 +208,8 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
         writer.WriteJsonObject(state: (apiKeyDefinition, writeContext), writeObject: static (writer, state) =>
         {
             var (apiKeyDefinition, writeContext) = state;
-            WriteApiName(writer, apiKeyDefinition, writeContext);
-            WriteApiKeyPaths(writer, apiKeyDefinition, writeContext);
+            WriteApiNamedKeyDefinitionApiName(writer, apiKeyDefinition, writeContext);
+            WriteApiKeyDefinitionApiKeyPaths(writer, apiKeyDefinition, writeContext);
 
             WriteExtensibleBaseExtensions
             (
@@ -212,10 +223,10 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiName(Utf8JsonWriter writer, ApiNamedKeyDefinition apiNamedKeyDefinition, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiNamedKeyDefinitionApiName(Utf8JsonWriter writer, ApiNamedKeyDefinition apiNamedKeyDefinition, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiNamedKeyDefinition.ApiName, value: apiNamedKeyDefinition.ApiName, options: writeContext.Options);
 
-    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiNamedKeyDefinition apiNamedKeyDefinition, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiKeyDefinitionApiKeyPaths(Utf8JsonWriter writer, ApiNamedKeyDefinition apiNamedKeyDefinition, DefaultWriteContext<PropertyNames> writeContext)
     {
         writer.TryWritePropertyAsArray
         (

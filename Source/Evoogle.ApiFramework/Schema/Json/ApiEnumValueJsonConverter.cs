@@ -73,7 +73,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     /// <summary>
     ///     Collects the fully parsed data required to construct an <see cref="ApiEnumValue"/>.
     /// </summary>
-    private class ReadState : ExtensibleReadData
+    private class ReadData : ExtensibleReadData
     {
         #region Properties
         public ApiEnumValueReadData? ApiEnumValue { get; set; }
@@ -81,12 +81,12 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     }
 
     /// <summary>
-    ///     Maps JSON property names to handlers that populate <see cref="ReadState"/> during deserialization.
+    ///     Maps JSON property names to handlers that populate <see cref="ReadData"/> during deserialization.
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiEnumValue Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiEnumValue Property Handlers
             { propertyNames.ApiEnumValue.ApiName, HandleApiEnumValueApiName },
@@ -94,26 +94,26 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
             { propertyNames.ApiEnumValue.ClrOrdinal, HandleApiEnumValueClrOrdinal },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
         #endregion
 
         #region ApiEnumValue Methods
-        private static void HandleApiEnumValueApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiEnumValueApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
 
             context.ReadData.ApiEnumValue.ApiName = reader.GetString();
         }
 
-        private static void HandleApiEnumValueClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiEnumValueClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
 
             context.ReadData.ApiEnumValue.ClrName = reader.GetString();
         }
 
-        private static void HandleApiEnumValueClrOrdinal(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiEnumValueClrOrdinal(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
 
@@ -134,7 +134,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -154,12 +154,12 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     /// <inheritdoc/>
     protected override ApiEnumValue? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData.ApiEnumValue;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiEnumValueReadData = readContext.ReadData.ApiEnumValue;
 
-        var apiName = readState?.ApiName;
-        var clrName = readState?.ClrName;
-        var clrOrdinal = readState?.ClrOrdinal.GetValueOrDefault() ?? default;
+        var apiName = apiEnumValueReadData?.ApiName;
+        var clrName = apiEnumValueReadData?.ClrName;
+        var clrOrdinal = apiEnumValueReadData?.ClrOrdinal.GetValueOrDefault() ?? default;
 
         var apiEnumValue = new ApiEnumValue(apiName!, clrName!, clrOrdinal);
 
@@ -172,7 +172,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);

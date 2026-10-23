@@ -20,44 +20,80 @@ namespace Evoogle.ApiFramework.Schema.Json;
 public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonConverter>? logger) : JsonConverterBase<ApiObjectTypeOptions>(logger)
 {
     #region Property Types
-    private readonly record struct PropertyNames
+    /// <summary>
+    ///     Stores the resolved JSON property names for an <see cref="ApiObjectTypeOptions"/> under a given naming policy.
+    /// </summary>
+    private readonly record struct ApiObjectTypeOptionsPropertyNames
     {
         #region Immutable Properties
         public required string ApiKeyNullHandling { get; init; }
+        #endregion
+    }
+
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
+    private readonly record struct PropertyNames
+    {
+        #region Immutable Properties
+        public required ApiObjectTypeOptionsPropertyNames ApiObjectTypeOptions { get; init; }
         #endregion
 
         #region Factory Methods
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ApiKeyNullHandling = policy.ConvertName(nameof(ApiObjectTypeOptions.ApiKeyNullHandling)),
+                ApiObjectTypeOptions = new ApiObjectTypeOptionsPropertyNames
+                {
+                    ApiKeyNullHandling = policy.ConvertName(nameof(Types.ApiObjectTypeOptions.ApiKeyNullHandling)),
+                },
             };
         #endregion
     }
     #endregion
 
     #region Read Types
-    private class ReadState
+    /// <summary>
+    ///     Temporary storage used while reading options members from JSON.
+    /// </summary>
+    private class ApiObjectTypeOptionsReadData
     {
         #region Properties
         public JsonEnumReadState<ApiKeyNullHandling>? ApiKeyNullHandling { get; set; }
         #endregion
     }
 
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiObjectTypeOptions"/> during deserialization.
+    /// </summary>
+    private class ReadData
+    {
+        #region Properties
+        public ApiObjectTypeOptionsReadData? ApiObjectTypeOptions { get; set; }
+        #endregion
+    }
+
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        #region ApiObjectTypeOptions Fields
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiKeyNullHandling, HandleApiKeyNullHandling, true },
+            // ApiObjectTypeOptions Property Handlers
+            { propertyNames.ApiObjectTypeOptions.ApiKeyNullHandling, HandleApiObjectTypeOptionsApiKeyNullHandling, true },
         };
         #endregion
 
-        #region Methods
-        private static void HandleApiKeyNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        #region ApiObjectTypeOptions Methods
+        private static void HandleApiObjectTypeOptionsApiKeyNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiKeyNullHandling ??= new JsonEnumReadState<ApiKeyNullHandling>();
-            context.ReadData.ApiKeyNullHandling.Read(ref reader, context.Options, _nullableApiKeyNullHandlingJsonConverter);
+            context.ReadData.ApiObjectTypeOptions ??= new ApiObjectTypeOptionsReadData();
+
+            var apiObjectTypeOptionsReadData = context.ReadData.ApiObjectTypeOptions;
+            apiObjectTypeOptionsReadData.ApiKeyNullHandling ??= new JsonEnumReadState<ApiKeyNullHandling>();
+            apiObjectTypeOptionsReadData.ApiKeyNullHandling.Read(ref reader, context.Options, _nullableApiKeyNullHandlingJsonConverter);
         }
         #endregion
     }
@@ -80,7 +116,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -100,10 +136,10 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     /// <inheritdoc/>
     protected override ApiObjectTypeOptions? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiObjectTypeOptionsReadData = readContext.ReadData.ApiObjectTypeOptions;
 
-        var apiKeyNullHandlingReadState = readState.ApiKeyNullHandling;
+        var apiKeyNullHandlingReadState = apiObjectTypeOptionsReadData?.ApiKeyNullHandling;
         var apiKeyNullHandling = apiKeyNullHandlingReadState?.Value;
 
         var apiObjectTypeOptions = new ApiObjectTypeOptions()
@@ -118,7 +154,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject
@@ -137,13 +173,13 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
         writer.WriteJsonObject(state: (apiObjectTypeOptions, writeContext), writeObject: static (writer, state) =>
         {
             var (apiObjectTypeOptions, writeContext) = state;
-            WriteApiKeyNullHandling(writer, apiObjectTypeOptions, writeContext);
+            WriteApiObjectTypeOptionsApiKeyNullHandling(writer, apiObjectTypeOptions, writeContext);
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKeyNullHandling(Utf8JsonWriter writer, ApiObjectTypeOptions apiObjectTypeOptions, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiKeyNullHandling, value: apiObjectTypeOptions.ApiKeyNullHandling, options: writeContext.Options, converter: _apiKeyNullHandlingJsonConverter);
+    private static void WriteApiObjectTypeOptionsApiKeyNullHandling(Utf8JsonWriter writer, ApiObjectTypeOptions apiObjectTypeOptions, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiObjectTypeOptions.ApiKeyNullHandling, value: apiObjectTypeOptions.ApiKeyNullHandling, options: writeContext.Options, converter: _apiKeyNullHandlingJsonConverter);
     #endregion
 }

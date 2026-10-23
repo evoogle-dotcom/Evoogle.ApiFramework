@@ -16,10 +16,13 @@ namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>Converts ApiQuerySource schema declarations to and from JSON.</summary>
 /// <param name="logger">The optional serialization logger.</param>
-public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? logger)
+public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? logger)
     : JsonConverterBase<ApiQuerySource>(logger)
 {
     #region Property Types
+    /// <summary>
+    ///     Stores the resolved JSON property names for an <see cref="ApiQuerySource"/> under a given naming policy.
+    /// </summary>
     private readonly record struct ApiQuerySourcePropertyNames
     {
         #region Immutable Properties
@@ -31,6 +34,9 @@ public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConver
         #endregion
     }
 
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -49,14 +55,17 @@ public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConver
                 ApiOutputTypeModifiers = policy.ConvertName(nameof(Query.ApiQuerySource.ApiOutputTypeModifiers)),
                 ApiOutputComposition = policy.ConvertName(nameof(Query.ApiQuerySource.ApiOutputComposition)),
             },
-            ExtensibleBase = GetExtensiblePropertyNames(policy)
+            ExtensibleBase = GetExtensiblePropertyNames(policy),
         };
         #endregion
     }
     #endregion
 
     #region Read Types
-    private sealed class ApiQuerySourceReadData
+    /// <summary>
+    ///     Temporary storage used while reading query source members from JSON.
+    /// </summary>
+    private class ApiQuerySourceReadData
     {
         #region Properties
         public string? ApiName { get; set; } = null;
@@ -67,39 +76,45 @@ public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConver
         #endregion
     }
 
-    private sealed class ReadState : ExtensibleReadData
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiQuerySource"/> during deserialization.
+    /// </summary>
+    private class ReadData : ExtensibleReadData
     {
         #region Properties
         public ApiQuerySourceReadData? ApiQuerySource { get; set; }
         #endregion
     }
 
-    private sealed class ReadHandlers(PropertyNames names)
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
+    private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        #region ApiQuerySource Fields
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
-            // ApiQuerySourceParameter Property Handlers
-            { names.ApiQuerySource.ApiName, HandleApiName },
-            { names.ApiQuerySource.ApiInputParameters, HandleApiInputParameters },
-            { names.ApiQuerySource.ApiOutputTypeExpression, HandleApiOutputTypeExpression },
-            { names.ApiQuerySource.ApiOutputTypeModifiers, HandleApiOutputTypeModifiers },
-            { names.ApiQuerySource.ApiOutputComposition, HandleApiOutputComposition },
+            // ApiQuerySource Property Handlers
+            { propertyNames.ApiQuerySource.ApiName, HandleApiQuerySourceApiName },
+            { propertyNames.ApiQuerySource.ApiInputParameters, HandleApiQuerySourceApiInputParameters },
+            { propertyNames.ApiQuerySource.ApiOutputTypeExpression, HandleApiQuerySourceApiOutputTypeExpression },
+            { propertyNames.ApiQuerySource.ApiOutputTypeModifiers,             HandleApiQuerySourceApiOutputTypeModifiers },
+                        { propertyNames.ApiQuerySource.ApiOutputComposition, HandleApiQuerySourceApiOutputComposition },
 
             // ExtensibleBase Property Handlers
-            { names.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() }
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
         #endregion
 
-        #region Methods
-        private static void HandleApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        #region ApiQuerySource Methods
+        private static void HandleApiQuerySourceApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySource ??= new ApiQuerySourceReadData();
 
             context.ReadData.ApiQuerySource.ApiName = reader.GetString();
         }
 
-        private static void HandleApiInputParameters(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiQuerySourceApiInputParameters(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySource ??= new ApiQuerySourceReadData();
 
@@ -110,7 +125,7 @@ public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConver
             context.ReadData.ApiQuerySource.ApiInputParameters = apiInputParameters;
         }
 
-        private static void HandleApiOutputTypeExpression(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiQuerySourceApiOutputTypeExpression(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySource ??= new ApiQuerySourceReadData();
 
@@ -118,38 +133,41 @@ public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConver
             context.ReadData.ApiQuerySource.ApiOutputTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, options);
         }
 
-        private static void HandleApiOutputTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiQuerySourceApiOutputTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySource ??= new ApiQuerySourceReadData();
 
             var options = context.Options;
             context.ReadData.ApiQuerySource.ApiOutputTypeModifiers ??= new JsonEnumReadState<ApiTypeModifiers>();
-            context.ReadData.ApiQuerySource.ApiOutputTypeModifiers.Read(ref reader, options, _modifiersReader);
+            context.ReadData.ApiQuerySource.ApiOutputTypeModifiers.Read(ref reader, options, _nullableApiTypeModifiersJsonConverter);
         }
 
-        private static void HandleApiOutputComposition(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiQuerySourceApiOutputComposition(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySource ??= new ApiQuerySourceReadData();
 
             var options = context.Options;
             context.ReadData.ApiQuerySource.ApiOutputComposition ??= new JsonEnumReadState<ApiQueryComposition>();
-            context.ReadData.ApiQuerySource.ApiOutputComposition.Read(ref reader, options, _compositionReader);
+            context.ReadData.ApiQuerySource.ApiOutputComposition.Read(ref reader, options, _nullableApiQueryCompositionJsonConverter);
         }
         #endregion
     }
     #endregion
 
     #region Fields
-    private static readonly EnumJsonConverter<ApiTypeModifiers> _modifiersWriter = new();
-    private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _modifiersReader = new(EnumJsonInvalidValuePolicy.ReturnNull);
+    private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
+    private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _nullableApiTypeModifiersJsonConverter =
+        new(EnumJsonInvalidValuePolicy.ReturnNull);
 
-    private static readonly EnumJsonConverter<ApiQueryComposition> _compositionWriter = new();
-    private static readonly NullableEnumJsonConverter<ApiQueryComposition> _compositionReader = new(EnumJsonInvalidValuePolicy.ReturnNull);
+    private static readonly EnumJsonConverter<ApiQueryComposition> _apiQueryCompositionJsonConverter = new();
+    private static readonly NullableEnumJsonConverter<ApiQueryComposition> _nullableApiQueryCompositionJsonConverter =
+        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
-    /// <summary>Creates a converter for attribute-based serialization.</summary>
-    public ApiQuerySourceJsonConverter() : this(null)
+    /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
+    public ApiQuerySourceJsonConverter()
+        : this(null)
     {
     }
     #endregion
@@ -157,27 +175,37 @@ public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConver
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
-            (logger, options, PropertyNames.Create, names => new ReadHandlers(names));
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+            (
+                logger,
+                options,
+                buildPropertyNames: PropertyNames.Create,
+                buildReadHandlers: names => new ReadHandlers(names)
+            );
 
     /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultWriteContext(logger, options, PropertyNames.Create);
+        => CreateDefaultWriteContext
+            (
+                logger,
+                options,
+                buildPropertyNames: PropertyNames.Create
+            );
 
     /// <inheritdoc/>
     protected override ApiQuerySource? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData.ApiQuerySource;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiQuerySourceReadData = readContext.ReadData.ApiQuerySource;
 
-        var apiName = readState?.ApiName;
-        var apiInputParameters = readState?.ApiInputParameters;
-        var apiOutputTypeExpression = readState?.ApiOutputTypeExpression;
+        var apiName = apiQuerySourceReadData?.ApiName;
+        var apiInputParameters = apiQuerySourceReadData?.ApiInputParameters;
+        var apiOutputTypeExpression = apiQuerySourceReadData?.ApiOutputTypeExpression;
 
-        var apiOutputTypeModifiersReadState = readState?.ApiOutputTypeModifiers;
+        var apiOutputTypeModifiersReadState = apiQuerySourceReadData?.ApiOutputTypeModifiers;
         var apiOutputTypeModifiers = apiOutputTypeModifiersReadState?.Value ?? ApiTypeModifiers.None;
 
-        var apiOutputCompositionReadState = readState?.ApiOutputComposition;
+        var apiOutputCompositionReadState = apiQuerySourceReadData?.ApiOutputComposition;
         var apiOutputComposition = apiOutputCompositionReadState?.Value ?? ApiQueryComposition.None;
 
         var apiQuerySource = new ApiQuerySource
@@ -198,7 +226,7 @@ public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConver
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         ReadJsonObject(ref reader, readContext, readContext.ReadHandlers.PropertyHandlers);
     }
 
@@ -252,9 +280,9 @@ public sealed class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConver
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputTypeExpression, obj: apiQuerySource.ApiOutputTypeExpression, options: writeContext.Options);
 
     private static void WriteApiQuerySourceApiOutputTypeModifiers(Utf8JsonWriter writer, ApiQuerySource apiQuerySource, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputTypeModifiers, value: apiQuerySource.ApiOutputTypeModifiers, options: writeContext.Options, converter: _modifiersWriter);
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputTypeModifiers, value: apiQuerySource.ApiOutputTypeModifiers, options: writeContext.Options, converter: _apiTypeModifiersJsonConverter);
 
     private static void WriteApiQuerySourceApiOutputComposition(Utf8JsonWriter writer, ApiQuerySource apiQuerySource, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputComposition, value: apiQuerySource.ApiOutputComposition, options: writeContext.Options, converter: _compositionWriter);
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputComposition, value: apiQuerySource.ApiOutputComposition, options: writeContext.Options, converter: _apiQueryCompositionJsonConverter);
     #endregion
 }

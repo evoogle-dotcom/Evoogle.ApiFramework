@@ -95,7 +95,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     /// <summary>
     ///     Collects the complete data set required to instantiate an <see cref="ApiSchema"/> during deserialization.
     /// </summary>
-    private class ReadState : ExtensibleReadData
+    private class ReadData : ExtensibleReadData
     {
         #region Properties
         public ApiSchemaReadData? ApiSchema { get; set; }
@@ -103,51 +103,51 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     }
 
     /// <summary>
-    ///     Provides property handlers that map JSON members to <see cref="ReadState"/> assignments.
+    ///     Provides property handlers that map JSON members to <see cref="ReadData"/> assignments.
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiSchema Fields
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiSchema Property Handlers
-            { propertyNames.ApiSchema.ApiName, HandleApiName },
-            { propertyNames.ApiSchema.ApiVersion, HandleApiVersion },
-            { propertyNames.ApiSchema.ApiOptions, HandleApiOptions },
-            { propertyNames.ApiSchema.ApiScalarTypes, HandleApiScalarTypes },
-            { propertyNames.ApiSchema.ApiEnumTypes, HandleApiEnumTypes },
-            { propertyNames.ApiSchema.ApiObjectTypes, HandleApiObjectTypes },
-            { propertyNames.ApiSchema.ApiRelationships, HandleApiRelationships },
-            { propertyNames.ApiSchema.ApiQuerySources, HandleApiQuerySources },
+            { propertyNames.ApiSchema.ApiName, HandleApiSchemaApiName },
+            { propertyNames.ApiSchema.ApiVersion, HandleApiSchemaApiVersion },
+            { propertyNames.ApiSchema.ApiOptions, HandleApiSchemaApiOptions },
+            { propertyNames.ApiSchema.ApiScalarTypes, HandleApiSchemaApiScalarTypes },
+            { propertyNames.ApiSchema.ApiEnumTypes, HandleApiSchemaApiEnumTypes },
+            { propertyNames.ApiSchema.ApiObjectTypes, HandleApiSchemaApiObjectTypes },
+            { propertyNames.ApiSchema.ApiRelationships, HandleApiSchemaApiRelationships },
+            { propertyNames.ApiSchema.ApiQuerySources, HandleApiSchemaApiQuerySources },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
         #endregion
 
         #region ApiSchema Methods
-        private static void HandleApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiSchemaApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
             context.ReadData.ApiSchema.ApiName = reader.GetString();
         }
 
-        private static void HandleApiVersion(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiSchemaApiVersion(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
             context.ReadData.ApiSchema.ApiVersion = reader.GetString();
         }
 
-        private static void HandleApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiSchemaApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
             context.ReadData.ApiSchema.ApiOptions = JsonSerializer.Deserialize<ApiSchemaOptions>(ref reader, context.Options);
         }
 
-        private static void HandleApiScalarTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiSchemaApiScalarTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
@@ -158,7 +158,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             context.ReadData.ApiSchema.ApiScalarTypes = apiScalarTypes;
         }
 
-        private static void HandleApiEnumTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiSchemaApiEnumTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
@@ -169,7 +169,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             context.ReadData.ApiSchema.ApiEnumTypes = apiEnumTypes;
         }
 
-        private static void HandleApiObjectTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiSchemaApiObjectTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
@@ -180,7 +180,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             context.ReadData.ApiSchema.ApiObjectTypes = apiObjectTypes;
         }
 
-        private static void HandleApiRelationships(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiSchemaApiRelationships(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
@@ -191,7 +191,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             context.ReadData.ApiSchema.ApiRelationships = apiRelationships;
         }
 
-        private static void HandleApiQuerySources(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiSchemaApiQuerySources(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
@@ -216,7 +216,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -236,7 +236,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     /// <inheritdoc/>
     protected override ApiSchema? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
 
         // Create the ApiSchema instance using the read data.
         var apiName = readContext.ReadData.ApiSchema?.ApiName;
@@ -274,7 +274,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);
@@ -290,16 +290,16 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             var (apiSchema, writeContext) = state;
 
             // Prolog
-            WriteApiName(writer, apiSchema, writeContext);
-            WriteApiVersion(writer, apiSchema, writeContext);
-            WriteApiOptions(writer, apiSchema, writeContext);
+            WriteApiSchemaApiName(writer, apiSchema, writeContext);
+            WriteApiSchemaApiVersion(writer, apiSchema, writeContext);
+            WriteApiSchemaApiOptions(writer, apiSchema, writeContext);
 
             // Body
-            WriteApiScalarTypes(writer, apiSchema, writeContext);
-            WriteApiEnumTypes(writer, apiSchema, writeContext);
-            WriteApiObjectTypes(writer, apiSchema, writeContext);
-            WriteApiRelationships(writer, apiSchema, writeContext);
-            WriteApiQuerySources(writer, apiSchema, writeContext);
+            WriteApiSchemaApiScalarTypes(writer, apiSchema, writeContext);
+            WriteApiSchemaApiEnumTypes(writer, apiSchema, writeContext);
+            WriteApiSchemaApiObjectTypes(writer, apiSchema, writeContext);
+            WriteApiSchemaApiRelationships(writer, apiSchema, writeContext);
+            WriteApiSchemaApiQuerySources(writer, apiSchema, writeContext);
 
             // Epilog
             WriteExtensions(writer, apiSchema, writeContext);
@@ -308,16 +308,16 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiName(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiSchemaApiName(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiSchema.ApiName, value: apiSchema.ApiName, options: writeContext.Options);
 
-    private static void WriteApiVersion(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiSchemaApiVersion(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiSchema.ApiVersion, value: apiSchema.ApiVersion, options: writeContext.Options);
 
-    private static void WriteApiOptions(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiSchemaApiOptions(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiSchema.ApiOptions, obj: apiSchema.ApiOptions, options: writeContext.Options);
 
-    private static void WriteApiScalarTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiSchemaApiScalarTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
         var propertyName = writeContext.PropertyNames.ApiSchema.ApiScalarTypes;
         var apiScalarTypes = apiSchema.ApiScalarTypes.Cast<ApiType>();
@@ -334,7 +334,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         );
     }
 
-    private static void WriteApiEnumTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiSchemaApiEnumTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
         var propertyName = writeContext.PropertyNames.ApiSchema.ApiEnumTypes;
         var apiEnumTypes = apiSchema.ApiEnumTypes.Cast<ApiType>();
@@ -351,7 +351,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         );
     }
 
-    private static void WriteApiObjectTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiSchemaApiObjectTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
         var propertyName = writeContext.PropertyNames.ApiSchema.ApiObjectTypes;
         var apiObjectTypes = apiSchema.ApiObjectTypes.Cast<ApiType>();
@@ -368,7 +368,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         );
     }
 
-    private static void WriteApiRelationships(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiSchemaApiRelationships(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
         var propertyName = writeContext.PropertyNames.ApiSchema.ApiRelationships;
         var apiRelationships = apiSchema.ApiRelationships;
@@ -385,7 +385,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         );
     }
 
-    private static void WriteApiQuerySources(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiSchemaApiQuerySources(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
         var propertyName = writeContext.PropertyNames.ApiSchema.ApiQuerySources;
         var apiQuerySources = apiSchema.ApiQuerySources;

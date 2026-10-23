@@ -19,113 +19,159 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
     : JsonConverterBase<ApiRelationshipTraversal>(logger)
 {
     #region Property Types
-    private readonly record struct PropertyNames
+    /// <summary>
+    ///     Stores the resolved JSON property names for an <see cref="ApiRelationshipTraversal"/> under a given naming policy.
+    /// </summary>
+    private readonly record struct ApiRelationshipTraversalPropertyNames
     {
+        #region Immutable Properties
         public required string ApiName { get; init; }
         public required string ClrNavigationMember { get; init; }
-        public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
+        #endregion
+    }
 
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
+    private readonly record struct PropertyNames
+    {
+        #region Immutable Properties
+        public required ApiRelationshipTraversalPropertyNames ApiRelationshipTraversal { get; init; }
+        public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
+        #endregion
+
+        #region Factory Methods
         public static PropertyNames Create(JsonNamingPolicy policy) => new()
         {
-            ApiName = policy.ConvertName(nameof(ApiRelationshipTraversal.ApiName)),
-            ClrNavigationMember = policy.ConvertName
-            (
-                nameof(ApiRelationshipTraversal.ClrNavigationMember)
-            ),
-            ExtensibleBase = GetExtensiblePropertyNames(policy)
+            ApiRelationshipTraversal = new ApiRelationshipTraversalPropertyNames
+            {
+                ApiName = policy.ConvertName(nameof(Relationships.ApiRelationshipTraversal.ApiName)),
+                ClrNavigationMember = policy.ConvertName(nameof(Relationships.ApiRelationshipTraversal.ClrNavigationMember)),
+            },
+            ExtensibleBase = GetExtensiblePropertyNames(policy),
         };
+        #endregion
     }
     #endregion
 
     #region Read Types
-    private sealed class ReadState : ExtensibleReadData
+    /// <summary>
+    ///     Temporary storage used while reading traversal members from JSON.
+    /// </summary>
+    private class ApiRelationshipTraversalReadData
     {
+        #region Properties
         public string? ApiName { get; set; }
         public ClrMemberReference? ClrNavigationMember { get; set; }
+        #endregion
     }
 
-    private sealed class ReadHandlers(PropertyNames names)
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiRelationshipTraversal"/> during deserialization.
+    /// </summary>
+    private class ReadData : ExtensibleReadData
     {
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        #region Properties
+        public ApiRelationshipTraversalReadData? ApiRelationshipTraversal { get; set; }
+        #endregion
+    }
+
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
+    private class ReadHandlers(PropertyNames propertyNames)
+    {
+        #region ApiRelationshipTraversal Fields
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
-            { names.ApiName, HandleApiName },
-            { names.ClrNavigationMember, HandleClrNavigationMember },
-            {
-                names.ExtensibleBase.Extensions,
-                CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>()
-            }
+            // ApiRelationshipTraversal Property Handlers
+            { propertyNames.ApiRelationshipTraversal.ApiName, HandleApiRelationshipTraversalApiName },
+            { propertyNames.ApiRelationshipTraversal.ClrNavigationMember, HandleApiRelationshipTraversalClrNavigationMember },
+
+            // ExtensibleBase Property Handlers
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
+        #endregion
 
-        private static void HandleApiName
-        (
-            ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
-        ) => context.ReadData.ApiName = reader.GetString();
+        #region ApiRelationshipTraversal Methods
+        private static void HandleApiRelationshipTraversalApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiRelationshipTraversal ??= new ApiRelationshipTraversalReadData();
 
-        private static void HandleClrNavigationMember
-        (
-            ref Utf8JsonReader reader,
-            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
-        ) => context.ReadData.ClrNavigationMember =
-            JsonSerializer.Deserialize<ClrMemberReference>(ref reader, context.Options);
+            context.ReadData.ApiRelationshipTraversal.ApiName = reader.GetString();
+        }
+
+        private static void HandleApiRelationshipTraversalClrNavigationMember(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiRelationshipTraversal ??= new ApiRelationshipTraversalReadData();
+
+            context.ReadData.ApiRelationshipTraversal.ClrNavigationMember =
+                JsonSerializer.Deserialize<ClrMemberReference>(ref reader, context.Options);
+        }
+        #endregion
     }
     #endregion
 
     #region Constructors
-    /// <summary>Creates a converter for use by the JSON converter attribute.</summary>
-    public ApiRelationshipTraversalJsonConverter() : this(null)
-    { }
+    /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
+    public ApiRelationshipTraversalJsonConverter()
+        : this(null)
+    {
+    }
     #endregion
 
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
-        (
-            logger, options,
-            buildPropertyNames: PropertyNames.Create,
-            buildReadHandlers: names => new ReadHandlers(names)
-        );
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+            (
+                logger,
+                options,
+                buildPropertyNames: PropertyNames.Create,
+                buildReadHandlers: names => new ReadHandlers(names)
+            );
 
     /// <inheritdoc/>
-    protected override IWriteContext CreateWriteContext
-    (
-        ILogger logger,
-        JsonSerializerOptions options
-    )
-        => CreateDefaultWriteContext(logger, options, buildPropertyNames: PropertyNames.Create);
+    protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
+        => CreateDefaultWriteContext
+            (
+                logger,
+                options,
+                buildPropertyNames: PropertyNames.Create
+            );
 
     /// <inheritdoc/>
     protected override ApiRelationshipTraversal? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var state = readContext.ReadData;
-        var traversal = new ApiRelationshipTraversal(state.ApiName!, state.ClrNavigationMember);
-        AttachExtensions(traversal, state.Extensions);
-        return traversal;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var apiRelationshipTraversalReadData = readContext.ReadData.ApiRelationshipTraversal;
+
+        var apiName = apiRelationshipTraversalReadData?.ApiName;
+        var clrNavigationMember = apiRelationshipTraversalReadData?.ClrNavigationMember;
+
+        var apiRelationshipTraversal = new ApiRelationshipTraversal(apiName!, clrNavigationMember);
+        AttachExtensions(apiRelationshipTraversal, readContext.ReadData.Extensions);
+
+        return apiRelationshipTraversal;
     }
 
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         ReadJsonObject(ref reader, readContext, readContext.ReadHandlers.PropertyHandlers);
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore
-    (
-        Utf8JsonWriter writer,
-        ApiRelationshipTraversal apiRelationshipTraversal,
-        IWriteContext context
-    )
+    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationshipTraversal apiRelationshipTraversal, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
+
         writer.WriteJsonObject(state: (apiRelationshipTraversal, writeContext), writeObject: static (writer, state) =>
         {
             var (apiRelationshipTraversal, writeContext) = state;
-            WriteApiName(writer, apiRelationshipTraversal, writeContext);
-            WriteClrNavigationMember(writer, apiRelationshipTraversal, writeContext);
+            WriteApiRelationshipTraversalApiName(writer, apiRelationshipTraversal, writeContext);
+            WriteApiRelationshipTraversalClrNavigationMember(writer, apiRelationshipTraversal, writeContext);
             WriteExtensibleBaseExtensions
             (
                 writer,
@@ -138,19 +184,10 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiName(Utf8JsonWriter writer, ApiRelationshipTraversal apiRelationshipTraversal, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiName, value: apiRelationshipTraversal.ApiName, options: writeContext.Options);
+    private static void WriteApiRelationshipTraversalApiName(Utf8JsonWriter writer, ApiRelationshipTraversal apiRelationshipTraversal, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiRelationshipTraversal.ApiName, value: apiRelationshipTraversal.ApiName, options: writeContext.Options);
 
-    private static void WriteClrNavigationMember
-    (
-        Utf8JsonWriter writer,
-        ApiRelationshipTraversal apiRelationshipTraversal,
-        DefaultWriteContext<PropertyNames> writeContext
-    ) => writer.TryWritePropertyWithSerializer
-    (
-        propertyName: writeContext.PropertyNames.ClrNavigationMember,
-        obj: apiRelationshipTraversal.ClrNavigationMember,
-        options: writeContext.Options
-    );
+    private static void WriteApiRelationshipTraversalClrNavigationMember(Utf8JsonWriter writer, ApiRelationshipTraversal apiRelationshipTraversal, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipTraversal.ClrNavigationMember, obj: apiRelationshipTraversal.ClrNavigationMember, options: writeContext.Options);
     #endregion
 }

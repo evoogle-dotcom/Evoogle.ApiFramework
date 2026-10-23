@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema.Json;
 public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
 {
     #region ApiCollectionType Factory Methods
-    private static ApiCollectionType CreateApiCollectionType(DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+    private static ApiCollectionType CreateApiCollectionType(DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
     {
         var apiItemTypeExpression = context.ReadData.ApiCollectionType?.ApiItemTypeExpression;
         var apiItemTypeModifiersReadState = context.ReadData.ApiCollectionType?.ApiItemTypeModifiers;
@@ -38,7 +38,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     #endregion
 
     #region ApiEnumType Factory Methods
-    private static ApiEnumType CreateApiEnumType(DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+    private static ApiEnumType CreateApiEnumType(DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
     {
         var apiName = context.ReadData.ApiNamedType?.ApiName;
         var apiEnumValues = context.ReadData.ApiEnumType?.ApiEnumValues;
@@ -56,7 +56,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     #endregion
 
     #region ApiObjectType Factory Methods
-    private static ApiObjectType CreateApiObjectType(DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+    private static ApiObjectType CreateApiObjectType(DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
     {
         var apiName = context.ReadData.ApiNamedType?.ApiName;
         var apiOptions = context.ReadData.ApiObjectType?.ApiOptions;
@@ -82,7 +82,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     #endregion
 
     #region ApiScalarType Factory Methods
-    private static ApiScalarType CreateApiScalarType(DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+    private static ApiScalarType CreateApiScalarType(DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
     {
         var apiName = context.ReadData.ApiNamedType?.ApiName;
         var clrType = context.ReadData.ApiType?.ClrType;

@@ -23,34 +23,57 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     : JsonConverterBase<ApiRelationship>(logger)
 {
     #region Property Types
+    /// <summary>
+    ///     Stores the resolved JSON property names for the <see cref="ApiRelationship"/> members under a given naming
+    ///     policy.
+    /// </summary>
     private readonly record struct ApiRelationshipPropertyNames
     {
+        #region Immutable Properties
         public required string ApiKind { get; init; }
         public required string ApiName { get; init; }
         public required string ApiDeleteBehavior { get; init; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Stores the resolved JSON property names for the <see cref="ApiRelationshipOneTo"/> members under a given
+    ///     naming policy.
+    /// </summary>
     private readonly record struct ApiRelationshipOneToPropertyNames
     {
+        #region Immutable Properties
         public required string ApiPrincipalEnd { get; init; }
         public required string ApiDependentEnd { get; init; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Stores the resolved JSON property names for the <see cref="ApiRelationshipManyToMany"/> members under a
+    ///     given naming policy.
+    /// </summary>
     private readonly record struct ApiRelationshipManyToManyPropertyNames
     {
+        #region Immutable Properties
         public required string ApiPrincipalEndA { get; init; }
         public required string ApiPrincipalEndB { get; init; }
         public required string ApiAssociation { get; init; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
     private readonly record struct PropertyNames
     {
+        #region Immutable Properties
         public required ApiRelationshipPropertyNames ApiRelationship { get; init; }
         public required ApiRelationshipOneToPropertyNames ApiRelationshipOneTo { get; init; }
         public required ApiRelationshipManyToManyPropertyNames ApiRelationshipManyToMany { get; init; }
-
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
+        #endregion
 
+        #region Factory Methods
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
@@ -73,56 +96,91 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
+        #endregion
     }
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Temporary storage used while reading relationship members from JSON.
+    /// </summary>
     private class ApiRelationshipReadData
     {
+        #region Properties
         public ApiRelationshipKind? ApiKind { get; set; }
         public string? ApiName { get; set; }
         public JsonEnumReadState<ApiRelationshipDeleteBehavior>? ApiDeleteBehavior { get; set; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Temporary storage used while reading one-to relationship members from JSON.
+    /// </summary>
     private class ApiRelationshipOneToReadData
     {
+        #region Properties
         public ApiRelationshipPrincipalEnd? ApiPrincipalEnd { get; set; }
         public ApiRelationshipDependentEnd? ApiDependentEnd { get; set; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Temporary storage used while reading many-to-many relationship members from JSON.
+    /// </summary>
     private class ApiRelationshipManyToManyReadData
     {
+        #region Properties
         public ApiRelationshipPrincipalEnd? ApiPrincipalEndA { get; set; }
         public ApiRelationshipPrincipalEnd? ApiPrincipalEndB { get; set; }
         public ApiRelationshipAssociation? ApiAssociation { get; set; }
+        #endregion
     }
 
-    private class ReadState : ExtensibleReadData
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiRelationship"/> during deserialization.
+    /// </summary>
+    private class ReadData : ExtensibleReadData
     {
+        #region Properties
         public ApiRelationshipReadData? ApiRelationship { get; set; }
         public ApiRelationshipOneToReadData? ApiRelationshipOneTo { get; set; }
         public ApiRelationshipManyToManyReadData? ApiRelationshipManyToMany { get; set; }
+        #endregion
     }
 
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
+        #region ApiRelationship Fields
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiRelationship.ApiKind, HandleApiKind, true },
-            { propertyNames.ApiRelationship.ApiName, HandleApiName },
-            { propertyNames.ApiRelationship.ApiDeleteBehavior, HandleApiDeleteBehavior, true },
-            { propertyNames.ApiRelationshipOneTo.ApiPrincipalEnd, HandleApiPrincipalEnd },
-            { propertyNames.ApiRelationshipOneTo.ApiDependentEnd, HandleApiDependentEnd },
-            { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA, HandleApiPrincipalEndA },
-            { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB, HandleApiPrincipalEndB },
-            { propertyNames.ApiRelationshipManyToMany.ApiAssociation, HandleApiAssociation },
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
-        };
+            // ApiRelationship Property Handlers
+            { propertyNames.ApiRelationship.ApiKind, HandleApiRelationshipApiKind, true },
+            { propertyNames.ApiRelationship.ApiName, HandleApiRelationshipApiName },
+            { propertyNames.ApiRelationship.ApiDeleteBehavior, HandleApiRelationshipApiDeleteBehavior, true },
 
-        private static void HandleApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+            // ApiRelationshipOneTo Property Handlers
+            { propertyNames.ApiRelationshipOneTo.ApiPrincipalEnd, HandleApiRelationshipOneToApiPrincipalEnd },
+            { propertyNames.ApiRelationshipOneTo.ApiDependentEnd, HandleApiRelationshipOneToApiDependentEnd },
+
+            // ApiRelationshipManyToMany Property Handlers
+            { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA, HandleApiRelationshipManyToManyApiPrincipalEndA },
+            { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB, HandleApiRelationshipManyToManyApiPrincipalEndB },
+            { propertyNames.ApiRelationshipManyToMany.ApiAssociation, HandleApiRelationshipManyToManyApiAssociation },
+
+            // ExtensibleBase Property Handlers
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
+        };
+        #endregion
+
+        #region ApiRelationship Methods
+        private static void HandleApiRelationshipApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            context.ReadData.ApiRelationship.ApiKind = _nullableKindJsonConverter.Read
+
+            context.ReadData.ApiRelationship.ApiKind = _nullableApiRelationshipKindJsonConverter.Read
             (
                 ref reader,
                 typeof(ApiRelationshipKind?),
@@ -130,63 +188,75 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             );
         }
 
-        private static void HandleApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiRelationshipApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
+
             context.ReadData.ApiRelationship.ApiName = reader.GetString();
         }
 
-        private static void HandleApiDeleteBehavior(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiRelationshipApiDeleteBehavior(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var readData = context.ReadData.ApiRelationship;
-            readData.ApiDeleteBehavior ??= new JsonEnumReadState<ApiRelationshipDeleteBehavior>();
-            readData.ApiDeleteBehavior.Read(ref reader, context.Options, _nullableDeleteBehaviorJsonConverter);
-        }
 
-        private static void HandleApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+            var apiRelationshipReadData = context.ReadData.ApiRelationship;
+            apiRelationshipReadData.ApiDeleteBehavior ??= new JsonEnumReadState<ApiRelationshipDeleteBehavior>();
+            apiRelationshipReadData.ApiDeleteBehavior.Read(ref reader, context.Options, _nullableApiRelationshipDeleteBehaviorJsonConverter);
+        }
+        #endregion
+
+        #region ApiRelationshipOneTo Methods
+        private static void HandleApiRelationshipOneToApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipOneTo ??= new ApiRelationshipOneToReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationshipOneTo.ApiPrincipalEnd = end;
+
+            context.ReadData.ApiRelationshipOneTo.ApiPrincipalEnd =
+                JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
         }
 
-        private static void HandleApiDependentEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiRelationshipOneToApiDependentEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipOneTo ??= new ApiRelationshipOneToReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationshipOneTo.ApiDependentEnd = end;
-        }
 
-        private static void HandleApiPrincipalEndA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+            context.ReadData.ApiRelationshipOneTo.ApiDependentEnd =
+                JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
+        }
+        #endregion
+
+        #region ApiRelationshipManyToMany Methods
+        private static void HandleApiRelationshipManyToManyApiPrincipalEndA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationshipManyToMany.ApiPrincipalEndA = end;
+
+            context.ReadData.ApiRelationshipManyToMany.ApiPrincipalEndA =
+                JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
         }
 
-        private static void HandleApiPrincipalEndB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiRelationshipManyToManyApiPrincipalEndB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationshipManyToMany.ApiPrincipalEndB = end;
+
+            context.ReadData.ApiRelationshipManyToMany.ApiPrincipalEndB =
+                JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
         }
 
-        private static void HandleApiAssociation(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiRelationshipManyToManyApiAssociation(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipAssociation>(ref reader, context.Options);
-            context.ReadData.ApiRelationshipManyToMany.ApiAssociation = end;
+
+            context.ReadData.ApiRelationshipManyToMany.ApiAssociation =
+                JsonSerializer.Deserialize<ApiRelationshipAssociation>(ref reader, context.Options);
         }
+        #endregion
     }
     #endregion
 
     #region Fields
-    private static readonly EnumJsonConverter<ApiRelationshipKind> _kindConverter = new();
-    private static readonly EnumJsonConverter<ApiRelationshipDeleteBehavior> _deleteBehaviorConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiRelationshipKind> _nullableKindJsonConverter =
+    private static readonly EnumJsonConverter<ApiRelationshipKind> _apiRelationshipKindJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiRelationshipDeleteBehavior> _apiRelationshipDeleteBehaviorJsonConverter = new();
+    private static readonly NullableEnumJsonConverter<ApiRelationshipKind> _nullableApiRelationshipKindJsonConverter =
         new(EnumJsonInvalidValuePolicy.Throw);
-    private static readonly NullableEnumJsonConverter<ApiRelationshipDeleteBehavior> _nullableDeleteBehaviorJsonConverter =
+    private static readonly NullableEnumJsonConverter<ApiRelationshipDeleteBehavior> _nullableApiRelationshipDeleteBehaviorJsonConverter =
         new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
@@ -201,7 +271,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
                 logger,
                 options,
@@ -211,42 +281,48 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultWriteContext(logger, options, buildPropertyNames: PropertyNames.Create);
+        => CreateDefaultWriteContext
+            (
+                logger,
+                options,
+                buildPropertyNames: PropertyNames.Create
+            );
 
     /// <inheritdoc/>
     protected override ApiRelationship? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readData = readContext.ReadData;
 
-        var apiRelationshipReadData = readState.ApiRelationship;
+        var apiRelationshipReadData = readData.ApiRelationship;
         var apiKind = apiRelationshipReadData?.ApiKind
             ?? throw new JsonException($"Missing {nameof(ApiRelationship.ApiKind)} enumeration value.");
         var apiDeleteBehaviorReadState = apiRelationshipReadData.ApiDeleteBehavior;
-        ApiRelationship relationship = apiKind switch
+
+        ApiRelationship apiRelationship = apiKind switch
         {
             ApiRelationshipKind.OneToOne => new ApiRelationshipOneToOne
             (
                 apiRelationshipReadData.ApiName!,
-                readState.ApiRelationshipOneTo?.ApiPrincipalEnd!,
-                readState.ApiRelationshipOneTo?.ApiDependentEnd!,
+                readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
+                readData.ApiRelationshipOneTo?.ApiDependentEnd!,
                 apiDeleteBehaviorReadState?.Value ?? ApiRelationshipOneToOne.DefaultDeleteBehavior
             ),
 
             ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany
             (
                 apiRelationshipReadData.ApiName!,
-                readState.ApiRelationshipOneTo?.ApiPrincipalEnd!,
-                readState.ApiRelationshipOneTo?.ApiDependentEnd!,
+                readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
+                readData.ApiRelationshipOneTo?.ApiDependentEnd!,
                 apiDeleteBehaviorReadState?.Value ?? ApiRelationshipOneToMany.DefaultDeleteBehavior
             ),
 
             ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany
             (
                 apiRelationshipReadData.ApiName!,
-                readState.ApiRelationshipManyToMany?.ApiPrincipalEndA!,
-                readState.ApiRelationshipManyToMany?.ApiPrincipalEndB!,
-                readState.ApiRelationshipManyToMany?.ApiAssociation!,
+                readData.ApiRelationshipManyToMany?.ApiPrincipalEndA!,
+                readData.ApiRelationshipManyToMany?.ApiPrincipalEndB!,
+                readData.ApiRelationshipManyToMany?.ApiAssociation!,
                 apiDeleteBehaviorReadState?.Value ?? ApiRelationshipManyToMany.DefaultDeleteBehavior
             ),
 
@@ -255,17 +331,17 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
         if (apiDeleteBehaviorReadState?.IsInvalid == true || apiDeleteBehaviorReadState?.IsNull == true)
         {
-            relationship.MarkInvalidApiDeleteBehavior();
+            apiRelationship.MarkInvalidApiDeleteBehavior();
         }
 
-        AttachExtensions(relationship, readContext.ReadData.Extensions);
-        return relationship;
+        AttachExtensions(apiRelationship, readContext.ReadData.Extensions);
+        return apiRelationship;
     }
 
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         ReadJsonObject
         (
             ref reader,
@@ -282,24 +358,24 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         writer.WriteJsonObject(state: (apiRelationship, writeContext), writeObject: static (writer, state) =>
         {
             var (apiRelationship, writeContext) = state;
-            WriteApiKind(writer, apiRelationship, writeContext);
-            WriteApiName(writer, apiRelationship, writeContext);
+            WriteApiRelationshipApiKind(writer, apiRelationship, writeContext);
+            WriteApiRelationshipApiName(writer, apiRelationship, writeContext);
 
             switch (apiRelationship)
             {
-                case ApiRelationshipOneTo oneToRelationship:
-                    WriteApiPrincipalEnd(writer, oneToRelationship, writeContext);
-                    WriteApiDependentEnd(writer, oneToRelationship, writeContext);
+                case ApiRelationshipOneTo apiRelationshipOneTo:
+                    WriteApiRelationshipOneToApiPrincipalEnd(writer, apiRelationshipOneTo, writeContext);
+                    WriteApiRelationshipOneToApiDependentEnd(writer, apiRelationshipOneTo, writeContext);
                     break;
 
-                case ApiRelationshipManyToMany manyToMany:
-                    WriteApiPrincipalEndA(writer, manyToMany, writeContext);
-                    WriteApiPrincipalEndB(writer, manyToMany, writeContext);
-                    WriteApiAssociation(writer, manyToMany, writeContext);
+                case ApiRelationshipManyToMany apiRelationshipManyToMany:
+                    WriteApiRelationshipManyToManyApiPrincipalEndA(writer, apiRelationshipManyToMany, writeContext);
+                    WriteApiRelationshipManyToManyApiPrincipalEndB(writer, apiRelationshipManyToMany, writeContext);
+                    WriteApiRelationshipManyToManyApiAssociation(writer, apiRelationshipManyToMany, writeContext);
                     break;
             }
 
-            WriteApiDeleteBehavior(writer, apiRelationship, writeContext);
+            WriteApiRelationshipApiDeleteBehavior(writer, apiRelationship, writeContext);
 
             WriteExtensibleBaseExtensions
             (
@@ -313,38 +389,28 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKind
-    (
-        Utf8JsonWriter writer,
-        ApiRelationship relationship,
-        DefaultWriteContext<PropertyNames> writeContext
-    ) => writer.WritePropertyWithConverter
-    (
-        propertyName: writeContext.PropertyNames.ApiRelationship.ApiKind,
-        value: relationship.ApiKind,
-        options: writeContext.Options,
-        converter: _kindConverter
-    );
+    private static void WriteApiRelationshipApiKind(Utf8JsonWriter writer, ApiRelationship apiRelationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.WritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiRelationship.ApiKind, value: apiRelationship.ApiKind, options: writeContext.Options, converter: _apiRelationshipKindJsonConverter);
 
-    private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiRelationship.ApiDeleteBehavior, value: relationship.ApiDeleteBehavior, options: writeContext.Options, converter: _deleteBehaviorConverter);
+    private static void WriteApiRelationshipApiName(Utf8JsonWriter writer, ApiRelationship apiRelationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiRelationship.ApiName, value: apiRelationship.ApiName, options: writeContext.Options);
 
-    private static void WriteApiName(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiRelationship.ApiName, value: relationship.ApiName, options: writeContext.Options);
+    private static void WriteApiRelationshipOneToApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo apiRelationshipOneTo, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipOneTo.ApiPrincipalEnd, obj: apiRelationshipOneTo.ApiPrincipalEnd, options: writeContext.Options);
 
-    private static void WriteApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipOneTo.ApiPrincipalEnd, obj: relationship.ApiPrincipalEnd, options: writeContext.Options);
+    private static void WriteApiRelationshipOneToApiDependentEnd(Utf8JsonWriter writer, ApiRelationshipOneTo apiRelationshipOneTo, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipOneTo.ApiDependentEnd, obj: apiRelationshipOneTo.ApiDependentEnd, options: writeContext.Options);
 
-    private static void WriteApiDependentEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipOneTo.ApiDependentEnd, obj: relationship.ApiDependentEnd, options: writeContext.Options);
+    private static void WriteApiRelationshipManyToManyApiPrincipalEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany apiRelationshipManyToMany, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA, obj: apiRelationshipManyToMany.ApiPrincipalEndA, options: writeContext.Options);
 
-    private static void WriteApiPrincipalEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA, obj: relationship.ApiPrincipalEndA, options: writeContext.Options);
+    private static void WriteApiRelationshipManyToManyApiPrincipalEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany apiRelationshipManyToMany, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB, obj: apiRelationshipManyToMany.ApiPrincipalEndB, options: writeContext.Options);
 
-    private static void WriteApiPrincipalEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB, obj: relationship.ApiPrincipalEndB, options: writeContext.Options);
+    private static void WriteApiRelationshipManyToManyApiAssociation(Utf8JsonWriter writer, ApiRelationshipManyToMany apiRelationshipManyToMany, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiAssociation, obj: apiRelationshipManyToMany.ApiAssociation, options: writeContext.Options);
 
-    private static void WriteApiAssociation(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiAssociation, obj: relationship.ApiAssociation, options: writeContext.Options);
+    private static void WriteApiRelationshipApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationship apiRelationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiRelationship.ApiDeleteBehavior, value: apiRelationship.ApiDeleteBehavior, options: writeContext.Options, converter: _apiRelationshipDeleteBehaviorJsonConverter);
     #endregion
 }

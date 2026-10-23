@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema.Json;
 ///     Converts <see cref="ApiTypeExpression"/> instances to and from JSON.
 /// </summary>
 /// <param name="logger">The optional logger instance.</param>
-public sealed class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConverter>? logger)
+public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConverter>? logger)
     : JsonConverterBase<ApiTypeExpression>(logger)
 {
     private enum ExpressionShape
