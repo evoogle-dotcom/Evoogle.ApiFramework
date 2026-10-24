@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.Extensions;
@@ -27,9 +28,9 @@ public sealed record class ApiSchemaOptions
 
     /// <summary>
     ///     Gets the null-handling strategy applied when resolving keys across the entire schema.
-    ///     Defaults to <see cref="ApiKeyNullHandling.UseDefaultOnNull"/>.
+    ///     Defaults to <see cref="ApiKeyNullHandling.UseEmptyOnNull"/>.
     /// </summary>
-    public ApiKeyNullHandling ApiKeyNullHandling { get; init; } = ApiKeyNullHandling.UseDefaultOnNull;
+    public ApiKeyNullHandling ApiKeyNullHandling { get; init; } = ApiSchemaDefaults.KeyNullHandling;
 
     internal bool HasInvalidApiKeyNullHandling { get; init; }
     #endregion

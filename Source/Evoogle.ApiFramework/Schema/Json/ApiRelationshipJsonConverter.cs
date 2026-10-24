@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.Json;
@@ -306,7 +307,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 apiRelationshipReadData.ApiName!,
                 readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
                 readData.ApiRelationshipOneTo?.ApiDependentEnd!,
-                apiDeleteBehaviorReadState?.Value ?? ApiRelationshipOneToOne.DefaultDeleteBehavior
+                apiDeleteBehaviorReadState?.Value ?? ApiSchemaDefaults.OneToOneRelationshipDeleteBehavior
             ),
 
             ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany
@@ -314,7 +315,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 apiRelationshipReadData.ApiName!,
                 readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
                 readData.ApiRelationshipOneTo?.ApiDependentEnd!,
-                apiDeleteBehaviorReadState?.Value ?? ApiRelationshipOneToMany.DefaultDeleteBehavior
+                apiDeleteBehaviorReadState?.Value ?? ApiSchemaDefaults.OneToManyRelationshipDeleteBehavior
             ),
 
             ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany
@@ -323,7 +324,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 readData.ApiRelationshipManyToMany?.ApiPrincipalEndA!,
                 readData.ApiRelationshipManyToMany?.ApiPrincipalEndB!,
                 readData.ApiRelationshipManyToMany?.ApiAssociation!,
-                apiDeleteBehaviorReadState?.Value ?? ApiRelationshipManyToMany.DefaultDeleteBehavior
+                apiDeleteBehaviorReadState?.Value ?? ApiSchemaDefaults.ManyToManyRelationshipDeleteBehavior
             ),
 
             _ => throw new JsonException($"Unsupported {nameof(ApiRelationshipKind)} enumeration value: '{apiKind}'.")

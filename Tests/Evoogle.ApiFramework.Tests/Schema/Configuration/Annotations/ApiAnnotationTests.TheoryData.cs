@@ -27,7 +27,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -99,7 +99,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -125,7 +125,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [
@@ -163,7 +163,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [
@@ -201,7 +201,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [
@@ -240,7 +240,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [
@@ -278,7 +278,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -362,7 +362,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -424,7 +424,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -497,7 +497,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -580,7 +580,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -674,7 +674,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -784,7 +784,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -857,7 +857,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -930,7 +930,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1003,7 +1003,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1123,7 +1123,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1243,7 +1243,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1347,7 +1347,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1404,7 +1404,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1557,7 +1557,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1682,7 +1682,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1835,7 +1835,7 @@ public partial class ApiAnnotationTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {

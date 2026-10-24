@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Types;
@@ -203,10 +204,12 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
         var apiOutputTypeExpression = apiQuerySourceReadData?.ApiOutputTypeExpression;
 
         var apiOutputTypeModifiersReadState = apiQuerySourceReadData?.ApiOutputTypeModifiers;
-        var apiOutputTypeModifiers = apiOutputTypeModifiersReadState?.Value ?? ApiTypeModifiers.None;
+        var apiOutputTypeModifiers = apiOutputTypeModifiersReadState?.Value
+            ?? ApiSchemaDefaults.NullableTypeModifiers;
 
         var apiOutputCompositionReadState = apiQuerySourceReadData?.ApiOutputComposition;
-        var apiOutputComposition = apiOutputCompositionReadState?.Value ?? ApiQueryComposition.None;
+        var apiOutputComposition = apiOutputCompositionReadState?.Value
+            ?? ApiSchemaDefaults.QuerySourceOutputComposition;
 
         var apiQuerySource = new ApiQuerySource
         (

@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Query.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -109,7 +110,10 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
     /// <summary>Configures whether an argument must be supplied.</summary>
     /// <param name="requiresArgument">Whether argument omission is prohibited.</param>
     /// <returns>The current builder.</returns>
-    public ApiQuerySourceParameterBuilder WithRequiredArgument(bool requiresArgument = true)
+    public ApiQuerySourceParameterBuilder WithRequiredArgument
+    (
+        bool requiresArgument = ApiSchemaDefaults.QuerySourceParameterRequiresArgument
+    )
     {
         var source = this.CurrentConfigurationSource;
         if (source >= _state.ApiRequiresArgumentSource)

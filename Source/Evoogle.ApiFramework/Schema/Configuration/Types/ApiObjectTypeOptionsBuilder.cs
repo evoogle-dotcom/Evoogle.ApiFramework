@@ -37,7 +37,7 @@ public sealed class ApiObjectTypeOptionsBuilder()
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeOptionsBuilder UseEmptyKeyOnNullKeyPart()
     {
-        _state.ApiKeyNullHandling = ApiKeyNullHandling.UseDefaultOnNull;
+        _state.ApiKeyNullHandling = ApiKeyNullHandling.UseEmptyOnNull;
         return this;
     }
     #endregion

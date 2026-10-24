@@ -4,7 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
-
+using System.Text.Json.Serialization;
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
@@ -142,6 +142,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         public JsonRoundtripTest()
         {
             this.ExcludeMembers = ApiSchemaExcludeMembers.CompiledSchema;
+            this.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
         }
         #endregion
 

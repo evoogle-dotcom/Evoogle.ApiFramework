@@ -516,13 +516,13 @@ public partial class ApiKeyDefinitionTests
             )
         },
 
-        // Null handling — UseDefaultOnNull
+        // Null handling — UseEmptyOnNull
         new MaterializeKeyFromInstanceTest
         {
-            Name = $"{KeyTwoScalarPartCompositeWithNullId2PropertyInstance} returns empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            Name = $"{KeyTwoScalarPartCompositeWithNullId2PropertyInstance} returns empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseEmptyOnNull}",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
             SelfObject = KeyTwoScalarPartCompositeWithNullId2PropertyInstance,
-            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            NullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
@@ -533,10 +533,10 @@ public partial class ApiKeyDefinitionTests
 
         new MaterializeKeyFromInstanceTest
         {
-            Name = $"{KeyNestedCompositeWithNullNestedPartPropertyInstance} returns empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            Name = $"{KeyNestedCompositeWithNullNestedPartPropertyInstance} returns empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseEmptyOnNull}",
             ApiObjectTypeName = nameof(KeyNestedComposite),
             SelfObject = KeyNestedCompositeWithNullNestedPartPropertyInstance,
-            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            NullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
@@ -547,11 +547,11 @@ public partial class ApiKeyDefinitionTests
 
         new MaterializeKeyFromInstanceTest
         {
-            Name = $"{KeyOwnedCompositeInstance} returns empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull} and null owner",
+            Name = $"{KeyOwnedCompositeInstance} returns empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseEmptyOnNull} and null owner",
             ApiObjectTypeName = nameof(KeyOwnedComposite),
             SelfObject = KeyOwnedCompositeInstance,
             OwnerObject = null,
-            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            NullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
@@ -691,10 +691,10 @@ public partial class ApiKeyDefinitionTests
 
         new MaterializeKeyFromValuesTest
         {
-            Name = $"{nameof(KeyTwoScalarPartComposite)} values return empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            Name = $"{nameof(KeyTwoScalarPartComposite)} values return empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseEmptyOnNull}",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
             ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureMissingCompositeValue(a),
-            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            NullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
@@ -705,33 +705,33 @@ public partial class ApiKeyDefinitionTests
 
         new MaterializeKeyFromValuesTest
         {
-            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when text is null and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when text is null and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseEmptyOnNull}",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyName = "PK_KeyOneScalarPart",
             ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureNullText(a),
-            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            NullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
         },
 
         new MaterializeKeyFromValuesTest
         {
-            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when text is whitespace and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when text is whitespace and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseEmptyOnNull}",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyName = "PK_KeyOneScalarPart",
             ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureWhitespaceText(a),
-            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            NullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
         },
 
         new MaterializeKeyFromValuesTest
         {
-            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when ApiKey is empty and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when ApiKey is empty and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseEmptyOnNull}",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyName = "PK_KeyOneScalarPart",
             ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureEmptyApiKey(a),
-            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            NullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
         },
@@ -751,7 +751,7 @@ public partial class ApiKeyDefinitionTests
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyName = "PK_KeyOneScalarPart",
             ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureInvalidTextParse(a),
-            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            NullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
 

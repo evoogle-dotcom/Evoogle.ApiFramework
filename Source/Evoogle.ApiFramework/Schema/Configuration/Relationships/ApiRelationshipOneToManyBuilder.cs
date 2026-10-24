@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -21,7 +22,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
 public sealed class ApiRelationshipOneToManyBuilder(string apiName)
-    : ApiRelationshipBuilder(apiName, ApiRelationshipOneToMany.DefaultDeleteBehavior)
+    : ApiRelationshipBuilder(apiName, ApiSchemaDefaults.OneToManyRelationshipDeleteBehavior)
 {
     #region Fields
     private readonly Internal.ApiRelationshipEndsState _endsState = new();

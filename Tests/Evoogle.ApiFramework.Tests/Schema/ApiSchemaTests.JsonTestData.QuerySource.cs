@@ -106,7 +106,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With ApiQuerySource",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -157,6 +157,94 @@ public partial class ApiSchemaTests
                         },
                         "ApiOutputTypeModifiers": "Required",
                         "ApiOutputComposition": "Projection, Filtering, Ordering, OffsetPagination"
+                    }
+                ]
+            }
+            """
+        }
+    ];
+
+    private static ApiSchemaJsonTestCase[] QuerySourceDefaultJsonTestCases =>
+    [
+        new ApiSchemaJsonTestCase
+        {
+            Name = $"{nameof(ApiSchema)} With omitted {nameof(ApiQuerySource)} defaults",
+            FactoryArgument = new ApiSchemaDef
+            (
+                ApiName: "QuerySourceDefaults",
+                ApiNamedTypes:
+                [
+                    new ApiScalarTypeDef
+                    (
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
+                    )
+                ],
+                ApiQuerySources:
+                [
+                    new ApiQuerySourceDef
+                    (
+                        ApiName: "Echo",
+                        ApiInputParameters:
+                        [
+                            new ApiQuerySourceParameterDef
+                            (
+                                ApiName: "text",
+                                ApiTypeExpression: new ApiTypeExpressionDef
+                                (
+                                    ApiTypeDef: null,
+                                    ApiTypeReferenceDef: new ApiTypeReferenceDef
+                                    (
+                                        ApiKind: ApiTypeKind.Scalar,
+                                        ApiName: nameof(String),
+                                        ClrType: null
+                                    )
+                                ),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiRequiresArgument: true
+                            )
+                        ],
+                        ApiOutputTypeExpression: new ApiTypeExpressionDef
+                        (
+                            ApiTypeDef: null,
+                            ApiTypeReferenceDef: new ApiTypeReferenceDef
+                            (
+                                ApiKind: ApiTypeKind.Scalar,
+                                ApiName: nameof(String),
+                                ClrType: null
+                            )
+                        ),
+                        ApiOutputTypeModifiers: ApiTypeModifiers.None,
+                        ApiOutputComposition: ApiQueryComposition.Projection
+                    )
+                ]
+            ),
+            Json = """
+            {
+                "ApiName": "QuerySourceDefaults",
+                "ApiScalarTypes": [
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
+                    }
+                ],
+                "ApiQuerySources": [
+                    {
+                        "ApiName": "Echo",
+                        "ApiInputParameters": [
+                            {
+                                "ApiName": "text",
+                                "ApiType": {
+                                    "ApiKind": "Scalar",
+                                    "ApiName": "String"
+                                }
+                            }
+                        ],
+                        "ApiOutputType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
+                        }
                     }
                 ]
             }

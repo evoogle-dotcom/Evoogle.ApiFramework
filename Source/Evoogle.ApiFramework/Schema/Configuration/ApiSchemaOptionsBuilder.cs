@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Key;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Key;
 
@@ -30,13 +31,13 @@ public sealed class ApiSchemaOptionsBuilder()
     }
 
     /// <summary>
-    ///     Configures key null handling to emit <see cref="Evoogle.ApiFramework.Key.ApiKey.Empty"/>
+    ///     Configures key null handling to emit <see cref="ApiKey.Empty"/>
     ///     for the affected path when a segment is null or cannot be resolved during key construction.
     /// </summary>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaOptionsBuilder UseEmptyKeyOnNullKeyPart()
     {
-        _state.ApiKeyNullHandling = ApiKeyNullHandling.UseDefaultOnNull;
+        _state.ApiKeyNullHandling = ApiKeyNullHandling.UseEmptyOnNull;
         return this;
     }
     #endregion

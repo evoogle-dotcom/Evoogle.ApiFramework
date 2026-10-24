@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.ApiFramework.TestData;
@@ -165,13 +166,13 @@ public static partial class ApiSchemaFactory
     );
 
     // Relationship Presets
-    private static ApiRelationshipOneToMany R1M(string name, ApiRelationshipPrincipalEnd principal, ApiRelationshipDependentEnd dependent, ApiRelationshipDeleteBehavior deleteBehavior = ApiRelationshipOneToMany.DefaultDeleteBehavior)
+    private static ApiRelationshipOneToMany R1M(string name, ApiRelationshipPrincipalEnd principal, ApiRelationshipDependentEnd dependent, ApiRelationshipDeleteBehavior deleteBehavior = ApiSchemaDefaults.OneToManyRelationshipDeleteBehavior)
         => new(name, principal, dependent, deleteBehavior);
 
-    private static ApiRelationshipOneToOne R11(string name, ApiRelationshipPrincipalEnd principal, ApiRelationshipDependentEnd dependent, ApiRelationshipDeleteBehavior deleteBehavior = ApiRelationshipOneToOne.DefaultDeleteBehavior)
+    private static ApiRelationshipOneToOne R11(string name, ApiRelationshipPrincipalEnd principal, ApiRelationshipDependentEnd dependent, ApiRelationshipDeleteBehavior deleteBehavior = ApiSchemaDefaults.OneToOneRelationshipDeleteBehavior)
         => new(name, principal, dependent, deleteBehavior);
 
-    private static ApiRelationshipManyToMany RMN(string name, ApiRelationshipPrincipalEnd principalA, ApiRelationshipPrincipalEnd principalB, ApiRelationshipAssociation association, ApiRelationshipDeleteBehavior deleteBehavior = ApiRelationshipManyToMany.DefaultDeleteBehavior)
+    private static ApiRelationshipManyToMany RMN(string name, ApiRelationshipPrincipalEnd principalA, ApiRelationshipPrincipalEnd principalB, ApiRelationshipAssociation association, ApiRelationshipDeleteBehavior deleteBehavior = ApiSchemaDefaults.ManyToManyRelationshipDeleteBehavior)
         => new(name, principalA, principalB, association, deleteBehavior);
 
     private static ApiRelationshipPrincipalEnd RPE(Type clr, string? identityName = null)

@@ -6,6 +6,7 @@
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Relationships.Internal;
 using Evoogle.ApiFramework.Schema.Types;
@@ -39,7 +40,7 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 /// </param>
 /// <param name="apiDeleteBehavior">
 ///     The delete behavior that governs what happens to the association objects when either principal end is deleted.
-///     Defaults to <see cref="DefaultDeleteBehavior"/>.
+///     Defaults to <see cref="ApiRelationshipDeleteBehavior.Delete"/>
 /// </param>
 public sealed class ApiRelationshipManyToMany
 (
@@ -47,16 +48,10 @@ public sealed class ApiRelationshipManyToMany
     ApiRelationshipPrincipalEnd apiPrincipalEndA,
     ApiRelationshipPrincipalEnd apiPrincipalEndB,
     ApiRelationshipAssociation apiAssociation,
-    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipManyToMany.DefaultDeleteBehavior
+    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiSchemaDefaults.ManyToManyRelationshipDeleteBehavior
 ) : ApiRelationship(apiName, apiDeleteBehavior)
 {
     #region ApiRelationshipManyToMany Fields
-    /// <summary>
-    ///     The default delete behavior for many-to-many relationships.
-    ///     Association rows are deleted automatically when either principal is removed.
-    /// </summary>
-    public const ApiRelationshipDeleteBehavior DefaultDeleteBehavior = ApiRelationshipDeleteBehavior.Delete;
-
     private ApiRelationshipKeyBinding? _apiResolvedKeyBindingA = null;
     private ApiRelationshipKeyBinding? _apiResolvedKeyBindingB = null;
     #endregion

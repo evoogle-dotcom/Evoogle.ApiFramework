@@ -26,7 +26,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [],
               "ApiEnumTypes": [
@@ -74,7 +74,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [],
               "ApiEnumTypes": [
@@ -123,7 +123,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [
                 {
@@ -149,7 +149,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [],
               "ApiEnumTypes": [
@@ -197,7 +197,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [],
               "ApiEnumTypes": [
@@ -231,7 +231,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [],
               "ApiEnumTypes": [
@@ -270,7 +270,7 @@ public partial class ApiConventionTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -342,7 +342,7 @@ public partial class ApiConventionTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -414,7 +414,7 @@ public partial class ApiConventionTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -486,7 +486,7 @@ public partial class ApiConventionTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -558,7 +558,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [],
               "ApiEnumTypes": [
@@ -599,7 +599,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [],
               "ApiEnumTypes": [
@@ -633,7 +633,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [
                 {
@@ -719,7 +719,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [
                 {
@@ -805,7 +805,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [
                 {
@@ -881,7 +881,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [
                 {
@@ -954,7 +954,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [
                 {
@@ -1028,7 +1028,7 @@ public partial class ApiConventionTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1100,7 +1100,7 @@ public partial class ApiConventionTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1177,7 +1177,7 @@ public partial class ApiConventionTests
                 "ApiName": "Test",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1250,7 +1250,7 @@ public partial class ApiConventionTests
               "ApiName": "Test",
               "ApiVersion": "0.1.0",
               "ApiOptions": {
-                "ApiKeyNullHandling": "UseDefaultOnNull"
+                "ApiKeyNullHandling": "UseEmptyOnNull"
               },
               "ApiScalarTypes": [
                 {

@@ -73,6 +73,8 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
         #region User Supplied Properties
         public required bool UsesGenericOutput { get; init; }
 
+        public required bool UsesDefaultComposition { get; init; }
+
         public required ApiTypeModifiers ExpectedCollectionTypeModifiers { get; init; }
 
         public required ApiTypeModifiers ExpectedItemTypeModifiers { get; init; }
@@ -94,7 +96,7 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
             this.WriteLine($"Uses Generic Output:           {this.UsesGenericOutput}");
             this.WriteLine($"Expected Collection Modifiers: {this.ExpectedCollectionTypeModifiers}");
             this.WriteLine($"Expected Item Modifiers:       {this.ExpectedItemTypeModifiers}");
-            this.WriteLine("Initial Composition:           Projection, Filtering");
+            this.WriteLine($"Uses Default Composition:      {this.UsesDefaultComposition}");
             this.WriteLine($"Expected Composition:          {this.ExpectedComposition}");
             this.WriteLine("Expected Exception:            None");
 
@@ -116,9 +118,12 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
                         source.WithCollectionOutput<string>(apiCollectionTypeModifiers: this.ExpectedCollectionTypeModifiers, apiItemTypeModifiers: this.ExpectedItemTypeModifiers);
                     }
 
-                    source
-                        .WithOutputComposition(ApiQueryComposition.Projection | ApiQueryComposition.Filtering)
-                        .WithOutputComposition(this.ExpectedComposition);
+                    if (!this.UsesDefaultComposition)
+                    {
+                        source
+                            .WithOutputComposition(ApiQueryComposition.Projection | ApiQueryComposition.Filtering)
+                            .WithOutputComposition(this.ExpectedComposition);
+                    }
                 });
         }
 
@@ -151,6 +156,14 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] BuildInputParameterTheoryData =>
     [
+        new BuildInputParameterTest
+        {
+            Name = "Default argument settings require a non-null value",
+            BuildExpression = static () =>
+                ApiQuerySourceBuilderTestsFactory.BuildWithDefaultArgumentSettings(),
+            ExpectedApiRequiresArgument = true,
+            ExpectedTypeModifiers = ApiTypeModifiers.Required
+        },
         new BuildInputParameterTest
         {
             Name = "Required argument with non-null value",
@@ -219,8 +232,18 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
     [
         new BuildCollectionOutputTest
         {
+            Name = "Default composition allows projection",
+            UsesGenericOutput = true,
+            UsesDefaultComposition = true,
+            ExpectedCollectionTypeModifiers = ApiTypeModifiers.Required,
+            ExpectedItemTypeModifiers = ApiTypeModifiers.Required,
+            ExpectedComposition = ApiQueryComposition.Projection
+        },
+        new BuildCollectionOutputTest
+        {
             Name = "Generic nullable collection with non-null items and ordering only",
             UsesGenericOutput = true,
+            UsesDefaultComposition = false,
             ExpectedCollectionTypeModifiers = ApiTypeModifiers.None,
             ExpectedItemTypeModifiers = ApiTypeModifiers.Required,
             ExpectedComposition = ApiQueryComposition.Ordering
@@ -229,6 +252,7 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
         {
             Name = "Generic non-null collection with nullable items and no composition",
             UsesGenericOutput = true,
+            UsesDefaultComposition = false,
             ExpectedCollectionTypeModifiers = ApiTypeModifiers.Required,
             ExpectedItemTypeModifiers = ApiTypeModifiers.None,
             ExpectedComposition = ApiQueryComposition.None
@@ -237,6 +261,7 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
         {
             Name = "CLR nullable collection with non-null items and combined composition",
             UsesGenericOutput = false,
+            UsesDefaultComposition = false,
             ExpectedCollectionTypeModifiers = ApiTypeModifiers.None,
             ExpectedItemTypeModifiers = ApiTypeModifiers.Required,
             ExpectedComposition = ApiQueryComposition.Projection | ApiQueryComposition.Ordering
@@ -246,6 +271,7 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
         {
             Name = "CLR non-null collection with nullable items and no composition",
             UsesGenericOutput = false,
+            UsesDefaultComposition = false,
             ExpectedCollectionTypeModifiers = ApiTypeModifiers.Required,
             ExpectedItemTypeModifiers = ApiTypeModifiers.None,
             ExpectedComposition = ApiQueryComposition.None

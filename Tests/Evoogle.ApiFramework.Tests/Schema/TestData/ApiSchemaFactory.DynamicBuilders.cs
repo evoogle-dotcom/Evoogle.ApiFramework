@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.Extension;
@@ -198,7 +199,7 @@ public static partial class ApiSchemaFactory
         ApiRelationshipPrincipalEndDef ApiPrincipalEndA,
         ApiRelationshipPrincipalEndDef ApiPrincipalEndB,
         ApiRelationshipAssociationDef ApiAssociation,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipManyToMany.DefaultDeleteBehavior,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiSchemaDefaults.ManyToManyRelationshipDeleteBehavior,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipDef(ApiName, ExtensionTypes);
 
@@ -207,7 +208,7 @@ public static partial class ApiSchemaFactory
         string ApiName,
         ApiRelationshipPrincipalEndDef ApiPrincipalEnd,
         ApiRelationshipDependentEndDef ApiDependentEnd,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipOneToMany.DefaultDeleteBehavior,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiSchemaDefaults.OneToManyRelationshipDeleteBehavior,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipDef(ApiName, ExtensionTypes);
 
@@ -216,7 +217,7 @@ public static partial class ApiSchemaFactory
         string ApiName,
         ApiRelationshipPrincipalEndDef ApiPrincipalEnd,
         ApiRelationshipDependentEndDef ApiDependentEnd,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipOneToOne.DefaultDeleteBehavior,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiSchemaDefaults.OneToOneRelationshipDeleteBehavior,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipDef(ApiName, ExtensionTypes);
 

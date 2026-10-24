@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Query.Internal;
@@ -17,11 +18,11 @@ internal sealed class ApiQuerySourceParameterState
     #region Properties
     internal ApiConfigurationSource RegistrationSource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal ApiTypeModifiers ApiTypeModifiers { get; set; } = ApiTypeModifiers.Required;
+    internal ApiTypeModifiers ApiTypeModifiers { get; set; } = ApiSchemaDefaults.NonNullableTypeModifiers;
 
     internal ApiConfigurationSource ModifiersSource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal bool ApiRequiresArgument { get; set; } = true;
+    internal bool ApiRequiresArgument { get; set; } = ApiSchemaDefaults.QuerySourceParameterRequiresArgument;
 
     internal ApiConfigurationSource ApiRequiresArgumentSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion

@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Extensions;
 
@@ -30,17 +31,9 @@ public sealed class ApiRelationshipOneToMany
     string apiName,
     ApiRelationshipPrincipalEnd apiPrincipalEnd,
     ApiRelationshipDependentEnd apiDependentEnd,
-    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipOneToMany.DefaultDeleteBehavior
+    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiSchemaDefaults.OneToManyRelationshipDeleteBehavior
 ) : ApiRelationshipOneTo(apiName, apiPrincipalEnd, apiDependentEnd, apiDeleteBehavior)
 {
-    #region ApiRelationshipOneToMany Fields
-    /// <summary>
-    ///     The default delete behavior for one-to-many relationships.
-    ///     Dependent objects are left unmodified when the principal is removed.
-    /// </summary>
-    public const ApiRelationshipDeleteBehavior DefaultDeleteBehavior = ApiRelationshipDeleteBehavior.None;
-    #endregion
-
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiRelationshipOneToMany);

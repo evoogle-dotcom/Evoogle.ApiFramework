@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -17,13 +18,12 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 ///     <see cref="And(Type, Action{ApiRelationshipPrincipalEndBuilder}?)"/>,
 ///     and <see cref="WithAssociation(Type, Action{ApiRelationshipAssociationBuilder}?)"/> to define
 ///     both principal ends and the association object type.
-///     Optionally call <see cref="WithDeleteBehavior"/> to override the default
-///     (<see cref="ApiRelationshipManyToMany.DefaultDeleteBehavior"/>).
+///     Optionally call <see cref="WithDeleteBehavior"/> to override the default.
 ///     Subsequent calls to any configuration method for the same end replace the previous configuration.
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
 public class ApiRelationshipManyToManyBuilder(string apiName)
-    : ApiRelationshipBuilder(apiName, ApiRelationshipManyToMany.DefaultDeleteBehavior)
+    : ApiRelationshipBuilder(apiName, ApiSchemaDefaults.ManyToManyRelationshipDeleteBehavior)
 {
     #region Fields
     private readonly Internal.ApiRelationshipEndsState _endsState = new();

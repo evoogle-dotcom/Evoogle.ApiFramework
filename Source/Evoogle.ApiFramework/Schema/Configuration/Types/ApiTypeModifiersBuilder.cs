@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Types;
@@ -11,7 +12,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Types;
 /// <summary>
 ///     Helper used to fluently configure <see cref="ApiTypeModifiers"/> flags.
 /// </summary>
-public sealed class ApiTypeModifiersBuilder(ApiTypeModifiers modifiers = ApiTypeModifiers.None)
+public sealed class ApiTypeModifiersBuilder
+    (ApiTypeModifiers modifiers = ApiSchemaDefaults.NullableTypeModifiers)
 {
     #region Fields
     private readonly ApiTypeModifiersState _state = new(modifiers);

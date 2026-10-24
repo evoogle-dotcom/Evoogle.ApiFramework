@@ -276,13 +276,13 @@ public partial class ApiSchemaTests
         new DefaultAndInheritanceTest
         {
             Name = "Omitted schema key null handling uses the default",
-            ExpectedSchemaNullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            ExpectedSchemaNullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.RemoveSchemaApiKeyNullHandling(a),
         },
         new DefaultAndInheritanceTest
         {
             Name = "Null object key null handling preserves inheritance",
-            ExpectedSchemaNullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            ExpectedSchemaNullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             ExpectsInheritedObjectNullHandling = true,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstObjectTypeApiKeyNullHandlingToNull(a),
         },

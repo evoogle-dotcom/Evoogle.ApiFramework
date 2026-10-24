@@ -22,7 +22,7 @@ public enum ApiKeyNullHandling
     ///     When any member in the path — whether an intermediate navigation member or the terminal
     ///     scalar member — is <see langword="null"/>, emit <see cref="ApiKey.Empty"/> for that path and continue.
     /// </summary>
-    UseDefaultOnNull = 0,
+    UseEmptyOnNull = 0,
 
     /// <summary>
     ///     When any member in the path — whether an intermediate navigation member or the terminal

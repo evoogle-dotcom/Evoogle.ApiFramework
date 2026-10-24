@@ -55,7 +55,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With Property Backed ApiVersionDefinition",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -122,7 +122,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With Repository Backed ApiVersionDefinition",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {

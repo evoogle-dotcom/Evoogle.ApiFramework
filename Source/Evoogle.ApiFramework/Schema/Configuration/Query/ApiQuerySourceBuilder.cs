@@ -6,6 +6,7 @@
 using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Query.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -159,7 +160,7 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     public ApiQuerySourceBuilder WithOutput
     (
         ApiTypeReference apiTypeReference,
-        ApiTypeModifiers apiTypeModifiers = ApiTypeModifiers.None
+        ApiTypeModifiers apiTypeModifiers = ApiSchemaDefaults.NullableTypeModifiers
     )
     {
         ArgumentNullException.ThrowIfNull(apiTypeReference);
@@ -173,7 +174,7 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     public ApiQuerySourceBuilder WithOutput
     (
         Type clrType,
-        ApiTypeModifiers apiTypeModifiers = ApiTypeModifiers.None
+        ApiTypeModifiers apiTypeModifiers = ApiSchemaDefaults.NullableTypeModifiers
     )
     {
         ArgumentNullException.ThrowIfNull(clrType);
@@ -184,7 +185,10 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     /// <typeparam name="TOutput">The registered CLR output type.</typeparam>
     /// <param name="apiTypeModifiers">The output nullability; nullable by default.</param>
     /// <returns>The current builder.</returns>
-    public ApiQuerySourceBuilder WithOutput<TOutput>(ApiTypeModifiers apiTypeModifiers = ApiTypeModifiers.None)
+    public ApiQuerySourceBuilder WithOutput<TOutput>
+    (
+        ApiTypeModifiers apiTypeModifiers = ApiSchemaDefaults.NullableTypeModifiers
+    )
         => this.WithOutput(typeof(TOutput), apiTypeModifiers);
 
     /// <summary>Declares list output using a registered CLR item type.</summary>
@@ -196,8 +200,8 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     public ApiQuerySourceBuilder WithCollectionOutput
     (
         Type clrItemType,
-        ApiTypeModifiers apiCollectionTypeModifiers = ApiTypeModifiers.Required,
-        ApiTypeModifiers apiItemTypeModifiers = ApiTypeModifiers.Required
+        ApiTypeModifiers apiCollectionTypeModifiers = ApiSchemaDefaults.NonNullableTypeModifiers,
+        ApiTypeModifiers apiItemTypeModifiers = ApiSchemaDefaults.NonNullableTypeModifiers
     )
     {
         ArgumentNullException.ThrowIfNull(clrItemType);
@@ -222,8 +226,8 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     /// <returns>The current builder.</returns>
     public ApiQuerySourceBuilder WithCollectionOutput<TItem>
     (
-        ApiTypeModifiers apiCollectionTypeModifiers = ApiTypeModifiers.Required,
-        ApiTypeModifiers apiItemTypeModifiers = ApiTypeModifiers.Required
+        ApiTypeModifiers apiCollectionTypeModifiers = ApiSchemaDefaults.NonNullableTypeModifiers,
+        ApiTypeModifiers apiItemTypeModifiers = ApiSchemaDefaults.NonNullableTypeModifiers
     ) => this.WithCollectionOutput(typeof(TItem), apiCollectionTypeModifiers, apiItemTypeModifiers);
 
     /// <summary>Declares which query composition operations are allowed over the source output.</summary>

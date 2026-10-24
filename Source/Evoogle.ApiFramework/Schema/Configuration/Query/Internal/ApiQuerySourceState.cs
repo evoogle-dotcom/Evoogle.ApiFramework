@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -22,11 +23,11 @@ internal sealed class ApiQuerySourceState
 
     internal Func<ApiTypeExpression>? OutputTypeFactory { get; set; }
 
-    internal ApiTypeModifiers ApiOutputTypeModifiers { get; set; }
+    internal ApiTypeModifiers ApiOutputTypeModifiers { get; set; } = ApiSchemaDefaults.NullableTypeModifiers;
 
     internal ApiConfigurationSource OutputSource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal ApiQueryComposition ApiOutputComposition { get; set; } = ApiQueryComposition.Projection;
+    internal ApiQueryComposition ApiOutputComposition { get; set; } = ApiSchemaDefaults.QuerySourceOutputComposition;
 
     internal ApiConfigurationSource OutputCompositionSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion

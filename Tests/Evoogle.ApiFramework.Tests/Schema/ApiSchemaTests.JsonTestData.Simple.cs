@@ -34,7 +34,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 0 ApiType",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [],
@@ -90,7 +90,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 1 ApiScalarType",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -168,7 +168,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 1 ApiScalarType And GraphQlExtension",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -216,7 +216,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 2 ApiScalarType",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -269,7 +269,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 3 ApiScalarType",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -328,7 +328,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 3 ApiScalarType And GraphQlExtension And JsonApiExtension",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -384,7 +384,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 1 ApiEnumType",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [
@@ -440,7 +440,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 1 ApiEnumType And ProtobufExtension",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [
@@ -608,7 +608,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person)",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -891,7 +891,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person) And GraphQlExtension And JsonApiExtension",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {
@@ -1252,7 +1252,7 @@ public partial class ApiSchemaTests
                 "ApiName": "ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 2 ApiObjectType (Company And Person)",
                 "ApiVersion": "0.1.0",
                 "ApiOptions": {
-                    "ApiKeyNullHandling": "UseDefaultOnNull"
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
                 },
                 "ApiScalarTypes": [
                     {

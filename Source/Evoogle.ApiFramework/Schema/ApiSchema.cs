@@ -12,6 +12,7 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Query;
@@ -105,7 +106,7 @@ public sealed class ApiSchema : ApiSchemaElement
     ///     Instantiates a new instance of the <see cref="ApiSchema"/> class using separate collections for scalar, enum, and object types.
     /// </summary>
     /// <param name="apiName">The name of the API schema.</param>
-    /// <param name="apiVersion">The optional version of the API schema. Will default to "1.0" if not provided.</param>
+    /// <param name="apiVersion">The optional version of the API schema. If null, the default version is used.</param>
     /// <param name="apiOptions">The options used to configure this API schema. If null, the default options are used.</param>
     /// <param name="apiScalarTypes">The collection of scalar types to include in the API schema.</param>
     /// <param name="apiEnumTypes">The collection of enum types to include in the API schema.</param>
@@ -128,8 +129,7 @@ public sealed class ApiSchema : ApiSchemaElement
         this.ApiName = apiName;
 
         // Compile the API version.
-        // Default to standard semantic versioning for initial development version.
-        this.ApiVersion = apiVersion ?? "0.1.0";
+        this.ApiVersion = apiVersion ?? ApiSchemaDefaults.ApiVersion;
 
         // Compile the API schema options.
         this.ApiOptions = apiOptions ?? ApiSchemaOptions.Default;

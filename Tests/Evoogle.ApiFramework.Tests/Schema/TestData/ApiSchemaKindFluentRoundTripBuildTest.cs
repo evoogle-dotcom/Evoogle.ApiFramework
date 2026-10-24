@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration;
 using Evoogle.Extensions;
-using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
 

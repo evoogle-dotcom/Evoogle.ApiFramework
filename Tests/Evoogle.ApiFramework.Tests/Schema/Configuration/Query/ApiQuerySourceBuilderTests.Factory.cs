@@ -14,6 +14,9 @@ public static class ApiQuerySourceBuilderTestsFactory
     public static ApiSchema BuildRequiredArgumentWithNonNullableValue()
         => BuildSchema(parameter => parameter.WithRequiredArgument().AsNonNullable());
 
+    public static ApiSchema BuildWithDefaultArgumentSettings()
+        => BuildSchema(static _ => { });
+
     public static ApiSchema BuildRequiredArgumentWithNullableValue()
         => BuildSchema(parameter => parameter.WithRequiredArgument().AsNullable());
 

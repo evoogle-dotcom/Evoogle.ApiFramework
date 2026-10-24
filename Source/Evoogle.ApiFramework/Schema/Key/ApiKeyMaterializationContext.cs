@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Key;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Key;
@@ -92,7 +93,7 @@ public sealed class ApiKeyMaterializationContext
     ///     Use <see cref="ApiKeyPartNameFormat.None"/> to materialize unnamed/positional key parts.
     ///     A single composite key must still be consistently named or unnamed.
     /// </remarks>
-    public ApiKeyPartNameFormat PartNameFormat { get; init; } = ApiKeyPartNameFormat.None;
+    public ApiKeyPartNameFormat PartNameFormat { get; init; } = ApiSchemaDefaults.KeyPartNameFormat;
 
     /// <summary>
     ///     Gets an optional custom formatter used to create <see cref="ApiKeyPart.ApiName"/> values during materialization.
@@ -106,9 +107,9 @@ public sealed class ApiKeyMaterializationContext
     /// <summary>
     ///     Gets the behavior when any property in a path — whether an intermediate navigation member
     ///     or the terminal scalar member — is <see langword="null"/>.
-    ///     Defaults to <see cref="ApiKeyNullHandling.UseDefaultOnNull"/>.
+    ///     Defaults to <see cref="ApiKeyNullHandling.UseEmptyOnNull"/>.
     /// </summary>
-    public ApiKeyNullHandling NullHandling { get; init; } = ApiKeyNullHandling.UseDefaultOnNull;
+    public ApiKeyNullHandling NullHandling { get; init; } = ApiSchemaDefaults.KeyNullHandling;
 
     /// <summary>
     ///     Gets the optional contextual name override for the key definition being materialized.
