@@ -156,6 +156,19 @@ public sealed class ApiQuerySource
 
     private void ValidateApiOutputComposition(ApiSchemaCompilationContext context)
     {
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiOutputComposition));
+        if (jsonEnumFinding is not null)
+        {
+            var findingApiPath = this.ApiPath;
+            var findingSeverity = ApiSchemaCompilationSeverity.Error;
+            var findingCode = ApiSchemaCompilationCode.ApiQuerySourceInvalidComposition;
+            var findingDescription = jsonEnumFinding.DescribeProblem();
+            var findingRemediation = $"Specify a valid {nameof(this.ApiOutputComposition)} value";
+
+            context.AddIssue(findingApiPath, findingSeverity, findingCode, findingDescription, findingRemediation);
+            return;
+        }
+
         const ApiQueryComposition collectionComposition = ApiQueryComposition.Filtering | ApiQueryComposition.Ordering | ApiQueryComposition.OffsetPagination;
         const ApiQueryComposition knownComposition = collectionComposition | ApiQueryComposition.Projection;
 
@@ -191,6 +204,19 @@ public sealed class ApiQuerySource
 
     private void ValidateApiOutputTypeModifiers(ApiSchemaCompilationContext context)
     {
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiOutputTypeModifiers));
+        if (jsonEnumFinding is not null)
+        {
+            var findingApiPath = this.ApiPath;
+            var findingSeverity = ApiSchemaCompilationSeverity.Error;
+            var findingCode = ApiSchemaCompilationCode.ApiQuerySourceInvalidOutputTypeModifiers;
+            var findingDescription = jsonEnumFinding.DescribeProblem();
+            var findingRemediation = $"Specify a valid {nameof(this.ApiOutputTypeModifiers)} value";
+
+            context.AddIssue(findingApiPath, findingSeverity, findingCode, findingDescription, findingRemediation);
+            return;
+        }
+
         var hasUnsupportedApiOutputTypeModifiers = (this.ApiOutputTypeModifiers & ~ApiTypeModifiers.Required) != 0;
         if (hasUnsupportedApiOutputTypeModifiers)
         {

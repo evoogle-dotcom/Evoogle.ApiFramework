@@ -6,6 +6,7 @@
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.Extension;
 using Evoogle.NTree;
@@ -55,6 +56,8 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     private ApiSchemaElementTopology? _topology = null;
 
     private bool _isFrozen;
+
+    private List<JsonEnumFinding>? _jsonEnumFindings = null;
     #endregion
 
     #region Properties
@@ -195,6 +198,29 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     internal virtual IEnumerable<ApiSchemaElement> GetOwnedElements() => [];
 
     internal virtual void CompileCore(ApiSchemaCompilationContext context) => ArgumentNullException.ThrowIfNull(context);
+
+    internal JsonEnumFinding? GetJsonEnumFinding(string memberName)
+        => _jsonEnumFindings?.Find(finding => finding.MemberName == memberName);
+
+    internal void RecordJsonEnumFinding<TEnum>
+    (
+        string memberName,
+        JsonEnumReadResult<TEnum> readResult,
+        bool allowsNull = false
+    )
+        where TEnum : struct, Enum
+    {
+        var finding = JsonEnumFinding.Create(memberName, readResult, allowsNull);
+        if (finding is null)
+        {
+            return;
+        }
+
+        this.ThrowIfFrozen();
+
+        _jsonEnumFindings ??= [];
+        _jsonEnumFindings.Add(finding);
+    }
 
     internal void AttachExtensions(IEnumerable<KeyValuePair<Type, object>> extensions)
     {

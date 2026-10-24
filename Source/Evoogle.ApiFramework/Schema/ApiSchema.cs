@@ -370,17 +370,7 @@ public sealed class ApiSchema : ApiSchemaElement
 
     private void ValidateApiOptions(ApiSchemaCompilationContext context)
     {
-        if (!this.ApiOptions.HasInvalidApiKeyNullHandling)
-        {
-            return;
-        }
-
-        var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiSchemaInvalidApiKeyNullHandling;
-        var description = $"{nameof(this.ApiOptions)}.{nameof(ApiSchemaOptions.ApiKeyNullHandling)} must be a valid {nameof(ApiKeyNullHandling)} value";
-        var remediation = $"Specify a valid {nameof(ApiSchemaOptions.ApiKeyNullHandling)} value";
-
-        context.AddIssue(severity, code, description, remediation);
+        this.ApiOptions.Validate(context);
     }
 
     private void CompileApiEnumTypes(ApiSchemaCompilationContext context)

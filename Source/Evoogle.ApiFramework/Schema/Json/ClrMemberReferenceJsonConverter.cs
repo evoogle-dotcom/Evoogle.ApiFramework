@@ -62,7 +62,7 @@ public class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJsonConve
     private class ClrMemberReferenceReadData
     {
         #region Properties
-        public JsonEnumReadState<ClrMemberKind>? ClrKind { get; set; }
+        public JsonEnumReadResult<ClrMemberKind> ClrKind { get; set; }
         public string? ClrName { get; set; }
         #endregion
     }
@@ -95,9 +95,8 @@ public class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJsonConve
         {
             context.ReadData.ClrMemberReference ??= new ClrMemberReferenceReadData();
 
-            var clrMemberReferenceReadData = context.ReadData.ClrMemberReference;
-            clrMemberReferenceReadData.ClrKind ??= new JsonEnumReadState<ClrMemberKind>();
-            clrMemberReferenceReadData.ClrKind.Read(ref reader, context.Options, _nullableClrMemberKindJsonConverter);
+            context.ReadData.ClrMemberReference.ClrKind =
+                JsonEnumReader.Read<ClrMemberKind>(ref reader, context.Options);
         }
 
         private static void HandleClrMemberReferenceClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -112,7 +111,6 @@ public class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJsonConve
 
     #region Fields
     private static readonly EnumJsonConverter<ClrMemberKind> _clrMemberKindJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ClrMemberKind> _nullableClrMemberKindJsonConverter = new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -148,15 +146,15 @@ public class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJsonConve
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var clrMemberReferenceReadData = readContext.ReadData.ClrMemberReference;
-        var clrKindReadState = clrMemberReferenceReadData?.ClrKind;
+        var clrKindReadResult = clrMemberReferenceReadData?.ClrKind ?? default;
 
-        var clrKind = clrKindReadState?.Value;
+        var clrKind = clrKindReadResult.Value;
         var clrName = clrMemberReferenceReadData?.ClrName;
-        var hasInvalidClrKind = clrKind is null ||
-            clrKindReadState?.IsInvalid == true ||
-            clrKindReadState?.IsNull == true;
 
-        var clrMemberReference = new ClrMemberReference(clrKind, clrName!, hasInvalidClrKind);
+        // An absent clrKind is reported by the reference's own validation because its value is null.
+        var clrKindFinding = JsonEnumFinding.Create(nameof(ClrMemberReference.ClrKind), clrKindReadResult);
+
+        var clrMemberReference = new ClrMemberReference(clrKind, clrName!, clrKindFinding);
         return clrMemberReference;
     }
 

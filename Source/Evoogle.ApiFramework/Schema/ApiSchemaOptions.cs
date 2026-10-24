@@ -5,8 +5,11 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Schema.Compilation;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.Extensions;
 
@@ -20,6 +23,20 @@ public sealed record class ApiSchemaOptions
 {
     #region Fields
     private static readonly ApiSchemaOptions _default = new();
+
+    private readonly JsonEnumFinding? _apiKeyNullHandlingFinding;
+    #endregion
+
+    #region Constructors
+    /// <summary>Creates schema options with all settings at their defaults.</summary>
+    public ApiSchemaOptions()
+    {
+    }
+
+    internal ApiSchemaOptions(JsonEnumFinding? apiKeyNullHandlingFinding)
+    {
+        _apiKeyNullHandlingFinding = apiKeyNullHandlingFinding;
+    }
     #endregion
 
     #region Properties
@@ -31,11 +48,33 @@ public sealed record class ApiSchemaOptions
     ///     Defaults to <see cref="ApiKeyNullHandling.UseEmptyOnNull"/>.
     /// </summary>
     public ApiKeyNullHandling ApiKeyNullHandling { get; init; } = ApiSchemaDefaults.KeyNullHandling;
+    #endregion
 
-    internal bool HasInvalidApiKeyNullHandling { get; init; }
+    #region Methods
+    internal void Validate(ApiSchemaCompilationContext context)
+    {
+        if (_apiKeyNullHandlingFinding is null)
+        {
+            return;
+        }
+
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiSchemaInvalidApiKeyNullHandling;
+        var description = $"{nameof(ApiSchema.ApiOptions)}.{_apiKeyNullHandlingFinding.DescribeProblem()}";
+        var remediation = $"Specify a valid {nameof(this.ApiKeyNullHandling)} value";
+
+        context.AddIssue(severity, code, description, remediation);
+    }
     #endregion
 
     #region Object Methods
+    /// <inheritdoc/>
+    public bool Equals(ApiSchemaOptions? other)
+        => other is not null && this.ApiKeyNullHandling == other.ApiKeyNullHandling;
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => this.ApiKeyNullHandling.GetHashCode();
+
     /// <inheritdoc/>
     public override string ToString()
     {

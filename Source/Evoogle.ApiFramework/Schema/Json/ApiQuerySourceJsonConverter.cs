@@ -72,8 +72,8 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
         public string? ApiName { get; set; } = null;
         public List<ApiQuerySourceParameter>? ApiInputParameters { get; set; } = null;
         public ApiTypeExpression? ApiOutputTypeExpression { get; set; } = null;
-        public JsonEnumReadState<ApiTypeModifiers>? ApiOutputTypeModifiers { get; set; }
-        public JsonEnumReadState<ApiQueryComposition>? ApiOutputComposition { get; set; }
+        public JsonEnumReadResult<ApiTypeModifiers> ApiOutputTypeModifiers { get; set; }
+        public JsonEnumReadResult<ApiQueryComposition> ApiOutputComposition { get; set; }
         #endregion
     }
 
@@ -138,18 +138,16 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
         {
             context.ReadData.ApiQuerySource ??= new ApiQuerySourceReadData();
 
-            var options = context.Options;
-            context.ReadData.ApiQuerySource.ApiOutputTypeModifiers ??= new JsonEnumReadState<ApiTypeModifiers>();
-            context.ReadData.ApiQuerySource.ApiOutputTypeModifiers.Read(ref reader, options, _nullableApiTypeModifiersJsonConverter);
+            context.ReadData.ApiQuerySource.ApiOutputTypeModifiers =
+                JsonEnumReader.Read<ApiTypeModifiers>(ref reader, context.Options);
         }
 
         private static void HandleApiQuerySourceApiOutputComposition(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySource ??= new ApiQuerySourceReadData();
 
-            var options = context.Options;
-            context.ReadData.ApiQuerySource.ApiOutputComposition ??= new JsonEnumReadState<ApiQueryComposition>();
-            context.ReadData.ApiQuerySource.ApiOutputComposition.Read(ref reader, options, _nullableApiQueryCompositionJsonConverter);
+            context.ReadData.ApiQuerySource.ApiOutputComposition =
+                JsonEnumReader.Read<ApiQueryComposition>(ref reader, context.Options);
         }
         #endregion
     }
@@ -157,12 +155,8 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
 
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _nullableApiTypeModifiersJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
 
     private static readonly EnumJsonConverter<ApiQueryComposition> _apiQueryCompositionJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiQueryComposition> _nullableApiQueryCompositionJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -203,13 +197,11 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
         var apiInputParameters = apiQuerySourceReadData?.ApiInputParameters;
         var apiOutputTypeExpression = apiQuerySourceReadData?.ApiOutputTypeExpression;
 
-        var apiOutputTypeModifiersReadState = apiQuerySourceReadData?.ApiOutputTypeModifiers;
-        var apiOutputTypeModifiers = apiOutputTypeModifiersReadState?.Value
-            ?? ApiSchemaDefaults.NullableTypeModifiers;
+        var apiOutputTypeModifiersReadResult = apiQuerySourceReadData?.ApiOutputTypeModifiers ?? default;
+        var apiOutputTypeModifiers = apiOutputTypeModifiersReadResult.ValueOr(ApiSchemaDefaults.NullableTypeModifiers);
 
-        var apiOutputCompositionReadState = apiQuerySourceReadData?.ApiOutputComposition;
-        var apiOutputComposition = apiOutputCompositionReadState?.Value
-            ?? ApiSchemaDefaults.QuerySourceOutputComposition;
+        var apiOutputCompositionReadResult = apiQuerySourceReadData?.ApiOutputComposition ?? default;
+        var apiOutputComposition = apiOutputCompositionReadResult.ValueOr(ApiSchemaDefaults.QuerySourceOutputComposition);
 
         var apiQuerySource = new ApiQuerySource
         (
@@ -219,6 +211,9 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
             apiOutputTypeModifiers,
             apiOutputComposition
         );
+
+        apiQuerySource.RecordJsonEnumFinding(nameof(ApiQuerySource.ApiOutputTypeModifiers), apiOutputTypeModifiersReadResult);
+        apiQuerySource.RecordJsonEnumFinding(nameof(ApiQuerySource.ApiOutputComposition), apiOutputCompositionReadResult);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiQuerySource, extensions);

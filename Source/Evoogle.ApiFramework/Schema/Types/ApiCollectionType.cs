@@ -25,10 +25,6 @@ public sealed class ApiCollectionType
     Type clrCollectionType
 ) : ApiType(clrCollectionType)
 {
-    #region Fields
-    private bool _hasInvalidApiItemTypeModifiers;
-    #endregion
-
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiCollectionType);
@@ -49,8 +45,6 @@ public sealed class ApiCollectionType
     public ApiTypeModifiers ApiItemTypeModifiers { get; } = apiItemTypeModifiers;
 
     internal ApiTypeExpression ApiItemTypeExpression { get; } = apiItemTypeExpression;
-
-    internal void MarkInvalidApiItemTypeModifiers() => _hasInvalidApiItemTypeModifiers = true;
     #endregion
 
     #region ApiCollectionType Computed Properties
@@ -122,17 +116,19 @@ public sealed class ApiCollectionType
 
     private void ValidateApiItemTypeModifiers(ApiSchemaCompilationContext context)
     {
-        if (!_hasInvalidApiItemTypeModifiers)
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiItemTypeModifiers));
+        if (jsonEnumFinding is null)
         {
             return;
         }
 
+        var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemTypeModifiers;
-        var description = $"{nameof(this.ApiItemTypeModifiers)} must be a valid {nameof(ApiTypeModifiers)} value";
+        var description = jsonEnumFinding.DescribeProblem();
         var remediation = $"Specify a valid {nameof(this.ApiItemTypeModifiers)} value";
 
-        context.AddIssue(severity, code, description, remediation);
+        context.AddIssue(apiPath, severity, code, description, remediation);
     }
     #endregion
 }

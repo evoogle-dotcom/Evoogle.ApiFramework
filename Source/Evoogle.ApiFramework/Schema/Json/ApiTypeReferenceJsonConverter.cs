@@ -64,7 +64,7 @@ public class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonConverter
     private class ApiTypeReferenceReadData
     {
         #region Properties
-        public JsonEnumReadState<ApiTypeKind>? ApiKind { get; set; }
+        public JsonEnumReadResult<ApiTypeKind> ApiKind { get; set; }
         public string? ApiName { get; set; }
         public Type? ClrType { get; set; }
         #endregion
@@ -99,9 +99,8 @@ public class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonConverter
         {
             context.ReadData.ApiTypeReference ??= new ApiTypeReferenceReadData();
 
-            var apiTypeReferenceReadData = context.ReadData.ApiTypeReference;
-            apiTypeReferenceReadData.ApiKind ??= new JsonEnumReadState<ApiTypeKind>();
-            apiTypeReferenceReadData.ApiKind.Read(ref reader, context.Options, _nullableApiTypeKindJsonConverter);
+            context.ReadData.ApiTypeReference.ApiKind =
+                JsonEnumReader.Read<ApiTypeKind>(ref reader, context.Options);
         }
 
         private static void HandleApiTypeReferenceApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -123,8 +122,6 @@ public class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonConverter
 
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeKind> _apiTypeKindJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiTypeKind> _nullableApiTypeKindJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
 
     private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
@@ -162,14 +159,21 @@ public class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonConverter
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var apiTypeReferenceReadData = readContext.ReadData.ApiTypeReference;
-        var apiKindReadState = apiTypeReferenceReadData?.ApiKind;
+        var apiKindReadResult = apiTypeReferenceReadData?.ApiKind ?? default;
 
-        var apiKind = apiKindReadState?.Value;
+        var apiKind = apiKindReadResult.Value;
         var apiName = apiTypeReferenceReadData?.ApiName;
         var clrType = apiTypeReferenceReadData?.ClrType;
-        var hasInvalidApiKind = apiKindReadState?.IsInvalid == true;
 
-        var apiTypeReference = new ApiTypeReference(apiKind, apiName, clrType, hasInvalidApiKind);
+        // Null is valid here: a null kind identifies a CLR-backed reference.
+        var apiKindFinding = JsonEnumFinding.Create
+        (
+            nameof(ApiTypeReference.ApiKind),
+            apiKindReadResult,
+            allowsNull: true
+        );
+
+        var apiTypeReference = new ApiTypeReference(apiKind, apiName, clrType, apiKindFinding);
         return apiTypeReference;
     }
 

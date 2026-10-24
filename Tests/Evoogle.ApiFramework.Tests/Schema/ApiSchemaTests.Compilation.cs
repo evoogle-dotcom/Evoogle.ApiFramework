@@ -3783,7 +3783,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind,
-                    description: $"{nameof(ClrMemberReference.ClrKind)} must be a valid {nameof(ClrMemberKind)} value",
+                    description: $"{nameof(ClrMemberReference.ClrKind)} must be a valid {nameof(ClrMemberKind)} value, but 'Unknown' was supplied",
                     remediation: $"Specify a valid {nameof(ClrMemberReference.ClrKind)} value"
                 ),
             ]
@@ -3964,7 +3964,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToOne)}[\"TestRel\"].{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}.{nameof(ApiRelationshipTraversal)}[\"Related\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind,
-                    description: $"{nameof(ClrMemberReference.ClrKind)} must be a valid {nameof(ClrMemberKind)} value",
+                    description: $"{nameof(ClrMemberReference.ClrKind)} must be a valid {nameof(ClrMemberKind)} value, but '42' was supplied",
                     remediation: $"Specify a valid {nameof(ClrMemberReference.ClrKind)} value"
                 ),
             ]

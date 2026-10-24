@@ -9,6 +9,7 @@ using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Extensions;
 using Evoogle.Reflection;
 
@@ -21,7 +22,7 @@ namespace Evoogle.ApiFramework.Schema.Types;
 public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
 {
     #region Fields
-    private readonly bool _hasInvalidApiKind;
+    private readonly JsonEnumFinding? _apiKindFinding;
     #endregion
 
     #region Properties
@@ -54,7 +55,7 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
     /// <param name="apiKind">The expected kind of the referenced API type.</param>
     /// <param name="apiName">The API name of the referenced type.</param>
     public ApiTypeReference(ApiTypeKind apiKind, string apiName)
-        : this(apiKind, apiName, null, false)
+        : this(apiKind, apiName, null, null)
     {
     }
 
@@ -66,7 +67,7 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
             null,
             null,
             clrType is not null && TypeReflection.IsNullableType(clrType) ? Nullable.GetUnderlyingType(clrType) : clrType,
-            false
+            null
         )
     {
     }
@@ -76,13 +77,13 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
         ApiTypeKind? apiKind,
         string? apiName,
         Type? clrType,
-        bool hasInvalidApiKind
+        JsonEnumFinding? apiKindFinding
     )
     {
         this.ApiKind = apiKind;
         this.ApiName = apiName;
         this.ClrType = clrType;
-        _hasInvalidApiKind = hasInvalidApiKind;
+        _apiKindFinding = apiKindFinding;
     }
     #endregion
 
@@ -251,11 +252,12 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
 
     private bool ValidateApiKind(ApiSchemaCompilationContext context)
     {
-        if (_hasInvalidApiKind || this.ApiKind is ApiTypeKind apiKind && !Enum.IsDefined(apiKind))
+        if (_apiKindFinding is not null || this.ApiKind is ApiTypeKind apiKind && !Enum.IsDefined(apiKind))
         {
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiTypeReferenceInvalidApiKind;
-            var description = $"{nameof(this.ApiKind)} must be a valid {nameof(ApiTypeKind)} value";
+            var description = _apiKindFinding?.DescribeProblem()
+                ?? $"{nameof(this.ApiKind)} must be a valid {nameof(ApiTypeKind)} value";
             var remediation = $"Specify a valid {nameof(this.ApiKind)} value";
 
             context.AddIssue(severity, code, description, remediation);

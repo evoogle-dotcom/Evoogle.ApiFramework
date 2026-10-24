@@ -58,7 +58,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     private class ApiSchemaOptionsReadData
     {
         #region Properties
-        public JsonEnumReadState<ApiKeyNullHandling>? ApiKeyNullHandling { get; set; }
+        public JsonEnumReadResult<ApiKeyNullHandling> ApiKeyNullHandling { get; set; }
         #endregion
     }
 
@@ -90,9 +90,8 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         {
             context.ReadData.ApiSchemaOptions ??= new ApiSchemaOptionsReadData();
 
-            var apiSchemaOptionsReadData = context.ReadData.ApiSchemaOptions;
-            apiSchemaOptionsReadData.ApiKeyNullHandling ??= new JsonEnumReadState<ApiKeyNullHandling>();
-            apiSchemaOptionsReadData.ApiKeyNullHandling.Read(ref reader, context.Options, _nullableApiKeyNullHandlingJsonConverter);
+            context.ReadData.ApiSchemaOptions.ApiKeyNullHandling =
+                JsonEnumReader.Read<ApiKeyNullHandling>(ref reader, context.Options);
         }
         #endregion
     }
@@ -100,8 +99,6 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
 
     #region Fields
     private static readonly EnumJsonConverter<ApiKeyNullHandling> _apiKeyNullHandlingJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiKeyNullHandling> _nullableApiKeyNullHandlingJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -138,14 +135,18 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var apiSchemaOptionsReadData = readContext.ReadData.ApiSchemaOptions;
 
-        var apiKeyNullHandlingReadState = apiSchemaOptionsReadData?.ApiKeyNullHandling;
-        var apiKeyNullHandling = apiKeyNullHandlingReadState?.Value ?? ApiSchemaOptions.Default.ApiKeyNullHandling;
+        var apiKeyNullHandlingReadResult = apiSchemaOptionsReadData?.ApiKeyNullHandling ?? default;
+        var apiKeyNullHandling = apiKeyNullHandlingReadResult.ValueOr(ApiSchemaOptions.Default.ApiKeyNullHandling);
 
-        var apiSchemaOptions = new ApiSchemaOptions()
+        var apiKeyNullHandlingFinding = JsonEnumFinding.Create
+        (
+            nameof(ApiSchemaOptions.ApiKeyNullHandling),
+            apiKeyNullHandlingReadResult
+        );
+
+        var apiSchemaOptions = new ApiSchemaOptions(apiKeyNullHandlingFinding)
         {
             ApiKeyNullHandling = apiKeyNullHandling,
-            HasInvalidApiKeyNullHandling = apiKeyNullHandlingReadState?.IsInvalid == true ||
-                apiKeyNullHandlingReadState?.IsNull == true,
         };
 
         return apiSchemaOptions;

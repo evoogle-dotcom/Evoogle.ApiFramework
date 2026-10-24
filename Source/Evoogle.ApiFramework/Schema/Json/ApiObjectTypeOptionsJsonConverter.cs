@@ -59,7 +59,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     private class ApiObjectTypeOptionsReadData
     {
         #region Properties
-        public JsonEnumReadState<ApiKeyNullHandling>? ApiKeyNullHandling { get; set; }
+        public JsonEnumReadResult<ApiKeyNullHandling> ApiKeyNullHandling { get; set; }
         #endregion
     }
 
@@ -91,9 +91,8 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
         {
             context.ReadData.ApiObjectTypeOptions ??= new ApiObjectTypeOptionsReadData();
 
-            var apiObjectTypeOptionsReadData = context.ReadData.ApiObjectTypeOptions;
-            apiObjectTypeOptionsReadData.ApiKeyNullHandling ??= new JsonEnumReadState<ApiKeyNullHandling>();
-            apiObjectTypeOptionsReadData.ApiKeyNullHandling.Read(ref reader, context.Options, _nullableApiKeyNullHandlingJsonConverter);
+            context.ReadData.ApiObjectTypeOptions.ApiKeyNullHandling =
+                JsonEnumReader.Read<ApiKeyNullHandling>(ref reader, context.Options);
         }
         #endregion
     }
@@ -101,8 +100,6 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
 
     #region Fields
     private static readonly EnumJsonConverter<ApiKeyNullHandling> _apiKeyNullHandlingJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiKeyNullHandling> _nullableApiKeyNullHandlingJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -139,13 +136,19 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var apiObjectTypeOptionsReadData = readContext.ReadData.ApiObjectTypeOptions;
 
-        var apiKeyNullHandlingReadState = apiObjectTypeOptionsReadData?.ApiKeyNullHandling;
-        var apiKeyNullHandling = apiKeyNullHandlingReadState?.Value;
+        var apiKeyNullHandlingReadResult = apiObjectTypeOptionsReadData?.ApiKeyNullHandling ?? default;
 
-        var apiObjectTypeOptions = new ApiObjectTypeOptions()
+        // Null is valid here: it selects inheritance from the schema options.
+        var apiKeyNullHandlingFinding = JsonEnumFinding.Create
+        (
+            nameof(ApiObjectTypeOptions.ApiKeyNullHandling),
+            apiKeyNullHandlingReadResult,
+            allowsNull: true
+        );
+
+        var apiObjectTypeOptions = new ApiObjectTypeOptions(apiKeyNullHandlingFinding)
         {
-            ApiKeyNullHandling = apiKeyNullHandling,
-            HasInvalidApiKeyNullHandling = apiKeyNullHandlingReadState?.IsInvalid == true,
+            ApiKeyNullHandling = apiKeyNullHandlingReadResult.Value,
         };
 
         return apiObjectTypeOptions;

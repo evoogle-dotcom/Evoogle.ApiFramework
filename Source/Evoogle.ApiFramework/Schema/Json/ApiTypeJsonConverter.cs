@@ -135,8 +135,6 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
     private static readonly NullableEnumJsonConverter<ApiTypeKind> _nullableApiTypeKindJsonConverter =
         new(EnumJsonInvalidValuePolicy.Throw);
-    private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _nullableApiTypeModifiersJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
 
     private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion

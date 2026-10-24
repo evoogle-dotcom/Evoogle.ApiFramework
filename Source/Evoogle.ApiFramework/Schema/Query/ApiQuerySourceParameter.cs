@@ -141,6 +141,19 @@ public sealed class ApiQuerySourceParameter
 
     private void ValidateApiTypeModifiers(ApiSchemaCompilationContext context)
     {
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiTypeModifiers));
+        if (jsonEnumFinding is not null)
+        {
+            var findingApiPath = this.ApiPath;
+            var findingSeverity = ApiSchemaCompilationSeverity.Error;
+            var findingCode = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidTypeModifiers;
+            var findingDescription = jsonEnumFinding.DescribeProblem();
+            var findingRemediation = $"Specify a valid {nameof(this.ApiTypeModifiers)} value";
+
+            context.AddIssue(findingApiPath, findingSeverity, findingCode, findingDescription, findingRemediation);
+            return;
+        }
+
         var hasUnsupportedApiTypeModifiers = (this.ApiTypeModifiers & ~ApiTypeModifiers.Required) != 0;
         if (hasUnsupportedApiTypeModifiers)
         {

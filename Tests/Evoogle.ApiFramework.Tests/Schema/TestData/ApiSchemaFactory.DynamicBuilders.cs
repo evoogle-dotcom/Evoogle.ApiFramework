@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.Extension;
@@ -315,6 +316,8 @@ public static partial class ApiSchemaFactory
             clrMemberReferenceDef.ClrKind,
             clrMemberReferenceDef.ClrName!,
             clrMemberReferenceDef.HasInvalidClrKind
+                ? new JsonEnumFinding(nameof(ClrMemberReference.ClrKind), typeof(ClrMemberKind), JsonEnumReadStatus.Invalid, null)
+                : null
         );
     }
 
@@ -365,8 +368,11 @@ public static partial class ApiSchemaFactory
         var apiName = apiTypeReferenceDef.ApiName;
         var clrType = apiTypeReferenceDef.ClrType;
         var hasInvalidApiKind = apiKind is not null && Enum.IsDefined(typeof(ApiTypeKind), apiKind) is false;
+        var apiKindFinding = hasInvalidApiKind
+            ? new JsonEnumFinding(nameof(ApiTypeReference.ApiKind), typeof(ApiTypeKind), JsonEnumReadStatus.Invalid, null)
+            : null;
 
-        return new ApiTypeReference(apiKind, apiName, clrType, hasInvalidApiKind: hasInvalidApiKind);
+        return new ApiTypeReference(apiKind, apiName, clrType, apiKindFinding);
     }
 
     public static ApiTypeExpression? BuildApiTypeExpression(ApiTypeExpressionDef? apiTypeExpressionDef)
@@ -578,7 +584,13 @@ public static partial class ApiSchemaFactory
         (
             clrKind: null,
             clrName: null!,
-            hasInvalidClrKind: true
+            clrKindFinding: new JsonEnumFinding
+            (
+                nameof(ClrMemberReference.ClrKind),
+                typeof(ClrMemberKind),
+                JsonEnumReadStatus.Invalid,
+                null
+            )
         );
 
         var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrValueMember);

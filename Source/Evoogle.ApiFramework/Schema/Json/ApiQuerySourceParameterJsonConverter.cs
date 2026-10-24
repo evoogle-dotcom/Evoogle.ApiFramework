@@ -69,7 +69,7 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
         #region Properties
         public string? ApiName { get; set; } = null;
         public ApiTypeExpression? ApiTypeExpression { get; set; } = null;
-        public JsonEnumReadState<ApiTypeModifiers>? ApiTypeModifiers { get; set; }
+        public JsonEnumReadResult<ApiTypeModifiers> ApiTypeModifiers { get; set; }
         public bool? ApiRequiresArgument { get; set; }
         #endregion
     }
@@ -123,9 +123,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
         {
             context.ReadData.ApiQuerySourceParameter ??= new ApiQuerySourceParameterReadData();
 
-            var options = context.Options;
-            context.ReadData.ApiQuerySourceParameter.ApiTypeModifiers ??= new JsonEnumReadState<ApiTypeModifiers>();
-            context.ReadData.ApiQuerySourceParameter.ApiTypeModifiers.Read(ref reader, options, _nullableApiTypeModifiersJsonConverter);
+            context.ReadData.ApiQuerySourceParameter.ApiTypeModifiers =
+                JsonEnumReader.Read<ApiTypeModifiers>(ref reader, context.Options);
         }
 
         private static void HandleApiQuerySourceParameterApiRequiresArgument(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -140,8 +139,6 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
 
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _nullableApiTypeModifiersJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -180,9 +177,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
 
         var apiName = apiQuerySourceParameterReadData?.ApiName;
         var apiTypeExpression = apiQuerySourceParameterReadData?.ApiTypeExpression;
-        var apiTypeModifiersReadState = apiQuerySourceParameterReadData?.ApiTypeModifiers;
-        var apiTypeModifiers = apiTypeModifiersReadState?.Value
-            ?? ApiSchemaDefaults.NonNullableTypeModifiers;
+        var apiTypeModifiersReadResult = apiQuerySourceParameterReadData?.ApiTypeModifiers ?? default;
+        var apiTypeModifiers = apiTypeModifiersReadResult.ValueOr(ApiSchemaDefaults.NonNullableTypeModifiers);
         var apiRequiresArgument = apiQuerySourceParameterReadData?.ApiRequiresArgument
             ?? ApiSchemaDefaults.QuerySourceParameterRequiresArgument;
 
@@ -193,6 +189,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
             apiTypeModifiers,
             apiRequiresArgument
         );
+
+        apiQuerySourceParameter.RecordJsonEnumFinding(nameof(ApiQuerySourceParameter.ApiTypeModifiers), apiTypeModifiersReadResult);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiQuerySourceParameter, extensions);

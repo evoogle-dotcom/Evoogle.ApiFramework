@@ -68,7 +68,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #region Properties
         public string? ApiName { get; set; }
         public ApiTypeExpression? ApiTypeExpression { get; set; }
-        public JsonEnumReadState<ApiTypeModifiers>? ApiTypeModifiers { get; set; }
+        public JsonEnumReadResult<ApiTypeModifiers> ApiTypeModifiers { get; set; }
         public ClrMemberReference? ClrValueMember { get; set; }
         #endregion
     }
@@ -122,9 +122,8 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
-            var apiPropertyReadData = context.ReadData.ApiProperty;
-            apiPropertyReadData.ApiTypeModifiers ??= new JsonEnumReadState<ApiTypeModifiers>();
-            apiPropertyReadData.ApiTypeModifiers.Read(ref reader, context.Options, _nullableApiTypeModifiersJsonConverter);
+            context.ReadData.ApiProperty.ApiTypeModifiers =
+                JsonEnumReader.Read<ApiTypeModifiers>(ref reader, context.Options);
         }
 
         private static void HandleApiPropertyClrValueMember
@@ -144,8 +143,6 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
 
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _nullableApiTypeModifiersJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -184,21 +181,18 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
 
         var apiName = apiPropertyReadData?.ApiName;
         var apiTypeExpression = apiPropertyReadData?.ApiTypeExpression;
-        var apiTypeModifiersReadState = apiPropertyReadData?.ApiTypeModifiers;
-        var apiTypeModifiers = apiTypeModifiersReadState?.Value ?? ApiTypeModifiers.None;
+        var apiTypeModifiersReadResult = apiPropertyReadData?.ApiTypeModifiers ?? default;
+        var apiTypeModifiers = apiTypeModifiersReadResult.ValueOr(ApiTypeModifiers.None);
         var clrValueMember = apiPropertyReadData?.ClrValueMember ?? new ClrMemberReference
         (
             clrKind: null,
             clrName: null!,
-            hasInvalidClrKind: true
+            clrKindFinding: null
         );
 
         var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrValueMember);
 
-        if (apiTypeModifiersReadState?.IsInvalid == true || apiTypeModifiersReadState?.IsNull == true)
-        {
-            apiProperty.MarkInvalidApiTypeModifiers();
-        }
+        apiProperty.RecordJsonEnumFinding(nameof(ApiProperty.ApiTypeModifiers), apiTypeModifiersReadResult);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiProperty, extensions);

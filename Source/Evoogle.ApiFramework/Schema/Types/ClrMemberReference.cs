@@ -10,6 +10,7 @@ using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Types;
@@ -26,7 +27,7 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
 {
     #region Fields
     private readonly ClrMemberKind? _clrKind;
-    private readonly bool _hasInvalidClrKind;
+    private readonly JsonEnumFinding? _clrKindFinding;
     #endregion
 
     #region Properties
@@ -44,15 +45,15 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
     /// <param name="clrKind">The CLR member kind.</param>
     /// <param name="clrName">The CLR member name.</param>
     public ClrMemberReference(ClrMemberKind clrKind, string clrName)
-        : this(clrKind, clrName, false)
+        : this(clrKind, clrName, null)
     {
     }
 
-    internal ClrMemberReference(ClrMemberKind? clrKind, string clrName, bool hasInvalidClrKind)
+    internal ClrMemberReference(ClrMemberKind? clrKind, string clrName, JsonEnumFinding? clrKindFinding)
     {
         _clrKind = clrKind;
         this.ClrName = clrName;
-        _hasInvalidClrKind = hasInvalidClrKind;
+        _clrKindFinding = clrKindFinding;
     }
     #endregion
 
@@ -175,12 +176,13 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
 
     private bool ValidateClrKind(ApiSchemaCompilationContext context, string validationApiPath)
     {
-        if (_clrKind is null || _hasInvalidClrKind || !Enum.IsDefined(_clrKind.Value))
+        if (_clrKind is null || _clrKindFinding is not null || !Enum.IsDefined(_clrKind.Value))
         {
             var apiPath = validationApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind;
-            var description = $"{nameof(this.ClrKind)} must be a valid {nameof(ClrMemberKind)} value";
+            var description = _clrKindFinding?.DescribeProblem()
+                ?? $"{nameof(this.ClrKind)} must be a valid {nameof(ClrMemberKind)} value";
             var remediation = $"Specify a valid {nameof(this.ClrKind)} value";
 
             context.AddIssue(apiPath, severity, code, description, remediation);

@@ -26,7 +26,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     {
         #region Properties
         public ApiTypeExpression? ApiItemTypeExpression { get; set; }
-        public JsonEnumReadState<ApiTypeModifiers>? ApiItemTypeModifiers { get; set; }
+        public JsonEnumReadResult<ApiTypeModifiers> ApiItemTypeModifiers { get; set; }
         #endregion
     }
 
@@ -137,9 +137,8 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         {
             context.ReadData.ApiCollectionType ??= new ApiCollectionTypeReadData();
 
-            var apiCollectionTypeReadData = context.ReadData.ApiCollectionType;
-            apiCollectionTypeReadData.ApiItemTypeModifiers ??= new JsonEnumReadState<ApiTypeModifiers>();
-            apiCollectionTypeReadData.ApiItemTypeModifiers.Read(ref reader, context.Options, _nullableApiTypeModifiersJsonConverter);
+            context.ReadData.ApiCollectionType.ApiItemTypeModifiers =
+                JsonEnumReader.Read<ApiTypeModifiers>(ref reader, context.Options);
         }
         #endregion
 

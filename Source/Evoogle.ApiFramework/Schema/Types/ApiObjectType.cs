@@ -467,17 +467,7 @@ public sealed partial class ApiObjectType
 
     private void ValidateApiOptions(ApiSchemaCompilationContext context)
     {
-        if (this.ApiOptions?.HasInvalidApiKeyNullHandling != true)
-        {
-            return;
-        }
-
-        var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiObjectTypeInvalidApiKeyNullHandling;
-        var description = $"{nameof(this.ApiOptions)}.{nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} must be a valid {nameof(ApiKeyNullHandling)} value";
-        var remediation = $"Specify a valid {nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} value";
-
-        context.AddIssue(severity, code, description, remediation);
+        this.ApiOptions?.Validate(context);
     }
     #endregion
 }

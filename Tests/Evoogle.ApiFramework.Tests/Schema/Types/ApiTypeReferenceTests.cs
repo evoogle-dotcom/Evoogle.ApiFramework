@@ -6,6 +6,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -88,7 +89,13 @@ public class ApiTypeReferenceTests(ITestOutputHelper output) : XUnitTests(output
     private static readonly ApiTypeReference _apiIntTypeReference = new(apiKind: ApiTypeKind.Scalar, apiName: "Int");
     private static readonly ApiTypeReference _clrIntTypeReference = new(clrType: typeof(int));
 
-    private static readonly ApiTypeReference _nullTypeReference = new(null, null, null, true);
+    private static readonly ApiTypeReference _nullTypeReference = new
+    (
+        null,
+        null,
+        null,
+        new JsonEnumFinding(nameof(ApiTypeReference.ApiKind), typeof(ApiTypeKind), JsonEnumReadStatus.Invalid, null)
+    );
     #endregion
 
     #region Test Properties

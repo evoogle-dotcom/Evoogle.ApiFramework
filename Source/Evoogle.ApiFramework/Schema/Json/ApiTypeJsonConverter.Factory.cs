@@ -17,8 +17,8 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     private static ApiCollectionType CreateApiCollectionType(DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
     {
         var apiItemTypeExpression = context.ReadData.ApiCollectionType?.ApiItemTypeExpression;
-        var apiItemTypeModifiersReadState = context.ReadData.ApiCollectionType?.ApiItemTypeModifiers;
-        var apiItemTypeModifiers = apiItemTypeModifiersReadState?.Value ?? ApiTypeModifiers.None;
+        var apiItemTypeModifiersReadResult = context.ReadData.ApiCollectionType?.ApiItemTypeModifiers ?? default;
+        var apiItemTypeModifiers = apiItemTypeModifiersReadResult.ValueOr(ApiTypeModifiers.None);
         var clrCollectionType = context.ReadData.ApiType?.ClrType;
 
         var apiCollectionType = new ApiCollectionType
@@ -28,10 +28,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             clrCollectionType!
         );
 
-        if (apiItemTypeModifiersReadState?.IsInvalid == true || apiItemTypeModifiersReadState?.IsNull == true)
-        {
-            apiCollectionType.MarkInvalidApiItemTypeModifiers();
-        }
+        apiCollectionType.RecordJsonEnumFinding(nameof(ApiCollectionType.ApiItemTypeModifiers), apiItemTypeModifiersReadResult);
 
         return apiCollectionType;
     }

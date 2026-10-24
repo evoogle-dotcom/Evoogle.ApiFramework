@@ -110,7 +110,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         #region Properties
         public ApiRelationshipKind? ApiKind { get; set; }
         public string? ApiName { get; set; }
-        public JsonEnumReadState<ApiRelationshipDeleteBehavior>? ApiDeleteBehavior { get; set; }
+        public JsonEnumReadResult<ApiRelationshipDeleteBehavior> ApiDeleteBehavior { get; set; }
         #endregion
     }
 
@@ -200,9 +200,8 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
 
-            var apiRelationshipReadData = context.ReadData.ApiRelationship;
-            apiRelationshipReadData.ApiDeleteBehavior ??= new JsonEnumReadState<ApiRelationshipDeleteBehavior>();
-            apiRelationshipReadData.ApiDeleteBehavior.Read(ref reader, context.Options, _nullableApiRelationshipDeleteBehaviorJsonConverter);
+            context.ReadData.ApiRelationship.ApiDeleteBehavior =
+                JsonEnumReader.Read<ApiRelationshipDeleteBehavior>(ref reader, context.Options);
         }
         #endregion
 
@@ -257,8 +256,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static readonly EnumJsonConverter<ApiRelationshipDeleteBehavior> _apiRelationshipDeleteBehaviorJsonConverter = new();
     private static readonly NullableEnumJsonConverter<ApiRelationshipKind> _nullableApiRelationshipKindJsonConverter =
         new(EnumJsonInvalidValuePolicy.Throw);
-    private static readonly NullableEnumJsonConverter<ApiRelationshipDeleteBehavior> _nullableApiRelationshipDeleteBehaviorJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -298,7 +295,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         var apiRelationshipReadData = readData.ApiRelationship;
         var apiKind = apiRelationshipReadData?.ApiKind
             ?? throw new JsonException($"Missing {nameof(ApiRelationship.ApiKind)} enumeration value.");
-        var apiDeleteBehaviorReadState = apiRelationshipReadData.ApiDeleteBehavior;
+        var apiDeleteBehaviorReadResult = apiRelationshipReadData.ApiDeleteBehavior;
 
         ApiRelationship apiRelationship = apiKind switch
         {
@@ -307,7 +304,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 apiRelationshipReadData.ApiName!,
                 readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
                 readData.ApiRelationshipOneTo?.ApiDependentEnd!,
-                apiDeleteBehaviorReadState?.Value ?? ApiSchemaDefaults.OneToOneRelationshipDeleteBehavior
+                apiDeleteBehaviorReadResult.ValueOr(ApiSchemaDefaults.OneToOneRelationshipDeleteBehavior)
             ),
 
             ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany
@@ -315,7 +312,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 apiRelationshipReadData.ApiName!,
                 readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
                 readData.ApiRelationshipOneTo?.ApiDependentEnd!,
-                apiDeleteBehaviorReadState?.Value ?? ApiSchemaDefaults.OneToManyRelationshipDeleteBehavior
+                apiDeleteBehaviorReadResult.ValueOr(ApiSchemaDefaults.OneToManyRelationshipDeleteBehavior)
             ),
 
             ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany
@@ -324,16 +321,13 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 readData.ApiRelationshipManyToMany?.ApiPrincipalEndA!,
                 readData.ApiRelationshipManyToMany?.ApiPrincipalEndB!,
                 readData.ApiRelationshipManyToMany?.ApiAssociation!,
-                apiDeleteBehaviorReadState?.Value ?? ApiSchemaDefaults.ManyToManyRelationshipDeleteBehavior
+                apiDeleteBehaviorReadResult.ValueOr(ApiSchemaDefaults.ManyToManyRelationshipDeleteBehavior)
             ),
 
             _ => throw new JsonException($"Unsupported {nameof(ApiRelationshipKind)} enumeration value: '{apiKind}'.")
         };
 
-        if (apiDeleteBehaviorReadState?.IsInvalid == true || apiDeleteBehaviorReadState?.IsNull == true)
-        {
-            apiRelationship.MarkInvalidApiDeleteBehavior();
-        }
+        apiRelationship.RecordJsonEnumFinding(nameof(ApiRelationship.ApiDeleteBehavior), apiDeleteBehaviorReadResult);
 
         AttachExtensions(apiRelationship, readContext.ReadData.Extensions);
         return apiRelationship;

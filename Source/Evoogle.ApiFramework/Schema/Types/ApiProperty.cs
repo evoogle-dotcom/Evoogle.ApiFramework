@@ -41,8 +41,6 @@ public sealed partial class ApiProperty : ApiSchemaElement
 {
     #region ApiProperty Fields
     private readonly ClrMemberBinding _clrValueMemberBinding;
-
-    private bool _hasInvalidApiTypeModifiers;
     #endregion
 
     #region Constructors
@@ -98,8 +96,6 @@ public sealed partial class ApiProperty : ApiSchemaElement
     public string ClrName => this.ClrValueMember.ClrName;
 
     internal ApiTypeExpression ApiTypeExpression { get; }
-
-    internal void MarkInvalidApiTypeModifiers() => _hasInvalidApiTypeModifiers = true;
     #endregion
 
     #region ApiProperty Computed Properties
@@ -180,17 +176,19 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
     private void ValidateApiTypeModifiers(ApiSchemaCompilationContext context)
     {
-        if (!_hasInvalidApiTypeModifiers)
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiTypeModifiers));
+        if (jsonEnumFinding is null)
         {
             return;
         }
 
+        var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiPropertyInvalidApiTypeModifiers;
-        var description = $"{nameof(this.ApiTypeModifiers)} must be a valid {nameof(this.ApiTypeModifiers)} value";
+        var description = jsonEnumFinding.DescribeProblem();
         var remediation = $"Specify a valid {nameof(this.ApiTypeModifiers)} value";
 
-        context.AddIssue(severity, code, description, remediation);
+        context.AddIssue(apiPath, severity, code, description, remediation);
     }
 
     private void ResolveApiTypeExpression(ApiSchemaCompilationContext context)
