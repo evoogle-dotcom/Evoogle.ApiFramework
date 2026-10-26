@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
@@ -27,7 +28,14 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiCollectionType.ApiItemTypeExpression, obj: apiCollectionType.ApiItemTypeExpression, options: writeContext.Options);
 
     private static void WriteApiCollectionTypeApiItemTypeModifiers(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiCollectionType.ApiItemTypeModifiers, value: apiCollectionType.ApiItemTypeModifiers, options: writeContext.Options, converter: _apiTypeModifiersJsonConverter);
+        => writer.TryWritePropertyWithConverter
+        (
+            propertyName: writeContext.PropertyNames.ApiCollectionType.ApiItemTypeModifiers,
+            value: apiCollectionType.ApiItemTypeModifiers,
+            options: writeContext.Options,
+            converter: _apiTypeModifiersJsonConverter,
+            defaultValue: ApiSchemaDefaults.NullableTypeModifiers
+        );
 
     // ApiEnumType
     private static void WriteApiEnumType(Utf8JsonWriter writer, ApiEnumType apiEnumType, DefaultWriteContext<PropertyNames> writeContext)

@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.Json;
@@ -136,7 +137,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         var apiSchemaOptionsReadData = readContext.ReadData.ApiSchemaOptions;
 
         var apiKeyNullHandlingReadResult = apiSchemaOptionsReadData?.ApiKeyNullHandling ?? default;
-        var apiKeyNullHandling = apiKeyNullHandlingReadResult.ValueOr(ApiSchemaOptions.Default.ApiKeyNullHandling);
+        var apiKeyNullHandling = apiKeyNullHandlingReadResult.ValueOr(ApiSchemaDefaults.KeyNullHandling);
 
         var apiKeyNullHandlingFinding = JsonEnumFinding.Create
         (
@@ -181,6 +182,13 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
 
     #region Write Implementation Methods
     private static void WriteApiSchemaOptionsApiKeyNullHandling(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiSchemaOptions.ApiKeyNullHandling, value: apiSchemaOptions.ApiKeyNullHandling, options: writeContext.Options, converter: _apiKeyNullHandlingJsonConverter);
+        => writer.TryWritePropertyWithConverter
+        (
+            propertyName: writeContext.PropertyNames.ApiSchemaOptions.ApiKeyNullHandling,
+            value: apiSchemaOptions.ApiKeyNullHandling,
+            options: writeContext.Options,
+            converter: _apiKeyNullHandlingJsonConverter,
+            defaultValue: ApiSchemaDefaults.KeyNullHandling
+        );
     #endregion
 }

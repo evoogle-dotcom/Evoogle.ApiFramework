@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Relationships;
@@ -312,7 +313,13 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiSchema.ApiName, value: apiSchema.ApiName, options: writeContext.Options);
 
     private static void WriteApiSchemaApiVersion(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiSchema.ApiVersion, value: apiSchema.ApiVersion, options: writeContext.Options);
+        => writer.TryWritePropertyAsString
+        (
+            propertyName: writeContext.PropertyNames.ApiSchema.ApiVersion,
+            value: apiSchema.ApiVersion,
+            options: writeContext.Options,
+            defaultValue: ApiSchemaDefaults.ApiVersion
+        );
 
     private static void WriteApiSchemaApiOptions(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiSchema.ApiOptions, obj: apiSchema.ApiOptions, options: writeContext.Options);

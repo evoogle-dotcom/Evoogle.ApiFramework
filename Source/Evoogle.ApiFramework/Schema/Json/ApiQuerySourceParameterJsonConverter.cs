@@ -237,9 +237,22 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiTypeExpression, obj: apiQuerySourceParameter.ApiTypeExpression, options: writeContext.Options);
 
     private static void WriteApiQuerySourceParameterApiTypeModifiers(Utf8JsonWriter writer, ApiQuerySourceParameter apiQuerySourceParameter, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiTypeModifiers, value: apiQuerySourceParameter.ApiTypeModifiers, options: writeContext.Options, converter: _apiTypeModifiersJsonConverter);
+        => writer.TryWritePropertyWithConverter
+        (
+            propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiTypeModifiers,
+            value: apiQuerySourceParameter.ApiTypeModifiers,
+            options: writeContext.Options,
+            converter: _apiTypeModifiersJsonConverter,
+            defaultValue: ApiSchemaDefaults.NonNullableTypeModifiers
+        );
 
     private static void WriteApiQuerySourceParameterApiRequiresArgument(Utf8JsonWriter writer, ApiQuerySourceParameter apiQuerySourceParameter, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsBoolean(propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiRequiresArgument, value: apiQuerySourceParameter.ApiRequiresArgument, options: writeContext.Options);
+        => writer.TryWritePropertyAsBoolean
+        (
+            propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiRequiresArgument,
+            value: apiQuerySourceParameter.ApiRequiresArgument,
+            options: writeContext.Options,
+            defaultValue: ApiSchemaDefaults.QuerySourceParameterRequiresArgument
+        );
     #endregion
 }

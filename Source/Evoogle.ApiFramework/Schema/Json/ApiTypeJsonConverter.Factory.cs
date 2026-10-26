@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
@@ -18,7 +19,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     {
         var apiItemTypeExpression = context.ReadData.ApiCollectionType?.ApiItemTypeExpression;
         var apiItemTypeModifiersReadResult = context.ReadData.ApiCollectionType?.ApiItemTypeModifiers ?? default;
-        var apiItemTypeModifiers = apiItemTypeModifiersReadResult.ValueOr(ApiTypeModifiers.None);
+        var apiItemTypeModifiers = apiItemTypeModifiersReadResult.ValueOr(ApiSchemaDefaults.NullableTypeModifiers);
         var clrCollectionType = context.ReadData.ApiType?.ClrType;
 
         var apiCollectionType = new ApiCollectionType

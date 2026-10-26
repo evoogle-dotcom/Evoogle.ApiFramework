@@ -278,9 +278,23 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputTypeExpression, obj: apiQuerySource.ApiOutputTypeExpression, options: writeContext.Options);
 
     private static void WriteApiQuerySourceApiOutputTypeModifiers(Utf8JsonWriter writer, ApiQuerySource apiQuerySource, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputTypeModifiers, value: apiQuerySource.ApiOutputTypeModifiers, options: writeContext.Options, converter: _apiTypeModifiersJsonConverter);
+        => writer.TryWritePropertyWithConverter
+        (
+            propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputTypeModifiers,
+            value: apiQuerySource.ApiOutputTypeModifiers,
+            options: writeContext.Options,
+            converter: _apiTypeModifiersJsonConverter,
+            defaultValue: ApiSchemaDefaults.NullableTypeModifiers
+        );
 
     private static void WriteApiQuerySourceApiOutputComposition(Utf8JsonWriter writer, ApiQuerySource apiQuerySource, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputComposition, value: apiQuerySource.ApiOutputComposition, options: writeContext.Options, converter: _apiQueryCompositionJsonConverter);
+        => writer.TryWritePropertyWithConverter
+        (
+            propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputComposition,
+            value: apiQuerySource.ApiOutputComposition,
+            options: writeContext.Options,
+            converter: _apiQueryCompositionJsonConverter,
+            defaultValue: ApiSchemaDefaults.QuerySourceOutputComposition
+        );
     #endregion
 }

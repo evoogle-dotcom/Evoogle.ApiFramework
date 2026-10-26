@@ -406,6 +406,24 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiAssociation, obj: apiRelationshipManyToMany.ApiAssociation, options: writeContext.Options);
 
     private static void WriteApiRelationshipApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationship apiRelationship, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiRelationship.ApiDeleteBehavior, value: apiRelationship.ApiDeleteBehavior, options: writeContext.Options, converter: _apiRelationshipDeleteBehaviorJsonConverter);
+    {
+        var defaultDeleteBehavior = apiRelationship.ApiKind switch
+        {
+            ApiRelationshipKind.OneToOne => ApiSchemaDefaults.OneToOneRelationshipDeleteBehavior,
+            ApiRelationshipKind.OneToMany => ApiSchemaDefaults.OneToManyRelationshipDeleteBehavior,
+            ApiRelationshipKind.ManyToMany => ApiSchemaDefaults.ManyToManyRelationshipDeleteBehavior,
+            _ => throw new JsonException(
+                $"Unsupported {nameof(ApiRelationshipKind)} enumeration value: '{apiRelationship.ApiKind}'.")
+        };
+
+        writer.TryWritePropertyWithConverter
+        (
+            propertyName: writeContext.PropertyNames.ApiRelationship.ApiDeleteBehavior,
+            value: apiRelationship.ApiDeleteBehavior,
+            options: writeContext.Options,
+            converter: _apiRelationshipDeleteBehaviorJsonConverter,
+            defaultValue: defaultDeleteBehavior
+        );
+    }
     #endregion
 }

@@ -13,6 +13,14 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
 ///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
+/// <remarks>
+///     These constants define semantic defaults, which may differ from CLR defaults. Every default
+///     represented in schema JSON must be passed as <c>defaultValue</c> to the corresponding
+///     <c>TryWriteProperty*</c> call in the schema JSON converters, using the same default when reading
+///     an omitted property. This preserves values when serializing with <c>WhenWritingDefault</c>.
+///     When adding or changing a default, update all corresponding converter reads and writes together.
+///     Defaults used only during key materialization have no corresponding schema JSON property.
+/// </remarks>
 internal static class ApiSchemaDefaults
 {
     #region Key Defaults

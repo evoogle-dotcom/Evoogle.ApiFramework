@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
@@ -182,7 +183,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         var apiName = apiPropertyReadData?.ApiName;
         var apiTypeExpression = apiPropertyReadData?.ApiTypeExpression;
         var apiTypeModifiersReadResult = apiPropertyReadData?.ApiTypeModifiers ?? default;
-        var apiTypeModifiers = apiTypeModifiersReadResult.ValueOr(ApiTypeModifiers.None);
+        var apiTypeModifiers = apiTypeModifiersReadResult.ValueOr(ApiSchemaDefaults.NullableTypeModifiers);
         var clrValueMember = apiPropertyReadData?.ClrValueMember ?? new ClrMemberReference
         (
             clrKind: null,
@@ -246,7 +247,14 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiProperty.ApiTypeExpression, obj: apiProperty.ApiTypeExpression, options: writeContext.Options);
 
     private static void WriteApiPropertyApiTypeModifiers(Utf8JsonWriter writer, ApiProperty apiProperty, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiProperty.ApiTypeModifiers, value: apiProperty.ApiTypeModifiers, options: writeContext.Options, converter: _apiTypeModifiersJsonConverter);
+        => writer.TryWritePropertyWithConverter
+        (
+            propertyName: writeContext.PropertyNames.ApiProperty.ApiTypeModifiers,
+            value: apiProperty.ApiTypeModifiers,
+            options: writeContext.Options,
+            converter: _apiTypeModifiersJsonConverter,
+            defaultValue: ApiSchemaDefaults.NullableTypeModifiers
+        );
 
     private static void WriteApiPropertyClrValueMember
     (
