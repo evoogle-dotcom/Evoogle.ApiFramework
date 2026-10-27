@@ -65,8 +65,8 @@ public abstract class ApiType : ApiSchemaElement
         if (this.ClrType is null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiTypeNullClrType;
-            var description = $"{nameof(this.ClrType)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiTypeMissingClrType;
+            var description = $"{nameof(this.ClrType)} is required";
             var remediation = $"Specify a valid {nameof(this.ClrType)}";
 
             context.AddIssue(severity, code, description, remediation);

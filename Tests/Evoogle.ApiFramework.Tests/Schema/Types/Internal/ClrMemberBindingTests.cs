@@ -286,15 +286,25 @@ public class ClrMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
         new(typeof(BindingSource), ClrMemberKind.Property, "ReadOnly", typeof(long), true, false, true, true, true, false, [], []),
         new(typeof(BindingSource), ClrMemberKind.Property, "WriteOnly", typeof(long), false, true, true, true, false, true, [], []),
         new(typeof(BindingSource), ClrMemberKind.Property, "ReadOnly", typeof(long), false, false, true, true, true, false, [], []),
-        new(typeof(BindingSource), ClrMemberKind.Property, "ReadOnly", typeof(long), true, true, true, false, false, false, [ApiSchemaCompilationCode.ClrMemberIncompatible], ["must be readable and writable"]),
-        new(typeof(BindingSource), ClrMemberKind.Property, "WriteOnly", typeof(long), true, true, true, false, false, false, [ApiSchemaCompilationCode.ClrMemberIncompatible], ["must be readable and writable"])
+        new(typeof(BindingSource), ClrMemberKind.Property, "ReadOnly", typeof(long),
+            true, true, true, false, false, false,
+            [ApiSchemaCompilationCode.ClrMemberBindingIncompatible], ["must be readable and writable"]),
+        new(typeof(BindingSource), ClrMemberKind.Property, "WriteOnly", typeof(long),
+            true, true, true, false, false, false,
+            [ApiSchemaCompilationCode.ClrMemberBindingIncompatible], ["must be readable and writable"])
     ];
 
     private static ResolutionCase[] UnsupportedShapeCases =>
     [
-        new(typeof(RefLikeSource), ClrMemberKind.Field, "SpanField", typeof(Span<byte>),false, false, true, false, false, false, [ApiSchemaCompilationCode.ClrMemberIncompatible], ["unsupported by-ref-like"]),
-        new(typeof(RefLikeSource), ClrMemberKind.Property, "SpanProperty", typeof(Span<byte>),false, false, true, false, false, false, [ApiSchemaCompilationCode.ClrMemberIncompatible], ["unsupported by-ref-like"]),
-        new(typeof(BindingSource), ClrMemberKind.Property, "Item", typeof(long), false, false, true, false, false, false, [ApiSchemaCompilationCode.ClrMemberIncompatible], ["is an indexer"])
+        new(typeof(RefLikeSource), ClrMemberKind.Field, "SpanField", typeof(Span<byte>),
+            false, false, true, false, false,
+            false, [ApiSchemaCompilationCode.ClrMemberBindingIncompatible], ["unsupported by-ref-like"]),
+        new(typeof(RefLikeSource), ClrMemberKind.Property, "SpanProperty", typeof(Span<byte>),
+            false, false, true, false,
+            false, false, [ApiSchemaCompilationCode.ClrMemberBindingIncompatible], ["unsupported by-ref-like"]),
+        new(typeof(BindingSource), ClrMemberKind.Property, "Item", typeof(long),
+            false, false, true, false, false, false,
+            [ApiSchemaCompilationCode.ClrMemberBindingIncompatible], ["is an indexer"])
     ];
 
     private static ResolutionCase[] InvalidAccessorCases =>
@@ -303,8 +313,11 @@ public class ClrMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
            let clrName = clrKind == ClrMemberKind.Property ? "PointerProperty" : "PointerField"
            select new ResolutionCase(typeof(PointerSource), clrKind, clrName, typeof(byte).MakePointerType(),
                false, false, true, false, false, false,
-               [ApiSchemaCompilationCode.ClrMemberInvalidGetter, ApiSchemaCompilationCode.ClrMemberInvalidSetter],
-               ["Failed to compile getter", "Failed to compile setter"])
+               [
+                   ApiSchemaCompilationCode.ClrMemberReadAccessFailed,
+                   ApiSchemaCompilationCode.ClrMemberWriteAccessFailed
+               ],
+               ["cannot be read by the framework", "cannot be written by the framework"])
     ];
     #endregion
 

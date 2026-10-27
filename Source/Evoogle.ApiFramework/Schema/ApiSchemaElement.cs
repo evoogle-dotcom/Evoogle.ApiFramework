@@ -296,8 +296,9 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
                     issuePath,
                     ApiSchemaCompilationSeverity.Error,
                     ApiSchemaCompilationCode.ApiSchemaExtensionInvalidSnapshot,
-                    $"Extension value '{extension.GetType().FullName}' is not assignable to its registered key type '{extensionType.FullName}'.",
-                    "Register the extension under a type assignable from the extension value and its frozen snapshot."
+                    $"Extension value '{extension.GetType().FullName}' is not assignable to its " +
+                    $"registered key type '{extensionType.FullName}'",
+                    "Register the extension under a type assignable from the extension value and its frozen snapshot"
                 );
                 continue;
             }
@@ -309,9 +310,9 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
                 (
                     issuePath,
                     ApiSchemaCompilationSeverity.Error,
-                    ApiSchemaCompilationCode.ApiSchemaExtensionUnsupported,
-                    $"Extension '{extensionType.FullName}' does not implement {nameof(IApiSchemaExtension)}.",
-                    $"Implement {nameof(IApiSchemaExtension)} and return an immutable runtime snapshot."
+                    ApiSchemaCompilationCode.ApiSchemaExtensionNotFreezable,
+                    $"Extension '{extensionType.FullName}' does not implement {nameof(IApiSchemaExtension)}",
+                    $"Implement {nameof(IApiSchemaExtension)} and return an immutable runtime snapshot"
                 );
                 continue;
             }
@@ -330,7 +331,7 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
                     ApiSchemaCompilationSeverity.Error,
                     ApiSchemaCompilationCode.ApiSchemaExtensionSnapshotFailed,
                     $"Extension '{extensionType.FullName}' failed to create a frozen snapshot: {exception.Message}",
-                    "Correct the extension snapshot implementation so it completes successfully."
+                    "Correct the extension snapshot implementation so it completes successfully"
                 );
                 continue;
             }
@@ -345,8 +346,8 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
                     issuePath,
                     ApiSchemaCompilationSeverity.Error,
                     ApiSchemaCompilationCode.ApiSchemaExtensionInvalidSnapshot,
-                    $"Extension '{extensionType.FullName}' returned a null, reused, or incompatible frozen snapshot.",
-                    "Return a distinct immutable snapshot assignable to the registered extension key type."
+                    $"Extension '{extensionType.FullName}' returned a missing, reused, or incompatible frozen snapshot",
+                    "Return a distinct immutable snapshot assignable to the registered extension key type"
                 );
                 continue;
             }

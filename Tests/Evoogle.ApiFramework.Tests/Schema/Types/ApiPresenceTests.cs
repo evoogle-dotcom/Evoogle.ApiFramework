@@ -40,7 +40,7 @@ public class ApiPresenceTests(ITestOutputHelper output) : XUnitTests(output)
             this.WriteLine($"Supplied Number: {this.SuppliedNumber}");
             this.WriteLine($"JSON Token:      {this.JsonToken ?? "<direct construction>"}");
             this.WriteLine();
-            this.WriteLine($"Expected Issue:     {ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidPresence}");
+            this.WriteLine($"Expected Issue:     {ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidApiPresence}");
             this.WriteLine($"Expected Exception: {nameof(ApiSchemaCompilationException)}");
 
             var serializer = new XUnitTestSerializer();
@@ -88,7 +88,7 @@ public class ApiPresenceTests(ITestOutputHelper output) : XUnitTests(output)
             this.RestoredTestCase.JsonToken.Should().Be(this.JsonToken);
             this.ActualException.Should().NotBeNull();
             var issue = this.ActualException!.Errors.Should().ContainSingle().Subject;
-            issue.Code.Should().Be(ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidPresence);
+            issue.Code.Should().Be(ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidApiPresence);
             issue.ApiPath.Should().EndWith("ApiQuerySource[\"Echo\"].ApiQuerySourceParameter[\"text\"]");
         }
         #endregion

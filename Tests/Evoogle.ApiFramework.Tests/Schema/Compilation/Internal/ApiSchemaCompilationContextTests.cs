@@ -167,7 +167,7 @@ public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitT
             (
                 this.FirstSession.ApiSchema.ApiPath,
                 ApiSchemaCompilationSeverity.Warning,
-                ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties,
+                ApiSchemaCompilationCode.ApiObjectTypeMissingProperties,
                 "First-session issue",
                 remediation: null
             );
@@ -314,7 +314,7 @@ public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Information Issues Are Logged Without Remediation",
             Severity = ApiSchemaCompilationSeverity.Info,
-            Code = ApiSchemaCompilationCode.ApiSchemaInvalidName,
+            Code = ApiSchemaCompilationCode.ApiSchemaInvalidApiName,
             ExpectedLogLevel = LogLevel.Information,
             Remediation = null
         },
@@ -322,7 +322,7 @@ public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Warning Issues Are Logged With Remediation",
             Severity = ApiSchemaCompilationSeverity.Warning,
-            Code = ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties,
+            Code = ApiSchemaCompilationCode.ApiObjectTypeMissingProperties,
             ExpectedLogLevel = LogLevel.Warning,
             Remediation = "Remediation"
         },
@@ -330,7 +330,7 @@ public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Error Issues Are Logged With Remediation",
             Severity = ApiSchemaCompilationSeverity.Error,
-            Code = ApiSchemaCompilationCode.ApiKeyDefinitionNullOrEmptyPaths,
+            Code = ApiSchemaCompilationCode.ApiKeyDefinitionMissingPaths,
             ExpectedLogLevel = LogLevel.Error,
             Remediation = "Remediation"
         },

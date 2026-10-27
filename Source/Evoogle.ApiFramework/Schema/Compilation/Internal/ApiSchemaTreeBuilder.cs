@@ -97,8 +97,8 @@ internal static class ApiSchemaTreeBuilder
                 var apiPath = apiSchemaPath;
                 var severity = ApiSchemaCompilationSeverity.Error;
                 var code = ApiSchemaCompilationCode.ApiSchemaElementOwnershipCycle;
-                var description = $"Schema element ownership contains a cycle involving '{apiSchemaElement.GetType().Name}'.";
-                var remediation = "Remove the ownership cycle so every schema element belongs to an acyclic tree.";
+                var description = $"Schema element ownership contains a cycle involving '{apiSchemaElement.GetType().Name}'";
+                var remediation = "Remove the cycle so every schema element belongs to an acyclic ownership tree";
 
                 session.AddIssue(apiPath, severity, code, description, remediation);
                 return;
@@ -111,8 +111,8 @@ internal static class ApiSchemaTreeBuilder
                 var severity = ApiSchemaCompilationSeverity.Error;
                 var code = ApiSchemaCompilationCode.ApiSchemaElementDuplicateOwnership;
                 var apiSchemaElementTypeName = apiSchemaElement.GetType().Name;
-                var description = $"Schema element instance '{apiSchemaElementTypeName}' already belongs to a compiled schema tree.";
-                var remediation = "Create a distinct schema element instance for each schema tree.";
+                var description = $"Schema element '{apiSchemaElementTypeName}' already belongs to a compiled schema tree";
+                var remediation = "Create a distinct schema element instance for each schema tree";
 
                 session.AddIssue(apiPath, severity, code, description, remediation);
                 return;
@@ -126,8 +126,8 @@ internal static class ApiSchemaTreeBuilder
                 var apiPath = apiSchemaPath;
                 var severity = ApiSchemaCompilationSeverity.Error;
                 var code = ApiSchemaCompilationCode.ApiSchemaElementDuplicateOwnership;
-                var description = $"Schema element instance '{apiSchemaElement.GetType().Name}' is owned more than once by '{existingOwner}' and '{duplicateOwner}'.";
-                var remediation = "Create a distinct schema element instance for each structural ownership position.";
+                var description = $"Schema element '{apiSchemaElement.GetType().Name}' is owned by both '{existingOwner}' and '{duplicateOwner}'";
+                var remediation = "Create a distinct schema element instance for each ownership position";
 
                 session.AddIssue(apiPath, severity, code, description, remediation);
                 return;

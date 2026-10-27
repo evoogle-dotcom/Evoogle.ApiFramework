@@ -119,8 +119,8 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
                 (
                     configurationType,
                     ApiSchemaCompilationCode.ApiConfigurationActivationFailed,
-                    $"The API configuration type '{configurationTypeName}' could not be activated.",
-                    "Provide a public parameterless constructor.",
+                    $"API configuration type '{configurationTypeName}' could not be activated",
+                    "Provide a public parameterless constructor",
                     exception
                 )
             );
@@ -242,9 +242,9 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
                 (
                     configurationType,
                     ApiSchemaCompilationCode.ApiConfigurationExecutionFailed,
-                    $"The API configuration type '{configurationTypeName}' threw while configuring its " +
-                    $"{configurationRole} role.",
-                    "Correct the configuration identity or Configure implementation.",
+                    $"API configuration type '{configurationTypeName}' failed while configuring its " +
+                    $"{configurationRole} role",
+                    "Correct the configuration identity or Configure implementation",
                     exception
                 )
             );

@@ -299,11 +299,8 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
         {
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiVersionDefinitionClrTypeMismatch;
-            var description =
-                $"Version member CLR type '{apiProperty.ClrMemberType.SafeToName()}' does not " +
-                $"match scalar type '{apiScalarType.ClrType.SafeToName()}'";
-            var remediation =
-                "Use the same exact CLR type for the version member and scalar API type";
+            var description = $"Version member CLR type '{apiProperty.ClrMemberType.SafeToName()}' does not match scalar type '{apiScalarType.ClrType.SafeToName()}'";
+            var remediation = "Use the same exact CLR type for the version member and scalar API type";
 
             context.AddIssue(severity, code, description, remediation);
             return;
@@ -313,7 +310,7 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
         {
             var apiPath = context.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionDefinitionOptionalProperty;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionNullableProperty;
             var description = $"Version property '{apiProperty.ApiName}' is nullable";
             var remediation = "Configure the version property as non-nullable";
 
@@ -330,9 +327,8 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
         if (!schema.TryGetScalarTypeByClrType(_clrRepositoryType!, out var apiScalarType))
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedScalarType;
-            var description = $"No {nameof(this.ApiScalarType)} is registered for CLR type " +
-                $"'{_clrRepositoryType.SafeToName()}'";
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionMissingScalarType;
+            var description = $"No {nameof(this.ApiScalarType)} is registered for CLR type '{_clrRepositoryType.SafeToName()}'";
             var remediation = $"Add an {nameof(this.ApiScalarType)} for the configured version CLR type";
 
             context.AddIssue(severity, code, description, remediation);
@@ -347,9 +343,9 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
         if (clrType is null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionDefinitionNullClrType;
-            var description = $"{nameof(this.ClrType)} must not be null";
-            var remediation = $"Specify a valid scalar {nameof(this.ClrType)}";
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionMissingClrType;
+            var description = $"{nameof(this.ClrType)} is required for a repository-backed version";
+            var remediation = $"Specify the CLR type of the repository version value";
 
             context.AddIssue(severity, code, description, remediation);
             return false;
@@ -359,7 +355,7 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
         {
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiVersionDefinitionNullableClrType;
-            var description = $"{nameof(this.ClrType)} must not be nullable";
+            var description = $"{nameof(this.ClrType)} must be non-nullable";
             var remediation = "Use the non-nullable underlying CLR type for the version";
 
             context.AddIssue(severity, code, description, remediation);

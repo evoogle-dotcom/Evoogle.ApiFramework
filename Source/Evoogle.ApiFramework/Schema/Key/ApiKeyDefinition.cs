@@ -120,8 +120,8 @@ public partial class ApiKeyDefinition : ApiSchemaElement
         if (this.ApiKeyPaths.Length == 0)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiKeyDefinitionNullOrEmptyPaths;
-            var description = $"{nameof(this.ApiKeyPaths)} must not be null or empty";
+            var code = ApiSchemaCompilationCode.ApiKeyDefinitionMissingPaths;
+            var description = $"{nameof(this.ApiKeyPaths)} must contain at least one key path";
             var remediation = $"Specify at least one {nameof(ApiKeyPath)}";
 
             context.AddIssue(severity, code, description, remediation);

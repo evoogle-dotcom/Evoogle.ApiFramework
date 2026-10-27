@@ -64,8 +64,8 @@ public abstract class ApiRelationshipElement : ApiSchemaElement, IApiKeyPathRoot
         if (!_apiObjectTypeBinding.HasReference)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiRelationshipElementNullObjectTypeReference;
-            var description = $"{nameof(this.ApiObjectTypeReference)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiRelationshipElementMissingObjectType;
+            var description = $"{nameof(this.ApiObjectTypeReference)} is required";
             var remediation = $"Specify a valid {nameof(this.ApiObjectTypeReference)} value";
 
             context.AddIssue(severity, code, description, remediation);

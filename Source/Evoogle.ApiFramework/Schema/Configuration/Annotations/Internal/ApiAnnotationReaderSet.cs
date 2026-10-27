@@ -434,7 +434,7 @@ internal sealed class ApiAnnotationReaderSet
                     (
                         discoveryReader,
                         resultType.FullName ?? assembly.FullName ?? assembly.ToString(),
-                        "A type-discovery contribution did not satisfy the assembly scan eligibility rules."
+                        "The discovered CLR type does not satisfy the assembly eligibility rules"
                     );
                     continue;
                 }
@@ -445,7 +445,7 @@ internal sealed class ApiAnnotationReaderSet
                     (
                         discoveryReader,
                         resultType.FullName ?? resultType.Name,
-                        $"The API type kind '{result.ApiKind}' cannot be discovered from a CLR type."
+                        $"API type kind '{result.ApiKind}' cannot be discovered from a CLR type"
                     );
                     continue;
                 }
@@ -468,9 +468,9 @@ internal sealed class ApiAnnotationReaderSet
                             $"API {existingDiscovery.ApiKind} " +
                             "by reader '" +
                             $"{existingDiscovery.Reader.GetType().FullName ?? existingDiscovery.Reader.GetType().Name}' " +
-                            $"and cannot also be discovered as an API {result.ApiKind}.",
+                            $"and cannot also be discovered as an API {result.ApiKind}",
                             "Ensure all annotation readers agree on the API type kind for each " +
-                            "CLR type."
+                            "CLR type"
                         )]
                     );
                     continue;
@@ -527,7 +527,7 @@ internal sealed class ApiAnnotationReaderSet
                     (
                         versionReader,
                         builder.ClrType,
-                        "A version annotation reader returned a null result."
+                        "A version annotation reader returned no declaration"
                     );
                     continue;
                 }
@@ -541,8 +541,8 @@ internal sealed class ApiAnnotationReaderSet
                     (
                         versionReader,
                         builder.ClrType,
-                        "A version annotation contribution must provide exactly one of a CLR " +
-                        "type or a non-empty CLR member name."
+                        "A version annotation declaration must provide exactly one identity: a CLR " +
+                        "type or a non-empty CLR member name"
                     );
                     continue;
                 }
@@ -557,9 +557,8 @@ internal sealed class ApiAnnotationReaderSet
                     versionReader,
                     builder.ClrType,
                     "Version",
-                    "An annotation reader returned multiple valid version declarations for one " +
-                    "object type.",
-                    ApiSchemaCompilationCode.ApiAnnotationVersionConflict
+                    "Multiple annotation version declarations target the same object type",
+                    ApiSchemaCompilationCode.ApiAnnotationMultipleVersionDeclarations
                 );
                 continue;
             }
@@ -686,8 +685,8 @@ internal sealed class ApiAnnotationReaderSet
                     contribution.Reader,
                     builder.ClrType,
                     $"Key:{apiName}",
-                    $"Multiple annotation key paths use order {duplicateOrder.Key}. Key path orders must be unique.",
-                    ApiSchemaCompilationCode.ApiAnnotationKeyOrderConflict
+                    $"Multiple annotation key paths use order {duplicateOrder.Key}; key path orders must be unique",
+                    ApiSchemaCompilationCode.ApiAnnotationDuplicateKeyPathOrder
                 );
             }
 
@@ -1069,7 +1068,7 @@ internal sealed class ApiAnnotationReaderSet
                 (
                     reader,
                     defaultApiPath,
-                    "An annotation reader returned a null diagnostic."
+                    "An annotation reader returned no diagnostic"
                 );
                 continue;
             }
@@ -1081,7 +1080,7 @@ internal sealed class ApiAnnotationReaderSet
                     reader,
                     defaultApiPath,
                     "An annotation reader returned a diagnostic with an undefined " +
-                    "compilation code."
+                    "compilation code"
                 );
                 continue;
             }
@@ -1093,7 +1092,7 @@ internal sealed class ApiAnnotationReaderSet
                 (
                     reader,
                     defaultApiPath,
-                    "An annotation reader returned a diagnostic without a path or description."
+                    "An annotation reader returned a diagnostic without an API path or description"
                 );
                 continue;
             }
@@ -1140,8 +1139,8 @@ internal sealed class ApiAnnotationReaderSet
                 apiPath,
                 ApiSchemaCompilationSeverity.Error,
                 ApiSchemaCompilationCode.ApiAnnotationReaderExecutionFailed,
-                exception.Message,
-                "Correct the annotation reader implementation or its input metadata.",
+                exception.Message.TrimEnd('.'),
+                "Correct the annotation reader implementation or its input metadata",
                 reader.GetType(),
                 exception
             )
@@ -1159,7 +1158,7 @@ internal sealed class ApiAnnotationReaderSet
             reader,
             clrType.FullName ?? clrType.Name,
             description,
-            ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
+            ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
         );
 
     private void AddInvalidContributionIssue
@@ -1174,7 +1173,7 @@ internal sealed class ApiAnnotationReaderSet
             reader,
             $"{clrType.FullName ?? clrType.Name}.{memberName}",
             description,
-            ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
+            ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
         );
 
     private void AddInvalidContributionIssue
@@ -1198,7 +1197,7 @@ internal sealed class ApiAnnotationReaderSet
         IApiAnnotationReader reader,
         string apiPath,
         string description,
-        ApiSchemaCompilationCode code = ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
+        ApiSchemaCompilationCode code = ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
     )
     {
         _issues.Add
@@ -1209,7 +1208,7 @@ internal sealed class ApiAnnotationReaderSet
                 ApiSchemaCompilationSeverity.Error,
                 code,
                 description,
-                "Return a valid declarative annotation result for the supplied target.",
+                "Return a valid annotation declaration for the supplied target",
                 reader.GetType()
             )
         );

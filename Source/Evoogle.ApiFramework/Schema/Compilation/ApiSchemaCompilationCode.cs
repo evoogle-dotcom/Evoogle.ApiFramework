@@ -31,10 +31,10 @@ public enum ApiSchemaCompilationCode
     ApiAnnotationReaderExecutionFailed,
 
     /// <summary>
-    ///     An annotation reader returned an invalid or unsupported contribution.
+    ///     An annotation declaration is invalid or unsupported for its target.
     /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_INVALID_CONTRIBUTION")]
-    ApiAnnotationInvalidContribution,
+    [EnumMember(Value = "API_ANNOTATION_INVALID_DECLARATION")]
+    ApiAnnotationInvalidDeclaration,
 
     /// <summary>
     ///     A CLR type has conflicting built-in API type marker annotations.
@@ -51,14 +51,14 @@ public enum ApiSchemaCompilationCode
     /// <summary>
     ///     Multiple annotation key paths use the same order within one named key.
     /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_KEY_ORDER_CONFLICT")]
-    ApiAnnotationKeyOrderConflict,
+    [EnumMember(Value = "API_ANNOTATION_DUPLICATE_KEY_PATH_ORDER")]
+    ApiAnnotationDuplicateKeyPathOrder,
 
     /// <summary>
     ///     An annotation reader returned multiple valid version declarations for one object type.
     /// </summary>
-    [EnumMember(Value = "API_ANNOTATION_VERSION_CONFLICT")]
-    ApiAnnotationVersionConflict,
+    [EnumMember(Value = "API_ANNOTATION_MULTIPLE_VERSION_DECLARATIONS")]
+    ApiAnnotationMultipleVersionDeclarations,
     #endregion
 
     #region ApiAssembly Compilation Codes
@@ -72,16 +72,16 @@ public enum ApiSchemaCompilationCode
 
     #region ApiCollectionType Compilation Codes
     /// <summary>
-    ///     The collection type's item type was not specified, either in the JSON or by the builder.
+    ///     The collection type has no item type.
     /// </summary>
-    [EnumMember(Value = "API_COLLECTION_TYPE_ITEM_TYPE_UNSPECIFIED")]
-    ApiCollectionTypeItemTypeUnspecified,
+    [EnumMember(Value = "API_COLLECTION_TYPE_MISSING_ITEM_TYPE")]
+    ApiCollectionTypeMissingItemType,
 
     /// <summary>
-    ///     The collection type's item type reference could not be resolved to a declared API type.
+    ///     The collection type's item type could not be resolved to a declared API type.
     /// </summary>
-    [EnumMember(Value = "API_COLLECTION_TYPE_ITEM_TYPE_REFERENCE_UNRESOLVED")]
-    ApiCollectionTypeItemTypeReferenceUnresolved,
+    [EnumMember(Value = "API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE")]
+    ApiCollectionTypeUnresolvedItemType,
 
     /// <summary>
     ///     The collection type's item nullability is invalid.
@@ -90,18 +90,10 @@ public enum ApiSchemaCompilationCode
     ApiCollectionTypeInvalidApiItemNullability,
 
     /// <summary>
-    ///     The collection item is declared non-nullable but the CLR element type is nullable.
-    ///     The API contract prohibits null, but the CLR element type permits null.
+    ///     The collection item's API nullability conflicts with the CLR element nullability.
     /// </summary>
-    [EnumMember(Value = "API_COLLECTION_ITEM_NON_NULLABLE_NULLABLE_MISMATCH")]
-    ApiCollectionItemNonNullableNullableMismatch,
-
-    /// <summary>
-    ///     The collection item is declared nullable but the CLR element type is a non-nullable reference type.
-    ///     A nullable item may assign null to a CLR element that cannot hold it.
-    /// </summary>
-    [EnumMember(Value = "API_COLLECTION_ITEM_NULLABLE_NON_NULLABLE_MISMATCH")]
-    ApiCollectionItemNullableNonNullableMismatch,
+    [EnumMember(Value = "API_COLLECTION_ITEM_NULLABILITY_MISMATCH")]
+    ApiCollectionItemNullabilityMismatch,
     #endregion
 
     #region ApiConfiguration Compilation Codes
@@ -138,27 +130,27 @@ public enum ApiSchemaCompilationCode
     ApiEnumTypeDuplicateValueClrOrdinal,
 
     /// <summary>
-    ///     The CLR type is not a valid enumeration type.
+    ///     The enum type's CLR type does not represent an enumeration.
     /// </summary>
-    [EnumMember(Value = "API_ENUM_TYPE_INVALID_CLR_TYPE")]
-    ApiEnumTypeInvalidClrType,
+    [EnumMember(Value = "API_ENUM_TYPE_CLR_TYPE_NOT_ENUM")]
+    ApiEnumTypeClrTypeNotEnum,
 
     /// <summary>
-    ///     The enum type has no values defined.
+    ///     The enum type has no values.
     /// </summary>
-    [EnumMember(Value = "API_ENUM_TYPE_NULL_OR_EMPTY_VALUES")]
-    ApiEnumTypeNullOrEmptyValues,
+    [EnumMember(Value = "API_ENUM_TYPE_MISSING_VALUES")]
+    ApiEnumTypeMissingValues,
     #endregion
 
     #region ApiEnumValue Compilation Codes
     /// <summary>
-    ///     The enum value's API name is null, empty, or whitespace.
+    ///     The enum value does not have a valid API name.
     /// </summary>
     [EnumMember(Value = "API_ENUM_VALUE_INVALID_API_NAME")]
     ApiEnumValueInvalidApiName,
 
     /// <summary>
-    ///     The enum value's CLR name is null, empty, or whitespace.
+    ///     The enum value does not have a valid CLR name.
     /// </summary>
     [EnumMember(Value = "API_ENUM_VALUE_INVALID_CLR_NAME")]
     ApiEnumValueInvalidClrName,
@@ -168,30 +160,30 @@ public enum ApiSchemaCompilationCode
     /// <summary>
     ///     An <see cref="ApiKeyDefinition"/> has no key paths defined. At least one <see cref="ApiKeyPath"/> is required.
     /// </summary>
-    [EnumMember(Value = "API_KEY_DEFINITION_NULL_OR_EMPTY_PATHS")]
-    ApiKeyDefinitionNullOrEmptyPaths,
+    [EnumMember(Value = "API_KEY_DEFINITION_MISSING_PATHS")]
+    ApiKeyDefinitionMissingPaths,
     #endregion
 
     #region ApiKeyPath Compilation Codes
     /// <summary>
     ///     An <see cref="ApiKeyPath"/> has no segments. At least one segment is required to identify a scalar property.
     /// </summary>
-    [EnumMember(Value = "API_KEY_PATH_EMPTY_SEGMENTS")]
-    ApiKeyPathEmptySegments,
+    [EnumMember(Value = "API_KEY_PATH_MISSING_SEGMENTS")]
+    ApiKeyPathMissingSegments,
 
     /// <summary>
     ///     A non-terminal (navigation) segment of an <see cref="ApiKeyPath"/> resolved to a property whose type is not
     ///     an <see cref="ApiObjectType"/>. Navigation segments must refer to object-typed properties.
     /// </summary>
-    [EnumMember(Value = "API_KEY_PATH_NAVIGATION_SEGMENT_INVALID_TYPE")]
-    ApiKeyPathNavigationSegmentInvalidType,
+    [EnumMember(Value = "API_KEY_PATH_NAVIGATION_SEGMENT_NOT_OBJECT_TYPE")]
+    ApiKeyPathNavigationSegmentNotObjectType,
 
     /// <summary>
     ///     The terminal (scalar) segment of an <see cref="ApiKeyPath"/> resolved to a property whose type is not
     ///     an <see cref="ApiScalarType"/>. The last segment must refer to a scalar-typed property.
     /// </summary>
-    [EnumMember(Value = "API_KEY_PATH_SCALAR_SEGMENT_INVALID_TYPE")]
-    ApiKeyPathScalarSegmentInvalidType,
+    [EnumMember(Value = "API_KEY_PATH_TERMINAL_SEGMENT_NOT_SCALAR_TYPE")]
+    ApiKeyPathTerminalSegmentNotScalarType,
 
     /// <summary>
     ///     An <see cref="ApiKeyPath"/>'s explicit root reference could not be resolved to an
@@ -205,8 +197,8 @@ public enum ApiSchemaCompilationCode
     ///     <see cref="ApiObjectType"/> or <see cref="ApiRelationshipElement"/> can provide an
     ///     inferred root.
     /// </summary>
-    [EnumMember(Value = "API_KEY_PATH_UNINFERABLE_ROOT_TYPE")]
-    ApiKeyPathUninferableRootType,
+    [EnumMember(Value = "API_KEY_PATH_MISSING_ROOT_TYPE")]
+    ApiKeyPathMissingRootType,
     #endregion
 
     #region ApiKeyPathSegment Compilation Codes
@@ -214,13 +206,13 @@ public enum ApiSchemaCompilationCode
     ///     An <see cref="ApiKeyPath"/> segment's property reference could not be resolved to an
     ///     <see cref="ApiProperty"/> on the current object type.
     /// </summary>
-    [EnumMember(Value = "API_KEY_PATH_SEGMENT_UNRESOLVED_API_PROPERTY")]
-    ApiKeyPathSegmentUnresolvedApiProperty,
+    [EnumMember(Value = "API_KEY_PATH_SEGMENT_UNRESOLVED_PROPERTY")]
+    ApiKeyPathSegmentUnresolvedProperty,
     #endregion
 
     #region ApiNamedKeyDefinition Compilation Codes
     /// <summary>
-    ///     An <see cref="ApiNamedKeyDefinition"/>'s API name is null, empty, or whitespace.
+    ///     An <see cref="ApiNamedKeyDefinition"/> does not have a valid API name.
     /// </summary>
     [EnumMember(Value = "API_NAMED_KEY_DEFINITION_INVALID_API_NAME")]
     ApiNamedKeyDefinitionInvalidApiName,
@@ -228,7 +220,7 @@ public enum ApiSchemaCompilationCode
 
     #region ApiNamedType Compilation Codes
     /// <summary>
-    ///     The named type's API name is null, empty, or whitespace.
+    ///     The named type does not have a valid API name.
     /// </summary>
     [EnumMember(Value = "API_NAMED_TYPE_INVALID_API_NAME")]
     ApiNamedTypeInvalidApiName,
@@ -254,10 +246,10 @@ public enum ApiSchemaCompilationCode
     ApiObjectTypeDuplicatePropertyClrName,
 
     /// <summary>
-    ///     The object type has no properties defined.
+    ///     The object type has no properties.
     /// </summary>
-    [EnumMember(Value = "API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES")]
-    ApiObjectTypeNullOrEmptyProperties,
+    [EnumMember(Value = "API_OBJECT_TYPE_MISSING_PROPERTIES")]
+    ApiObjectTypeMissingProperties,
 
     /// <summary>
     ///     The object type's key null-handling option could not be read from schema JSON.
@@ -272,7 +264,7 @@ public enum ApiSchemaCompilationCode
 
     #region ApiProperty Compilation Codes
     /// <summary>
-    ///     The property's API name is null, empty, or whitespace.
+    ///     The property does not have a valid API name.
     /// </summary>
     [EnumMember(Value = "API_PROPERTY_INVALID_API_NAME")]
     ApiPropertyInvalidApiName,
@@ -284,38 +276,30 @@ public enum ApiSchemaCompilationCode
     ApiPropertyInvalidApiNullability,
 
     /// <summary>
-    ///     The property's type was not specified, either in the JSON or by the builder.
+    ///     The property has no type.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_TYPE_UNSPECIFIED")]
-    ApiPropertyTypeUnspecified,
+    [EnumMember(Value = "API_PROPERTY_MISSING_TYPE")]
+    ApiPropertyMissingType,
 
     /// <summary>
-    ///     The property's type reference could not be resolved to a declared API type.
+    ///     The property's type could not be resolved to a declared API type.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_TYPE_REFERENCE_UNRESOLVED")]
-    ApiPropertyTypeReferenceUnresolved,
+    [EnumMember(Value = "API_PROPERTY_UNRESOLVED_TYPE")]
+    ApiPropertyUnresolvedType,
 
     /// <summary>
-    ///     The property is declared non-nullable but the CLR member is nullable.
-    ///     The API contract prohibits null, but the CLR type permits null.
+    ///     The property's API nullability conflicts with the CLR member nullability.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_NON_NULLABLE_NULLABLE_MISMATCH")]
-    ApiPropertyNonNullableNullableMismatch,
-
-    /// <summary>
-    ///     The property is declared nullable but the CLR member is a non-nullable reference type.
-    ///     A nullable property may assign null to a CLR member that cannot hold it.
-    /// </summary>
-    [EnumMember(Value = "API_PROPERTY_NULLABLE_NON_NULLABLE_MISMATCH")]
-    ApiPropertyNullableNonNullableMismatch,
+    [EnumMember(Value = "API_PROPERTY_NULLABILITY_MISMATCH")]
+    ApiPropertyNullabilityMismatch,
     #endregion
 
     #region ApiPropertyReference Compilation Codes
     /// <summary>
-    ///     An API property reference does not contain exactly one complete API name or CLR name reference.
+    ///     An API property reference does not have exactly one API-name or CLR-name identity.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_REFERENCE_INVALID_FORM")]
-    ApiPropertyReferenceInvalidForm,
+    [EnumMember(Value = "API_PROPERTY_REFERENCE_INVALID_IDENTITY")]
+    ApiPropertyReferenceInvalidIdentity,
     #endregion
 
     #region ApiQuerySource Compilation Codes
@@ -332,28 +316,28 @@ public enum ApiSchemaCompilationCode
     ApiQuerySourceDuplicateParameterApiName,
 
     /// <summary>
-    ///     The query source output type was not specified, either in the JSON or by the builder.
+    ///     The query source has no output type.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_OUTPUT_TYPE_UNSPECIFIED")]
-    ApiQuerySourceOutputTypeUnspecified,
+    [EnumMember(Value = "API_QUERY_SOURCE_MISSING_OUTPUT_TYPE")]
+    ApiQuerySourceMissingOutputType,
 
     /// <summary>
-    ///     The query source output type reference could not be resolved to a declared API type.
+    ///     The query source output type could not be resolved to a declared API type.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_OUTPUT_TYPE_REFERENCE_UNRESOLVED")]
-    ApiQuerySourceOutputTypeReferenceUnresolved,
+    [EnumMember(Value = "API_QUERY_SOURCE_UNRESOLVED_OUTPUT_TYPE")]
+    ApiQuerySourceUnresolvedOutputType,
 
     /// <summary>
     ///     The query source output nullability is invalid.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_OUTPUT_NULLABILITY")]
-    ApiQuerySourceInvalidOutputNullability,
+    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_API_OUTPUT_NULLABILITY")]
+    ApiQuerySourceInvalidApiOutputNullability,
 
     /// <summary>
     ///     The allowed composition is invalid or incompatible with the output type.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_COMPOSITION")]
-    ApiQuerySourceInvalidComposition,
+    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_API_OUTPUT_COMPOSITION")]
+    ApiQuerySourceInvalidApiOutputComposition,
 
     /// <summary>
     ///     The query source parameter has an invalid API name.
@@ -362,31 +346,31 @@ public enum ApiSchemaCompilationCode
     ApiQuerySourceParameterInvalidApiName,
 
     /// <summary>
-    ///     The query source parameter type was not specified, either in the JSON or by the builder.
+    ///     The query source parameter has no type.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_TYPE_UNSPECIFIED")]
-    ApiQuerySourceParameterTypeUnspecified,
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_MISSING_TYPE")]
+    ApiQuerySourceParameterMissingType,
 
     /// <summary>
-    ///     The query source parameter type reference could not be resolved to a declared API type.
+    ///     The query source parameter type could not be resolved to a declared API type.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_TYPE_REFERENCE_UNRESOLVED")]
-    ApiQuerySourceParameterTypeReferenceUnresolved,
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_UNRESOLVED_TYPE")]
+    ApiQuerySourceParameterUnresolvedType,
 
     /// <summary>
     ///     The query source parameter nullability is invalid.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_NULLABILITY")]
-    ApiQuerySourceParameterInvalidNullability,
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_API_NULLABILITY")]
+    ApiQuerySourceParameterInvalidApiNullability,
 
     /// <summary>The query source parameter presence requirement is invalid.</summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_PRESENCE")]
-    ApiQuerySourceParameterInvalidPresence,
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_API_PRESENCE")]
+    ApiQuerySourceParameterInvalidApiPresence,
     #endregion
 
     #region ApiRelationship Compilation Codes
     /// <summary>
-    ///     The relationship's API name is null, empty, or whitespace.
+    ///     The relationship does not have a valid API name.
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_INVALID_API_NAME")]
     ApiRelationshipInvalidApiName,
@@ -398,24 +382,24 @@ public enum ApiSchemaCompilationCode
     ApiRelationshipInvalidApiDeleteBehavior,
 
     /// <summary>
-    ///     The relationship's principal end is null.
+    ///     The relationship has no principal end.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_NULL_PRINCIPAL_END")]
-    ApiRelationshipNullPrincipalEnd,
+    [EnumMember(Value = "API_RELATIONSHIP_MISSING_PRINCIPAL_END")]
+    ApiRelationshipMissingPrincipalEnd,
 
     /// <summary>
-    ///     The relationship's dependent end is null.
+    ///     The relationship has no dependent end.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_NULL_DEPENDENT_END")]
-    ApiRelationshipNullDependentEnd,
+    [EnumMember(Value = "API_RELATIONSHIP_MISSING_DEPENDENT_END")]
+    ApiRelationshipMissingDependentEnd,
     #endregion
 
     #region ApiRelationshipElement Compilation Codes
     /// <summary>
-    ///     The relationship element's object type reference is null.
+    ///     The relationship element has no object type.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_ELEMENT_NULL_OBJECT_TYPE_REFERENCE")]
-    ApiRelationshipElementNullObjectTypeReference,
+    [EnumMember(Value = "API_RELATIONSHIP_ELEMENT_MISSING_OBJECT_TYPE")]
+    ApiRelationshipElementMissingObjectType,
 
     /// <summary>
     ///     The relationship element's object type reference could not be resolved to an object type
@@ -429,48 +413,48 @@ public enum ApiSchemaCompilationCode
     /// <summary>
     ///     The principal end's explicitly referenced principal key could not be resolved.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_END_UNRESOLVED_KEY")]
-    ApiRelationshipEndUnresolvedKey,
+    [EnumMember(Value = "API_RELATIONSHIP_END_UNRESOLVED_PRINCIPAL_KEY")]
+    ApiRelationshipEndUnresolvedPrincipalKey,
 
     /// <summary>
     ///     A principal key name was supplied for a navigational relationship that has no foreign key binding.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_END_PRINCIPAL_KEY_WITHOUT_FOREIGN_KEY")]
-    ApiRelationshipEndPrincipalKeyWithoutForeignKey,
+    [EnumMember(Value = "API_RELATIONSHIP_END_PRINCIPAL_KEY_REQUIRES_FOREIGN_KEY")]
+    ApiRelationshipEndPrincipalKeyRequiresForeignKey,
     #endregion
 
     #region ApiRelationshipManyToMany Compilation Codes
     /// <summary>
-    ///     The many-to-many relationship's principal end A is null.
+    ///     The many-to-many relationship has no principal end A.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_A")]
-    ApiRelationshipManyToManyNullPrincipalEndA,
+    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_MISSING_PRINCIPAL_END_A")]
+    ApiRelationshipManyToManyMissingPrincipalEndA,
 
     /// <summary>
-    ///     The many-to-many relationship's principal end B is null.
+    ///     The many-to-many relationship has no principal end B.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_B")]
-    ApiRelationshipManyToManyNullPrincipalEndB,
+    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_MISSING_PRINCIPAL_END_B")]
+    ApiRelationshipManyToManyMissingPrincipalEndB,
 
     /// <summary>
-    ///     The many-to-many relationship's association is null.
+    ///     The many-to-many relationship has no association.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_NULL_ASSOCIATION")]
-    ApiRelationshipManyToManyNullAssociation,
+    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_MISSING_ASSOCIATION")]
+    ApiRelationshipManyToManyMissingAssociation,
 
     /// <summary>
     ///     The number of scalar leaves in the association's key paths for end A
     ///     does not match the number of scalar leaves in principal end A's key.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT")]
-    ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
+    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_FOREIGN_KEY_A_PATH_COUNT_MISMATCH")]
+    ApiRelationshipManyToManyForeignKeyAPathCountMismatch,
 
     /// <summary>
     ///     The number of scalar leaves in the association's key paths for end B
     ///     does not match the number of scalar leaves in principal end B's key.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT")]
-    ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
+    [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_FOREIGN_KEY_B_PATH_COUNT_MISMATCH")]
+    ApiRelationshipManyToManyForeignKeyBPathCountMismatch,
     #endregion
 
     #region ApiRelationshipOneTo Compilation Codes
@@ -479,8 +463,8 @@ public enum ApiSchemaCompilationCode
     ///     the number of scalar leaves in the principal end's key in either
     ///     one-to-one or one-to-many relationships.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT")]
-    ApiRelationshipOneToInvalidDependentKeyPathsCount,
+    [EnumMember(Value = "API_RELATIONSHIP_FOREIGN_KEY_PATH_COUNT_MISMATCH")]
+    ApiRelationshipForeignKeyPathCountMismatch,
 
     /// <summary>
     ///     The principal end's key cannot be automatically determined because multiple keys
@@ -494,8 +478,8 @@ public enum ApiSchemaCompilationCode
     ///     The principal end's key could not be matched to the foreign key because their ordered scalar
     ///     leaf types are incompatible.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY")]
-    ApiRelationshipIncompatiblePrincipalForeignKey,
+    [EnumMember(Value = "API_RELATIONSHIP_PRINCIPAL_FOREIGN_KEY_TYPE_MISMATCH")]
+    ApiRelationshipPrincipalForeignKeyTypeMismatch,
     #endregion
 
     #region ApiRelationshipTraversal Compilation Codes
@@ -503,15 +487,17 @@ public enum ApiSchemaCompilationCode
     [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_API_NAME")]
     ApiRelationshipTraversalInvalidApiName,
 
-    /// <summary>
-    ///     A relationship traversal conflicts with another API field on its source type.
-    /// </summary>
+    /// <summary>Multiple relationship traversals have the same API name on one source object type.</summary>
     [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_DUPLICATE_API_NAME")]
     ApiRelationshipTraversalDuplicateApiName,
 
+    /// <summary>A relationship traversal and contained property have the same API name.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_PROPERTY_API_NAME_CONFLICT")]
+    ApiRelationshipTraversalPropertyApiNameConflict,
+
     /// <summary>A CLR member is bound to both a contained property and a traversal.</summary>
     [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_CLR_MEMBER_CONFLICT")]
-    ApiRelationshipTraversalClrNavigationMemberConflict,
+    ApiRelationshipTraversalClrMemberConflict,
     #endregion
 
     #region ApiSchemaElement Compilation Codes
@@ -591,10 +577,10 @@ public enum ApiSchemaCompilationCode
     ApiSchemaDuplicateScalarTypeClrType,
 
     /// <summary>
-    ///     The schema's API name is null, empty, or whitespace.
+    ///     The schema does not have a valid API name.
     /// </summary>
-    [EnumMember(Value = "API_SCHEMA_INVALID_NAME")]
-    ApiSchemaInvalidName,
+    [EnumMember(Value = "API_SCHEMA_INVALID_API_NAME")]
+    ApiSchemaInvalidApiName,
 
     /// <summary>
     ///     The schema's key null-handling option could not be read from schema JSON.
@@ -605,8 +591,8 @@ public enum ApiSchemaCompilationCode
     /// <summary>
     ///     An attached schema extension does not implement the frozen snapshot contract.
     /// </summary>
-    [EnumMember(Value = "API_SCHEMA_EXTENSION_UNSUPPORTED")]
-    ApiSchemaExtensionUnsupported,
+    [EnumMember(Value = "API_SCHEMA_EXTENSION_NOT_FREEZABLE")]
+    ApiSchemaExtensionNotFreezable,
 
     /// <summary>
     ///     A schema extension failed while creating its frozen snapshot.
@@ -623,18 +609,18 @@ public enum ApiSchemaCompilationCode
 
     #region ApiType Compilation Codes
     /// <summary>
-    ///     The type's CLR type is null.
+    ///     The API type has no CLR type.
     /// </summary>
-    [EnumMember(Value = "API_TYPE_NULL_CLR_TYPE")]
-    ApiTypeNullClrType,
+    [EnumMember(Value = "API_TYPE_MISSING_CLR_TYPE")]
+    ApiTypeMissingClrType,
     #endregion
 
     #region ApiTypeExpression Compilation Codes
     /// <summary>
-    ///     A type expression does not contain exactly one inline type or type reference.
+    ///     A type expression does not define exactly one inline or referenced type source.
     /// </summary>
-    [EnumMember(Value = "API_TYPE_EXPRESSION_INVALID_FORM")]
-    ApiTypeExpressionInvalidForm,
+    [EnumMember(Value = "API_TYPE_EXPRESSION_INVALID_DEFINITION")]
+    ApiTypeExpressionInvalidDefinition,
     #endregion
 
     #region ApiTypeReference Compilation Codes
@@ -645,24 +631,24 @@ public enum ApiSchemaCompilationCode
     ApiTypeReferenceInvalidApiKind,
 
     /// <summary>
-    ///     A type reference does not contain exactly one complete API-named or CLR reference.
+    ///     A type reference does not have exactly one complete API or CLR identity.
     /// </summary>
-    [EnumMember(Value = "API_TYPE_REFERENCE_INVALID_FORM")]
-    ApiTypeReferenceInvalidForm,
+    [EnumMember(Value = "API_TYPE_REFERENCE_INVALID_IDENTITY")]
+    ApiTypeReferenceInvalidIdentity,
     #endregion
 
     #region ApiVersionDefinition Compilation Codes
-    /// <summary>The version definition's CLR type is null.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_NULL_CLR_TYPE")]
-    ApiVersionDefinitionNullClrType,
+    /// <summary>The repository-backed version definition has no CLR type.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_MISSING_CLR_TYPE")]
+    ApiVersionDefinitionMissingClrType,
 
     /// <summary>The version definition uses a nullable CLR value type.</summary>
     [EnumMember(Value = "API_VERSION_DEFINITION_NULLABLE_CLR_TYPE")]
     ApiVersionDefinitionNullableClrType,
 
-    /// <summary>No scalar schema type matches the version CLR type.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_UNRESOLVED_SCALAR_TYPE")]
-    ApiVersionDefinitionUnresolvedScalarType,
+    /// <summary>The schema has no scalar type for the version CLR type.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_MISSING_SCALAR_TYPE")]
+    ApiVersionDefinitionMissingScalarType,
 
     /// <summary>No API property matches the property-backed version property reference.</summary>
     [EnumMember(Value = "API_VERSION_DEFINITION_UNRESOLVED_PROPERTY")]
@@ -676,9 +662,9 @@ public enum ApiSchemaCompilationCode
     [EnumMember(Value = "API_VERSION_DEFINITION_CLR_TYPE_MISMATCH")]
     ApiVersionDefinitionClrTypeMismatch,
 
-    /// <summary>The property-backed version refers to an optional API property.</summary>
-    [EnumMember(Value = "API_VERSION_DEFINITION_OPTIONAL_PROPERTY")]
-    ApiVersionDefinitionOptionalProperty,
+    /// <summary>The property-backed version refers to a nullable API property.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_NULLABLE_PROPERTY")]
+    ApiVersionDefinitionNullableProperty,
     #endregion
 
     #region ClrMemberReference Compilation Codes
@@ -703,19 +689,19 @@ public enum ApiSchemaCompilationCode
     /// <summary>
     ///     A resolved CLR member is incompatible with its schema role.
     /// </summary>
-    [EnumMember(Value = "CLR_MEMBER_INCOMPATIBLE")]
-    ClrMemberIncompatible,
+    [EnumMember(Value = "CLR_MEMBER_BINDING_INCOMPATIBLE")]
+    ClrMemberBindingIncompatible,
 
     /// <summary>
-    ///     A CLR member getter could not be created or is invalid.
+    ///     The framework could not create read access for a CLR member.
     /// </summary>
-    [EnumMember(Value = "CLR_MEMBER_INVALID_GETTER")]
-    ClrMemberInvalidGetter,
+    [EnumMember(Value = "CLR_MEMBER_READ_ACCESS_FAILED")]
+    ClrMemberReadAccessFailed,
 
     /// <summary>
-    ///     A CLR member setter could not be created or is invalid.
+    ///     The framework could not create write access for a CLR member.
     /// </summary>
-    [EnumMember(Value = "CLR_MEMBER_INVALID_SETTER")]
-    ClrMemberInvalidSetter,
+    [EnumMember(Value = "CLR_MEMBER_WRITE_ACCESS_FAILED")]
+    ClrMemberWriteAccessFailed,
     #endregion
 }

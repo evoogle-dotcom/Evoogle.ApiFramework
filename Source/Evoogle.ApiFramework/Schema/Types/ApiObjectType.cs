@@ -331,9 +331,9 @@ public sealed partial class ApiObjectType
             {
                 var apiPath = traversal.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Error;
-                var code = ApiSchemaCompilationCode.ApiRelationshipTraversalDuplicateApiName;
-                var description = $"Traversal name '{traversal.ApiName}' conflicts with another property on '{this.ApiName}'";
-                var remediation = "Choose a unique API property name on the source object type";
+                var code = ApiSchemaCompilationCode.ApiRelationshipTraversalPropertyApiNameConflict;
+                var description = $"Traversal '{traversal.ApiName}' and a contained property have the same API name on object type '{this.ApiName}'";
+                var remediation = "Assign distinct API names to the traversal and contained property";
 
                 context.AddIssue(apiPath, severity, code, description, remediation);
             }
@@ -347,9 +347,8 @@ public sealed partial class ApiObjectType
             {
                 var apiPath = traversal.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Error;
-                var code = ApiSchemaCompilationCode.ApiRelationshipTraversalClrNavigationMemberConflict;
-                var description = $"CLR navigation member '{clrNavigationMember.ClrName}' is bound to "
-                    + $"both a contained property and traversal on '{this.ApiName}'";
+                var code = ApiSchemaCompilationCode.ApiRelationshipTraversalClrMemberConflict;
+                var description = $"CLR navigation member '{clrNavigationMember.ClrName}' is bound to both a contained property and traversal on '{this.ApiName}'";
                 var remediation = "Bind the traversal to a distinct CLR member";
 
                 context.AddIssue(apiPath, severity, code, description, remediation);
@@ -448,8 +447,8 @@ public sealed partial class ApiObjectType
         if (this.ApiProperties.Length == 0)
         {
             var severity = ApiSchemaCompilationSeverity.Warning;
-            var code = ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties;
-            var description = $"{nameof(this.ApiProperties)} is null or empty";
+            var code = ApiSchemaCompilationCode.ApiObjectTypeMissingProperties;
+            var description = $"{nameof(this.ApiProperties)} must contain at least one property";
             var remediation = $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"{this.ApiName}\"]";
 
             context.AddIssue(severity, code, description, remediation);

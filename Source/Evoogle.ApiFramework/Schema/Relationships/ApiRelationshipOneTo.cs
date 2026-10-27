@@ -99,8 +99,8 @@ public abstract class ApiRelationshipOneTo : ApiRelationship
         if (this.ApiPrincipalEnd is null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiRelationshipNullPrincipalEnd;
-            var description = $"{nameof(this.ApiPrincipalEnd)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiRelationshipMissingPrincipalEnd;
+            var description = $"{nameof(this.ApiPrincipalEnd)} is required";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}";
 
             context.AddIssue(severity, code, description, remediation);
@@ -116,8 +116,8 @@ public abstract class ApiRelationshipOneTo : ApiRelationship
         if (this.ApiDependentEnd is null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiRelationshipNullDependentEnd;
-            var description = $"{nameof(this.ApiDependentEnd)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiRelationshipMissingDependentEnd;
+            var description = $"{nameof(this.ApiDependentEnd)} is required";
             var remediation = $"Provide a valid {nameof(ApiRelationshipDependentEnd)}";
 
             context.AddIssue(severity, code, description, remediation);
@@ -156,7 +156,7 @@ public abstract class ApiRelationshipOneTo : ApiRelationship
             relationshipPath: this.ApiPath,
             principalEnd: principal,
             foreignKey: dependent.ApiForeignKey,
-            countMismatchCode: ApiSchemaCompilationCode.ApiRelationshipOneToInvalidDependentKeyPathsCount,
+            countMismatchCode: ApiSchemaCompilationCode.ApiRelationshipForeignKeyPathCountMismatch,
             foreignKeyPath: foreignKeyPath,
             principalCountLabel: principalKeyDesc,
             principalCompatibilityLabel: $"principal end {principalKeyDesc}",
@@ -176,7 +176,7 @@ public abstract class ApiRelationshipOneTo : ApiRelationship
         }
 
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
+        var code = ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyRequiresForeignKey;
         var description = $"Cannot resolve {explicitKeyTarget} '{principal.ApiPrincipalKeyName}' because this relationship has no foreign key binding";
         var remediation = $"Declare {nameof(this.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)} or remove {explicitKeyTarget}";
 

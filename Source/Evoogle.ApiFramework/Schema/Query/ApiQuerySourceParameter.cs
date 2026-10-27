@@ -126,7 +126,7 @@ public sealed class ApiQuerySourceParameter
 
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidPresence;
+        var code = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidApiPresence;
         var description = jsonEnumFinding?.DescribeProblem() ?? $"{nameof(this.ApiPresence)} is invalid";
         var remediation = $"Specify {ApiPresence.Optional} or {ApiPresence.Required} for {nameof(this.ApiPresence)}";
 
@@ -139,8 +139,8 @@ public sealed class ApiQuerySourceParameter
         {
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiQuerySourceParameterTypeUnspecified;
-            var description = $"{nameof(this.ApiType)} was not specified";
+            var code = ApiSchemaCompilationCode.ApiQuerySourceParameterMissingType;
+            var description = $"{nameof(this.ApiType)} is required";
             var remediation = $"Specify a valid {nameof(this.ApiType)}";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
@@ -158,7 +158,7 @@ public sealed class ApiQuerySourceParameter
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidApiName;
-            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var description = $"{nameof(this.ApiName)} must contain a non-whitespace value";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
@@ -175,7 +175,7 @@ public sealed class ApiQuerySourceParameter
 
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidNullability;
+        var code = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidApiNullability;
         var description = jsonEnumFinding?.DescribeProblem() ?? $"{nameof(this.ApiNullability)} is invalid";
         var remediation = $"Specify {ApiNullability.Nullable} or {ApiNullability.NonNullable} for {nameof(this.ApiNullability)}";
 

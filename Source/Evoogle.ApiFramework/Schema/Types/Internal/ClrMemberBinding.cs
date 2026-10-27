@@ -140,7 +140,7 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
         {
             var apiPath = bindingApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ClrMemberIncompatible;
+            var code = ApiSchemaCompilationCode.ClrMemberBindingIncompatible;
             var description = $"{referenceName} '{clrMemberInfo.Name}' has unsupported by-ref-like CLR type '{clrMemberType.SafeToName()}'";
             var remediation = "Bind a CLR member whose value can be boxed and accessed through object";
 
@@ -152,7 +152,7 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
         {
             var apiPath = bindingApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ClrMemberIncompatible;
+            var code = ApiSchemaCompilationCode.ClrMemberBindingIncompatible;
             var description = $"{referenceName} '{clrMemberInfo.Name}' is an indexer, which is not supported";
             var remediation = "Bind a non-indexed public instance CLR property or field";
 
@@ -168,9 +168,9 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
         {
             var apiPath = bindingApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ClrMemberIncompatible;
-            var description = $"{referenceName} '{clrMemberInfo.Name}' could not create a CLR member accessor: " + GetRootCauseMessage(exception);
-            var remediation = "Bind a readable or writable public instance CLR property or field";
+            var code = ApiSchemaCompilationCode.ClrMemberBindingIncompatible;
+            var description = $"{referenceName} '{clrMemberInfo.Name}' cannot be bound for CLR member access: " + GetRootCauseMessage(exception);
+            var remediation = "Bind a supported public instance CLR property or field";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
             return;
@@ -189,7 +189,7 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
                 : requiresRead ? "readable" : "writable";
             var apiPath = bindingApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ClrMemberIncompatible;
+            var code = ApiSchemaCompilationCode.ClrMemberBindingIncompatible;
             var description = $"{referenceName} '{clrMemberInfo.Name}' must be {requiredAccess}";
             var remediation = $"Bind a {requiredAccess} public instance CLR property or field";
 
@@ -239,10 +239,10 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
         {
             var apiPath = bindingApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ClrMemberInvalidGetter;
+            var code = ApiSchemaCompilationCode.ClrMemberReadAccessFailed;
             var rootCause = GetGetterRootCauseMessage(exception, clrMemberAccessor.MemberType);
-            var description = $"Failed to compile getter for {referenceName} '{clrMemberAccessor.MemberName}': " + rootCause;
-            var remediation = $"Verify that CLR member '{clrMemberAccessor.MemberName}' is readable and can be used in expression trees";
+            var description = $"{referenceName} '{clrMemberAccessor.MemberName}' cannot be read by the framework: " + rootCause;
+            var remediation = $"Bind a readable CLR member that supports expression-based access";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
             return false;
@@ -272,9 +272,9 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
         {
             var apiPath = bindingApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ClrMemberInvalidSetter;
-            var description = $"Failed to compile setter for {referenceName} '{clrMemberAccessor.MemberName}': " + GetRootCauseMessage(exception);
-            var remediation = $"Verify that CLR member '{clrMemberAccessor.MemberName}' is writable and can be used in expression trees";
+            var code = ApiSchemaCompilationCode.ClrMemberWriteAccessFailed;
+            var description = $"{referenceName} '{clrMemberAccessor.MemberName}' cannot be written by the framework: " + GetRootCauseMessage(exception);
+            var remediation = $"Bind a writable CLR member that supports expression-based access";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
             return false;

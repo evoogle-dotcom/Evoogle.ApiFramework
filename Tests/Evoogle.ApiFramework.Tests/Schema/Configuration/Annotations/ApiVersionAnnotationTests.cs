@@ -189,7 +189,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         MultipleMembers,
         TypeAndMember,
         MissingProperty,
-        OptionalProperty,
+        NullableProperty,
         MemberClrTypeSpecified,
         NullableRepositoryType,
         UnregisteredScalar
@@ -237,8 +237,8 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                 InvalidCase.MissingProperty => builder
                     .AddObject<MissingPropertyVersion>()
                     .UseDefaultAnnotations(),
-                InvalidCase.OptionalProperty => builder
-                    .AddObject<OptionalPropertyVersion>(objectType => objectType
+                InvalidCase.NullableProperty => builder
+                    .AddObject<NullablePropertyVersion>(objectType => objectType
                         .AddProperty(x => x.Version, property => property.AsNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.MemberClrTypeSpecified => builder
@@ -477,19 +477,19 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Type annotation requires a repository CLR type",
             TestCase = InvalidCase.MissingClrRepositoryType,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
         },
         new InvalidTest
         {
-            Name = "Multiple member annotations produce a version conflict",
+            Name = "Multiple member annotations produce multiple version declarations",
             TestCase = InvalidCase.MultipleMembers,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationVersionConflict
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationMultipleVersionDeclarations
         },
         new InvalidTest
         {
-            Name = "Type and member annotations produce a version conflict",
+            Name = "Type and member annotations produce multiple version declarations",
             TestCase = InvalidCase.TypeAndMember,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationVersionConflict
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationMultipleVersionDeclarations
         },
         new InvalidTest
         {
@@ -499,15 +499,15 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         },
         new InvalidTest
         {
-            Name = "Member annotation does not make its API property required",
-            TestCase = InvalidCase.OptionalProperty,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiVersionDefinitionOptionalProperty
+            Name = "Member annotation produces a nullable version property",
+            TestCase = InvalidCase.NullableProperty,
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiVersionDefinitionNullableProperty
         },
         new InvalidTest
         {
             Name = "Member annotation rejects a repository CLR type",
             TestCase = InvalidCase.MemberClrTypeSpecified,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
         },
         new InvalidTest
         {
@@ -519,7 +519,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Member annotation does not register its scalar type",
             TestCase = InvalidCase.UnregisteredScalar,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiPropertyTypeReferenceUnresolved
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiPropertyUnresolvedType
         }
     ];
 
@@ -535,7 +535,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                     TestCase = testCase,
                     CompilationCodeExpected = testCase == ReaderContractCase.ReaderThrows
                         ? ApiSchemaCompilationCode.ApiAnnotationReaderExecutionFailed
-                        : ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
+                        : ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
                 }
             )
         )
@@ -652,7 +652,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         public int Version { get; init; }
     }
 
-    private sealed class OptionalPropertyVersion
+    private sealed class NullablePropertyVersion
     {
         [ApiVersion]
         public int Version { get; init; }

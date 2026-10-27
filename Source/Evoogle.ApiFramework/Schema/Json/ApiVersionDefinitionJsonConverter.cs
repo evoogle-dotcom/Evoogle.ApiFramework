@@ -164,7 +164,7 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
         {
             throw new JsonException
             (
-                $"{nameof(ApiVersionDefinition.ApiPropertyReference)} must not be null."
+                $"{nameof(ApiVersionDefinition.ApiPropertyReference)} is required."
             );
         }
 

@@ -2005,7 +2005,7 @@ public partial class ApiAnnotationTests
         {
             Name = $"Build rejects an unresolved type-level {nameof(ApiKeyAttribute)} path",
             ExceptionTypeExpected = typeof(ApiSchemaCompilationException),
-            ExceptionMessagePatternExpected = "*ApiKeyPathSegmentUnresolvedApiProperty*",
+            ExceptionMessagePatternExpected = "*ApiKeyPathSegmentUnresolvedProperty*",
             ApiSchemaActualBuildExpression = static () =>
                 ApiAnnotationTestsFactory.BuildWithUnresolvedTypeLevelKeyPathAnnotation()
         },

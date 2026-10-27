@@ -182,7 +182,7 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
 
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ClrMemberIncompatible;
+        var code = ApiSchemaCompilationCode.ClrMemberBindingIncompatible;
         var description = $"CLR navigation member '{this.ClrName}' is incompatible with '{apiTargetObjectType.ClrType}'";
         var remediation = "Bind a readable and writable member with the traversal's target and cardinality";
 

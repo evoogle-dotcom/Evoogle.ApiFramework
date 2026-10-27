@@ -225,7 +225,7 @@ public partial class ApiSchemaTests
                 ),
                 new EnumDiagnostic
                 (
-                    ApiSchemaCompilationCode.ApiCollectionItemNullableNonNullableMismatch,
+                    ApiSchemaCompilationCode.ApiCollectionItemNullabilityMismatch,
                     ApiSchemaCompilationSeverity.Warning,
                     "ApiSchema[\"Commerce\"].ApiObjectType[\"Category\"].ApiProperty[\"Children\"]"
                 )
@@ -371,7 +371,10 @@ public partial class ApiSchemaTests
     private static EnumDiagnostic[] SimpleEnumIssues(ApiSchemaCompilationCode code, string apiPath) =>
     [
         new EnumDiagnostic(code, ApiSchemaCompilationSeverity.Error, apiPath),
-        new EnumDiagnostic(ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties, ApiSchemaCompilationSeverity.Warning, "ApiSchema[\"Simple\"].ApiObjectType[\"Empty\"]")
+        new EnumDiagnostic(
+            ApiSchemaCompilationCode.ApiObjectTypeMissingProperties,
+            ApiSchemaCompilationSeverity.Warning,
+            "ApiSchema[\"Simple\"].ApiObjectType[\"Empty\"]")
     ];
 
     private static JsonObject CreateSchemaJson(ApiSchemaKind schemaKind)

@@ -245,12 +245,9 @@ public sealed class ApiKeyPath
         }
 
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiKeyPathUninferableRootType;
-        var description = $"{nameof(this.ApiRootObjectTypeReference)} was not specified and no "
-            + $"enclosing {nameof(ApiObjectType)} or {nameof(ApiRelationshipElement)} provided an "
-            + "inferred root";
-        var remediation = $"Specify an explicit {nameof(this.ApiRootObjectTypeReference)} when "
-            + $"creating this {nameof(ApiKeyPath)}";
+        var code = ApiSchemaCompilationCode.ApiKeyPathMissingRootType;
+        var description = $"No root object type is available from {nameof(this.ApiRootObjectTypeReference)} or an enclosing {nameof(ApiObjectType)} or {nameof(ApiRelationshipElement)}";
+        var remediation = $"Specify an explicit {nameof(this.ApiRootObjectTypeReference)} when creating this {nameof(ApiKeyPath)}";
 
         context.AddIssue(severity, code, description, remediation);
     }
@@ -285,10 +282,9 @@ public sealed class ApiKeyPath
         }
 
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiKeyPathEmptySegments;
+        var code = ApiSchemaCompilationCode.ApiKeyPathMissingSegments;
         var description = $"{nameof(this.ApiSegments)} must contain at least one property reference";
-        var remediation = $"Specify at least one {nameof(ApiPropertyReference)} when creating an "
-            + $"{nameof(ApiKeyPath)}";
+        var remediation = $"Specify at least one {nameof(ApiPropertyReference)} when creating an {nameof(ApiKeyPath)}";
 
         context.AddIssue(severity, code, description, remediation);
     }
@@ -324,7 +320,7 @@ public sealed class ApiKeyPath
                 {
                     var apiPath = segment.ApiPath;
                     var severity = ApiSchemaCompilationSeverity.Error;
-                    var code = ApiSchemaCompilationCode.ApiKeyPathScalarSegmentInvalidType;
+                    var code = ApiSchemaCompilationCode.ApiKeyPathTerminalSegmentNotScalarType;
                     var description = $"Terminal segment member '{segment.ClrMemberName}' must resolve to a scalar type; found '{apiProperty.ApiType.GetType().Name}'";
                     var remediation = "Change the terminal member to a scalar-typed member or remove extra navigation segments";
 
@@ -335,7 +331,7 @@ public sealed class ApiKeyPath
             {
                 var apiPath = segment.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Error;
-                var code = ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType;
+                var code = ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentNotObjectType;
                 var description = $"Navigation segment member '{segment.ClrMemberName}' must resolve to an object type; found '{apiProperty.ApiType.GetType().Name}'";
                 var remediation = "Change the navigation member to an object-typed member or restructure the path segments";
 

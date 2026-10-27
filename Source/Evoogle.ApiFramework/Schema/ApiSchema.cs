@@ -359,8 +359,8 @@ public sealed class ApiSchema : ApiSchemaElement
         {
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiSchemaInvalidName;
-            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var code = ApiSchemaCompilationCode.ApiSchemaInvalidApiName;
+            var description = $"{nameof(this.ApiName)} must contain a non-whitespace value";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
@@ -677,7 +677,7 @@ public sealed class ApiSchema : ApiSchemaElement
         {
             if (end is null)
             {
-                // Already reported as ApiRelationshipNullPrincipalEnd or ApiRelationshipNullDependentEnd (Error).
+                // Already reported as ApiRelationshipMissingPrincipalEnd or ApiRelationshipMissingDependentEnd (Error).
                 return;
             }
 

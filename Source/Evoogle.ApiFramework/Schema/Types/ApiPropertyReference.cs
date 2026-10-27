@@ -166,9 +166,9 @@ public sealed class ApiPropertyReference : IEquatable<ApiPropertyReference>
     private void AddInvalidFormIssue(ApiSchemaCompilationContext context)
     {
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiPropertyReferenceInvalidForm;
-        var description = $"An API property reference must specify either {nameof(this.ApiName)} or {nameof(this.ClrName)}";
-        var remediation = $"Specify either {nameof(this.ApiName)}, or {nameof(this.ClrName)}, but not both";
+        var code = ApiSchemaCompilationCode.ApiPropertyReferenceInvalidIdentity;
+        var description = $"An API property reference must have exactly one identity: {nameof(this.ApiName)} or {nameof(this.ClrName)}";
+        var remediation = $"Specify either {nameof(this.ApiName)} or {nameof(this.ClrName)}, but not both";
 
         context.AddIssue(severity, code, description, remediation);
     }

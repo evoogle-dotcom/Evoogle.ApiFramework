@@ -143,8 +143,8 @@ public sealed class ApiQuerySource
         {
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiQuerySourceOutputTypeUnspecified;
-            var description = $"{nameof(this.ApiOutputType)} was not specified";
+            var code = ApiSchemaCompilationCode.ApiQuerySourceMissingOutputType;
+            var description = $"{nameof(this.ApiOutputType)} is required";
             var remediation = $"Specify a valid {nameof(this.ApiOutputType)}";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
@@ -161,7 +161,7 @@ public sealed class ApiQuerySource
         {
             var findingApiPath = this.ApiPath;
             var findingSeverity = ApiSchemaCompilationSeverity.Error;
-            var findingCode = ApiSchemaCompilationCode.ApiQuerySourceInvalidComposition;
+            var findingCode = ApiSchemaCompilationCode.ApiQuerySourceInvalidApiOutputComposition;
             var findingDescription = jsonEnumFinding.DescribeProblem();
             var findingRemediation = $"Specify a valid {nameof(this.ApiOutputComposition)} value";
 
@@ -179,8 +179,8 @@ public sealed class ApiQuerySource
         {
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiQuerySourceInvalidComposition;
-            var description = $"{nameof(this.ApiOutputComposition)} is unknown or incompatible with the output type";
+            var code = ApiSchemaCompilationCode.ApiQuerySourceInvalidApiOutputComposition;
+            var description = $"{nameof(this.ApiOutputComposition)} is invalid for the configured output type";
             var remediation = $"Use supported {nameof(this.ApiOutputComposition)} flags; filtering, ordering, and pagination require a collection";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
@@ -195,7 +195,7 @@ public sealed class ApiQuerySource
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiQuerySourceInvalidApiName;
-            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var description = $"{nameof(this.ApiName)} must contain a non-whitespace value";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
@@ -212,7 +212,7 @@ public sealed class ApiQuerySource
 
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiQuerySourceInvalidOutputNullability;
+        var code = ApiSchemaCompilationCode.ApiQuerySourceInvalidApiOutputNullability;
         var description = jsonEnumFinding?.DescribeProblem() ?? $"{nameof(this.ApiOutputNullability)} is invalid";
         var remediation = $"Specify {ApiNullability.Nullable} or {ApiNullability.NonNullable} for {nameof(this.ApiOutputNullability)}";
 

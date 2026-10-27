@@ -125,8 +125,8 @@ public sealed class ApiEnumType
         if (this.ApiEnumValues.Length == 0)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiEnumTypeNullOrEmptyValues;
-            var description = $"{nameof(this.ApiEnumValues)} must not be null or empty";
+            var code = ApiSchemaCompilationCode.ApiEnumTypeMissingValues;
+            var description = $"{nameof(this.ApiEnumValues)} must contain at least one value";
             var remediation = $"Define at least one {nameof(ApiEnumValue)}";
 
             context.AddIssue(severity, code, description, remediation);
@@ -153,9 +153,9 @@ public sealed class ApiEnumType
         if (!TypeReflection.IsEnum(this.ClrType))
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiEnumTypeInvalidClrType;
-            var description = $"{nameof(this.ClrType)} '{this.ClrType.SafeToName()}' must be a CLR Enum";
-            var remediation = $"Set {nameof(this.ClrType)} to a CLR Enum type";
+            var code = ApiSchemaCompilationCode.ApiEnumTypeClrTypeNotEnum;
+            var description = $"{nameof(this.ClrType)} '{this.ClrType.SafeToName()}' does not represent a CLR enum type";
+            var remediation = $"Set {nameof(this.ClrType)} to a CLR enum type";
 
             context.AddIssue(severity, code, description, remediation);
         }

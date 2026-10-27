@@ -135,8 +135,7 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
         var apiPath = referenceApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ClrMemberReferenceUnresolved;
-        var description = $"{referenceName} could not resolve CLR " +
-            $"{this.ClrKind.ToString().ToLowerInvariant()} '{this.ClrName}' on CLR type '{clrObjectType}'";
+        var description = $"{referenceName} could not resolve CLR {this.ClrKind.ToString().ToLowerInvariant()} '{this.ClrName}' on CLR type '{clrObjectType}'";
         var remediation = $"Reference an existing public instance CLR {this.ClrKind.ToString().ToLowerInvariant()}";
 
         context.AddIssue(apiPath, severity, code, description, remediation);
@@ -157,8 +156,7 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
         var apiPath = referenceApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ClrMemberReferenceUnresolved;
-        var description = $"{referenceName} could not resolve CLR {this.ClrKind.ToString().ToLowerInvariant()} " +
-            $"'{this.ClrName}' on CLR type '{clrObjectType}': {exception.GetBaseException().Message.TrimEnd('.')}";
+        var description = $"{referenceName} could not resolve CLR {this.ClrKind.ToString().ToLowerInvariant()} '{this.ClrName}' on CLR type '{clrObjectType}': {exception.GetBaseException().Message.TrimEnd('.')}";
         var remediation = $"Reference an unambiguous public instance CLR {this.ClrKind.ToString().ToLowerInvariant()}";
 
         context.AddIssue(apiPath, severity, code, description, remediation);
@@ -181,8 +179,7 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
             var apiPath = validationApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrKind;
-            var description = _clrKindFinding?.DescribeProblem()
-                ?? $"{nameof(this.ClrKind)} must be a valid {nameof(ClrMemberKind)} value";
+            var description = _clrKindFinding?.DescribeProblem() ?? $"{nameof(this.ClrKind)} must be a valid {nameof(ClrMemberKind)} value";
             var remediation = $"Specify a valid {nameof(this.ClrKind)} value";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
@@ -200,7 +197,7 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
             var apiPath = validationApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrName;
-            var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
+            var description = $"{nameof(this.ClrName)} must contain a non-whitespace value";
             var remediation = $"Specify a valid {nameof(this.ClrName)} value";
 
             context.AddIssue(apiPath, severity, code, description, remediation);

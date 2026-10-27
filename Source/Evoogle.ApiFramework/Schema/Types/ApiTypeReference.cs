@@ -221,12 +221,9 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
     private void AddInvalidFormIssue(ApiSchemaCompilationContext context)
     {
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiTypeReferenceInvalidForm;
-        var description = $"A type reference must specify exactly one complete API-named reference "
-            + $"({nameof(this.ApiKind)} and {nameof(this.ApiName)}) or CLR reference "
-            + $"({nameof(this.ClrType)})";
-        var remediation = $"Specify either {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or "
-            + $"{nameof(this.ClrType)}, but not both";
+        var code = ApiSchemaCompilationCode.ApiTypeReferenceInvalidIdentity;
+        var description = $"A type reference must have exactly one complete identity: an API identity ({nameof(this.ApiKind)} and {nameof(this.ApiName)}) or CLR reference ({nameof(this.ClrType)})";
+        var remediation = $"Specify either {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}, but not both";
 
         context.AddIssue(severity, code, description, remediation);
     }
@@ -256,8 +253,7 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
         {
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiTypeReferenceInvalidApiKind;
-            var description = _apiKindFinding?.DescribeProblem()
-                ?? $"{nameof(this.ApiKind)} must be a valid {nameof(ApiTypeKind)} value";
+            var description = _apiKindFinding?.DescribeProblem() ?? $"{nameof(this.ApiKind)} must be a valid {nameof(ApiTypeKind)} value";
             var remediation = $"Specify a valid {nameof(this.ApiKind)} value";
 
             context.AddIssue(severity, code, description, remediation);

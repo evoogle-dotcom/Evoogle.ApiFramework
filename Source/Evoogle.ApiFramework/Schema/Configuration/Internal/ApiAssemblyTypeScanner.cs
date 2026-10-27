@@ -44,8 +44,8 @@ internal static class ApiAssemblyTypeScanner
             issues.Add(CreateAssemblyIssue(
                 assembly,
                 exception,
-                $"Assembly type discovery for '{GetAssemblyName(assembly)}' was incomplete.",
-                "Resolve the assembly loader failures before building the API schema."));
+                $"Assembly type discovery for '{GetAssemblyName(assembly)}' was incomplete",
+                "Resolve the assembly loader failures before building the API schema"));
         }
         catch (Exception exception)
         {
@@ -53,8 +53,8 @@ internal static class ApiAssemblyTypeScanner
             issues.Add(CreateAssemblyIssue(
                 assembly,
                 exception,
-                $"Assembly type discovery for '{GetAssemblyName(assembly)}' failed.",
-                "Resolve the assembly discovery failure before building the API schema."));
+                $"Assembly type discovery for '{GetAssemblyName(assembly)}' failed",
+                "Resolve the assembly discovery failure before building the API schema"));
         }
 
         var types = new List<Type>(exportedTypes.Length);
@@ -83,10 +83,10 @@ internal static class ApiAssemblyTypeScanner
                 issues.Add(CreateAssemblyIssue(
                     type.FullName ?? type.Name,
                     exception,
-                    $"Assembly type discovery filter evaluation failed for CLR type " +
-                        $"'{type.FullName ?? type.Name}'.",
+                    $"Assembly type discovery filter failed for CLR type " +
+                        $"'{type.FullName ?? type.Name}'",
                     "Correct the assembly discovery filter so it can evaluate " +
-                        "every candidate type."));
+                        "every candidate type"));
             }
         }
 

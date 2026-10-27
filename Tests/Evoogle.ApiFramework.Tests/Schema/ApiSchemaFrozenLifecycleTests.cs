@@ -147,13 +147,13 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             this.ErrorResult.HasErrors.Should().BeTrue();
             this.ErrorResult.Errors.Should().Contain
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidName
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidApiName
             );
             this.Exception.Should().NotBeNull();
             this.Exception!.Result.Schema.Should().BeNull();
             this.Exception.Result.Errors.Should().Contain
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidName
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidApiName
             );
         }
         #endregion
@@ -262,7 +262,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             this.Results.Should().OnlyContain(result => result.Schema == null);
             this.Results[0].Errors.Should().ContainSingle
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionUnsupported
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionNotFreezable
             );
             this.Results[1].Errors.Should().ContainSingle
             (

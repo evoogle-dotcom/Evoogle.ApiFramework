@@ -101,7 +101,7 @@ public sealed class ApiKeyPathSegment(ApiPropertyReference apiPropertyReference)
         (
             apiObjectType,
             context,
-            ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedApiProperty,
+            ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedProperty,
             "Key path property reference"
         );
     }

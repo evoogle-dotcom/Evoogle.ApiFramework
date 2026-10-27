@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 using Evoogle.Json;
 using Evoogle.XUnit;
@@ -28,7 +29,10 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
 
         #region XUnitTest Methods
         protected override void Arrange()
-        { }
+        {
+            this.WriteLine($"Compilation Code: {this.Code}");
+            this.WriteLine($"Expected JSON:    \"{this.ExpectedValue}\"");
+        }
 
         protected override void Act()
         {
@@ -36,6 +40,9 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
             options.Converters.Add(new EnumJsonConverter<ApiSchemaCompilationCode>());
 
             this.ActualJson = JsonSerializer.Serialize(this.Code, options);
+
+            this.WriteLine();
+            this.WriteLine($"Actual JSON: {this.ActualJson}");
         }
 
         protected override void Assert() => this.ActualJson.Should().Be
@@ -49,64 +56,11 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
     #endregion
 
     #region Theory Data
-    public static TheoryData<IXUnitTest> SerializationTheoryData => new()
-    {
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiKeyDefinitionNullOrEmptyPaths,
-            "API_KEY_DEFINITION_NULL_OR_EMPTY_PATHS"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiNamedKeyDefinitionInvalidApiName,
-            "API_NAMED_KEY_DEFINITION_INVALID_API_NAME"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyApiName,
-            "API_OBJECT_TYPE_DUPLICATE_KEY_API_NAME"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiVersionDefinitionNullClrType,
-            "API_VERSION_DEFINITION_NULL_CLR_TYPE"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiVersionDefinitionNullableClrType,
-            "API_VERSION_DEFINITION_NULLABLE_CLR_TYPE"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedScalarType,
-            "API_VERSION_DEFINITION_UNRESOLVED_SCALAR_TYPE"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedProperty,
-            "API_VERSION_DEFINITION_UNRESOLVED_PROPERTY"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiVersionDefinitionNonScalarProperty,
-            "API_VERSION_DEFINITION_NON_SCALAR_PROPERTY"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiVersionDefinitionClrTypeMismatch,
-            "API_VERSION_DEFINITION_CLR_TYPE_MISMATCH"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiVersionDefinitionOptionalProperty,
-            "API_VERSION_DEFINITION_OPTIONAL_PROPERTY"
-        ),
-        CreateSerializationTest
-        (
-            ApiSchemaCompilationCode.ApiRelationshipEndUnresolvedKey,
-            "API_RELATIONSHIP_END_UNRESOLVED_KEY"
-        )
-    };
+    public static TheoryData<IXUnitTest> SerializationTheoryData => new
+    (
+        Enum.GetValues<ApiSchemaCompilationCode>()
+            .Select(code => (IXUnitTest)CreateSerializationTest(code, GetExpectedSerializedValue(code)))
+    );
     #endregion
 
     #region Test Methods
@@ -126,5 +80,13 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
         Code = code,
         ExpectedValue = expectedValue
     };
+
+    private static string GetExpectedSerializedValue(ApiSchemaCompilationCode code)
+    {
+        var value = code.ToString();
+        value = Regex.Replace(value, "([a-z0-9])([A-Z])", "$1_$2");
+        value = Regex.Replace(value, "([A-Z])([A-Z][a-z])", "$1_$2");
+        return value.ToUpperInvariant();
+    }
     #endregion
 }

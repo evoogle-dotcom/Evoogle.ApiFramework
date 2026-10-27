@@ -51,7 +51,7 @@ public abstract class ApiNamedType : ApiType
         {
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiNamedTypeInvalidApiName;
-            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var description = $"{nameof(this.ApiName)} must contain a non-whitespace value";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(severity, code, description, remediation);

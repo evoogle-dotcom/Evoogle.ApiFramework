@@ -15,19 +15,19 @@ public partial class ApiSchemaTests
     #region Test Types
     public ref struct TypesWithRefStructMembers
     {
-        // This will trigger ClrMemberIncompatible
+        // This will trigger ClrMemberBindingIncompatible
         public Span<byte> SpanField;
 
-        // This will trigger ClrMemberIncompatible
+        // This will trigger ClrMemberBindingIncompatible
         public Span<byte> SpanProperty { get; set; }
     }
 
     public unsafe class TypesWithPointerMembers
     {
-        // This will trigger ClrMemberInvalidGetter/Setter
+        // This will trigger ClrMemberReadAccessFailed/Setter
         public byte* PointerField;
 
-        // This will trigger ClrMemberInvalidGetter/Setter
+        // This will trigger ClrMemberReadAccessFailed/Setter
         public byte* PointerProperty { get; set; }
     }
 
@@ -198,8 +198,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiCollectionTypeItemTypeUnspecified,
-                    description: $"{nameof(ApiCollectionType.ApiItemType)} was not specified",
+                    code: ApiSchemaCompilationCode.ApiCollectionTypeMissingItemType,
+                    description: $"{nameof(ApiCollectionType.ApiItemType)} is required",
                     remediation: $"Specify a valid {nameof(ApiCollectionType.ApiItemType)}"
                 ),
             ]
@@ -248,7 +248,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiCollectionTypeItemTypeReferenceUnresolved,
+                    code: ApiSchemaCompilationCode.ApiCollectionTypeUnresolvedItemType,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeReference.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeReference.ApiName)}='String'",
                     remediation: $"Verify that a compatible type is declared in the schema for {nameof(ApiTypeReference.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeReference.ApiName)}='String'"
                 ),
@@ -302,7 +302,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiEnumType)}",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiNamedTypeInvalidApiName,
-                    description: $"{nameof(ApiEnumType.ApiName)} must not be null, empty, or whitespace",
+                    description: $"{nameof(ApiEnumType.ApiName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ApiEnumType.ApiName)} value"
                 ),
             ]
@@ -349,8 +349,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiTypeNullClrType,
-                    description: $"{nameof(ApiEnumType.ClrType)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiTypeMissingClrType,
+                    description: $"{nameof(ApiEnumType.ClrType)} is required",
                     remediation: $"Specify a valid {nameof(ApiEnumType.ClrType)}"
                 ),
             ]
@@ -398,9 +398,9 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiEnumTypeInvalidClrType,
-                    description: $"{nameof(ApiEnumType.ClrType)} 'String' must be a CLR Enum",
-                    remediation: $"Set {nameof(ApiEnumType.ClrType)} to a CLR Enum type"
+                    code: ApiSchemaCompilationCode.ApiEnumTypeClrTypeNotEnum,
+                    description: $"{nameof(ApiEnumType.ClrType)} 'String' does not represent a CLR enum type",
+                    remediation: $"Set {nameof(ApiEnumType.ClrType)} to a CLR enum type"
                 ),
             ]
         },
@@ -430,8 +430,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiEnumTypeNullOrEmptyValues,
-                    description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
+                    code: ApiSchemaCompilationCode.ApiEnumTypeMissingValues,
+                    description: $"{nameof(ApiEnumType.ApiEnumValues)} must contain at least one value",
                     remediation: $"Define at least one {nameof(ApiEnumValue)}"
                 ),
             ]
@@ -463,8 +463,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiEnumTypeNullOrEmptyValues,
-                    description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
+                    code: ApiSchemaCompilationCode.ApiEnumTypeMissingValues,
+                    description: $"{nameof(ApiEnumType.ApiEnumValues)} must contain at least one value",
                     remediation: $"Define at least one {nameof(ApiEnumValue)}"
                 ),
             ]
@@ -669,7 +669,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiEnumValueInvalidApiName,
-                    description: $"{nameof(ApiEnumValue.ApiName)} must not be null, empty, or whitespace",
+                    description: $"{nameof(ApiEnumValue.ApiName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ApiEnumValue.ApiName)} value"
                 ),
             ]
@@ -718,7 +718,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}[\"{nameof(Gender.Male)}\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiEnumValueInvalidClrName,
-                    description: $"{nameof(ApiEnumValue.ClrName)} must not be null, empty, or whitespace",
+                    description: $"{nameof(ApiEnumValue.ClrName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ApiEnumValue.ClrName)} value"
                 ),
             ]
@@ -774,7 +774,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiPropertyInvalidApiName,
-                    description: $"{nameof(ApiProperty.ApiName)} must not be null, empty, or whitespace",
+                    description: $"{nameof(ApiProperty.ApiName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ApiProperty.ApiName)} value"
                 ),
             ]
@@ -826,7 +826,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ClrMemberReferenceInvalidClrName,
-                    description: $"{nameof(ClrMemberReference.ClrName)} must not be null, empty, or whitespace",
+                    description: $"{nameof(ClrMemberReference.ClrName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ClrMemberReference.ClrName)} value"
                 ),
             ]
@@ -1023,8 +1023,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyTypeUnspecified,
-                    description: $"{nameof(ApiProperty.ApiType)} was not specified",
+                    code: ApiSchemaCompilationCode.ApiPropertyMissingType,
+                    description: $"{nameof(ApiProperty.ApiType)} is required",
                     remediation: $"Specify a valid {nameof(ApiProperty.ApiType)}"
                 ),
             ]
@@ -1097,7 +1097,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ClrMemberIncompatible,
+                    code: ApiSchemaCompilationCode.ClrMemberBindingIncompatible,
                     description: $"API property CLR value member reference '{nameof(TypesWithRefStructMembers.SpanField)}' has unsupported by-ref-like CLR type '{typeof(Span<byte>).SafeToName()}'",
                     remediation: "Bind a CLR member whose value can be boxed and accessed through object"
                 ),
@@ -1105,7 +1105,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ClrMemberIncompatible,
+                    code: ApiSchemaCompilationCode.ClrMemberBindingIncompatible,
                     description: $"API property CLR value member reference '{nameof(TypesWithRefStructMembers.SpanProperty)}' has unsupported by-ref-like CLR type '{typeof(Span<byte>).SafeToName()}'",
                     remediation: "Bind a CLR member whose value can be boxed and accessed through object"
                 ),
@@ -1151,7 +1151,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyTypeReferenceUnresolved,
+                    code: ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeReference.ApiKind)}='Scalar' and {nameof(ApiTypeReference.ApiName)}='String'",
                     remediation: $"Verify that a compatible type is declared in the schema for {nameof(ApiTypeReference.ApiKind)}='Scalar' and {nameof(ApiTypeReference.ApiName)}='String'"
                 ),
@@ -1195,7 +1195,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiPropertyTypeReferenceUnresolved,
+                    code: ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeReference.ClrType)}='{nameof(String)}'",
                     remediation: $"Verify that a compatible type is declared in the schema for {nameof(ApiTypeReference.ClrType)}='{nameof(String)}'"
                 ),
@@ -1237,8 +1237,10 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiTypeExpressionInvalidForm,
-                    description: $"A type expression must contain exactly one of {nameof(ApiTypeExpression.ApiInlineType)} or {nameof(ApiTypeExpression.ApiTypeReference)}",
+                    code: ApiSchemaCompilationCode.ApiTypeExpressionInvalidDefinition,
+                    description: $"A type expression must define exactly one type source: " +
+                        $"{nameof(ApiTypeExpression.ApiInlineType)} or " +
+                        $"{nameof(ApiTypeExpression.ApiTypeReference)}",
                     remediation: $"Specify exactly one of {nameof(ApiTypeExpression.ApiInlineType)} or {nameof(ApiTypeExpression.ApiTypeReference)}"
                 ),
             ]
@@ -1246,10 +1248,10 @@ public partial class ApiSchemaTests
 
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiTypeReference)} Form Is Invalid",
+            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiTypeReference)} Identity Is Invalid",
             SourceJson = """
             {
-                "ApiName": "ApiProperty Throws If ApiTypeReference Form Is Invalid",
+                "ApiName": "ApiProperty Throws If ApiTypeReference Identity Is Invalid",
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [
@@ -1279,9 +1281,12 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiTypeReferenceInvalidForm,
-                    description: $"A type reference must specify exactly one complete API-named reference ({nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)}) or CLR reference ({nameof(ApiTypeReference.ClrType)})",
-                    remediation: $"Specify either {nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)}, or {nameof(ApiTypeReference.ClrType)}, but not both"
+                    code: ApiSchemaCompilationCode.ApiTypeReferenceInvalidIdentity,
+                    description: $"A type reference must have exactly one complete identity: an API identity " +
+                        $"({nameof(ApiTypeReference.ApiKind)} and {nameof(ApiTypeReference.ApiName)}) or CLR " +
+                        $"reference ({nameof(ApiTypeReference.ClrType)})",
+                    remediation: $"Specify either {nameof(ApiTypeReference.ApiKind)} and " +
+                        $"{nameof(ApiTypeReference.ApiName)}, or {nameof(ApiTypeReference.ClrType)}, but not both"
                 ),
             ]
         },
@@ -1343,33 +1348,41 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ClrMemberInvalidGetter,
-                    description: $"Failed to compile getter for API property CLR value member reference '{nameof(TypesWithPointerMembers.PointerField)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
-                    remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerField)}' is readable and can be used in expression trees"
+                    code: ApiSchemaCompilationCode.ClrMemberReadAccessFailed,
+                    description: $"API property CLR value member reference " +
+                        $"'{nameof(TypesWithPointerMembers.PointerField)}' cannot be read by the framework: " +
+                        "No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
+                    remediation: "Bind a readable CLR member that supports expression-based access"
                 ),
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ClrMemberInvalidSetter,
-                    description: $"Failed to compile setter for API property CLR value member reference '{nameof(TypesWithPointerMembers.PointerField)}': Type must not be a pointer type (Parameter 'type')",
-                    remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerField)}' is writable and can be used in expression trees"
+                    code: ApiSchemaCompilationCode.ClrMemberWriteAccessFailed,
+                    description: $"API property CLR value member reference " +
+                        $"'{nameof(TypesWithPointerMembers.PointerField)}' cannot be written by the framework: " +
+                        "Type must not be a pointer type (Parameter 'type')",
+                    remediation: "Bind a writable CLR member that supports expression-based access"
                 ),
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ClrMemberInvalidGetter,
-                    description: $"Failed to compile getter for API property CLR value member reference '{nameof(TypesWithPointerMembers.PointerProperty)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
-                    remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerProperty)}' is readable and can be used in expression trees"
+                    code: ApiSchemaCompilationCode.ClrMemberReadAccessFailed,
+                    description: $"API property CLR value member reference " +
+                        $"'{nameof(TypesWithPointerMembers.PointerProperty)}' cannot be read by the framework: " +
+                        "No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
+                    remediation: "Bind a readable CLR member that supports expression-based access"
                 ),
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ClrMemberInvalidSetter,
-                    description: $"Failed to compile setter for API property CLR value member reference '{nameof(TypesWithPointerMembers.PointerProperty)}': Type must not be a pointer type (Parameter 'type')",
-                    remediation: $"Verify that CLR member '{nameof(TypesWithPointerMembers.PointerProperty)}' is writable and can be used in expression trees"
+                    code: ApiSchemaCompilationCode.ClrMemberWriteAccessFailed,
+                    description: $"API property CLR value member reference " +
+                        $"'{nameof(TypesWithPointerMembers.PointerProperty)}' cannot be written by the framework: " +
+                        "Type must not be a pointer type (Parameter 'type')",
+                    remediation: "Bind a writable CLR member that supports expression-based access"
                 ),
             ]
         },
@@ -1626,7 +1639,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiScalarType)}",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiNamedTypeInvalidApiName,
-                    description: $"{nameof(ApiScalarType.ApiName)} must not be null, empty, or whitespace",
+                    description: $"{nameof(ApiScalarType.ApiName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ApiScalarType.ApiName)} value"
                 ),
             ]
@@ -1656,8 +1669,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiScalarType)}[\"String\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiTypeNullClrType,
-                    description: $"{nameof(ApiScalarType.ClrType)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiTypeMissingClrType,
+                    description: $"{nameof(ApiScalarType.ClrType)} is required",
                     remediation: $"Specify a valid {nameof(ApiScalarType.ClrType)}"
                 ),
             ]
@@ -1686,8 +1699,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiSchema)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiSchemaInvalidName,
-                    description: $"{nameof(ApiSchema.ApiName)} must not be null, empty, or whitespace",
+                    code: ApiSchemaCompilationCode.ApiSchemaInvalidApiName,
+                    description: $"{nameof(ApiSchema.ApiName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ApiSchema.ApiName)} value"
                 )
             ]
@@ -2216,14 +2229,13 @@ public partial class ApiSchemaTests
                         $"{nameof(ApiNamedKeyDefinition)}",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiNamedKeyDefinitionInvalidApiName,
-                    description: $"{nameof(ApiNamedKeyDefinition.ApiName)} must not be null, empty, " +
-                        "or whitespace",
+                    description: $"{nameof(ApiNamedKeyDefinition.ApiName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ApiNamedKeyDefinition.ApiName)} value"
                 ),
             ]
         },
 
-        // ApiKeyDefinition throws if ApiKeyPaths is null or empty
+        // ApiKeyDefinition reports an issue if ApiKeyPaths contains no key paths.
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyDefinition)} Throws If {nameof(ApiKeyDefinition.ApiKeyPaths)} Is Null Or Empty",
@@ -2274,8 +2286,8 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiKeyDefinitionNullOrEmptyPaths,
-                    description: $"{nameof(ApiKeyDefinition.ApiKeyPaths)} must not be null or empty",
+                    code: ApiSchemaCompilationCode.ApiKeyDefinitionMissingPaths,
+                    description: $"{nameof(ApiKeyDefinition.ApiKeyPaths)} must contain at least one key path",
                     remediation: $"Specify at least one {nameof(ApiKeyPath)}"
                 ),
             ]
@@ -2338,7 +2350,7 @@ public partial class ApiSchemaTests
                         $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(DuplicateKeyApiNameObject)}.\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiKeyPathEmptySegments,
+                    code: ApiSchemaCompilationCode.ApiKeyPathMissingSegments,
                     description: $"{nameof(ApiKeyPath.ApiSegments)} must contain at least one property reference",
                     remediation: $"Specify at least one {nameof(ApiPropertyReference)} when creating an "
                         + $"{nameof(ApiKeyPath)}"
@@ -2473,7 +2485,7 @@ public partial class ApiSchemaTests
                         $"[0][\"{nameof(DuplicateKeyApiNameObject)}.MissingId\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"MissingId\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedApiProperty,
+                    code: ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedProperty,
                     description: "Key path property reference could not be resolved for "
                         + "ClrName='MissingId' on object type 'TestObject'",
                     remediation: "Reference a declared ApiProperty on 'TestObject'"
@@ -2553,7 +2565,7 @@ public partial class ApiSchemaTests
                         $"[0][\"{nameof(DuplicateKeyApiNameObject)}.Id.Code\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"Id\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType,
+                    code: ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentNotObjectType,
                     description: $"Navigation segment member 'Id' must resolve to an object type; found '{nameof(ApiScalarType)}'",
                     remediation: "Change the navigation member to an object-typed member or "
                         + "restructure the path segments"
@@ -2650,7 +2662,7 @@ public partial class ApiSchemaTests
                         $"[0][\"{nameof(OwnerType)}.Item\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"Item\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiKeyPathScalarSegmentInvalidType,
+                    code: ApiSchemaCompilationCode.ApiKeyPathTerminalSegmentNotScalarType,
                     description: $"Terminal segment member 'Item' must resolve to a scalar type; found '{nameof(ApiObjectType)}'",
                     remediation: "Change the terminal member to a scalar-typed member or remove "
                         + "extra navigation segments"
@@ -2665,10 +2677,10 @@ public partial class ApiSchemaTests
         // ApiQuerySource throws if the output type is not specified
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiQuerySource)} Throws If {nameof(ApiQuerySource.ApiOutputType)} Is Unspecified",
+            Name = $"{nameof(ApiQuerySource)} Throws If {nameof(ApiQuerySource.ApiOutputType)} Is Missing",
             SourceJson = """
             {
-                "ApiName": "ApiQuerySource Throws If ApiOutputType Is Unspecified",
+                "ApiName": "ApiQuerySource Throws If ApiOutputType Is Missing",
                 "ApiScalarTypes": [],
                 "ApiEnumTypes": [],
                 "ApiObjectTypes": [],
@@ -2687,8 +2699,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiQuerySource)}[\"SearchNames\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiQuerySourceOutputTypeUnspecified,
-                    description: $"{nameof(ApiQuerySource.ApiOutputType)} was not specified",
+                    code: ApiSchemaCompilationCode.ApiQuerySourceMissingOutputType,
+                    description: $"{nameof(ApiQuerySource.ApiOutputType)} is required",
                     remediation: $"Specify a valid {nameof(ApiQuerySource.ApiOutputType)}"
                 ),
             ]
@@ -2697,10 +2709,10 @@ public partial class ApiSchemaTests
         // ApiQuerySourceParameter throws if the type is not specified
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiQuerySourceParameter)} Throws If {nameof(ApiQuerySourceParameter.ApiType)} Is Unspecified",
+            Name = $"{nameof(ApiQuerySourceParameter)} Throws If {nameof(ApiQuerySourceParameter.ApiType)} Is Missing",
             SourceJson = """
             {
-                "ApiName": "ApiQuerySourceParameter Throws If ApiType Is Unspecified",
+                "ApiName": "ApiQuerySourceParameter Throws If ApiType Is Missing",
                 "ApiScalarTypes": [
                     {
                         "ApiKind": "Scalar",
@@ -2733,8 +2745,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiQuerySource)}[\"SearchNames\"].{nameof(ApiQuerySourceParameter)}[\"searchTerm\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiQuerySourceParameterTypeUnspecified,
-                    description: $"{nameof(ApiQuerySourceParameter.ApiType)} was not specified",
+                    code: ApiSchemaCompilationCode.ApiQuerySourceParameterMissingType,
+                    description: $"{nameof(ApiQuerySourceParameter.ApiType)} is required",
                     remediation: $"Specify a valid {nameof(ApiQuerySourceParameter.ApiType)}"
                 ),
             ]
@@ -2797,7 +2809,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiRelationshipInvalidApiName,
-                    description: $"{nameof(ApiRelationship.ApiName)} must not be null, empty, or whitespace",
+                    description: $"{nameof(ApiRelationship.ApiName)} must contain a non-whitespace value",
                     remediation: $"Specify a valid {nameof(ApiRelationship.ApiName)} value"
                 ),
             ]
@@ -2840,8 +2852,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipNullPrincipalEnd,
-                    description: $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiRelationshipMissingPrincipalEnd,
+                    description: $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)} is required",
                     remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}"
                 ),
             ]
@@ -2890,8 +2902,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipNullDependentEnd,
-                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiRelationshipMissingDependentEnd,
+                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)} is required",
                     remediation: $"Provide a valid {nameof(ApiRelationshipDependentEnd)}"
                 ),
             ]
@@ -2936,8 +2948,8 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
                         $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipElementNullObjectTypeReference,
-                    description: $"{nameof(ApiRelationshipElement.ApiObjectTypeReference)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiRelationshipElementMissingObjectType,
+                    description: $"{nameof(ApiRelationshipElement.ApiObjectTypeReference)} is required",
                     remediation: $"Specify a valid {nameof(ApiRelationshipElement.ApiObjectTypeReference)} value"
                 ),
             ]
@@ -3052,7 +3064,7 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
                         $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipEndUnresolvedKey,
+                    code: ApiSchemaCompilationCode.ApiRelationshipEndUnresolvedPrincipalKey,
                     description: "Referenced principal key 'NonExistentKey' could not be found on object type 'RelPrincipal'",
                     remediation: "Use one of the available keys: 'Id'"
                 ),
@@ -3114,7 +3126,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey,
+                    code: ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyRequiresForeignKey,
                     description: $"Cannot resolve {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} 'Id' because this relationship has no foreign key binding",
                     remediation: $"Declare {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)} or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)}"
                 ),
@@ -3174,8 +3186,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyNullPrincipalEndA,
-                    description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyMissingPrincipalEndA,
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)} is required",
                     remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end A"
                 ),
             ]
@@ -3234,8 +3246,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyNullPrincipalEndB,
-                    description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyMissingPrincipalEndB,
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)} is required",
                     remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end B"
                 ),
             ]
@@ -3285,8 +3297,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyNullAssociation,
-                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyMissingAssociation,
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)} is required",
                     remediation: $"Provide a valid {nameof(ApiRelationshipAssociation)} for the association between the two principal ends"
                 ),
             ]
@@ -3373,7 +3385,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyForeignKeyAPathCountMismatch,
                     description: $"Cannot automatically determine the referenced principal key for principal end A: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyA)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} has 2 key path(s), but no key on 'RelPrincipal' has 2 key path(s)",
                     remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} on principal end A explicitly or align the foreign key shape with one of these keys: 'Id'"
                 ),
@@ -3461,7 +3473,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyForeignKeyBPathCountMismatch,
                     description: $"Cannot automatically determine the referenced principal key for principal end B: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyB)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} has 2 key path(s), but no key on 'RelPrincipalB' has 2 key path(s)",
                     remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} on principal end B explicitly or align the foreign key shape with one of these keys: 'Id'"
                 ),
@@ -3529,7 +3541,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipOneToInvalidDependentKeyPathsCount,
+                    code: ApiSchemaCompilationCode.ApiRelationshipForeignKeyPathCountMismatch,
                     description: $"Cannot automatically determine the referenced principal key: {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} has 2 key path(s), but no key on 'RelPrincipal' has 2 key path(s)",
                     remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} explicitly or align the foreign key shape with one of these keys: 'Id'"
                 ),
@@ -3596,7 +3608,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipIncompatiblePrincipalForeignKey,
+                    code: ApiSchemaCompilationCode.ApiRelationshipPrincipalForeignKeyTypeMismatch,
                     description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)} leaf type(s) [String] are not compatible with principal end principal key 'PK_Id' leaf type(s) [Int32]",
                     remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)} paths are ordered to match the principal end's principal key and use compatible scalar types"
                 ),
@@ -3955,8 +3967,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"Source\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiTypeNullClrType,
-                    description: $"{nameof(ApiObjectType.ClrType)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiTypeMissingClrType,
+                    description: $"{nameof(ApiObjectType.ClrType)} is required",
                     remediation: $"Specify a valid {nameof(ApiObjectType.ClrType)}"
                 ),
                 new ApiSchemaCompilationIssue
@@ -4037,8 +4049,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"Target\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiTypeNullClrType,
-                    description: $"{nameof(ApiObjectType.ClrType)} must not be null",
+                    code: ApiSchemaCompilationCode.ApiTypeMissingClrType,
+                    description: $"{nameof(ApiObjectType.ClrType)} is required",
                     remediation: $"Specify a valid {nameof(ApiObjectType.ClrType)}"
                 ),
                 new ApiSchemaCompilationIssue
@@ -4108,7 +4120,7 @@ public partial class ApiSchemaTests
 
     public static TheoryDataRow<IXUnitTest>[] CompileWarnsTheoryData =>
     [
-        // ApiObjectType warns if ApiProperties is null or empty
+        // ApiObjectType warns if ApiProperties contains no properties.
         new CompileWarnsTest
         {
             Name = $"{nameof(ApiObjectType)} Warns If ApiProperties Is Null Or Empty",
@@ -4133,20 +4145,20 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"Empty\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties,
-                    description: $"{nameof(ApiObjectType.ApiProperties)} is null or empty",
+                    code: ApiSchemaCompilationCode.ApiObjectTypeMissingProperties,
+                    description: $"{nameof(ApiObjectType.ApiProperties)} must contain at least one property",
                     remediation: $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"Empty\"]"
                 ),
             ]
         },
 
-        // ApiProperty warns if Required property maps to a nullable CLR member
+        // ApiProperty warns if a non-nullable API property maps to a nullable CLR member.
         new CompileWarnsTest
         {
-            Name = $"{nameof(ApiProperty)} Warns If Required Property Maps To Nullable CLR Member",
+            Name = $"{nameof(ApiProperty)} Warns If NonNullable Property Maps To Nullable CLR Member",
             SourceJson = """
             {
-                "ApiName": "ApiProperty Warns If Required Property Maps To Nullable CLR Member",
+                "ApiName": "ApiProperty Warns If NonNullable Property Maps To Nullable CLR Member",
                 "ApiScalarTypes": [
                     {
                         "ApiKind": "Scalar",
@@ -4181,20 +4193,23 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableProp\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiPropertyNonNullableNullableMismatch,
-                    description: "CLR member 'NullableProp' is nullable but property 'NullableProp' is declared Required",
-                    remediation: "Change CLR member 'NullableProp' to a non-nullable type, or change property 'NullableProp' to Optional"
+                    code: ApiSchemaCompilationCode.ApiPropertyNullabilityMismatch,
+                    description: "CLR member 'NullableProp' is nullable but property 'NullableProp' is " +
+                        "declared non-nullable",
+                    remediation: "Change CLR member 'NullableProp' to a non-nullable type, or change " +
+                        "property 'NullableProp' to nullable"
                 ),
             ]
         },
 
-        // ApiProperty warns if Optional property maps to a non-nullable CLR reference type member
+        // ApiProperty warns if nullable API nullability maps to a non-nullable CLR reference member.
         new CompileWarnsTest
         {
-            Name = $"{nameof(ApiProperty)} Warns If Optional Property Maps To Non-Nullable CLR Reference Type Member",
+            Name = $"{nameof(ApiProperty)} Warns If Nullable Property Maps To Non-Nullable CLR " +
+                "Reference Type Member",
             SourceJson = """
             {
-                "ApiName": "ApiProperty Warns If Optional Property Maps To Non-Nullable CLR Reference Type Member",
+                "ApiName": "ApiProperty Warns If Nullable Property Maps To Non-Nullable CLR Reference Type Member",
                 "ApiScalarTypes": [
                     {
                         "ApiKind": "Scalar",
@@ -4228,20 +4243,22 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableProp\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiPropertyNullableNonNullableMismatch,
-                    description: "CLR member 'NonNullableProp' is non-nullable but property 'NonNullableProp' is declared Optional",
-                    remediation: "Change CLR member 'NonNullableProp' to a nullable reference type, or change property 'NonNullableProp' to Required"
+                    code: ApiSchemaCompilationCode.ApiPropertyNullabilityMismatch,
+                    description: "CLR member 'NonNullableProp' is non-nullable but property " +
+                        "'NonNullableProp' is declared nullable",
+                    remediation: "Change CLR member 'NonNullableProp' to a nullable reference type, " +
+                        "or change property 'NonNullableProp' to non-nullable"
                 ),
             ]
         },
 
-        // ApiProperty warns if Required item nullability maps to a nullable CLR collection element type
+        // ApiProperty warns if non-nullable API item nullability maps to a nullable CLR collection element type.
         new CompileWarnsTest
         {
-            Name = $"{nameof(ApiProperty)} Warns If Required Collection Item Maps To Nullable CLR Element Type",
+            Name = $"{nameof(ApiProperty)} Warns If NonNullable Collection Item Maps To Nullable CLR Element Type",
             SourceJson = """
             {
-                "ApiName": "ApiProperty Warns If Required Collection Item Maps To Nullable CLR Element Type",
+                "ApiName": "ApiProperty Warns If NonNullable Collection Item Maps To Nullable CLR Element Type",
                 "ApiScalarTypes": [
                     {
                         "ApiKind": "Scalar",
@@ -4280,20 +4297,22 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableItemsProp\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiCollectionItemNonNullableNullableMismatch,
-                    description: "CLR collection element in 'NullableItemsProp' is nullable but item is declared Required",
-                    remediation: "Change the CLR element type in 'NullableItemsProp' to non-nullable, or change the item nullability to Optional"
+                    code: ApiSchemaCompilationCode.ApiCollectionItemNullabilityMismatch,
+                    description: "CLR collection element in 'NullableItemsProp' is nullable but item " +
+                        "is declared non-nullable",
+                    remediation: "Change the CLR element type in 'NullableItemsProp' to non-nullable, " +
+                        "or change the item nullability to nullable"
                 ),
             ]
         },
 
-        // ApiProperty warns if Optional item nullability maps to a non-nullable CLR collection element reference type
+        // ApiProperty warns if nullable API item nullability maps to a non-nullable CLR collection element type.
         new CompileWarnsTest
         {
-            Name = $"{nameof(ApiProperty)} Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type",
+            Name = $"{nameof(ApiProperty)} Warns If Nullable Item Maps To NonNullable CLR Element",
             SourceJson = """
             {
-                "ApiName": "ApiProperty Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type",
+                "ApiName": "ApiProperty Warns If Nullable Item Maps To NonNullable CLR Element",
                 "ApiScalarTypes": [
                     {
                         "ApiKind": "Scalar",
@@ -4332,9 +4351,11 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableItemsProp\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiCollectionItemNullableNonNullableMismatch,
-                    description: "CLR collection element in 'NonNullableItemsProp' is non-nullable but item is declared Optional",
-                    remediation: "Change the CLR element type in 'NonNullableItemsProp' to a nullable reference type, or change the item nullability to Required"
+                    code: ApiSchemaCompilationCode.ApiCollectionItemNullabilityMismatch,
+                    description: "CLR collection element in 'NonNullableItemsProp' is non-nullable but " +
+                        "item is declared nullable",
+                    remediation: "Change the CLR element type in 'NonNullableItemsProp' to a nullable " +
+                        "reference type, or change the item nullability to non-nullable"
                 ),
             ]
         },

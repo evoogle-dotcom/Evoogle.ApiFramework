@@ -324,8 +324,8 @@ public class ApiNullabilityTests(ITestOutputHelper output) : XUnitTests(output)
     {
         NullabilityContext.Property => ApiSchemaCompilationCode.ApiPropertyInvalidApiNullability,
         NullabilityContext.CollectionItem => ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemNullability,
-        NullabilityContext.InputParameter => ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidNullability,
-        NullabilityContext.Output => ApiSchemaCompilationCode.ApiQuerySourceInvalidOutputNullability,
+        NullabilityContext.InputParameter => ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidApiNullability,
+        NullabilityContext.Output => ApiSchemaCompilationCode.ApiQuerySourceInvalidApiOutputNullability,
         _ => throw new ArgumentOutOfRangeException(nameof(context)),
     };
 

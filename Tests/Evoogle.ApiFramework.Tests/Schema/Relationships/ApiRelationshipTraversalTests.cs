@@ -304,7 +304,7 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
                UsesJson = usesJson,
                ExpectedDiagnostics = navigation.Item4 ? [] :
                [
-                   new ExpectedDiagnostic(ApiSchemaCompilationCode.ClrMemberIncompatible,
+                   new ExpectedDiagnostic(ApiSchemaCompilationCode.ClrMemberBindingIncompatible,
                        ApiSchemaCompilationSeverity.Error,
                        $"ApiSchema[\"Traversal\"].ApiRelationship{navigation.Item1}[\"R1\"]." +
                        "ApiPrincipalEnd.ApiRelationshipTraversal[\"ToTarget\"]")
@@ -341,14 +341,14 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
     #region Test Properties
     private static ExpectedDiagnostic ApiNameConflict => new
     (
-        ApiSchemaCompilationCode.ApiRelationshipTraversalDuplicateApiName,
+        ApiSchemaCompilationCode.ApiRelationshipTraversalPropertyApiNameConflict,
         ApiSchemaCompilationSeverity.Error,
         "ApiSchema[\"Traversal\"].ApiRelationshipOneToOne[\"R1\"].ApiPrincipalEnd.ApiRelationshipTraversal[\"ToTarget\"]"
     );
 
     private static ExpectedDiagnostic ClrMemberConflict => new
     (
-        ApiSchemaCompilationCode.ApiRelationshipTraversalClrNavigationMemberConflict,
+        ApiSchemaCompilationCode.ApiRelationshipTraversalClrMemberConflict,
         ApiSchemaCompilationSeverity.Error,
         "ApiSchema[\"Traversal\"].ApiRelationshipOneToOne[\"R1\"].ApiPrincipalEnd.ApiRelationshipTraversal[\"ToTarget\"]"
     );

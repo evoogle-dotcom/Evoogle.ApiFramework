@@ -79,11 +79,11 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    ApiSchemaCompilationCode.ApiAnnotationInvalidContribution,
+                    ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
                     clrType.FullName ?? clrType.Name,
-                    $"A type-level {nameof(ApiVersionAttribute)} must specify " +
-                    $"{nameof(ApiVersionAttribute.ClrType)}.",
-                    $"Set {nameof(ApiVersionAttribute.ClrType)} to the exact CLR version type."
+                    $"A type-level {nameof(ApiVersionAttribute)} requires " +
+                    $"{nameof(ApiVersionAttribute.ClrType)}",
+                    $"Set {nameof(ApiVersionAttribute.ClrType)} to the exact CLR version type"
                 )
             );
         }
@@ -103,11 +103,11 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    ApiSchemaCompilationCode.ApiAnnotationInvalidContribution,
+                    ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
                     $"{clrType.FullName ?? clrType.Name}.{member.Name}",
                     $"A member-level {nameof(ApiVersionAttribute)} cannot specify " +
-                    $"{nameof(ApiVersionAttribute.ClrType)}.",
-                    $"Remove {nameof(ApiVersionAttribute.ClrType)} from the member annotation."
+                    $"{nameof(ApiVersionAttribute.ClrType)}",
+                    $"Remove {nameof(ApiVersionAttribute.ClrType)} from the member annotation"
                 )
             );
         }
@@ -430,8 +430,8 @@ public sealed class ApiAttributeAnnotationReader :
         (
             ApiSchemaCompilationCode.ApiAnnotationTypeMarkerConflict,
             clrType.FullName ?? clrType.Name,
-            "A CLR type cannot be marked as both an API object and an API scalar.",
-            "Remove either the API object marker or the API scalar marker."
+            "A CLR type cannot be marked as both an API object and an API scalar",
+            "Remove either the API object marker or the API scalar marker"
         );
     }
 

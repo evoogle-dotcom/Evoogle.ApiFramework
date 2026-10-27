@@ -39,7 +39,7 @@ internal sealed record JsonEnumFinding(string MemberName, Type EnumType, JsonEnu
 
     #region Methods
     public string DescribeProblem() => this.Status == JsonEnumReadStatus.Null
-        ? $"{this.MemberName} must not be null"
+        ? $"{this.MemberName} is required"
         : $"{this.MemberName} must be a valid {this.EnumType.Name} value, but '{this.RawText}' was supplied";
     #endregion
 }

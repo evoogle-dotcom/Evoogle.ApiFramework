@@ -70,28 +70,28 @@ public sealed class ApiTypeExpression
     internal void ResolveForCollection(ApiSchemaCompilationContext context) => this.Resolve
     (
         context,
-        ApiSchemaCompilationCode.ApiCollectionTypeItemTypeReferenceUnresolved,
+        ApiSchemaCompilationCode.ApiCollectionTypeUnresolvedItemType,
         nameof(ApiCollectionType.ApiItemType)
     );
 
     internal void ResolveForQuerySource(ApiSchemaCompilationContext context) => this.Resolve
     (
         context,
-        ApiSchemaCompilationCode.ApiQuerySourceOutputTypeReferenceUnresolved,
+        ApiSchemaCompilationCode.ApiQuerySourceUnresolvedOutputType,
         nameof(ApiQuerySource.ApiOutputType)
     );
 
     internal void ResolveForQuerySourceParameter(ApiSchemaCompilationContext context) => this.Resolve
     (
         context,
-        ApiSchemaCompilationCode.ApiQuerySourceParameterTypeReferenceUnresolved,
+        ApiSchemaCompilationCode.ApiQuerySourceParameterUnresolvedType,
         nameof(ApiQuerySourceParameter.ApiType)
     );
 
     internal void ResolveForProperty(ApiSchemaCompilationContext context) => this.Resolve
     (
         context,
-        ApiSchemaCompilationCode.ApiPropertyTypeReferenceUnresolved,
+        ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
         nameof(ApiProperty.ApiType)
     );
 
@@ -107,8 +107,8 @@ public sealed class ApiTypeExpression
         if (!this.IsInline && !this.IsReference)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiTypeExpressionInvalidForm;
-            var description = $"A type expression must contain exactly one of {nameof(this.ApiInlineType)} or {nameof(this.ApiTypeReference)}";
+            var code = ApiSchemaCompilationCode.ApiTypeExpressionInvalidDefinition;
+            var description = $"A type expression must define exactly one type source: {nameof(this.ApiInlineType)} or {nameof(this.ApiTypeReference)}";
             var remediation = $"Specify exactly one of {nameof(this.ApiInlineType)} or {nameof(this.ApiTypeReference)}";
 
             context.AddIssue(severity, code, description, remediation);

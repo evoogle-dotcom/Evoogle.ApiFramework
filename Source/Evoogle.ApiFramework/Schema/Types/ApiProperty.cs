@@ -167,7 +167,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
         {
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiPropertyInvalidApiName;
-            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var description = $"{nameof(this.ApiName)} must contain a non-whitespace value";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(severity, code, description, remediation);
@@ -197,8 +197,8 @@ public sealed partial class ApiProperty : ApiSchemaElement
         {
             var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiPropertyTypeUnspecified;
-            var description = $"{nameof(this.ApiType)} was not specified";
+            var code = ApiSchemaCompilationCode.ApiPropertyMissingType;
+            var description = $"{nameof(this.ApiType)} is required";
             var remediation = $"Specify a valid {nameof(this.ApiType)}";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
@@ -264,7 +264,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
         {
             var apiPath = context.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Warning;
-            var code = ApiSchemaCompilationCode.ApiPropertyNonNullableNullableMismatch;
+            var code = ApiSchemaCompilationCode.ApiPropertyNullabilityMismatch;
             var description = $"CLR member '{clrMemberName}' is nullable but property '{this.ApiName}' is declared non-nullable";
             var remediation = $"Change CLR member '{clrMemberName}' to a non-nullable type, or change property '{this.ApiName}' to nullable";
 
@@ -283,7 +283,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
         {
             var apiPath = context.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Warning;
-            var code = ApiSchemaCompilationCode.ApiPropertyNullableNonNullableMismatch;
+            var code = ApiSchemaCompilationCode.ApiPropertyNullabilityMismatch;
             var description = $"CLR member '{clrMemberName}' is non-nullable but property '{this.ApiName}' is declared nullable";
             var remediation = $"Change CLR member '{clrMemberName}' to a nullable reference type, or change property '{this.ApiName}' to non-nullable";
 
@@ -314,7 +314,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
             {
                 var apiPath = context.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Warning;
-                var code = ApiSchemaCompilationCode.ApiCollectionItemNonNullableNullableMismatch;
+                var code = ApiSchemaCompilationCode.ApiCollectionItemNullabilityMismatch;
                 var description = $"CLR collection element in '{clrMemberName}' is nullable but item is declared non-nullable";
                 var remediation = $"Change the CLR element type in '{clrMemberName}' to non-nullable, or change the item nullability to nullable";
 
@@ -333,7 +333,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
             {
                 var apiPath = context.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Warning;
-                var code = ApiSchemaCompilationCode.ApiCollectionItemNullableNonNullableMismatch;
+                var code = ApiSchemaCompilationCode.ApiCollectionItemNullabilityMismatch;
                 var description = $"CLR collection element in '{clrMemberName}' is non-nullable but item is declared nullable";
                 var remediation = $"Change the CLR element type in '{clrMemberName}' to a nullable reference type, or change the item nullability to non-nullable";
 

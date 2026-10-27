@@ -159,7 +159,7 @@ public sealed class ApiRelationshipManyToMany
                 context,
                 this.ApiPrincipalEndA,
                 this.ApiAssociation.ApiForeignKeyA,
-                ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
+                ApiSchemaCompilationCode.ApiRelationshipManyToManyForeignKeyAPathCountMismatch,
                 nameof(ApiRelationshipAssociation.ApiForeignKeyA),
                 "A"
             );
@@ -172,7 +172,7 @@ public sealed class ApiRelationshipManyToMany
                 context,
                 this.ApiPrincipalEndB,
                 this.ApiAssociation.ApiForeignKeyB,
-                ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
+                ApiSchemaCompilationCode.ApiRelationshipManyToManyForeignKeyBPathCountMismatch,
                 nameof(ApiRelationshipAssociation.ApiForeignKeyB),
                 "B"
             );
@@ -224,7 +224,7 @@ public sealed class ApiRelationshipManyToMany
         }
 
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
+        var code = ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyRequiresForeignKey;
         var description = $"Cannot resolve {explicitKeyTarget} '{principalEnd.ApiPrincipalKeyName}' because this relationship has no association foreign key bindings";
         var remediation = $"Declare {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyA)} and {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyB)} or remove {explicitKeyTarget}";
 
@@ -236,8 +236,8 @@ public sealed class ApiRelationshipManyToMany
         if (this.ApiAssociation is null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyNullAssociation;
-            var description = $"{nameof(this.ApiAssociation)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyMissingAssociation;
+            var description = $"{nameof(this.ApiAssociation)} is required";
             var remediation = $"Provide a valid {nameof(ApiRelationshipAssociation)} for the association between the two principal ends";
 
             context.AddIssue(severity, code, description, remediation);
@@ -253,8 +253,8 @@ public sealed class ApiRelationshipManyToMany
         if (this.ApiPrincipalEndA is null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyNullPrincipalEndA;
-            var description = $"{nameof(this.ApiPrincipalEndA)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyMissingPrincipalEndA;
+            var description = $"{nameof(this.ApiPrincipalEndA)} is required";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end A";
 
             context.AddIssue(severity, code, description, remediation);
@@ -270,8 +270,8 @@ public sealed class ApiRelationshipManyToMany
         if (this.ApiPrincipalEndB is null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyNullPrincipalEndB;
-            var description = $"{nameof(this.ApiPrincipalEndB)} must not be null";
+            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyMissingPrincipalEndB;
+            var description = $"{nameof(this.ApiPrincipalEndB)} is required";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end B";
 
             context.AddIssue(severity, code, description, remediation);

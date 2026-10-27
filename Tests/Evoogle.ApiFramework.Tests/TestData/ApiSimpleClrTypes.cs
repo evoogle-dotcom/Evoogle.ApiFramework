@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.TestData;
@@ -124,29 +125,28 @@ public sealed class Company
 }
 
 /// <summary>
-///     CLR type used to test ApiPropertyNonNullableNullableMismatch and ApiPropertyNullableNonNullableMismatch
-///     compilation warnings by deliberately pairing nullable/non-nullable CLR members with mismatched API nullability.
+///     CLR type used to test <see cref="ApiSchemaCompilationCode.ApiPropertyNullabilityMismatch"/>
+///     by pairing CLR member nullability with conflicting API nullability.
 /// </summary>
 public sealed class NullabilityMismatch
 {
-    /// <summary>Nullable reference type: triggers ApiPropertyNonNullableNullableMismatch when declared Required.</summary>
+    /// <summary>Nullable reference type that conflicts with non-nullable API nullability.</summary>
     public string? NullableProp { get; set; }
 
-    /// <summary>Non-nullable reference type: triggers ApiPropertyNullableNonNullableMismatch when declared Optional.</summary>
+    /// <summary>Non-nullable reference type that conflicts with nullable API nullability.</summary>
     public string NonNullableProp { get; set; } = string.Empty;
 }
 
 /// <summary>
-///     CLR type used to test ApiCollectionItemNonNullableNullableMismatch and
-///     ApiCollectionItemNullableNonNullableMismatch compilation warnings by deliberately
-///     pairing nullable/non-nullable CLR collection element types with mismatched API item nullability.
+///     CLR type used to test <see cref="ApiSchemaCompilationCode.ApiCollectionItemNullabilityMismatch"/>
+///     by pairing CLR collection element nullability with conflicting API item nullability.
 /// </summary>
 public sealed class CollectionNullabilityMismatch
 {
-    /// <summary>Collection with nullable elements: triggers ApiCollectionItemNonNullableNullableMismatch when item declared Required.</summary>
+    /// <summary>Collection whose nullable elements conflict with non-nullable API item nullability.</summary>
     public List<string?>? NullableItemsProp { get; set; }
 
-    /// <summary>Collection with non-nullable elements: triggers ApiCollectionItemNullableNonNullableMismatch when item declared Optional.</summary>
+    /// <summary>Collection whose non-nullable elements conflict with nullable API item nullability.</summary>
     public List<string> NonNullableItemsProp { get; set; } = [];
 }
 #endregion
