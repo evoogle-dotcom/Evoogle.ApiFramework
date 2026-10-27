@@ -351,7 +351,7 @@ public partial class ApiObjectTypeTests
                     null,
                     new ApiTypeReferenceDef(ApiTypeKind.Scalar, "Int32", null)
                 ),
-                ApiTypeModifiers: ApiTypeModifiers.Required,
+                ApiNullability: ApiNullability.NonNullable,
                 ClrValueMember: new ClrMemberReferenceDef(ClrMemberKind.Property, nameof(Customer.Id))
             )
         ]

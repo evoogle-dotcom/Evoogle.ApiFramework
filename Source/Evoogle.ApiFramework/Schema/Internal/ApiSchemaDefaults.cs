@@ -29,10 +29,12 @@ internal static class ApiSchemaDefaults
     #endregion
 
     #region Query Defaults
-    public const ApiTypeModifiers NullableTypeModifiers = ApiTypeModifiers.None;
-    public const ApiTypeModifiers NonNullableTypeModifiers = ApiTypeModifiers.Required;
+    public const ApiNullability QuerySourceOutputNullability = ApiNullability.Nullable;
+    public const ApiNullability QuerySourceParameterNullability = ApiNullability.NonNullable;
+    public const ApiNullability QuerySourceCollectionOutputNullability = ApiNullability.NonNullable;
+    public const ApiNullability QuerySourceCollectionOutputItemNullability = ApiNullability.NonNullable;
     public const ApiQueryComposition QuerySourceOutputComposition = ApiQueryComposition.Projection;
-    public const bool QuerySourceParameterRequiresArgument = true;
+    public const ApiPresence QuerySourceParameterPresence = ApiPresence.Required;
     #endregion
 
     #region Relationship Defaults
@@ -42,6 +44,8 @@ internal static class ApiSchemaDefaults
     #endregion
 
     #region Schema Defaults
+    public const ApiNullability PropertyNullability = ApiNullability.Nullable;
+    public const ApiNullability CollectionItemNullability = ApiNullability.Nullable;
     public const string ApiVersion = "0.1.0";
     #endregion
 }

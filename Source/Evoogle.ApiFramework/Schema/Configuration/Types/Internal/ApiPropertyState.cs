@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 
@@ -18,8 +19,8 @@ internal sealed class ApiPropertyState(string apiName, ApiConfigurationSource ap
 
     internal ApiConfigurationSource ApiNameSource { get; set; } = apiNameSource;
 
-    internal Action<ApiTypeModifiersBuilder>? Modifiers { get; set; }
+    internal ApiNullability? ApiNullability { get; set; }
 
-    internal ApiConfigurationSource ModifiersSource { get; set; } = ApiConfigurationSource.Convention;
+    internal ApiConfigurationSource NullabilitySource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

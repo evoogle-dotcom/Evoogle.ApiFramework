@@ -38,7 +38,7 @@ Query-source metadata uses the `ApiQuerySource` family, including `ApiQuerySourc
 without a `Definition` suffix. `Source` identifies a named producer to which a query operation
 binds. The operation-side family uses `ApiQuery` and `ApiQueryParameter`; source declarations
 and operation parameters are separate concepts with separate ownership and lifecycles.
-Query sources use `ApiInputParameters`, `ApiOutputType`, `ApiOutputTypeModifiers`, and
+Query sources use `ApiInputParameters`, `ApiOutputType`, `ApiOutputNullability`, and
 `ApiOutputComposition`, in that order after `ApiName`, for both the API and serialized properties.
 Use **binding** for connecting an operation to a query source and its parameter declarations.
 Reserve **materialization** for producing actual values or objects, such as an `ApiKey` from a POCO.
@@ -211,10 +211,15 @@ Use `Nullable` and `NonNullable` for value constraints, including `AsNullable()`
 from CLR members through `AddProperty`; explicit overrides use the property builder's
 nullability methods.
 
-Reserve required/optional terminology for argument presence, such as `ApiRequiresArgument`,
-`WithRequiredArgument()`, and `WithOptionalArgument()`. The existing
-`ApiTypeModifiers.Required` flag continues to mean non-nullability; its name and
-serialized representation are retained pending a separate type-modifier redesign.
+Reserve required/optional terminology for presence, represented by `ApiPresence.Required` and
+`ApiPresence.Optional`. Query-source parameters expose `ApiPresence`, with computed `IsRequired` and
+`IsOptional` predicates. Configure presence with `WithPresence(...)`,
+`AsRequired()`, and `AsOptional()`. Use the non-flags `ApiNullability`
+enumeration for resolved API value constraints: `Nullable` or `NonNullable`.
+Use `ApiNullability` for properties and input parameters, `ApiItemNullability` for
+collection items, and `ApiOutputNullability` for query-source outputs. Configure explicit
+overrides with `WithNullability(...)`, `AsNullable()`, or `AsNonNullable()`.
+Keep CLR reflection's `MemberNullability.Unknown` separate from the resolved API contract.
 
 Use `UseEmptyKeyOnNullKeyPart()` for the builder policy that emits `ApiKey.Empty`
 for an affected key path.

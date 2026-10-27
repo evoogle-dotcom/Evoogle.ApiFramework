@@ -332,11 +332,11 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             .AddQuerySource("SearchCustomers", s => s
                 .AddInputParameter<string>("name")
                 .AddInputParameter<OrderStatus>("status", p => p
-                    .WithRequiredArgument()
+                    .AsRequired()
                     .AsNonNullable())
                 .WithCollectionOutput<Customer>(
-                    apiCollectionTypeModifiers: ApiTypeModifiers.Required,
-                    apiItemTypeModifiers: ApiTypeModifiers.Required)
+                    apiCollectionNullability: ApiNullability.NonNullable,
+                    apiItemNullability: ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.Projection
                     | ApiQueryComposition.Filtering
                     | ApiQueryComposition.Ordering
@@ -344,34 +344,34 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
 
             .AddQuerySource("GetCustomerById", s => s
                 .AddInputParameter<Ulid>("id", p => p
-                    .WithRequiredArgument()
+                    .AsRequired()
                     .AsNonNullable())
                 .WithOutput<Customer>()
                 .WithOutputComposition(ApiQueryComposition.Projection))
 
             .AddQuerySource("CountOrders", s => s
-                .WithOutput<int>(ApiTypeModifiers.Required)
+                .WithOutput<int>(ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.None))
 
             .AddQuerySource("GetOrderTotal", s => s
                 .AddInputParameter<Ulid>("orderId", p => p
-                    .WithRequiredArgument()
+                    .AsRequired()
                     .AsNonNullable())
-                .WithOutput<Money>(ApiTypeModifiers.Required)
+                .WithOutput<Money>(ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.None))
 
             .AddQuerySource("ListCategories", s => s
                 .WithCollectionOutput<Category>(
-                    apiCollectionTypeModifiers: ApiTypeModifiers.Required,
-                    apiItemTypeModifiers: ApiTypeModifiers.Required)
+                    apiCollectionNullability: ApiNullability.NonNullable,
+                    apiItemNullability: ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.Filtering | ApiQueryComposition.Ordering))
 
             .AddQuerySource("SearchOrders", s => s
                 .AddInputParameter<OrderStatus>("status")
                 .AddInputParameter<decimal>("minimumTotal")
                 .WithCollectionOutput<Order>(
-                    apiCollectionTypeModifiers: ApiTypeModifiers.Required,
-                    apiItemTypeModifiers: ApiTypeModifiers.Required)
+                    apiCollectionNullability: ApiNullability.NonNullable,
+                    apiItemNullability: ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.Projection
                     | ApiQueryComposition.Filtering
                     | ApiQueryComposition.Ordering

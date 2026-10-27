@@ -18,18 +18,18 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     private static ApiCollectionType CreateApiCollectionType(DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
     {
         var apiItemTypeExpression = context.ReadData.ApiCollectionType?.ApiItemTypeExpression;
-        var apiItemTypeModifiersReadResult = context.ReadData.ApiCollectionType?.ApiItemTypeModifiers ?? default;
-        var apiItemTypeModifiers = apiItemTypeModifiersReadResult.ValueOr(ApiSchemaDefaults.NullableTypeModifiers);
+        var apiItemNullabilityReadResult = context.ReadData.ApiCollectionType?.ApiItemNullability ?? default;
+        var apiItemNullability = apiItemNullabilityReadResult.ValueOr(ApiSchemaDefaults.CollectionItemNullability);
         var clrCollectionType = context.ReadData.ApiType?.ClrType;
 
         var apiCollectionType = new ApiCollectionType
         (
             apiItemTypeExpression!,
-            apiItemTypeModifiers,
+            apiItemNullability,
             clrCollectionType!
         );
 
-        apiCollectionType.RecordJsonEnumFinding(nameof(ApiCollectionType.ApiItemTypeModifiers), apiItemTypeModifiersReadResult);
+        apiCollectionType.RecordJsonEnumFinding(nameof(ApiCollectionType.ApiItemNullability), apiItemNullabilityReadResult);
 
         return apiCollectionType;
     }

@@ -19,6 +19,11 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         public string? Alias { get; set; }
         public List<string> Labels { get; set; } = [];
         public List<string?>? NullableLabels { get; set; }
+
+#nullable disable
+        public string ObliviousText { get; set; } = string.Empty;
+        public List<string> ObliviousLabels { get; set; } = [];
+#nullable restore
     }
 
     private sealed class BuildPropertyTest : XUnitTest
@@ -29,11 +34,18 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         public bool? OverrideIsNullable { get; init; }
         public required bool ExpectedIsNullable { get; init; }
         public bool? ExpectedItemIsNullable { get; init; }
+        public ApiNullability? ConventionNullability { get; init; }
+        public ApiNullability? AnnotationNullability { get; init; }
+        public ApiNullability? ExplicitNullability { get; init; }
+        public ApiNullability? LateConventionNullability { get; init; }
+        public ApiNullability? LateAnnotationNullability { get; init; }
         #endregion
 
         #region Calculated Properties
         private ApiSchemaBuilder Builder { get; set; } = null!;
         private ApiProperty ActualProperty { get; set; } = null!;
+        private string RestoredTestJson { get; set; } = null!;
+        private string OriginalTestJson { get; set; } = null!;
         #endregion
 
         #region XUnitTest Methods
@@ -44,10 +56,19 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             this.WriteLine();
             this.WriteLine($"Initial Nullable Override: {this.InitialIsNullable}");
             this.WriteLine($"Final Nullable Override:   {this.OverrideIsNullable}");
+            this.WriteLine($"Convention Nullability:    {this.ConventionNullability}");
+            this.WriteLine($"Annotation Nullability:    {this.AnnotationNullability}");
+            this.WriteLine($"Explicit Nullability:      {this.ExplicitNullability}");
+            this.WriteLine($"Late Convention Override:  {this.LateConventionNullability}");
+            this.WriteLine($"Late Annotation Override:  {this.LateAnnotationNullability}");
             this.WriteLine();
             this.WriteLine($"Expected Nullable:      {this.ExpectedIsNullable}");
             this.WriteLine($"Expected Item Nullable: {this.ExpectedItemIsNullable}");
             this.WriteLine("Expected Exception:     None");
+
+            var serializer = new XUnitTestSerializer();
+            this.OriginalTestJson = serializer.Serialize(this);
+            this.RestoredTestJson = serializer.Serialize(serializer.Deserialize(this.GetType(), this.OriginalTestJson));
 
             this.Builder = new ApiSchemaBuilder()
                 .WithName("PropertyNullabilityTests")
@@ -55,6 +76,21 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
                 .AddObject<NullabilityModel>(model => model
                     .AddProperty(this.ClrMemberName, property =>
                     {
+                        if (this.ConventionNullability is ApiNullability conventionNullability)
+                        {
+                            property.SetNullabilityConvention(conventionNullability);
+                        }
+
+                        if (this.AnnotationNullability is ApiNullability annotationNullability)
+                        {
+                            property.SetNullabilityDataAnnotation(annotationNullability);
+                        }
+
+                        if (this.ExplicitNullability is ApiNullability explicitNullability)
+                        {
+                            property.WithNullability(explicitNullability);
+                        }
+
                         if (this.InitialIsNullable is bool initialIsNullable)
                         {
                             if (initialIsNullable)
@@ -78,6 +114,16 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
                                 property.AsNonNullable();
                             }
                         }
+
+                        if (this.LateConventionNullability is ApiNullability lateConventionNullability)
+                        {
+                            property.SetNullabilityConvention(lateConventionNullability);
+                        }
+
+                        if (this.LateAnnotationNullability is ApiNullability lateAnnotationNullability)
+                        {
+                            property.SetNullabilityDataAnnotation(lateAnnotationNullability);
+                        }
                     }));
         }
 
@@ -89,7 +135,7 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             this.WriteLine();
             this.WriteLine($"Actual Nullable:     {this.ActualProperty.IsNullable}");
             this.WriteLine($"Actual Non-Nullable: {this.ActualProperty.IsNonNullable}");
-            this.WriteLine($"Actual Modifiers:    {this.ActualProperty.ApiTypeModifiers}");
+            this.WriteLine($"Actual Nullability:  {this.ActualProperty.ApiNullability}");
             if (this.ActualProperty.ApiType is ApiCollectionType collectionType)
             {
                 this.WriteLine();
@@ -100,6 +146,7 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
 
         protected override void Assert()
         {
+            this.RestoredTestJson.Should().Be(this.OriginalTestJson);
             this.ActualProperty.ApiName.Should().Be(this.ClrMemberName);
             this.ActualProperty.IsNullable.Should().Be(this.ExpectedIsNullable);
             this.ActualProperty.IsNonNullable.Should().Be(!this.ExpectedIsNullable);
@@ -107,9 +154,9 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             ApiPropertyExtensions.IsNonNullable(this.ActualProperty).Should().Be(!this.ExpectedIsNullable);
 
             using var json = JsonDocument.Parse(JsonSerializer.Serialize(this.ActualProperty));
-            json.RootElement.GetProperty(nameof(ApiProperty.ApiTypeModifiers)).GetString().Should().Be
+            json.RootElement.GetProperty(nameof(ApiProperty.ApiNullability)).GetString().Should().Be
             (
-                this.ExpectedIsNullable ? nameof(ApiTypeModifiers.None) : nameof(ApiTypeModifiers.Required)
+                this.ExpectedIsNullable ? nameof(ApiNullability.Nullable) : nameof(ApiNullability.NonNullable)
             );
 
             if (this.ExpectedItemIsNullable is bool expectedItemIsNullable)
@@ -128,6 +175,67 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] BuildPropertyTheoryData =>
     [
+        new BuildPropertyTest
+        {
+            Name = "Unknown CLR member nullability falls back to nullable",
+            ClrMemberName = nameof(NullabilityModel.ObliviousText),
+            ExpectedIsNullable = true
+        },
+        new BuildPropertyTest
+        {
+            Name = "Unknown CLR collection and item nullability fall back to nullable",
+            ClrMemberName = nameof(NullabilityModel.ObliviousLabels),
+            ExpectedIsNullable = true,
+            ExpectedItemIsNullable = true
+        },
+        new BuildPropertyTest
+        {
+            Name = "Explicit nullability overrides unknown CLR nullability",
+            ClrMemberName = nameof(NullabilityModel.ObliviousText),
+            ExplicitNullability = ApiNullability.NonNullable,
+            ExpectedIsNullable = false
+        },
+        new BuildPropertyTest
+        {
+            Name = "Convention nullability overrides CLR inference",
+            ClrMemberName = nameof(NullabilityModel.Name),
+            ConventionNullability = ApiNullability.Nullable,
+            ExpectedIsNullable = true
+        },
+        new BuildPropertyTest
+        {
+            Name = "Annotation nullability overrides convention and ignores later convention",
+            ClrMemberName = nameof(NullabilityModel.Name),
+            ConventionNullability = ApiNullability.NonNullable,
+            AnnotationNullability = ApiNullability.Nullable,
+            LateConventionNullability = ApiNullability.NonNullable,
+            ExpectedIsNullable = true
+        },
+        new BuildPropertyTest
+        {
+            Name = "Explicit nullability ignores later convention and annotation",
+            ClrMemberName = nameof(NullabilityModel.Name),
+            ExplicitNullability = ApiNullability.NonNullable,
+            LateConventionNullability = ApiNullability.Nullable,
+            LateAnnotationNullability = ApiNullability.Nullable,
+            ExpectedIsNullable = false
+        },
+        new BuildPropertyTest
+        {
+            Name = "Later annotation replaces earlier annotation nullability",
+            ClrMemberName = nameof(NullabilityModel.Name),
+            AnnotationNullability = ApiNullability.NonNullable,
+            LateAnnotationNullability = ApiNullability.Nullable,
+            ExpectedIsNullable = true
+        },
+        new BuildPropertyTest
+        {
+            Name = "Later convention replaces earlier convention nullability",
+            ClrMemberName = nameof(NullabilityModel.Name),
+            ConventionNullability = ApiNullability.NonNullable,
+            LateConventionNullability = ApiNullability.Nullable,
+            ExpectedIsNullable = true
+        },
         new BuildPropertyTest
         {
             Name = "AddProperty infers a non-nullable CLR reference member",

@@ -199,38 +199,38 @@ public partial class ApiSchemaTests
     [
         new CompilationIssueTest
         {
-            Name = "Property type modifiers reject an unknown JSON enum value",
+            Name = "Property nullability rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
-            ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiPropertyInvalidApiTypeModifiers, "ApiSchema[\"Simple\"].ApiObjectType[\"Company\"].ApiProperty[\"Id\"]"),
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeModifiersToUnknownString(a),
+            ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiPropertyInvalidApiNullability, "ApiSchema[\"Simple\"].ApiObjectType[\"Company\"].ApiProperty[\"Id\"]"),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiNullabilityToUnknownString(a),
         },
         new CompilationIssueTest
         {
-            Name = "Property type modifiers reject a JSON null enum value",
+            Name = "Property nullability rejects a JSON null enum value",
             SchemaKind = ApiSchemaKind.Simple,
-            ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiPropertyInvalidApiTypeModifiers, "ApiSchema[\"Simple\"].ApiObjectType[\"Company\"].ApiProperty[\"Id\"]"),
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeModifiersToNull(a),
+            ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiPropertyInvalidApiNullability, "ApiSchema[\"Simple\"].ApiObjectType[\"Company\"].ApiProperty[\"Id\"]"),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiNullabilityToNull(a),
         },
         new CompilationIssueTest
         {
-            Name = "Collection item type modifiers reject an incompatible JSON enum token",
+            Name = "Collection item nullability rejects an incompatible JSON enum token",
             SchemaKind = ApiSchemaKind.Commerce,
             ExpectedIssues =
             [
                 new EnumDiagnostic
                 (
-                    ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemTypeModifiers,
+                    ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemNullability,
                     ApiSchemaCompilationSeverity.Error,
                     "ApiSchema[\"Commerce\"].ApiObjectType[\"Category\"].ApiProperty[\"Children\"].ApiCollectionType"
                 ),
                 new EnumDiagnostic
                 (
-                    ApiSchemaCompilationCode.ApiCollectionItemOptionalNonNullableMismatch,
+                    ApiSchemaCompilationCode.ApiCollectionItemNullableNonNullableMismatch,
                     ApiSchemaCompilationSeverity.Warning,
                     "ApiSchema[\"Commerce\"].ApiObjectType[\"Category\"].ApiProperty[\"Children\"]"
                 )
             ],
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstCollectionTypeApiItemTypeModifiersToIncompatibleToken(a),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstCollectionTypeApiItemNullabilityToIncompatibleToken(a),
         },
         new CompilationIssueTest
         {

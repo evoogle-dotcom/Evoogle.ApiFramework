@@ -43,7 +43,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOneScalarPart.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -54,7 +54,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOneScalarPart.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -115,7 +115,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -127,7 +127,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -182,14 +182,14 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOneScalarPart.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef(ClrMemberKind.Property, nameof(KeyOneScalarPart.Id))
                             ),
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOneScalarPart.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef(ClrMemberKind.Property, nameof(KeyOneScalarPart.Name))
                             )
                         ],
@@ -247,7 +247,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -259,7 +259,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -323,7 +323,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Id1),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -334,7 +334,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Id2),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -345,7 +345,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -399,7 +399,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id1"
@@ -411,7 +411,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id2"
@@ -423,7 +423,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -486,7 +486,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id1),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -497,7 +497,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id2),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -508,7 +508,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id3),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Guid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -519,7 +519,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -579,7 +579,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id1"
@@ -591,7 +591,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id2"
@@ -603,7 +603,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Guid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id3"
@@ -615,7 +615,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -676,7 +676,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyNested.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -687,7 +687,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyNested.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -717,7 +717,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyNestedComposite.NestedPart),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyNested), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -728,7 +728,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyNestedComposite.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -782,7 +782,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -794,7 +794,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -823,7 +823,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "KeyNested"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NestedPart"
@@ -835,7 +835,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -893,7 +893,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwner.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -904,7 +904,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwner.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -914,8 +914,8 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Dependents),
-                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<KeyOwnedComposite>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedComposite), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<KeyOwnedComposite>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedComposite), ClrType: null)), ApiItemNullability: ApiNullability.NonNullable), ApiTypeReferenceDef: null),
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -926,7 +926,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwner.Dependent),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedDependent), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -956,7 +956,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwnedComposite.LineNumber),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -967,7 +967,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwnedComposite.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -998,7 +998,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwnedDependent.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1051,7 +1051,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "LineNumber"
@@ -1063,7 +1063,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1098,7 +1098,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1130,7 +1130,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1142,7 +1142,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1156,10 +1156,10 @@ public partial class ApiSchemaTests
                                         "ApiKind": "Object",
                                         "ApiName": "KeyOwnedComposite"
                                     },
-                                    "ApiItemTypeModifiers": "Required",
+                                    "ApiItemNullability": "NonNullable",
                                     "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Dependents"
@@ -1171,7 +1171,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "KeyOwnedDependent"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Dependent"
@@ -1231,7 +1231,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOneScalarPart.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1242,7 +1242,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOneScalarPart.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1280,7 +1280,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Id1),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1291,7 +1291,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Id2),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1302,7 +1302,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1333,7 +1333,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id1),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1344,7 +1344,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id2),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1355,7 +1355,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id3),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Guid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1366,7 +1366,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1398,7 +1398,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyNested.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1409,7 +1409,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyNested.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1439,7 +1439,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyNestedComposite.NestedPart),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyNested), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1450,7 +1450,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyNestedComposite.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1481,7 +1481,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwner.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1492,7 +1492,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwner.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ApiNullability: ApiNullability.Nullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1502,8 +1502,8 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Dependents),
-                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<KeyOwnedComposite>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedComposite), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<KeyOwnedComposite>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedComposite), ClrType: null)), ApiItemNullability: ApiNullability.NonNullable), ApiTypeReferenceDef: null),
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1514,7 +1514,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwner.Dependent),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedDependent), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1544,7 +1544,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwnedComposite.LineNumber),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1555,7 +1555,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwnedComposite.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1586,7 +1586,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(KeyOwnedDependent.Description),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1644,7 +1644,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1656,7 +1656,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1685,7 +1685,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "KeyNested"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NestedPart"
@@ -1697,7 +1697,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1729,7 +1729,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1741,7 +1741,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1778,7 +1778,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "LineNumber"
@@ -1790,7 +1790,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1825,7 +1825,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1857,7 +1857,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1869,7 +1869,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1883,10 +1883,10 @@ public partial class ApiSchemaTests
                                         "ApiKind": "Object",
                                         "ApiName": "KeyOwnedComposite"
                                     },
-                                    "ApiItemTypeModifiers": "Required",
+                                    "ApiItemNullability": "NonNullable",
                                     "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Dependents"
@@ -1898,7 +1898,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "KeyOwnedDependent"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Dependent"
@@ -1927,7 +1927,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id1"
@@ -1939,7 +1939,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id2"
@@ -1951,7 +1951,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Guid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id3"
@@ -1963,7 +1963,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1998,7 +1998,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id1"
@@ -2010,7 +2010,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id2"
@@ -2022,7 +2022,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"

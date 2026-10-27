@@ -308,7 +308,7 @@ public partial class ApiPropertyTests
         var scalar = new ApiScalarType("Int64", typeof(long));
         var numberMember = clrKind == ClrMemberKind.Property ? "Number" : "NumberField";
         var property = new ApiProperty("Value", new ApiTypeExpression(new ApiTypeReference(typeof(long))),
-            ApiTypeModifiers.Required, new ClrMemberReference(clrKind, numberMember));
+            ApiNullability.NonNullable, new ClrMemberReference(clrKind, numberMember));
         var source = new ApiObjectType("Source", null, [property], null, null, null,
             isUnbound && surface == MemberAccessSurface.Property ? null! : typeof(MemberAccessSource));
         ApiSchema schema;
@@ -323,7 +323,7 @@ public partial class ApiPropertyTests
             traversal = new ApiRelationshipTraversal("Related", isUnbound
                 ? null : new ClrMemberReference(clrKind, navigationMember));
             var targetProperty = new ApiProperty("Id", new ApiTypeExpression(new ApiTypeReference(typeof(long))),
-                ApiTypeModifiers.Required, new ClrMemberReference(ClrMemberKind.Property, "Id"));
+                ApiNullability.NonNullable, new ClrMemberReference(ClrMemberKind.Property, "Id"));
             var target = new ApiObjectType("Target", null, [targetProperty], null, null, null, typeof(MemberAccessTarget));
             var relationship = new ApiRelationshipOneToOne("SourceTarget",
                 new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(MemberAccessSource)), traversal),

@@ -29,8 +29,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
         #region Immutable Properties
         public required string ApiName { get; init; }
         public required string ApiTypeExpression { get; init; }
-        public required string ApiTypeModifiers { get; init; }
-        public required string ApiRequiresArgument { get; init; }
+        public required string ApiNullability { get; init; }
+        public required string ApiPresence { get; init; }
         #endregion
     }
 
@@ -51,8 +51,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
             {
                 ApiName = policy.ConvertName(nameof(Query.ApiQuerySourceParameter.ApiName)),
                 ApiTypeExpression = policy.ConvertName(nameof(Query.ApiQuerySourceParameter.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
-                ApiTypeModifiers = policy.ConvertName(nameof(Query.ApiQuerySourceParameter.ApiTypeModifiers)),
-                ApiRequiresArgument = policy.ConvertName(nameof(Query.ApiQuerySourceParameter.ApiRequiresArgument)),
+                ApiNullability = policy.ConvertName(nameof(Query.ApiQuerySourceParameter.ApiNullability)),
+                ApiPresence = policy.ConvertName(nameof(Query.ApiQuerySourceParameter.ApiPresence)),
             },
             ExtensibleBase = GetExtensiblePropertyNames(policy),
         };
@@ -69,8 +69,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
         #region Properties
         public string? ApiName { get; set; } = null;
         public ApiTypeExpression? ApiTypeExpression { get; set; } = null;
-        public JsonEnumReadResult<ApiTypeModifiers> ApiTypeModifiers { get; set; }
-        public bool? ApiRequiresArgument { get; set; }
+        public JsonEnumReadResult<ApiNullability> ApiNullability { get; set; }
+        public JsonEnumReadResult<ApiPresence> ApiPresence { get; set; }
         #endregion
     }
 
@@ -95,8 +95,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
             // ApiQuerySourceParameter Property Handlers
             { propertyNames.ApiQuerySourceParameter.ApiName, HandleApiQuerySourceParameterApiName },
             { propertyNames.ApiQuerySourceParameter.ApiTypeExpression, HandleApiQuerySourceParameterApiTypeExpression },
-            { propertyNames.ApiQuerySourceParameter.ApiTypeModifiers, HandleApiQuerySourceParameterApiTypeModifiers },
-            { propertyNames.ApiQuerySourceParameter.ApiRequiresArgument, HandleApiQuerySourceParameterApiRequiresArgument },
+            { propertyNames.ApiQuerySourceParameter.ApiNullability, HandleApiQuerySourceParameterApiNullability, true },
+            { propertyNames.ApiQuerySourceParameter.ApiPresence, HandleApiQuerySourceParameterApiPresence, true },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
@@ -119,26 +119,28 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
             context.ReadData.ApiQuerySourceParameter.ApiTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, options);
         }
 
-        private static void HandleApiQuerySourceParameterApiTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiQuerySourceParameterApiNullability(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySourceParameter ??= new ApiQuerySourceParameterReadData();
 
-            context.ReadData.ApiQuerySourceParameter.ApiTypeModifiers =
-                JsonEnumReader.Read<ApiTypeModifiers>(ref reader, context.Options);
+            context.ReadData.ApiQuerySourceParameter.ApiNullability =
+                JsonEnumReader.Read<ApiNullability>(ref reader, context.Options);
         }
 
-        private static void HandleApiQuerySourceParameterApiRequiresArgument(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiQuerySourceParameterApiPresence(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySourceParameter ??= new ApiQuerySourceParameterReadData();
 
-            context.ReadData.ApiQuerySourceParameter.ApiRequiresArgument = reader.GetBoolean();
+            context.ReadData.ApiQuerySourceParameter.ApiPresence =
+                JsonEnumReader.Read<ApiPresence>(ref reader, context.Options);
         }
         #endregion
     }
     #endregion
 
     #region Fields
-    private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiNullability> _apiNullabilityJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiPresence> _apiPresenceJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -177,20 +179,21 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
 
         var apiName = apiQuerySourceParameterReadData?.ApiName;
         var apiTypeExpression = apiQuerySourceParameterReadData?.ApiTypeExpression;
-        var apiTypeModifiersReadResult = apiQuerySourceParameterReadData?.ApiTypeModifiers ?? default;
-        var apiTypeModifiers = apiTypeModifiersReadResult.ValueOr(ApiSchemaDefaults.NonNullableTypeModifiers);
-        var apiRequiresArgument = apiQuerySourceParameterReadData?.ApiRequiresArgument
-            ?? ApiSchemaDefaults.QuerySourceParameterRequiresArgument;
+        var apiNullabilityReadResult = apiQuerySourceParameterReadData?.ApiNullability ?? default;
+        var apiNullability = apiNullabilityReadResult.ValueOr(ApiSchemaDefaults.QuerySourceParameterNullability);
+        var apiPresenceReadResult = apiQuerySourceParameterReadData?.ApiPresence ?? default;
+        var apiPresence = apiPresenceReadResult.ValueOr(ApiSchemaDefaults.QuerySourceParameterPresence);
 
         var apiQuerySourceParameter = new ApiQuerySourceParameter
         (
             apiName!,
             apiTypeExpression!,
-            apiTypeModifiers,
-            apiRequiresArgument
+            apiNullability,
+            apiPresence
         );
 
-        apiQuerySourceParameter.RecordJsonEnumFinding(nameof(ApiQuerySourceParameter.ApiTypeModifiers), apiTypeModifiersReadResult);
+        apiQuerySourceParameter.RecordJsonEnumFinding(nameof(ApiQuerySourceParameter.ApiNullability), apiNullabilityReadResult);
+        apiQuerySourceParameter.RecordJsonEnumFinding(nameof(ApiQuerySourceParameter.ApiPresence), apiPresenceReadResult);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiQuerySourceParameter, extensions);
@@ -215,8 +218,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
             var (apiQuerySourceParameter, writeContext) = state;
             WriteApiQuerySourceParameterApiName(writer, apiQuerySourceParameter, writeContext);
             WriteApiQuerySourceParameterApiTypeExpression(writer, apiQuerySourceParameter, writeContext);
-            WriteApiQuerySourceParameterApiTypeModifiers(writer, apiQuerySourceParameter, writeContext);
-            WriteApiQuerySourceParameterApiRequiresArgument(writer, apiQuerySourceParameter, writeContext);
+            WriteApiQuerySourceParameterApiNullability(writer, apiQuerySourceParameter, writeContext);
+            WriteApiQuerySourceParameterApiPresence(writer, apiQuerySourceParameter, writeContext);
 
             WriteExtensibleBaseExtensions
             (
@@ -236,23 +239,24 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
     private static void WriteApiQuerySourceParameterApiTypeExpression(Utf8JsonWriter writer, ApiQuerySourceParameter apiQuerySourceParameter, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiTypeExpression, obj: apiQuerySourceParameter.ApiTypeExpression, options: writeContext.Options);
 
-    private static void WriteApiQuerySourceParameterApiTypeModifiers(Utf8JsonWriter writer, ApiQuerySourceParameter apiQuerySourceParameter, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiQuerySourceParameterApiNullability(Utf8JsonWriter writer, ApiQuerySourceParameter apiQuerySourceParameter, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithConverter
         (
-            propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiTypeModifiers,
-            value: apiQuerySourceParameter.ApiTypeModifiers,
+            propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiNullability,
+            value: apiQuerySourceParameter.ApiNullability,
             options: writeContext.Options,
-            converter: _apiTypeModifiersJsonConverter,
-            defaultValue: ApiSchemaDefaults.NonNullableTypeModifiers
+            converter: _apiNullabilityJsonConverter,
+            defaultValue: ApiSchemaDefaults.QuerySourceParameterNullability
         );
 
-    private static void WriteApiQuerySourceParameterApiRequiresArgument(Utf8JsonWriter writer, ApiQuerySourceParameter apiQuerySourceParameter, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsBoolean
+    private static void WriteApiQuerySourceParameterApiPresence(Utf8JsonWriter writer, ApiQuerySourceParameter apiQuerySourceParameter, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter
         (
-            propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiRequiresArgument,
-            value: apiQuerySourceParameter.ApiRequiresArgument,
+            propertyName: writeContext.PropertyNames.ApiQuerySourceParameter.ApiPresence,
+            value: apiQuerySourceParameter.ApiPresence,
             options: writeContext.Options,
-            defaultValue: ApiSchemaDefaults.QuerySourceParameterRequiresArgument
+            converter: _apiPresenceJsonConverter,
+            defaultValue: ApiSchemaDefaults.QuerySourceParameterPresence
         );
     #endregion
 }

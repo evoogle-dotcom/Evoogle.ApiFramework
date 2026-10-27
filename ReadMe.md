@@ -199,10 +199,10 @@ Precedence is `Convention < DataAnnotation < Explicit`. Accept a setting when th
 source is greater than or equal to its stored source, updating the value and source together:
 
 ```csharp
-if (source >= _state.ModifiersSource)
+if (source >= _state.NullabilitySource)
 {
-    _state.ApiTypeModifiers = apiTypeModifiers;
-    _state.ModifiersSource = source;
+    _state.ApiNullability = apiNullability;
+    _state.NullabilitySource = source;
 }
 ```
 
@@ -218,6 +218,34 @@ callback temporarily changes the active source, then restores the previous sourc
 including when the callback throws. Stored state sources describe retained configuration and
 are updated only when the corresponding setting or registration is accepted.
 
+## API Nullability
+
+`ApiNullability` declares whether a value permits null in a particular API context:
+`Nullable = 0` or `NonNullable = 1`. It is not a flags enumeration and has no unknown state.
+Properties and query-source parameters expose `ApiNullability`; collections expose
+`ApiItemNullability`; query sources expose `ApiOutputNullability`. Collection nullability
+and item nullability are independent, including for nested collections.
+
+Property builders infer nullability from CLR members. Unknown CLR nullability falls back
+to nullable. Use `WithNullability(ApiNullability.NonNullable)`, `AsNonNullable()`, or
+`AsNullable()` for an explicit override. Argument presence remains a separate constraint.
+
+## API Presence
+
+`ApiPresence` is a non-flags enumeration with `Optional = 0` and `Required = 1`.
+Query-source parameters expose `ApiPresence` independently of `ApiNullability` and provide
+computed `IsRequired` and `IsOptional` predicates. Parameters default to required, non-nullable inputs.
+Configure presence with `WithPresence(ApiPresence.Optional)`, `AsOptional()`, or `AsRequired()`.
+
+This replaces the former Boolean argument-presence API and JSON property without compatibility aliases.
+Schema JSON writes `ApiPresence` as `"Optional"` or `"Required"` (subject to naming policy);
+omission defaults to required. Explicit null and invalid enum values produce compilation issues.
+
+Properties do not yet declare universal presence. Create/update and object-input contracts will
+establish their applicable requirements; query projections derive their result shapes.
+Collection types retain item nullability, and query sources retain output nullability without
+introducing an output-omission state. See ADR 0002 for the operation-oriented contract boundaries.
+
 ## Query Source Declarations
 
 Register query sources explicitly; registering an object type does not expose it for querying.
@@ -230,10 +258,10 @@ builder.AddQuerySource("CustomerById", source => source
 ```
 
 The output is nullable by default, parameters require supplied non-null arguments by default,
-and source composition defaults to projection. `WithRequiredArgument()` and `WithOptionalArgument()`
+and source composition defaults to projection. `WithPresence(...)`, `AsRequired()`, and `AsOptional()`
 control whether an argument must be supplied. `AsNullable()` and `AsNonNullable()`
-independently control whether its supplied value may be null. `WithModifiers(...)` remains available
-for explicit type modifiers.
+independently control whether its supplied value may be null. `WithNullability(...)` remains available
+for explicit nullability.
 
 `WithOutputComposition(...)` replaces the permitted operations; it does not execute them.
 Filtering, ordering, and offset pagination require collection output, configured with
@@ -242,11 +270,11 @@ Filtering, ordering, and offset pagination require collection output, configured
 ```csharp
 builder.AddQuerySource("Orders", source => source
     .AddInputParameter<OrderStatus>("status", parameter => parameter
-        .WithOptionalArgument()
+        .AsOptional()
         .AsNonNullable())
     .WithCollectionOutput<Order>(
-        apiCollectionTypeModifiers: ApiTypeModifiers.Required,
-        apiItemTypeModifiers: ApiTypeModifiers.Required)
+        apiCollectionNullability: ApiNullability.NonNullable,
+        apiItemNullability: ApiNullability.NonNullable)
     .WithOutputComposition(ApiQueryComposition.Projection | ApiQueryComposition.Filtering));
 ```
 

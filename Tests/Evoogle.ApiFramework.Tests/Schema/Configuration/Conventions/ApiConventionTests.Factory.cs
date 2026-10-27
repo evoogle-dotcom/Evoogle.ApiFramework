@@ -230,7 +230,7 @@ public static class ApiConventionTestsFactory
     #endregion
 
     #region ObjectType - Property Configuration Convention Factory Methods
-    internal static ApiSchema BuildWithObjectTypePropertyNullabilityModifiers()
+    internal static ApiSchema BuildWithObjectTypePropertyNullability()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -240,13 +240,13 @@ public static class ApiConventionTestsFactory
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Name)
                 .AddProperty(p => p.Email))
-            .UsePropertyNullabilityModifiers()
+            .UsePropertyNullability()
             .Build();
 
         return apiSchema;
     }
 
-    internal static ApiSchema BuildWithObjectTypePropertyNullabilityModifiersAndExplicitPropertyModifier()
+    internal static ApiSchema BuildWithObjectTypePropertyNullabilityAndExplicitPropertyNullability()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -255,8 +255,8 @@ public static class ApiConventionTestsFactory
             .AddObject<PersonWithId>(x => x
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Name)
-                .AddProperty("email", "Email", p => p.WithModifiers(m => m.AsNonNullable())))
-            .UsePropertyNullabilityModifiers()
+                .AddProperty("email", "Email", p => p.WithNullability(ApiNullability.NonNullable)))
+            .UsePropertyNullability()
             .Build();
 
         return apiSchema;

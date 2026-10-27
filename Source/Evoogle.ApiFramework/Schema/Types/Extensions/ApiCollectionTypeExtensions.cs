@@ -16,19 +16,19 @@ public static class ApiCollectionTypeExtensions
     /// </summary>
     /// <param name="apiCollectionType">The <see cref="ApiCollectionType"/> instance.</param>
     /// <returns>
-    ///     <c>true</c> if the <see cref="ApiCollectionType.ApiItemTypeModifiers"/> has the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
+    ///     <c>true</c> if the <see cref="ApiCollectionType.ApiItemNullability"/> is <see cref="ApiNullability.NonNullable"/>; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsItemNonNullable(this ApiCollectionType apiCollectionType)
-        => apiCollectionType.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+        => apiCollectionType.ApiItemNullability == ApiNullability.NonNullable;
 
     /// <summary>
     ///     Determines whether the items in the <see cref="ApiCollectionType"/> are nullable.
     /// </summary>
     /// <param name="apiCollectionType">The <see cref="ApiCollectionType"/> instance.</param>
     /// <returns>
-    ///     <c>true</c> if the <see cref="ApiCollectionType.ApiItemTypeModifiers"/> does not have the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
+    ///     <c>true</c> if the <see cref="ApiCollectionType.ApiItemNullability"/> is <see cref="ApiNullability.Nullable"/>; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsItemNullable(this ApiCollectionType apiCollectionType)
-        => !apiCollectionType.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+        => apiCollectionType.ApiItemNullability == ApiNullability.Nullable;
     #endregion
 }

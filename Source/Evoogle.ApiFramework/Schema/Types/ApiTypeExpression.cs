@@ -134,28 +134,28 @@ public sealed class ApiTypeExpression
     #region Factory Methods
     /// <summary>Creates an expression for a hash-set collection of CLR items.</summary>
     /// <typeparam name="TClr">The CLR item type.</typeparam>
-    /// <param name="apiItemTypeModifiers">Modifiers applied to each item.</param>
+    /// <param name="apiItemNullability">Nullability of each item.</param>
     /// <returns>A new inline collection expression.</returns>
-    public static ApiTypeExpression HashSetOf<TClr>(ApiTypeModifiers apiItemTypeModifiers) => new
+    public static ApiTypeExpression HashSetOf<TClr>(ApiNullability apiItemNullability) => new
     (
         new ApiCollectionType
         (
             new ApiTypeExpression(ApiTypeReference.ClrRef<TClr>()),
-            apiItemTypeModifiers,
+            apiItemNullability,
             typeof(HashSet<TClr>)
         )
     );
 
     /// <summary>Creates an expression for a list collection of CLR items.</summary>
     /// <typeparam name="TClr">The CLR item type.</typeparam>
-    /// <param name="apiItemTypeModifiers">Modifiers applied to each item.</param>
+    /// <param name="apiItemNullability">Nullability of each item.</param>
     /// <returns>A new inline collection expression.</returns>
-    public static ApiTypeExpression ListOf<TClr>(ApiTypeModifiers apiItemTypeModifiers) => new
+    public static ApiTypeExpression ListOf<TClr>(ApiNullability apiItemNullability) => new
     (
         new ApiCollectionType
         (
             new ApiTypeExpression(ApiTypeReference.ClrRef<TClr>()),
-            apiItemTypeModifiers,
+            apiItemNullability,
             typeof(List<TClr>)
         )
     );

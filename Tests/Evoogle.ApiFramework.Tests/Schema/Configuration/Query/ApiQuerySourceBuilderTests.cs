@@ -23,47 +23,54 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
         [JsonConverter(typeof(ExpressionFuncJsonConverter<ApiSchema>))]
         public required Expression<Func<ApiSchema>> BuildExpression { get; init; }
 
-        public required bool ExpectedApiRequiresArgument { get; init; }
+        public required ApiPresence ExpectedPresence { get; init; }
 
-        public required ApiTypeModifiers ExpectedTypeModifiers { get; init; }
+        public required ApiNullability ExpectedNullability { get; init; }
         #endregion
 
         #region Calculated Properties
         private ApiQuerySourceParameter ActualParameter { get; set; } = null!;
+        private BuildInputParameterTest RestoredTestCase { get; set; } = null!;
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"Scenario:        {this.Name}");
-            this.WriteLine("API Parameter:   Echo.text (String)");
+            this.WriteLine($"Scenario:      {this.Name}");
+            this.WriteLine("API Parameter: Echo.text (String)");
             this.WriteLine();
 
             this.WriteLine($"Build Expression: {this.BuildExpression}");
             this.WriteLine();
 
-            this.WriteLine($"Expected API Requires Argument: {this.ExpectedApiRequiresArgument}");
-            this.WriteLine($"Expected Type Modifiers:        {this.ExpectedTypeModifiers}");
-            this.WriteLine("Expected Exception:             None");
+            this.WriteLine($"Expected Presence:    {this.ExpectedPresence}");
+            this.WriteLine($"Expected Nullability: {this.ExpectedNullability}");
+            this.WriteLine("Expected Exception:   None");
+
+            var serializer = new XUnitTestSerializer();
+            this.RestoredTestCase = (BuildInputParameterTest)serializer.Deserialize(
+                this.GetType(), serializer.Serialize(this));
         }
 
         protected override void Act()
         {
-            var schema = this.BuildExpression.Compile()();
+            var schema = this.RestoredTestCase.BuildExpression.Compile()();
             this.ActualParameter = schema.ApiQuerySources.Single().ApiInputParameters.Single();
 
-            this.WriteLine($"Actual API Requires Argument:   {this.ActualParameter.ApiRequiresArgument}");
-            this.WriteLine($"Actual Type Modifiers:          {this.ActualParameter.ApiTypeModifiers}");
-            this.WriteLine($"Actual CLR Type:                {this.ActualParameter.ApiType.ClrType}");
-            this.WriteLine("Schema Compilation:             Succeeded");
+            this.WriteLine($"Actual Presence:              {this.ActualParameter.ApiPresence}");
+            this.WriteLine($"Actual Nullability:           {this.ActualParameter.ApiNullability}");
+            this.WriteLine($"Actual CLR Type:              {this.ActualParameter.ApiType.ClrType}");
+            this.WriteLine("Schema Compilation:           Succeeded");
         }
 
         protected override void Assert()
         {
             this.ActualParameter.ApiName.Should().Be("text");
             this.ActualParameter.ApiType.ClrType.Should().Be<string>();
-            this.ActualParameter.ApiRequiresArgument.Should().Be(this.ExpectedApiRequiresArgument);
-            this.ActualParameter.ApiTypeModifiers.Should().Be(this.ExpectedTypeModifiers);
+            this.ActualParameter.ApiPresence.Should().Be(this.ExpectedPresence);
+            this.ActualParameter.IsRequired.Should().Be(this.ExpectedPresence == ApiPresence.Required);
+            this.ActualParameter.IsOptional.Should().Be(this.ExpectedPresence == ApiPresence.Optional);
+            this.ActualParameter.ApiNullability.Should().Be(this.ExpectedNullability);
         }
         #endregion
     }
@@ -75,9 +82,9 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
 
         public required bool UsesDefaultComposition { get; init; }
 
-        public required ApiTypeModifiers ExpectedCollectionTypeModifiers { get; init; }
+        public required ApiNullability ExpectedCollectionNullability { get; init; }
 
-        public required ApiTypeModifiers ExpectedItemTypeModifiers { get; init; }
+        public required ApiNullability ExpectedItemNullability { get; init; }
 
         public required ApiQueryComposition ExpectedComposition { get; init; }
         #endregion
@@ -91,14 +98,14 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"Scenario:                      {this.Name}");
-            this.WriteLine("API Query Source:              Texts (String collection)");
-            this.WriteLine($"Uses Generic Output:           {this.UsesGenericOutput}");
-            this.WriteLine($"Expected Collection Modifiers: {this.ExpectedCollectionTypeModifiers}");
-            this.WriteLine($"Expected Item Modifiers:       {this.ExpectedItemTypeModifiers}");
-            this.WriteLine($"Uses Default Composition:      {this.UsesDefaultComposition}");
-            this.WriteLine($"Expected Composition:          {this.ExpectedComposition}");
-            this.WriteLine("Expected Exception:            None");
+            this.WriteLine($"Scenario:                        {this.Name}");
+            this.WriteLine("API Query Source:                Texts (String collection)");
+            this.WriteLine($"Uses Generic Output:             {this.UsesGenericOutput}");
+            this.WriteLine($"Expected Collection Nullability: {this.ExpectedCollectionNullability}");
+            this.WriteLine($"Expected Item Nullability:       {this.ExpectedItemNullability}");
+            this.WriteLine($"Uses Default Composition:        {this.UsesDefaultComposition}");
+            this.WriteLine($"Expected Composition:            {this.ExpectedComposition}");
+            this.WriteLine("Expected Exception:              None");
 
             this.Builder = new ApiSchemaBuilder()
                 .WithName("CollectionOutputTests")
@@ -109,13 +116,18 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
                     {
                         source.WithCollectionOutput<string>
                         (
-                            apiCollectionTypeModifiers: this.ExpectedCollectionTypeModifiers,
-                            apiItemTypeModifiers: this.ExpectedItemTypeModifiers
+                            apiCollectionNullability: this.ExpectedCollectionNullability,
+                            apiItemNullability: this.ExpectedItemNullability
                         );
                     }
                     else
                     {
-                        source.WithCollectionOutput<string>(apiCollectionTypeModifiers: this.ExpectedCollectionTypeModifiers, apiItemTypeModifiers: this.ExpectedItemTypeModifiers);
+                        source.WithCollectionOutput
+                        (
+                            typeof(string),
+                            apiCollectionNullability: this.ExpectedCollectionNullability,
+                            apiItemNullability: this.ExpectedItemNullability
+                        );
                     }
 
                     if (!this.UsesDefaultComposition)
@@ -133,8 +145,8 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
             this.ActualSource = schema.ApiQuerySources.Single();
             var collectionType = (ApiCollectionType)this.ActualSource.ApiOutputType;
 
-            this.WriteLine($"Actual Collection Modifiers:   {this.ActualSource.ApiOutputTypeModifiers}");
-            this.WriteLine($"Actual Item Modifiers:         {collectionType.ApiItemTypeModifiers}");
+            this.WriteLine($"Actual Collection Nullability: {this.ActualSource.ApiOutputNullability}");
+            this.WriteLine($"Actual Item Nullability:       {collectionType.ApiItemNullability}");
             this.WriteLine($"Actual Composition:            {this.ActualSource.ApiOutputComposition}");
             this.WriteLine($"Actual Item CLR Type:          {collectionType.ApiItemType.ClrType}");
             this.WriteLine("Schema Compilation:            Succeeded");
@@ -143,10 +155,10 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
         protected override void Assert()
         {
             this.ActualSource.ApiName.Should().Be("Texts");
-            this.ActualSource.ApiOutputTypeModifiers.Should().Be(this.ExpectedCollectionTypeModifiers);
+            this.ActualSource.ApiOutputNullability.Should().Be(this.ExpectedCollectionNullability);
             this.ActualSource.ApiOutputComposition.Should().Be(this.ExpectedComposition);
             var collectionType = this.ActualSource.ApiOutputType.Should().BeOfType<ApiCollectionType>().Subject;
-            collectionType.ApiItemTypeModifiers.Should().Be(this.ExpectedItemTypeModifiers);
+            collectionType.ApiItemNullability.Should().Be(this.ExpectedItemNullability);
             collectionType.ApiItemType.ClrType.Should().Be<string>();
         }
         #endregion
@@ -158,73 +170,94 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
     [
         new BuildInputParameterTest
         {
+            Name = "Later equal-precedence presence replaces earlier presence without changing nullability",
+            BuildExpression = static () => ApiQuerySourceBuilderTestsFactory.BuildWithLaterOptionalPresence(),
+            ExpectedPresence = ApiPresence.Optional,
+            ExpectedNullability = ApiNullability.NonNullable
+        },
+        new BuildInputParameterTest
+        {
+            Name = "Annotation presence takes precedence over a later convention",
+            BuildExpression = static () => ApiQuerySourceBuilderTestsFactory.BuildWithAnnotationPresence(),
+            ExpectedPresence = ApiPresence.Optional,
+            ExpectedNullability = ApiNullability.NonNullable
+        },
+        new BuildInputParameterTest
+        {
+            Name = "Explicit presence takes precedence over a later annotation",
+            BuildExpression = static () => ApiQuerySourceBuilderTestsFactory.BuildWithExplicitPresenceOverAnnotation(),
+            ExpectedPresence = ApiPresence.Optional,
+            ExpectedNullability = ApiNullability.NonNullable
+        },
+        new BuildInputParameterTest
+        {
             Name = "Default argument settings require a non-null value",
             BuildExpression = static () =>
                 ApiQuerySourceBuilderTestsFactory.BuildWithDefaultArgumentSettings(),
-            ExpectedApiRequiresArgument = true,
-            ExpectedTypeModifiers = ApiTypeModifiers.Required
+            ExpectedPresence = ApiPresence.Required,
+            ExpectedNullability = ApiNullability.NonNullable
         },
         new BuildInputParameterTest
         {
             Name = "Required argument with non-null value",
             BuildExpression = static () =>
                 ApiQuerySourceBuilderTestsFactory.BuildRequiredArgumentWithNonNullableValue(),
-            ExpectedApiRequiresArgument = true,
-            ExpectedTypeModifiers = ApiTypeModifiers.Required
+            ExpectedPresence = ApiPresence.Required,
+            ExpectedNullability = ApiNullability.NonNullable
         },
         new BuildInputParameterTest
         {
             Name = "Required argument with nullable value",
             BuildExpression = static () => ApiQuerySourceBuilderTestsFactory.BuildRequiredArgumentWithNullableValue(),
-            ExpectedApiRequiresArgument = true,
-            ExpectedTypeModifiers = ApiTypeModifiers.None
+            ExpectedPresence = ApiPresence.Required,
+            ExpectedNullability = ApiNullability.Nullable
         },
         new BuildInputParameterTest
         {
             Name = "Optional argument with non-null value",
             BuildExpression = static () =>
                 ApiQuerySourceBuilderTestsFactory.BuildOptionalArgumentWithNonNullableValue(),
-            ExpectedApiRequiresArgument = false,
-            ExpectedTypeModifiers = ApiTypeModifiers.Required
+            ExpectedPresence = ApiPresence.Optional,
+            ExpectedNullability = ApiNullability.NonNullable
         },
         new BuildInputParameterTest
         {
             Name = "Optional argument with nullable value",
             BuildExpression = static () => ApiQuerySourceBuilderTestsFactory.BuildOptionalArgumentWithNullableValue(),
-            ExpectedApiRequiresArgument = false,
-            ExpectedTypeModifiers = ApiTypeModifiers.None
+            ExpectedPresence = ApiPresence.Optional,
+            ExpectedNullability = ApiNullability.Nullable
         },
         new BuildInputParameterTest
         {
             Name = "Later required non-null configuration replaces optional nullable configuration",
             BuildExpression = static () =>
                 ApiQuerySourceBuilderTestsFactory.BuildWithLaterRequiredNonNullableConfiguration(),
-            ExpectedApiRequiresArgument = true,
-            ExpectedTypeModifiers = ApiTypeModifiers.Required
+            ExpectedPresence = ApiPresence.Required,
+            ExpectedNullability = ApiNullability.NonNullable
         },
         new BuildInputParameterTest
         {
-            Name = "Later nullable configuration replaces explicit non-null modifiers",
+            Name = "Later nullable configuration replaces explicit non-nullability",
             BuildExpression = static () =>
                 ApiQuerySourceBuilderTestsFactory.BuildWithLaterNullableConfiguration(),
-            ExpectedApiRequiresArgument = true,
-            ExpectedTypeModifiers = ApiTypeModifiers.None
+            ExpectedPresence = ApiPresence.Required,
+            ExpectedNullability = ApiNullability.Nullable
         },
         new BuildInputParameterTest
         {
             Name = "Lower precedence cannot replace explicit optional nullable configuration",
             BuildExpression = static () =>
                 ApiQuerySourceBuilderTestsFactory.BuildWithExplicitOptionalNullableConfiguration(),
-            ExpectedApiRequiresArgument = false,
-            ExpectedTypeModifiers = ApiTypeModifiers.None
+            ExpectedPresence = ApiPresence.Optional,
+            ExpectedNullability = ApiNullability.Nullable
         },
         new BuildInputParameterTest
         {
             Name = "Lower precedence cannot replace explicit required non-null configuration",
             BuildExpression = static () =>
                 ApiQuerySourceBuilderTestsFactory.BuildWithExplicitRequiredNonNullableConfiguration(),
-            ExpectedApiRequiresArgument = true,
-            ExpectedTypeModifiers = ApiTypeModifiers.Required
+            ExpectedPresence = ApiPresence.Required,
+            ExpectedNullability = ApiNullability.NonNullable
         }
     ];
 
@@ -235,8 +268,8 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
             Name = "Default composition allows projection",
             UsesGenericOutput = true,
             UsesDefaultComposition = true,
-            ExpectedCollectionTypeModifiers = ApiTypeModifiers.Required,
-            ExpectedItemTypeModifiers = ApiTypeModifiers.Required,
+            ExpectedCollectionNullability = ApiNullability.NonNullable,
+            ExpectedItemNullability = ApiNullability.NonNullable,
             ExpectedComposition = ApiQueryComposition.Projection
         },
         new BuildCollectionOutputTest
@@ -244,8 +277,8 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
             Name = "Generic nullable collection with non-null items and ordering only",
             UsesGenericOutput = true,
             UsesDefaultComposition = false,
-            ExpectedCollectionTypeModifiers = ApiTypeModifiers.None,
-            ExpectedItemTypeModifiers = ApiTypeModifiers.Required,
+            ExpectedCollectionNullability = ApiNullability.Nullable,
+            ExpectedItemNullability = ApiNullability.NonNullable,
             ExpectedComposition = ApiQueryComposition.Ordering
         },
         new BuildCollectionOutputTest
@@ -253,8 +286,8 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
             Name = "Generic non-null collection with nullable items and no composition",
             UsesGenericOutput = true,
             UsesDefaultComposition = false,
-            ExpectedCollectionTypeModifiers = ApiTypeModifiers.Required,
-            ExpectedItemTypeModifiers = ApiTypeModifiers.None,
+            ExpectedCollectionNullability = ApiNullability.NonNullable,
+            ExpectedItemNullability = ApiNullability.Nullable,
             ExpectedComposition = ApiQueryComposition.None
         },
         new BuildCollectionOutputTest
@@ -262,8 +295,8 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
             Name = "CLR nullable collection with non-null items and combined composition",
             UsesGenericOutput = false,
             UsesDefaultComposition = false,
-            ExpectedCollectionTypeModifiers = ApiTypeModifiers.None,
-            ExpectedItemTypeModifiers = ApiTypeModifiers.Required,
+            ExpectedCollectionNullability = ApiNullability.Nullable,
+            ExpectedItemNullability = ApiNullability.NonNullable,
             ExpectedComposition = ApiQueryComposition.Projection | ApiQueryComposition.Ordering
                 | ApiQueryComposition.OffsetPagination
         },
@@ -272,8 +305,8 @@ public class ApiQuerySourceBuilderTests(ITestOutputHelper output) : XUnitTests(o
             Name = "CLR non-null collection with nullable items and no composition",
             UsesGenericOutput = false,
             UsesDefaultComposition = false,
-            ExpectedCollectionTypeModifiers = ApiTypeModifiers.Required,
-            ExpectedItemTypeModifiers = ApiTypeModifiers.None,
+            ExpectedCollectionNullability = ApiNullability.NonNullable,
+            ExpectedItemNullability = ApiNullability.Nullable,
             ExpectedComposition = ApiQueryComposition.None
         }
     ];

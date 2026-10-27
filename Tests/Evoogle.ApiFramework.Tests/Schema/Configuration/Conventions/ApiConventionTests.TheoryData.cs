@@ -295,7 +295,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -306,7 +306,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -317,7 +317,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Email"
@@ -367,7 +367,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -378,7 +378,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -389,7 +389,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Email"
@@ -439,7 +439,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -450,7 +450,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -461,7 +461,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Email"
@@ -511,7 +511,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -522,7 +522,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -533,7 +533,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Email"
@@ -658,7 +658,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Id"
@@ -669,7 +669,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Name"
@@ -680,7 +680,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "None",
+                      "ApiNullability": "Nullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Email"
@@ -744,7 +744,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Id"
@@ -755,7 +755,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Name"
@@ -766,7 +766,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "None",
+                      "ApiNullability": "Nullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Email"
@@ -830,7 +830,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "OrderItemId"
@@ -841,7 +841,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Description"
@@ -875,7 +875,7 @@ public partial class ApiConventionTests
         // ObjectType - Property Configuration Convention Tests
         new BuildTest
         {
-            Name = $"Build with {nameof(ApiPropertyNullabilityModifierConvention)}",
+            Name = $"Build with {nameof(ApiPropertyNullabilityConvention)}",
             ApiSchemaExpectedJson = """
             {
               "ApiName": "Test",
@@ -906,7 +906,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Id"
@@ -917,7 +917,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Name"
@@ -928,7 +928,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "None",
+                      "ApiNullability": "Nullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Email"
@@ -943,12 +943,12 @@ public partial class ApiConventionTests
             }
             """,
             ApiSchemaActualBuildExpression = static () =>
-                ApiConventionTestsFactory.BuildWithObjectTypePropertyNullabilityModifiers()
+                ApiConventionTestsFactory.BuildWithObjectTypePropertyNullability()
         },
 
         new BuildTest
         {
-            Name = $"Build with {nameof(ApiPropertyNullabilityModifierConvention)} and explicit property modifier",
+            Name = $"Build with {nameof(ApiPropertyNullabilityConvention)} and explicit property nullability",
             ApiSchemaExpectedJson = """
             {
               "ApiName": "Test",
@@ -979,7 +979,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Id"
@@ -990,7 +990,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Name"
@@ -1001,7 +1001,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.String, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Email"
@@ -1016,7 +1016,7 @@ public partial class ApiConventionTests
             }
             """,
             ApiSchemaActualBuildExpression = static () =>
-                ApiConventionTestsFactory.BuildWithObjectTypePropertyNullabilityModifiersAndExplicitPropertyModifier()
+                ApiConventionTestsFactory.BuildWithObjectTypePropertyNullabilityAndExplicitPropertyNullability()
         },
 
         // ObjectType - Property Discovery Convention Tests
@@ -1053,7 +1053,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1064,7 +1064,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1075,7 +1075,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Email"
@@ -1130,7 +1130,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Field",
                                     "ClrName": "Id"
@@ -1141,7 +1141,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Field",
                                     "ClrName": "Name"
@@ -1152,7 +1152,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Field",
                                     "ClrName": "Count"
@@ -1202,7 +1202,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1213,7 +1213,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1224,7 +1224,7 @@ public partial class ApiConventionTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Email"
@@ -1288,7 +1288,7 @@ public partial class ApiConventionTests
                       "ApiType": {
                         "ClrType": "System.Guid, System.Private.CoreLib"
                       },
-                      "ApiTypeModifiers": "Required",
+                      "ApiNullability": "NonNullable",
                       "ClrValueMember": {
                           "ClrKind": "Property",
                           "ClrName": "Id"

@@ -31,7 +31,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     {
         #region Immutable Properties
         public required string ApiItemTypeExpression { get; init; }
-        public required string ApiItemTypeModifiers { get; init; }
+        public required string ApiItemNullability { get; init; }
         #endregion
     }
 
@@ -101,7 +101,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
                 ApiCollectionType = new ApiCollectionTypePropertyNames
                 {
                     ApiItemTypeExpression = policy.ConvertName(nameof(Types.ApiCollectionType.ApiItemType)), // Mapping property name from ApiItemTypeExpression to ApiItemType by design
-                    ApiItemTypeModifiers = policy.ConvertName(nameof(Types.ApiCollectionType.ApiItemTypeModifiers))
+                    ApiItemNullability = policy.ConvertName(nameof(Types.ApiCollectionType.ApiItemNullability))
                 },
                 ApiEnumType = new ApiEnumTypePropertyNames
                 {
@@ -132,7 +132,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
 
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeKind> _apiTypeKindJsonConverter = new();
-    private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiNullability> _apiNullabilityJsonConverter = new();
     private static readonly NullableEnumJsonConverter<ApiTypeKind> _nullableApiTypeKindJsonConverter =
         new(EnumJsonInvalidValuePolicy.Throw);
 

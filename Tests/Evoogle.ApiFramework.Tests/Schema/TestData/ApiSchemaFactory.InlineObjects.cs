@@ -60,7 +60,7 @@ public static partial class ApiSchemaFactory
                         ApiTypeDef: null,
                         ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiTypeKind.Scalar, "Int32", null)
                     ),
-                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                    ApiNullability: ApiNullability.NonNullable,
                     ClrValueMember: new ClrMemberReferenceDef(ClrMemberKind.Property, nameof(InlineLeaf.Id))
                 )
             ]
@@ -70,7 +70,7 @@ public static partial class ApiSchemaFactory
         (
             typeof(List<InlineLeaf>),
             leafExpression,
-            ApiTypeModifiers.Required
+            ApiNullability.NonNullable
         );
         var container = new ApiObjectTypeDef
         (
@@ -87,7 +87,7 @@ public static partial class ApiSchemaFactory
                         (
                             typeof(List<List<InlineLeaf>>),
                             new ApiTypeExpressionDef(collection, null),
-                            ApiTypeModifiers.Required
+                            ApiNullability.NonNullable
                         ),
                         null
                     )
@@ -143,7 +143,7 @@ public static partial class ApiSchemaFactory
     (
         ApiName: clrName,
         ApiTypeExpression: typeExpression,
-        ApiTypeModifiers: ApiTypeModifiers.None,
+        ApiNullability: ApiNullability.Nullable,
         ClrValueMember: new ClrMemberReferenceDef(ClrMemberKind.Property, clrName)
     );
     #endregion

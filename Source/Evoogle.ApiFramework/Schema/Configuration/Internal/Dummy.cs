@@ -696,25 +696,25 @@ internal static class Dummy
             .AddQuerySource("CustomerById", s => s
                 .AddInputParameter("id", new ApiTypeReference(typeof(int)), p => p
                     .AsNonNullable()
-                    .WithRequiredArgument()
+                    .AsRequired()
                     .AddQuerySourceParameterExtension(typeof(VisibleMetadata), new VisibleMetadata { IsVisible = true }))
-                .WithOutput(new ApiTypeReference(typeof(Customer)), ApiTypeModifiers.None)
+                .WithOutput(new ApiTypeReference(typeof(Customer)), ApiNullability.Nullable)
                 .WithOutputComposition(ApiQueryComposition.Projection)
                 .AddQuerySourceExtension(typeof(VisibleMetadata), new VisibleMetadata { IsVisible = true }))
             // Query source — CLR type output with multiple parameters configured by CLR type.
             .AddQuerySource("OrderByStatus", s => s
                 .AddInputParameter<OrderStatus>("status", p => p
                     .AsNullable()
-                    .WithOptionalArgument())
+                    .AsOptional())
                 .AddInputParameter<int>("customerId")
-                .WithOutput<Order>(ApiTypeModifiers.Required)
+                .WithOutput<Order>(ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.None))
             // Query source — collection output by CLR item type with combined composition flags.
             .AddQuerySource("Orders", s => s
                 .AddInputParameter<OrderStatus>("status", p => p
-                    .WithOptionalArgument()
+                    .AsOptional()
                     .AsNonNullable())
-                .WithCollectionOutput<Order>(apiCollectionTypeModifiers: ApiTypeModifiers.Required, apiItemTypeModifiers: ApiTypeModifiers.Required)
+                .WithCollectionOutput<Order>(apiCollectionNullability: ApiNullability.NonNullable, apiItemNullability: ApiNullability.NonNullable)
                 .WithOutputComposition(
                     ApiQueryComposition.Projection
                     | ApiQueryComposition.Filtering
@@ -811,7 +811,7 @@ internal static class Dummy
             .AddQuerySource("CustomerById", s => s
                 .AddInputParameter<int>("id", p => p
                     .AsNonNullable()
-                    .WithRequiredArgument()
+                    .AsRequired()
                     .AddParameterExtension(new VisibleMetadata { IsVisible = true }))
                 .WithOutput<Customer>()
                 .WithOutputComposition(ApiQueryComposition.Projection)
@@ -819,17 +819,17 @@ internal static class Dummy
             .AddQuerySource("OrderByStatus", s => s
                 .AddInputParameter<OrderStatus>("status", p => p
                     .AsNullable()
-                    .WithOptionalArgument())
+                    .AsOptional())
                 .AddInputParameter<int>("customerId")
-                .WithOutput<Order>(ApiTypeModifiers.Required)
+                .WithOutput<Order>(ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.None))
             .AddQuerySource("Orders", s => s
                 .AddInputParameter<OrderStatus>("status", p => p
-                    .WithOptionalArgument()
+                    .AsOptional()
                     .AsNonNullable())
                 .WithCollectionOutput<Order>(
-                    apiCollectionTypeModifiers: ApiTypeModifiers.Required,
-                    apiItemTypeModifiers: ApiTypeModifiers.Required)
+                    apiCollectionNullability: ApiNullability.NonNullable,
+                    apiItemNullability: ApiNullability.NonNullable)
                 .WithOutputComposition(
                     ApiQueryComposition.Projection
                     | ApiQueryComposition.Filtering
@@ -920,7 +920,7 @@ internal static class Dummy
             .AddScalar<Guid>(x => x.WithName("Guid"))
             .AddScalar<string>(x => x.WithName("String"))
             // Apply the full default convention set: enum-value discovery, property discovery,
-            // camelCase naming, nullability-based modifiers, and PrimaryKey inference.
+            // camelCase naming, nullability, and PrimaryKey inference.
             .UseDefaultConventions()
             // Augment the default set with a custom application-specific convention.
             .UseConventions(c => c

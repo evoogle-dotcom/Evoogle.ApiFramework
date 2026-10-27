@@ -439,7 +439,7 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
         (
             apiName: containedName,
             apiTypeExpression: new ApiTypeExpression(apiTypeReference: new ApiTypeReference(clrType: typeof(Target))),
-            apiTypeModifiers: ApiTypeModifiers.None,
+            apiNullability: ApiNullability.Nullable,
             clrValueMember: new ClrMemberReference(clrKind: containedClrKind, clrName: containedClrName)
         );
         var source = new ApiObjectType
@@ -518,7 +518,7 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
     (
         apiName: "Id",
         apiTypeExpression: new ApiTypeExpression(apiTypeReference: new ApiTypeReference(typeof(long))),
-        apiTypeModifiers: ApiTypeModifiers.Required,
+        apiNullability: ApiNullability.NonNullable,
         clrValueMember: new ClrMemberReference(clrKind: ClrMemberKind.Property, clrName: "Id")
     );
     #endregion

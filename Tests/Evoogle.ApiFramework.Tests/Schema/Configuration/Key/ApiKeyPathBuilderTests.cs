@@ -218,14 +218,14 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
             (
                 "nested",
                 new ApiTypeExpression(new ApiTypeReference(typeof(NestedObject))),
-                ApiTypeModifiers.Required,
+                ApiNullability.NonNullable,
                 new ClrMemberReference(ClrMemberKind.Property, nameof(RootObject.Nested))
             );
             var identifierProperty = new ApiProperty
             (
                 "identifier",
                 new ApiTypeExpression(new ApiTypeReference(typeof(int))),
-                ApiTypeModifiers.Required,
+                ApiNullability.NonNullable,
                 new ClrMemberReference(ClrMemberKind.Property, nameof(NestedObject.Id))
             );
             var rootType = new ApiObjectType

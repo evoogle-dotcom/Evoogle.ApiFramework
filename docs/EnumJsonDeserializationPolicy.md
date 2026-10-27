@@ -24,7 +24,7 @@ following table.
 | Enum role | Examples | Omitted | JSON `null` | Unknown name or incompatible token |
 | --- | --- | --- | --- | --- |
 | Required schema metadata | `ApiProperty.ClrValueMember.ClrKind` | Compilation issue | Compilation issue | Compilation issue |
-| Defaulted schema setting | `ApiTypeModifiers`, `ApiRelationshipDeleteBehavior`, `ApiSchemaOptions.ApiKeyNullHandling` | Use the documented default | Compilation issue | Compilation issue |
+| Defaulted schema setting | `ApiNullability`, `ApiPresence`, `ApiRelationshipDeleteBehavior`, `ApiSchemaOptions.ApiKeyNullHandling` | Use the documented default | Compilation issue | Compilation issue |
 | Nullable override | `ApiObjectTypeOptions.ApiKeyNullHandling` | Inherit | Inherit | Compilation issue |
 | Conditional reference metadata | `ApiTypeReference.ApiKind` | Allowed for CLR references; otherwise compilation issue | Allowed for CLR references; otherwise compilation issue | Compilation issue |
 | Structural discriminator | `ApiType.ApiKind`, `ApiRelationship.ApiKind` | `JsonException` | `JsonException` | `JsonException` |

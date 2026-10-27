@@ -6,16 +6,15 @@
 namespace Evoogle.ApiFramework.Schema.Types;
 
 /// <summary>
-///     Represents modifiers that affect the behavior or constraints of an API type (e.g., nullability).
+///     Specifies whether a value permits null in a particular API context.
 /// </summary>
-[Flags]
-public enum ApiTypeModifiers
+public enum ApiNullability
 {
     #region Values
-    /// <summary>Represents that the API type has no modifiers.</summary>
-    None = 0,
+    /// <summary>Specifies that an API value may be null.</summary>
+    Nullable = 0,
 
     /// <summary>Specifies that an API value must be non-null; does not require its presence in an input.</summary>
-    Required = 1,
+    NonNullable = 1,
     #endregion
 }

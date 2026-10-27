@@ -288,7 +288,7 @@ public static class ApiSchemaBuilderExtensions
     ///     This is equivalent to composing <see cref="UseAssemblyTypeInference"/>,
     ///     <see cref="UseConfigurationsFromAssembly"/>,
     ///     <see cref="UsePropertyDiscovery"/>, <see cref="UseEnumValueDiscovery"/>, and
-    ///     <see cref="UsePropertyNullabilityModifiers"/>. The optional filter is applied while
+    ///     <see cref="UsePropertyNullability"/>. The optional filter is applied while
     ///     scanning the assembly for eligible CLR types and configurations.
     /// </remarks>
     /// <param name="builder">The schema builder to configure.</param>
@@ -315,7 +315,7 @@ public static class ApiSchemaBuilderExtensions
                 .AddConvention(new ApiSchemaAssemblyConfigurationDiscoveryConvention(assembly, filter))
                 .AddConvention(new ApiEnumTypeEnumValueDiscoveryConvention())
                 .AddConvention(new ApiObjectTypePropertyDiscoveryConvention())
-                .AddConvention(new ApiPropertyNullabilityModifierConvention())
+                .AddConvention(new ApiPropertyNullabilityConvention())
         );
     }
 
@@ -488,16 +488,16 @@ public static class ApiSchemaBuilderExtensions
     }
 
     /// <summary>
-    ///     Adds the built-in convention that infers property required/optional modifiers from CLR
+    ///     Adds the built-in convention that infers property required/optional nullability overrides from CLR
     ///     nullability.
     /// </summary>
     /// <param name="builder">The schema builder to configure.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder UsePropertyNullabilityModifiers(this ApiSchemaBuilder builder)
+    public static ApiSchemaBuilder UsePropertyNullability(this ApiSchemaBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiPropertyNullabilityModifierConvention()));
+        return builder.UseConventions(c => c.AddConvention(new ApiPropertyNullabilityConvention()));
     }
 
     /// <summary>

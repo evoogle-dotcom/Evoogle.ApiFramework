@@ -52,7 +52,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -63,7 +63,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -74,7 +74,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Email"
@@ -272,7 +272,7 @@ public partial class ApiAnnotationTests
 
         new BuildTest
         {
-            Name = $"Build with {nameof(ApiPropertyAttribute)} configures name and modifiers",
+            Name = $"Build with {nameof(ApiPropertyAttribute)} configures name and nullability",
             ApiSchemaExpectedJson = """
             {
                 "ApiName": "Test",
@@ -303,7 +303,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -314,7 +314,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -325,7 +325,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NonNullableButOptional"
@@ -336,7 +336,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "RequiredWins"
@@ -351,7 +351,7 @@ public partial class ApiAnnotationTests
             }
             """,
             ApiSchemaActualBuildExpression = static () =>
-                ApiAnnotationTestsFactory.BuildWithApiPropertyAttributesConfigureNameAndModifiers()
+                ApiAnnotationTestsFactory.BuildWithApiPropertyAttributesConfigureNameAndNullability()
         },
 
         new BuildTest
@@ -387,7 +387,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Field",
                                     "ClrName": "Code"
@@ -449,7 +449,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -460,7 +460,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -522,7 +522,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -533,7 +533,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -610,7 +610,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "OrderId"
@@ -621,7 +621,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int64, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "LineItemNumber"
@@ -632,7 +632,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -704,7 +704,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id1"
@@ -715,7 +715,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id2"
@@ -726,7 +726,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id3"
@@ -737,7 +737,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -809,7 +809,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -820,7 +820,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -882,7 +882,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -893,7 +893,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -955,7 +955,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -966,7 +966,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Code"
@@ -1028,7 +1028,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+NestedKeyPartAnnotation, Evoogle.ApiFramework.Tests"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NestedPart"
@@ -1039,7 +1039,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1075,7 +1075,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1086,7 +1086,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1148,7 +1148,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "LineNumber"
@@ -1159,7 +1159,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1195,7 +1195,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1206,7 +1206,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1268,7 +1268,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1299,7 +1299,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1310,7 +1310,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Description"
@@ -1367,7 +1367,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Int32, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1434,7 +1434,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1445,7 +1445,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1475,7 +1475,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1486,7 +1486,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "CustomerId"
@@ -1497,7 +1497,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Decimal, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Total"
@@ -1582,7 +1582,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1593,7 +1593,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "None",
+                                "ApiNullability": "Nullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "OrderId"
@@ -1604,7 +1604,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Decimal, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Amount"
@@ -1623,7 +1623,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1702,7 +1702,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1732,7 +1732,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "ProductId"
@@ -1743,7 +1743,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "TagId"
@@ -1762,7 +1762,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1855,7 +1855,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1885,7 +1885,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1915,7 +1915,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "ProductId"
@@ -1926,7 +1926,7 @@ public partial class ApiAnnotationTests
                                 "ApiType": {
                                     "ClrType": "System.Guid, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "TagId"

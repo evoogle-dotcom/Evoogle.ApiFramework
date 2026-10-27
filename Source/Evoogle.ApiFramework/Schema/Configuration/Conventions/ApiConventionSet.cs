@@ -91,7 +91,7 @@ public sealed class ApiConventionSet
         set.EnumTypeConventions.Add(new ApiEnumTypeEnumValueDiscoveryConvention());
         set.ObjectTypeConventions.Add(new ApiObjectTypePropertyDiscoveryConvention());
         set.ObjectTypeConventions.Add(new ApiObjectTypePrimaryKeyInferenceConvention());
-        set.PropertyConventions.Add(new ApiPropertyNullabilityModifierConvention());
+        set.PropertyConventions.Add(new ApiPropertyNullabilityConvention());
 
         return set;
     }

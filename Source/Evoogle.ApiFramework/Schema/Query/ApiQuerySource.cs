@@ -21,7 +21,7 @@ namespace Evoogle.ApiFramework.Schema.Query;
 /// <param name="apiName">The source API name.</param>
 /// <param name="apiInputParameters">The input declarations owned by the source.</param>
 /// <param name="apiOutputTypeExpression">The declared output type.</param>
-/// <param name="apiOutputTypeModifiers">The output nullability.</param>
+/// <param name="apiOutputNullability">The output nullability.</param>
 /// <param name="apiOutputComposition">The permitted composition over the output.</param>
 [JsonConverter(typeof(ApiQuerySourceJsonConverter))]
 public sealed class ApiQuerySource
@@ -29,7 +29,7 @@ public sealed class ApiQuerySource
     string apiName,
     IEnumerable<ApiQuerySourceParameter>? apiInputParameters,
     ApiTypeExpression apiOutputTypeExpression,
-    ApiTypeModifiers apiOutputTypeModifiers,
+    ApiNullability apiOutputNullability,
     ApiQueryComposition apiOutputComposition
 ) : ApiSchemaElement
 {
@@ -57,7 +57,7 @@ public sealed class ApiQuerySource
     public ApiType ApiOutputType => this.ApiOutputTypeExpression.ApiType;
 
     /// <summary>Gets the output nullability.</summary>
-    public ApiTypeModifiers ApiOutputTypeModifiers { get; } = apiOutputTypeModifiers;
+    public ApiNullability ApiOutputNullability { get; } = apiOutputNullability;
 
     /// <summary>Gets the composition permitted over the source output.</summary>
     public ApiQueryComposition ApiOutputComposition { get; } = apiOutputComposition;
@@ -103,7 +103,7 @@ public sealed class ApiQuerySource
         this.ValidateApiName(context);
         this.BuildLookupDictionaries(context);
         this.CompileApiInputParameters(context);
-        this.ValidateApiOutputTypeModifiers(context);
+        this.ValidateApiOutputNullability(context);
         this.ResolveApiOutputTypeExpression(context);
         this.ValidateApiOutputComposition(context);
     }
@@ -202,32 +202,21 @@ public sealed class ApiQuerySource
         }
     }
 
-    private void ValidateApiOutputTypeModifiers(ApiSchemaCompilationContext context)
+    private void ValidateApiOutputNullability(ApiSchemaCompilationContext context)
     {
-        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiOutputTypeModifiers));
-        if (jsonEnumFinding is not null)
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiOutputNullability));
+        if (jsonEnumFinding is null && Enum.IsDefined(this.ApiOutputNullability))
         {
-            var findingApiPath = this.ApiPath;
-            var findingSeverity = ApiSchemaCompilationSeverity.Error;
-            var findingCode = ApiSchemaCompilationCode.ApiQuerySourceInvalidOutputTypeModifiers;
-            var findingDescription = jsonEnumFinding.DescribeProblem();
-            var findingRemediation = $"Specify a valid {nameof(this.ApiOutputTypeModifiers)} value";
-
-            context.AddIssue(findingApiPath, findingSeverity, findingCode, findingDescription, findingRemediation);
             return;
         }
 
-        var hasUnsupportedApiOutputTypeModifiers = (this.ApiOutputTypeModifiers & ~ApiTypeModifiers.Required) != 0;
-        if (hasUnsupportedApiOutputTypeModifiers)
-        {
-            var apiPath = this.ApiPath;
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiQuerySourceInvalidOutputTypeModifiers;
-            var description = $"{nameof(this.ApiOutputTypeModifiers)} are invalid";
-            var remediation = $"Use {ApiTypeModifiers.None} for nullable output or {ApiTypeModifiers.Required} for non-null output";
+        var apiPath = this.ApiPath;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiQuerySourceInvalidOutputNullability;
+        var description = jsonEnumFinding?.DescribeProblem() ?? $"{nameof(this.ApiOutputNullability)} is invalid";
+        var remediation = $"Specify {ApiNullability.Nullable} or {ApiNullability.NonNullable} for {nameof(this.ApiOutputNullability)}";
 
-            context.AddIssue(apiPath, severity, code, description, remediation);
-        }
+        context.AddIssue(apiPath, severity, code, description, remediation);
     }
     #endregion
 }

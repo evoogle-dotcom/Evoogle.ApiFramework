@@ -15,7 +15,7 @@ using Evoogle.Reflection;
 namespace Evoogle.ApiFramework.Schema.Configuration.Types;
 
 /// <summary>
-///     Builds <see cref="ApiProperty"/> definitions from CLR property/field metadata and optional modifiers.
+///     Builds <see cref="ApiProperty"/> definitions from CLR property/field metadata and optional nullability overrides.
 /// </summary>
 public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 {
@@ -65,7 +65,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     internal bool IsConventionOnly => this.IsConventionDiscovered &&
         _state.ApiNameSource == ApiConfigurationSource.Convention &&
-        _state.ModifiersSource == ApiConfigurationSource.Convention &&
+        _state.NullabilitySource == ApiConfigurationSource.Convention &&
         this.BuildExtensions() is null;
     #endregion
 
@@ -81,16 +81,12 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     #region With Methods
     /// <summary>
-    ///     Configures type modifiers for the property at explicit precedence.
+    ///     Configures nullability for the property at explicit precedence.
     /// </summary>
-    /// <param name="configure">Callback to configure type modifiers.</param>
+    /// <param name="apiNullability">The property value nullability.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder WithModifiers(Action<ApiTypeModifiersBuilder> configure)
-    {
-        ArgumentNullException.ThrowIfNull(configure);
-
-        return this.SetModifiers(configure, ApiConfigurationSource.Explicit);
-    }
+    public ApiPropertyBuilder WithNullability(ApiNullability apiNullability)
+        => this.SetNullability(apiNullability, ApiConfigurationSource.Explicit);
 
     /// <summary>
     ///     Sets the API name for the property at explicit precedence.
@@ -121,18 +117,18 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
         => this.SetApiName(apiName, ApiConfigurationSource.DataAnnotation);
 
     /// <summary>
-    ///     Sets the type modifier delegate at convention precedence.
+    ///     Sets nullability at convention precedence.
     ///     Has no effect if a higher-precedence value has already been applied.
     /// </summary>
-    internal ApiPropertyBuilder SetModifiersConvention(Action<ApiTypeModifiersBuilder> configure)
-        => this.SetModifiers(configure, ApiConfigurationSource.Convention);
+    internal ApiPropertyBuilder SetNullabilityConvention(ApiNullability apiNullability)
+        => this.SetNullability(apiNullability, ApiConfigurationSource.Convention);
 
     /// <summary>
-    ///     Sets the type modifier delegate at data-annotation precedence.
+    ///     Sets nullability at data-annotation precedence.
     ///     Has no effect if an explicit value has already been applied.
     /// </summary>
-    internal ApiPropertyBuilder SetModifiersDataAnnotation(Action<ApiTypeModifiersBuilder> configure)
-        => this.SetModifiers(configure, ApiConfigurationSource.DataAnnotation);
+    internal ApiPropertyBuilder SetNullabilityDataAnnotation(ApiNullability apiNullability)
+        => this.SetNullability(apiNullability, ApiConfigurationSource.DataAnnotation);
     #endregion
 
     #region Build Methods
@@ -174,19 +170,8 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
         return this.BuildFromNullabilityInfo(clrFieldNullabilityInfo, ClrMemberKind.Field);
     }
 
-    private ApiTypeModifiers BuildModifiers(ApiTypeModifiers apiNullabilityModifiers)
-    {
-        // No tier has set modifiers: fall back to the nullability-derived default.
-        if (_state.Modifiers == null)
-        {
-            return apiNullabilityModifiers;
-        }
-
-        // A tier set modifiers; start from None so the stored delegate has full control.
-        var modifierBuilder = new ApiTypeModifiersBuilder(ApiTypeModifiers.None);
-        _state.Modifiers.Invoke(modifierBuilder);
-        return modifierBuilder.Build();
-    }
+    private ApiNullability BuildNullability(ApiNullability inferredNullability)
+        => _state.ApiNullability ?? inferredNullability;
 
     private ApiPropertyBuilder SetApiName(string apiName, ApiConfigurationSource source)
     {
@@ -199,12 +184,12 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
         return this;
     }
 
-    private ApiPropertyBuilder SetModifiers(Action<ApiTypeModifiersBuilder> configure, ApiConfigurationSource source)
+    private ApiPropertyBuilder SetNullability(ApiNullability apiNullability, ApiConfigurationSource source)
     {
-        if (source >= _state.ModifiersSource)
+        if (source >= _state.NullabilitySource)
         {
-            _state.Modifiers = configure;
-            _state.ModifiersSource = source;
+            _state.ApiNullability = apiNullability;
+            _state.NullabilitySource = source;
         }
 
         return this;
@@ -213,16 +198,16 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     private ApiProperty BuildFromNullabilityInfo(MemberNullableInfo clrNullabilityInfo, ClrMemberKind clrMemberKind)
     {
         var apiTypeExpression = ApiTypeExpressionBuilder.Build(clrNullabilityInfo);
-        var apiInitialTypeModifiers = clrNullabilityInfo.Nullability == MemberNullability.NonNullable ? ApiTypeModifiers.Required : ApiTypeModifiers.None;
-        var apiTypeModifiers = this.BuildModifiers(apiInitialTypeModifiers);
+        var apiInitialNullability = clrNullabilityInfo.Nullability == MemberNullability.NonNullable ? ApiNullability.NonNullable : ApiNullability.Nullable;
+        var apiNullability = this.BuildNullability(apiInitialNullability);
 
-        return this.CreateAndBuildExtensions(_state.ApiName, apiTypeExpression, apiTypeModifiers, _clrName, clrMemberKind);
+        return this.CreateAndBuildExtensions(_state.ApiName, apiTypeExpression, apiNullability, _clrName, clrMemberKind);
     }
 
-    private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName, ClrMemberKind clrMemberKind)
+    private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiNullability apiNullability, string clrName, ClrMemberKind clrMemberKind)
     {
         var clrValueMember = new ClrMemberReference(clrMemberKind, clrName);
-        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrValueMember);
+        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiNullability, clrValueMember);
 
         var extensions = this.BuildExtensions();
         if (extensions is not null)

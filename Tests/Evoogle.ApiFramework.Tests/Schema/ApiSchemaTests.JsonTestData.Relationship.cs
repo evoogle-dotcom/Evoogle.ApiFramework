@@ -45,7 +45,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUser.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -56,7 +56,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUser.UserName),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -88,7 +88,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUserRef.UserId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -120,7 +120,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUserProfile.UserId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -131,7 +131,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUserProfile.UserRef),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(RelationshipUserRef), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -142,7 +142,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUserProfile.DisplayName),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -263,7 +263,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -275,7 +275,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "UserName"
@@ -304,7 +304,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "UserId"
@@ -316,7 +316,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "RelationshipUserRef"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "UserRef"
@@ -328,7 +328,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "DisplayName"
@@ -365,7 +365,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "UserId"
@@ -481,7 +481,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUser.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -492,7 +492,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUser.UserName),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -524,7 +524,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipUserRef.UserId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -556,7 +556,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPost.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -567,7 +567,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPost.AuthorUserId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -578,7 +578,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPost.AuthorUserRef),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(RelationshipUserRef), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -589,7 +589,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPost.Title),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -599,8 +599,8 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(RelationshipPost.Comments),
-                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<RelationshipComment>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(RelationshipComment), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<RelationshipComment>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(RelationshipComment), ClrType: null)), ApiItemNullability: ApiNullability.NonNullable), ApiTypeReferenceDef: null),
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -632,7 +632,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPostRef.PostId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -664,7 +664,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipComment.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -675,7 +675,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipComment.PostId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -686,7 +686,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipComment.PostRef),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(RelationshipPostRef), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -697,7 +697,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipComment.Body),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -708,7 +708,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipComment.Post),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(RelationshipPost), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -861,7 +861,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -873,7 +873,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "PostId"
@@ -885,7 +885,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "RelationshipPostRef"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "PostRef"
@@ -897,7 +897,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Body"
@@ -909,7 +909,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "RelationshipPost"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Post"
@@ -938,7 +938,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -950,7 +950,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "AuthorUserId"
@@ -962,7 +962,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Object",
                                     "ApiName": "RelationshipUserRef"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "AuthorUserRef"
@@ -974,7 +974,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Title"
@@ -988,10 +988,10 @@ public partial class ApiSchemaTests
                                         "ApiKind": "Object",
                                         "ApiName": "RelationshipComment"
                                     },
-                                    "ApiItemTypeModifiers": "Required",
+                                    "ApiItemNullability": "NonNullable",
                                     "ClrType": "System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests]],System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Comments"
@@ -1020,7 +1020,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "PostId"
@@ -1049,7 +1049,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1061,7 +1061,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "UserName"
@@ -1090,7 +1090,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "UserId"
@@ -1250,7 +1250,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPost.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1261,7 +1261,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPost.Title),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1293,7 +1293,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipTag.Id),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1304,7 +1304,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipTag.Name),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1336,7 +1336,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPostTag.PostId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1347,7 +1347,7 @@ public partial class ApiSchemaTests
                             (
                                 ApiName: nameof(RelationshipPostTag.TagId),
                                 ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ApiNullability: ApiNullability.NonNullable,
                                 ClrValueMember: new ClrMemberReferenceDef
                                 (
                                     ClrMemberKind.Property,
@@ -1449,7 +1449,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1461,7 +1461,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Title"
@@ -1490,7 +1490,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "PostId"
@@ -1502,7 +1502,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "TagId"
@@ -1534,7 +1534,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Ulid"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Id"
@@ -1546,7 +1546,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"

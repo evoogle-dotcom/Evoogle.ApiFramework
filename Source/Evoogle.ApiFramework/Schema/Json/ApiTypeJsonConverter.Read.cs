@@ -26,7 +26,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     {
         #region Properties
         public ApiTypeExpression? ApiItemTypeExpression { get; set; }
-        public JsonEnumReadResult<ApiTypeModifiers> ApiItemTypeModifiers { get; set; }
+        public JsonEnumReadResult<ApiNullability> ApiItemNullability { get; set; }
         #endregion
     }
 
@@ -101,7 +101,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         {
             // ApiCollectionType Property Handlers
             { propertyNames.ApiCollectionType.ApiItemTypeExpression, HandleApiCollectionTypeApiItemTypeExpression },
-            { propertyNames.ApiCollectionType.ApiItemTypeModifiers, HandleApiCollectionTypeApiItemTypeModifiers, true },
+            { propertyNames.ApiCollectionType.ApiItemNullability, HandleApiCollectionTypeApiItemNullability, true },
 
             // ApiEnumType Property Handlers
             { propertyNames.ApiEnumType.ApiEnumValues, HandleApiEnumTypeApiEnumValues },
@@ -133,12 +133,12 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             context.ReadData.ApiCollectionType.ApiItemTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, context.Options);
         }
 
-        private static void HandleApiCollectionTypeApiItemTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiCollectionTypeApiItemNullability(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiCollectionType ??= new ApiCollectionTypeReadData();
 
-            context.ReadData.ApiCollectionType.ApiItemTypeModifiers =
-                JsonEnumReader.Read<ApiTypeModifiers>(ref reader, context.Options);
+            context.ReadData.ApiCollectionType.ApiItemNullability =
+                JsonEnumReader.Read<ApiNullability>(ref reader, context.Options);
         }
         #endregion
 

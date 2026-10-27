@@ -29,7 +29,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #region Immutable Properties
         public required string ApiName { get; init; }
         public required string ApiTypeExpression { get; init; }
-        public required string ApiTypeModifiers { get; init; }
+        public required string ApiNullability { get; init; }
         public required string ClrValueMember { get; init; }
         #endregion
     }
@@ -51,7 +51,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             {
                 ApiName = policy.ConvertName(nameof(Types.ApiProperty.ApiName)),
                 ApiTypeExpression = policy.ConvertName(nameof(Types.ApiProperty.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
-                ApiTypeModifiers = policy.ConvertName(nameof(Types.ApiProperty.ApiTypeModifiers)),
+                ApiNullability = policy.ConvertName(nameof(Types.ApiProperty.ApiNullability)),
                 ClrValueMember = policy.ConvertName(nameof(Types.ApiProperty.ClrValueMember)),
             },
             ExtensibleBase = GetExtensiblePropertyNames(policy),
@@ -69,7 +69,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #region Properties
         public string? ApiName { get; set; }
         public ApiTypeExpression? ApiTypeExpression { get; set; }
-        public JsonEnumReadResult<ApiTypeModifiers> ApiTypeModifiers { get; set; }
+        public JsonEnumReadResult<ApiNullability> ApiNullability { get; set; }
         public ClrMemberReference? ClrValueMember { get; set; }
         #endregion
     }
@@ -95,7 +95,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             // ApiProperty Property Handlers
             { propertyNames.ApiProperty.ApiName, HandleApiPropertyApiName },
             { propertyNames.ApiProperty.ApiTypeExpression, HandleApiPropertyApiTypeExpression },
-            { propertyNames.ApiProperty.ApiTypeModifiers, HandleApiPropertyApiTypeModifiers, true },
+            { propertyNames.ApiProperty.ApiNullability, HandleApiPropertyApiNullability, true },
             { propertyNames.ApiProperty.ClrValueMember, HandleApiPropertyClrValueMember },
 
             // ExtensibleBase Property Handlers
@@ -119,12 +119,12 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             context.ReadData.ApiProperty.ApiTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, options);
         }
 
-        private static void HandleApiPropertyApiTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPropertyApiNullability(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
-            context.ReadData.ApiProperty.ApiTypeModifiers =
-                JsonEnumReader.Read<ApiTypeModifiers>(ref reader, context.Options);
+            context.ReadData.ApiProperty.ApiNullability =
+                JsonEnumReader.Read<ApiNullability>(ref reader, context.Options);
         }
 
         private static void HandleApiPropertyClrValueMember
@@ -143,7 +143,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     #endregion
 
     #region Fields
-    private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiNullability> _apiNullabilityJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -182,8 +182,8 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
 
         var apiName = apiPropertyReadData?.ApiName;
         var apiTypeExpression = apiPropertyReadData?.ApiTypeExpression;
-        var apiTypeModifiersReadResult = apiPropertyReadData?.ApiTypeModifiers ?? default;
-        var apiTypeModifiers = apiTypeModifiersReadResult.ValueOr(ApiSchemaDefaults.NullableTypeModifiers);
+        var apiNullabilityReadResult = apiPropertyReadData?.ApiNullability ?? default;
+        var apiNullability = apiNullabilityReadResult.ValueOr(ApiSchemaDefaults.PropertyNullability);
         var clrValueMember = apiPropertyReadData?.ClrValueMember ?? new ClrMemberReference
         (
             clrKind: null,
@@ -191,9 +191,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             clrKindFinding: null
         );
 
-        var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrValueMember);
+        var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiNullability, clrValueMember);
 
-        apiProperty.RecordJsonEnumFinding(nameof(ApiProperty.ApiTypeModifiers), apiTypeModifiersReadResult);
+        apiProperty.RecordJsonEnumFinding(nameof(ApiProperty.ApiNullability), apiNullabilityReadResult);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiProperty, extensions);
@@ -225,7 +225,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             var (apiProperty, writeContext) = state;
             WriteApiPropertyApiName(writer, apiProperty, writeContext);
             WriteApiPropertyApiTypeExpression(writer, apiProperty, writeContext);
-            WriteApiPropertyApiTypeModifiers(writer, apiProperty, writeContext);
+            WriteApiPropertyApiNullability(writer, apiProperty, writeContext);
             WriteApiPropertyClrValueMember(writer, apiProperty, writeContext);
 
             WriteExtensibleBaseExtensions
@@ -246,14 +246,14 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     private static void WriteApiPropertyApiTypeExpression(Utf8JsonWriter writer, ApiProperty apiProperty, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiProperty.ApiTypeExpression, obj: apiProperty.ApiTypeExpression, options: writeContext.Options);
 
-    private static void WriteApiPropertyApiTypeModifiers(Utf8JsonWriter writer, ApiProperty apiProperty, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiPropertyApiNullability(Utf8JsonWriter writer, ApiProperty apiProperty, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithConverter
         (
-            propertyName: writeContext.PropertyNames.ApiProperty.ApiTypeModifiers,
-            value: apiProperty.ApiTypeModifiers,
+            propertyName: writeContext.PropertyNames.ApiProperty.ApiNullability,
+            value: apiProperty.ApiNullability,
             options: writeContext.Options,
-            converter: _apiTypeModifiersJsonConverter,
-            defaultValue: ApiSchemaDefaults.NullableTypeModifiers
+            converter: _apiNullabilityJsonConverter,
+            defaultValue: ApiSchemaDefaults.PropertyNullability
         );
 
     private static void WriteApiPropertyClrValueMember

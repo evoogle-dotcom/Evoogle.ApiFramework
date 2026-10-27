@@ -30,7 +30,7 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
         public required string ApiName { get; init; }
         public required string ApiInputParameters { get; init; }
         public required string ApiOutputTypeExpression { get; init; }
-        public required string ApiOutputTypeModifiers { get; init; }
+        public required string ApiOutputNullability { get; init; }
         public required string ApiOutputComposition { get; init; }
         #endregion
     }
@@ -53,7 +53,7 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
                 ApiName = policy.ConvertName(nameof(Query.ApiQuerySource.ApiName)),
                 ApiInputParameters = policy.ConvertName(nameof(Query.ApiQuerySource.ApiInputParameters)),
                 ApiOutputTypeExpression = policy.ConvertName(nameof(Query.ApiQuerySource.ApiOutputType)), // Mapping property name from ApiOutputTypeExpression to ApiOutputType by design
-                ApiOutputTypeModifiers = policy.ConvertName(nameof(Query.ApiQuerySource.ApiOutputTypeModifiers)),
+                ApiOutputNullability = policy.ConvertName(nameof(Query.ApiQuerySource.ApiOutputNullability)),
                 ApiOutputComposition = policy.ConvertName(nameof(Query.ApiQuerySource.ApiOutputComposition)),
             },
             ExtensibleBase = GetExtensiblePropertyNames(policy),
@@ -72,7 +72,7 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
         public string? ApiName { get; set; } = null;
         public List<ApiQuerySourceParameter>? ApiInputParameters { get; set; } = null;
         public ApiTypeExpression? ApiOutputTypeExpression { get; set; } = null;
-        public JsonEnumReadResult<ApiTypeModifiers> ApiOutputTypeModifiers { get; set; }
+        public JsonEnumReadResult<ApiNullability> ApiOutputNullability { get; set; }
         public JsonEnumReadResult<ApiQueryComposition> ApiOutputComposition { get; set; }
         #endregion
     }
@@ -99,8 +99,8 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
             { propertyNames.ApiQuerySource.ApiName, HandleApiQuerySourceApiName },
             { propertyNames.ApiQuerySource.ApiInputParameters, HandleApiQuerySourceApiInputParameters },
             { propertyNames.ApiQuerySource.ApiOutputTypeExpression, HandleApiQuerySourceApiOutputTypeExpression },
-            { propertyNames.ApiQuerySource.ApiOutputTypeModifiers,             HandleApiQuerySourceApiOutputTypeModifiers },
-                        { propertyNames.ApiQuerySource.ApiOutputComposition, HandleApiQuerySourceApiOutputComposition },
+            { propertyNames.ApiQuerySource.ApiOutputNullability, HandleApiQuerySourceApiOutputNullability, true },
+            { propertyNames.ApiQuerySource.ApiOutputComposition, HandleApiQuerySourceApiOutputComposition },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
@@ -134,12 +134,12 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
             context.ReadData.ApiQuerySource.ApiOutputTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, options);
         }
 
-        private static void HandleApiQuerySourceApiOutputTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiQuerySourceApiOutputNullability(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiQuerySource ??= new ApiQuerySourceReadData();
 
-            context.ReadData.ApiQuerySource.ApiOutputTypeModifiers =
-                JsonEnumReader.Read<ApiTypeModifiers>(ref reader, context.Options);
+            context.ReadData.ApiQuerySource.ApiOutputNullability =
+                JsonEnumReader.Read<ApiNullability>(ref reader, context.Options);
         }
 
         private static void HandleApiQuerySourceApiOutputComposition(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -154,7 +154,7 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
     #endregion
 
     #region Fields
-    private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiNullability> _apiNullabilityJsonConverter = new();
 
     private static readonly EnumJsonConverter<ApiQueryComposition> _apiQueryCompositionJsonConverter = new();
     #endregion
@@ -197,8 +197,8 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
         var apiInputParameters = apiQuerySourceReadData?.ApiInputParameters;
         var apiOutputTypeExpression = apiQuerySourceReadData?.ApiOutputTypeExpression;
 
-        var apiOutputTypeModifiersReadResult = apiQuerySourceReadData?.ApiOutputTypeModifiers ?? default;
-        var apiOutputTypeModifiers = apiOutputTypeModifiersReadResult.ValueOr(ApiSchemaDefaults.NullableTypeModifiers);
+        var apiOutputNullabilityReadResult = apiQuerySourceReadData?.ApiOutputNullability ?? default;
+        var apiOutputNullability = apiOutputNullabilityReadResult.ValueOr(ApiSchemaDefaults.QuerySourceOutputNullability);
 
         var apiOutputCompositionReadResult = apiQuerySourceReadData?.ApiOutputComposition ?? default;
         var apiOutputComposition = apiOutputCompositionReadResult.ValueOr(ApiSchemaDefaults.QuerySourceOutputComposition);
@@ -208,11 +208,11 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
             apiName!,
             apiInputParameters,
             apiOutputTypeExpression!,
-            apiOutputTypeModifiers,
+            apiOutputNullability,
             apiOutputComposition
         );
 
-        apiQuerySource.RecordJsonEnumFinding(nameof(ApiQuerySource.ApiOutputTypeModifiers), apiOutputTypeModifiersReadResult);
+        apiQuerySource.RecordJsonEnumFinding(nameof(ApiQuerySource.ApiOutputNullability), apiOutputNullabilityReadResult);
         apiQuerySource.RecordJsonEnumFinding(nameof(ApiQuerySource.ApiOutputComposition), apiOutputCompositionReadResult);
 
         var extensions = readContext.ReadData.Extensions;
@@ -239,7 +239,7 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
             WriteApiQuerySourceApiName(writer, apiQuerySource, writeContext);
             WriteApiQuerySourceApiInputParameters(writer, apiQuerySource, writeContext);
             WriteApiQuerySourceApiOutputTypeExpression(writer, apiQuerySource, writeContext);
-            WriteApiQuerySourceApiOutputTypeModifiers(writer, apiQuerySource, writeContext);
+            WriteApiQuerySourceApiOutputNullability(writer, apiQuerySource, writeContext);
             WriteApiQuerySourceApiOutputComposition(writer, apiQuerySource, writeContext);
 
             WriteExtensibleBaseExtensions
@@ -277,14 +277,14 @@ public class ApiQuerySourceJsonConverter(ILogger<ApiQuerySourceJsonConverter>? l
     private static void WriteApiQuerySourceApiOutputTypeExpression(Utf8JsonWriter writer, ApiQuerySource apiQuerySource, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputTypeExpression, obj: apiQuerySource.ApiOutputTypeExpression, options: writeContext.Options);
 
-    private static void WriteApiQuerySourceApiOutputTypeModifiers(Utf8JsonWriter writer, ApiQuerySource apiQuerySource, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiQuerySourceApiOutputNullability(Utf8JsonWriter writer, ApiQuerySource apiQuerySource, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithConverter
         (
-            propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputTypeModifiers,
-            value: apiQuerySource.ApiOutputTypeModifiers,
+            propertyName: writeContext.PropertyNames.ApiQuerySource.ApiOutputNullability,
+            value: apiQuerySource.ApiOutputNullability,
             options: writeContext.Options,
-            converter: _apiTypeModifiersJsonConverter,
-            defaultValue: ApiSchemaDefaults.NullableTypeModifiers
+            converter: _apiNullabilityJsonConverter,
+            defaultValue: ApiSchemaDefaults.QuerySourceOutputNullability
         );
 
     private static void WriteApiQuerySourceApiOutputComposition(Utf8JsonWriter writer, ApiQuerySource apiQuerySource, DefaultWriteContext<PropertyNames> writeContext)

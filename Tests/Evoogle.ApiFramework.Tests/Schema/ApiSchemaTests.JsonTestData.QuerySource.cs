@@ -53,8 +53,8 @@ public partial class ApiSchemaTests
                                         ClrType: null
                                     )
                                 ),
-                                ApiTypeModifiers: ApiTypeModifiers.None,
-                                ApiRequiresArgument: false
+                                ApiNullability: ApiNullability.Nullable,
+                                ApiPresence: ApiPresence.Optional
                             ),
                             new ApiQuerySourceParameterDef
                             (
@@ -69,8 +69,8 @@ public partial class ApiSchemaTests
                                         ClrType: null
                                     )
                                 ),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ApiRequiresArgument: true
+                                ApiNullability: ApiNullability.NonNullable,
+                                ApiPresence: ApiPresence.Required
                             )
                         ],
                         ApiOutputTypeExpression: new ApiTypeExpressionDef
@@ -88,11 +88,11 @@ public partial class ApiSchemaTests
                                         ClrType: null
                                     )
                                 ),
-                                ApiItemTypeModifiers: ApiTypeModifiers.Required
+                                ApiItemNullability: ApiNullability.NonNullable
                             ),
                             ApiTypeReferenceDef: null
                         ),
-                        ApiOutputTypeModifiers: ApiTypeModifiers.Required,
+                        ApiOutputNullability: ApiNullability.NonNullable,
                         ApiOutputComposition:
                             ApiQueryComposition.Projection
                             | ApiQueryComposition.Filtering
@@ -133,8 +133,8 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "None",
-                                "ApiRequiresArgument": false
+                                "ApiNullability": "Nullable",
+                                "ApiPresence": "Optional"
                             },
                             {
                                 "ApiName": "limit",
@@ -142,8 +142,8 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
-                                "ApiRequiresArgument": true
+                                "ApiNullability": "NonNullable",
+                                "ApiPresence": "Required"
                             }
                         ],
                         "ApiOutputType": {
@@ -152,10 +152,10 @@ public partial class ApiSchemaTests
                                 "ApiKind": "Scalar",
                                 "ApiName": "String"
                             },
-                            "ApiItemTypeModifiers": "Required",
+                            "ApiItemNullability": "NonNullable",
                             "ClrType": "System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib"
                         },
-                        "ApiOutputTypeModifiers": "Required",
+                        "ApiOutputNullability": "NonNullable",
                         "ApiOutputComposition": "Projection, Filtering, Ordering, OffsetPagination"
                     }
                 ]
@@ -200,8 +200,8 @@ public partial class ApiSchemaTests
                                         ClrType: null
                                     )
                                 ),
-                                ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ApiRequiresArgument: true
+                                ApiNullability: ApiNullability.NonNullable,
+                                ApiPresence: ApiPresence.Required
                             )
                         ],
                         ApiOutputTypeExpression: new ApiTypeExpressionDef
@@ -214,7 +214,7 @@ public partial class ApiSchemaTests
                                 ClrType: null
                             )
                         ),
-                        ApiOutputTypeModifiers: ApiTypeModifiers.None,
+                        ApiOutputNullability: ApiNullability.Nullable,
                         ApiOutputComposition: ApiQueryComposition.Projection
                     )
                 ]

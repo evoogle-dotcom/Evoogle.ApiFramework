@@ -192,11 +192,11 @@ public sealed class ApiAttributeAnnotationReader :
             return [];
         }
 
-        var modifiers = attr.IsNonNullable
-            ? ApiTypeModifiers.Required
-            : attr.IsNullable ? ApiTypeModifiers.None : (ApiTypeModifiers?)null;
+        var apiNullability = attr.IsNonNullable
+            ? ApiNullability.NonNullable
+            : attr.IsNullable ? ApiNullability.Nullable : (ApiNullability?)null;
 
-        return [new(attr.ApiName, modifiers)];
+        return [new(attr.ApiName, apiNullability)];
     }
     #endregion
 

@@ -16,19 +16,19 @@ public static class ApiPropertyExtensions
     /// </summary>
     /// <param name="apiProperty">The <see cref="ApiProperty"/> instance.</param>
     /// <returns>
-    ///     <c>true</c> if the <see cref="ApiProperty.ApiTypeModifiers"/> has the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
+    ///     <c>true</c> if the <see cref="ApiProperty.ApiNullability"/> is <see cref="ApiNullability.NonNullable"/>; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsNonNullable(this ApiProperty apiProperty)
-        => apiProperty.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+        => apiProperty.ApiNullability == ApiNullability.NonNullable;
 
     /// <summary>
     ///     Determines whether the <see cref="ApiProperty"/> is nullable.
     /// </summary>
     /// <param name="apiProperty">The <see cref="ApiProperty"/> instance.</param>
     /// <returns>
-    ///     <c>true</c> if the <see cref="ApiProperty.ApiTypeModifiers"/> does not have the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
+    ///     <c>true</c> if the <see cref="ApiProperty.ApiNullability"/> is <see cref="ApiNullability.Nullable"/>; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsNullable(this ApiProperty apiProperty)
-        => !apiProperty.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+        => apiProperty.ApiNullability == ApiNullability.Nullable;
     #endregion
 }

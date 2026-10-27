@@ -289,23 +289,9 @@ internal sealed class ApiAnnotationReaderSet
                                 propertyBuilder.SetApiNameDataAnnotation(result.ApiName);
                             }
 
-                            if (result.Modifiers is not null)
+                            if (result.ApiNullability is not null)
                             {
-                                var modifiers = result.Modifiers.Value;
-                                propertyBuilder.SetModifiersDataAnnotation
-                                (
-                                    builder =>
-                                    {
-                                        if ((modifiers & ApiTypeModifiers.Required) != 0)
-                                        {
-                                            builder.AsNonNullable();
-                                        }
-                                        else
-                                        {
-                                            builder.AsNullable();
-                                        }
-                                    }
-                                );
+                                propertyBuilder.SetNullabilityDataAnnotation(result.ApiNullability.Value);
                             }
                         }
                     );

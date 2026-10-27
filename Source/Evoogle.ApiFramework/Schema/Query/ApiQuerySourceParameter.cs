@@ -14,47 +14,47 @@ namespace Evoogle.ApiFramework.Schema.Query;
 
 /// <summary>Declares a schema-owned input to a query source, independently of operation parameters.</summary>
 /// <remarks>
-/// Argument presence and nullability are independent. <see cref="ApiRequiresArgument"/> determines whether an
-/// argument must be supplied; <see cref="ApiTypeModifiers.Required"/> prohibits null when an argument is supplied.
+/// Argument presence and nullability are independent. <see cref="ApiPresence"/> determines whether an
+/// argument must be supplied; <see cref="ApiNullability.NonNullable"/> prohibits null when an argument is supplied.
 /// <list type="table">
 ///     <listheader>
-///         <term>ApiRequiresArgument</term>
-///         <term>ApiTypeModifiers.Required</term>
+///         <term>ApiPresence</term>
+///         <term>ApiNullability</term>
 ///         <description>Meaning</description>
 ///     </listheader>
 ///     <item>
-///         <term><see langword="true"/></term>
-///         <term>Set</term>
+///         <term>Required</term>
+///         <term>NonNullable</term>
 ///         <description>Must supply a non-null value.</description>
 ///     </item>
 ///     <item>
-///         <term><see langword="true"/></term>
-///         <term>Unset</term>
+///         <term>Required</term>
+///         <term>Nullable</term>
 ///         <description>Must supply an argument; null is valid.</description>
 ///     </item>
 ///     <item>
-///         <term><see langword="false"/></term>
-///         <term>Set</term>
+///         <term>Optional</term>
+///         <term>NonNullable</term>
 ///         <description>May omit the argument; if supplied, it must be non-null.</description>
 ///     </item>
 ///     <item>
-///         <term><see langword="false"/></term>
-///         <term>Unset</term>
+///         <term>Optional</term>
+///         <term>Nullable</term>
 ///         <description>May omit the argument or supply null.</description>
 ///     </item>
 /// </list>
 /// </remarks>
 /// <param name="apiName">The parameter's API name.</param>
 /// <param name="apiTypeExpression">The declared input type.</param>
-/// <param name="apiTypeModifiers">Input nullability; Required prohibits null.</param>
-/// <param name="requiresArgument">Whether an argument must be supplied, independently of nullability.</param>
+/// <param name="apiNullability">Input nullability; NonNullable prohibits null.</param>
+/// <param name="apiPresence">Whether an argument must be supplied, independently of nullability.</param>
 [JsonConverter(typeof(ApiQuerySourceParameterJsonConverter))]
 public sealed class ApiQuerySourceParameter
 (
     string apiName,
     ApiTypeExpression apiTypeExpression,
-    ApiTypeModifiers apiTypeModifiers,
-    bool requiresArgument
+    ApiNullability apiNullability,
+    ApiPresence apiPresence
 ) : ApiSchemaElement
 {
     #region ApiSchemaElement Properties
@@ -73,12 +73,20 @@ public sealed class ApiQuerySourceParameter
     public ApiType ApiType => this.ApiTypeExpression.ApiType;
 
     /// <summary>Gets input nullability independently of argument presence.</summary>
-    public ApiTypeModifiers ApiTypeModifiers { get; } = apiTypeModifiers;
+    public ApiNullability ApiNullability { get; } = apiNullability;
 
     /// <summary>Gets whether the source requires an argument for this parameter.</summary>
-    public bool ApiRequiresArgument { get; } = requiresArgument;
+    public ApiPresence ApiPresence { get; } = apiPresence;
 
     internal ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression;
+    #endregion
+
+    #region Computed Properties
+    /// <summary>Gets whether an argument must be supplied.</summary>
+    public bool IsRequired => this.ApiPresence == ApiPresence.Required;
+
+    /// <summary>Gets whether an argument may be omitted.</summary>
+    public bool IsOptional => this.ApiPresence == ApiPresence.Optional;
     #endregion
 
     #region ApiSchemaElement Methods
@@ -101,12 +109,30 @@ public sealed class ApiQuerySourceParameter
         base.CompileCore(context);
 
         this.ValidateApiName(context);
-        this.ValidateApiTypeModifiers(context);
+        this.ValidateApiNullability(context);
+        this.ValidateApiPresence(context);
         this.ResolveApiTypeExpression(context);
     }
     #endregion
 
     #region Implementation Methods
+    private void ValidateApiPresence(ApiSchemaCompilationContext context)
+    {
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiPresence));
+        if (jsonEnumFinding is null && Enum.IsDefined(this.ApiPresence))
+        {
+            return;
+        }
+
+        var apiPath = this.ApiPath;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidPresence;
+        var description = jsonEnumFinding?.DescribeProblem() ?? $"{nameof(this.ApiPresence)} is invalid";
+        var remediation = $"Specify {ApiPresence.Optional} or {ApiPresence.Required} for {nameof(this.ApiPresence)}";
+
+        context.AddIssue(apiPath, severity, code, description, remediation);
+    }
+
     private void ResolveApiTypeExpression(ApiSchemaCompilationContext context)
     {
         if (this.ApiTypeExpression is null)
@@ -139,32 +165,21 @@ public sealed class ApiQuerySourceParameter
         }
     }
 
-    private void ValidateApiTypeModifiers(ApiSchemaCompilationContext context)
+    private void ValidateApiNullability(ApiSchemaCompilationContext context)
     {
-        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiTypeModifiers));
-        if (jsonEnumFinding is not null)
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiNullability));
+        if (jsonEnumFinding is null && Enum.IsDefined(this.ApiNullability))
         {
-            var findingApiPath = this.ApiPath;
-            var findingSeverity = ApiSchemaCompilationSeverity.Error;
-            var findingCode = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidTypeModifiers;
-            var findingDescription = jsonEnumFinding.DescribeProblem();
-            var findingRemediation = $"Specify a valid {nameof(this.ApiTypeModifiers)} value";
-
-            context.AddIssue(findingApiPath, findingSeverity, findingCode, findingDescription, findingRemediation);
             return;
         }
 
-        var hasUnsupportedApiTypeModifiers = (this.ApiTypeModifiers & ~ApiTypeModifiers.Required) != 0;
-        if (hasUnsupportedApiTypeModifiers)
-        {
-            var apiPath = this.ApiPath;
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidTypeModifiers;
-            var description = $"{nameof(this.ApiTypeModifiers)} are invalid";
-            var remediation = $"Use {ApiTypeModifiers.None} for nullable input or {ApiTypeModifiers.Required} for non-null input";
+        var apiPath = this.ApiPath;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiQuerySourceParameterInvalidNullability;
+        var description = jsonEnumFinding?.DescribeProblem() ?? $"{nameof(this.ApiNullability)} is invalid";
+        var remediation = $"Specify {ApiNullability.Nullable} or {ApiNullability.NonNullable} for {nameof(this.ApiNullability)}";
 
-            context.AddIssue(apiPath, severity, code, description, remediation);
-        }
+        context.AddIssue(apiPath, severity, code, description, remediation);
     }
     #endregion
 }

@@ -187,7 +187,7 @@ public partial class ApiPropertyTests
                 (
                     apiName: "Value",
                     apiTypeExpression: new ApiTypeExpression(apiTypeReference: new ApiTypeReference(clrType: typeof(long))),
-                    apiTypeModifiers: ApiTypeModifiers.Required,
+                    apiNullability: ApiNullability.NonNullable,
                     clrValueMember: reference);
             }
             else
@@ -407,7 +407,7 @@ public partial class ApiPropertyTests
         (
             apiName: apiName,
             apiTypeExpression: new ApiTypeExpression(apiTypeReference: new ApiTypeReference(clrType: typeof(long))),
-            apiTypeModifiers: ApiTypeModifiers.Required,
+            apiNullability: ApiNullability.NonNullable,
             clrValueMember: new ClrMemberReference(clrKind, clrName)
         );
     #endregion

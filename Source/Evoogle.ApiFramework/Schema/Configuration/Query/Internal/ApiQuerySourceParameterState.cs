@@ -18,12 +18,12 @@ internal sealed class ApiQuerySourceParameterState
     #region Properties
     internal ApiConfigurationSource RegistrationSource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal ApiTypeModifiers ApiTypeModifiers { get; set; } = ApiSchemaDefaults.NonNullableTypeModifiers;
+    internal ApiNullability ApiNullability { get; set; } = ApiSchemaDefaults.QuerySourceParameterNullability;
 
-    internal ApiConfigurationSource ModifiersSource { get; set; } = ApiConfigurationSource.Convention;
+    internal ApiConfigurationSource NullabilitySource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal bool ApiRequiresArgument { get; set; } = ApiSchemaDefaults.QuerySourceParameterRequiresArgument;
+    internal ApiPresence ApiPresence { get; set; } = ApiSchemaDefaults.QuerySourceParameterPresence;
 
-    internal ApiConfigurationSource ApiRequiresArgumentSource { get; set; } = ApiConfigurationSource.Convention;
+    internal ApiConfigurationSource PresenceSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

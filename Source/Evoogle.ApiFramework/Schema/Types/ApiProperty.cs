@@ -49,13 +49,13 @@ public sealed partial class ApiProperty : ApiSchemaElement
     /// </summary>
     /// <param name="apiName">The API name of the property.</param>
     /// <param name="apiTypeExpression">The API type expression of the property.</param>
-    /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
+    /// <param name="apiNullability">Nullability of the property value.</param>
     /// <param name="clrValueMember">The required CLR value member reference.</param>
     public ApiProperty
     (
         string apiName,
         ApiTypeExpression apiTypeExpression,
-        ApiTypeModifiers apiTypeModifiers,
+        ApiNullability apiNullability,
         ClrMemberReference clrValueMember
     )
     {
@@ -63,7 +63,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
         this.ApiName = apiName;
         this.ApiTypeExpression = apiTypeExpression;
-        this.ApiTypeModifiers = apiTypeModifiers;
+        this.ApiNullability = apiNullability;
         _clrValueMemberBinding = new ClrMemberBinding(clrValueMember);
     }
     #endregion
@@ -83,8 +83,8 @@ public sealed partial class ApiProperty : ApiSchemaElement
     /// <summary>Gets the API type of the property.</summary>
     public ApiType ApiType => this.ApiTypeExpression.ApiType;
 
-    /// <summary>Gets the modifiers applied to this property (e.g., Required).</summary>
-    public ApiTypeModifiers ApiTypeModifiers { get; }
+    /// <summary>Gets the nullability of the property value.</summary>
+    public ApiNullability ApiNullability { get; }
 
     /// <summary>Gets the required CLR value member reference.</summary>
     public ClrMemberReference ClrValueMember => _clrValueMemberBinding.ClrMemberReference!;
@@ -100,10 +100,10 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
     #region ApiProperty Computed Properties
     /// <summary>Gets a value indicating whether this property permits a null value.</summary>
-    public bool IsNullable => !this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    public bool IsNullable => this.ApiNullability == ApiNullability.Nullable;
 
     /// <summary>Gets a value indicating whether this property prohibits a null value.</summary>
-    public bool IsNonNullable => this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    public bool IsNonNullable => this.ApiNullability == ApiNullability.NonNullable;
 
     internal bool IsResolved => this.ApiTypeExpression?.IsResolved == true;
 
@@ -116,11 +116,11 @@ public sealed partial class ApiProperty : ApiSchemaElement
     {
         var apiName = this.ApiName.SafeToString();
         var apiTypeExpression = this.ApiTypeExpression.SafeToString();
-        var apiTypeModifiers = this.ApiTypeModifiers.SafeToString();
+        var apiNullability = this.ApiNullability.SafeToString();
         var clrValueMember = this.ClrValueMember.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrValueMember)}={clrValueMember}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiNullability)}={apiNullability}, {nameof(this.ClrValueMember)}={clrValueMember}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -146,7 +146,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
         base.CompileCore(context);
 
         this.ValidateApiName(context);
-        this.ValidateApiTypeModifiers(context);
+        this.ValidateApiNullability(context);
         this.ResolveApiTypeExpression(context);
         if (this.ApiTypeExpression?.IsResolved == true)
         {
@@ -174,19 +174,19 @@ public sealed partial class ApiProperty : ApiSchemaElement
         }
     }
 
-    private void ValidateApiTypeModifiers(ApiSchemaCompilationContext context)
+    private void ValidateApiNullability(ApiSchemaCompilationContext context)
     {
-        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiTypeModifiers));
-        if (jsonEnumFinding is null)
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiNullability));
+        if (jsonEnumFinding is null && Enum.IsDefined(this.ApiNullability))
         {
             return;
         }
 
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiPropertyInvalidApiTypeModifiers;
-        var description = jsonEnumFinding.DescribeProblem();
-        var remediation = $"Specify a valid {nameof(this.ApiTypeModifiers)} value";
+        var code = ApiSchemaCompilationCode.ApiPropertyInvalidApiNullability;
+        var description = jsonEnumFinding?.DescribeProblem() ?? $"{nameof(this.ApiNullability)} is invalid";
+        var remediation = $"Specify {ApiNullability.Nullable} or {ApiNullability.NonNullable} for {nameof(this.ApiNullability)}";
 
         context.AddIssue(apiPath, severity, code, description, remediation);
     }
@@ -264,7 +264,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
         {
             var apiPath = context.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Warning;
-            var code = ApiSchemaCompilationCode.ApiPropertyRequiredNullableMismatch;
+            var code = ApiSchemaCompilationCode.ApiPropertyNonNullableNullableMismatch;
             var description = $"CLR member '{clrMemberName}' is nullable but property '{this.ApiName}' is declared non-nullable";
             var remediation = $"Change CLR member '{clrMemberName}' to a non-nullable type, or change property '{this.ApiName}' to nullable";
 
@@ -283,14 +283,14 @@ public sealed partial class ApiProperty : ApiSchemaElement
         {
             var apiPath = context.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Warning;
-            var code = ApiSchemaCompilationCode.ApiPropertyOptionalNonNullableMismatch;
+            var code = ApiSchemaCompilationCode.ApiPropertyNullableNonNullableMismatch;
             var description = $"CLR member '{clrMemberName}' is non-nullable but property '{this.ApiName}' is declared nullable";
             var remediation = $"Change CLR member '{clrMemberName}' to a nullable reference type, or change property '{this.ApiName}' to non-nullable";
 
             context.AddIssue(apiPath, severity, code, description, remediation);
         }
 
-        // Check collection item nullability against ApiCollectionType.ApiItemTypeModifiers
+        // Check collection item nullability against ApiCollectionType.ApiItemNullability
         var hasClrCollectionElements = clrNullableInfo.CollectionChain.Count > 0;
 
         if (hasClrCollectionElements && this.ApiType is ApiCollectionType apiCollectionType)
@@ -314,9 +314,9 @@ public sealed partial class ApiProperty : ApiSchemaElement
             {
                 var apiPath = context.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Warning;
-                var code = ApiSchemaCompilationCode.ApiCollectionItemRequiredNullableMismatch;
+                var code = ApiSchemaCompilationCode.ApiCollectionItemNonNullableNullableMismatch;
                 var description = $"CLR collection element in '{clrMemberName}' is nullable but item is declared non-nullable";
-                var remediation = $"Change the CLR element type in '{clrMemberName}' to non-nullable, or change the item modifier to nullable";
+                var remediation = $"Change the CLR element type in '{clrMemberName}' to non-nullable, or change the item nullability to nullable";
 
                 context.AddIssue(apiPath, severity, code, description, remediation);
                 return;
@@ -333,9 +333,9 @@ public sealed partial class ApiProperty : ApiSchemaElement
             {
                 var apiPath = context.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Warning;
-                var code = ApiSchemaCompilationCode.ApiCollectionItemOptionalNonNullableMismatch;
+                var code = ApiSchemaCompilationCode.ApiCollectionItemNullableNonNullableMismatch;
                 var description = $"CLR collection element in '{clrMemberName}' is non-nullable but item is declared nullable";
-                var remediation = $"Change the CLR element type in '{clrMemberName}' to a nullable reference type, or change the item modifier to non-nullable";
+                var remediation = $"Change the CLR element type in '{clrMemberName}' to a nullable reference type, or change the item nullability to non-nullable";
 
                 context.AddIssue(apiPath, severity, code, description, remediation);
             }

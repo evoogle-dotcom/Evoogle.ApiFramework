@@ -54,7 +54,7 @@ public static partial class ApiSchemaFactory
     (
         Type ClrType,
         ApiTypeExpressionDef ApiItemTypeExpression,
-        ApiTypeModifiers ApiItemTypeModifiers,
+        ApiNullability ApiItemNullability,
         List<Type>? ExtensionTypes = null
     ) : ApiTypeDef(ClrType, ExtensionTypes);
 
@@ -88,7 +88,7 @@ public static partial class ApiSchemaFactory
     (
         string ApiName,
         ApiTypeExpressionDef ApiTypeExpression,
-        ApiTypeModifiers ApiTypeModifiers,
+        ApiNullability ApiNullability,
         ClrMemberReferenceDef? ClrValueMember,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
@@ -151,7 +151,7 @@ public static partial class ApiSchemaFactory
         string ApiName,
         List<ApiQuerySourceParameterDef> ApiInputParameters,
         ApiTypeExpressionDef ApiOutputTypeExpression,
-        ApiTypeModifiers ApiOutputTypeModifiers,
+        ApiNullability ApiOutputNullability,
         ApiQueryComposition ApiOutputComposition,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
@@ -160,8 +160,8 @@ public static partial class ApiSchemaFactory
     (
         string ApiName,
         ApiTypeExpressionDef ApiTypeExpression,
-        ApiTypeModifiers ApiTypeModifiers,
-        bool ApiRequiresArgument,
+        ApiNullability ApiNullability,
+        ApiPresence ApiPresence,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
 
@@ -506,10 +506,10 @@ public static partial class ApiSchemaFactory
     private static ApiCollectionType BuildApiCollectionType(ApiCollectionTypeDef def)
     {
         var apiItemTypeExpression = BuildApiTypeExpression(def.ApiItemTypeExpression)!;
-        var apiItemTypeModifiers = def.ApiItemTypeModifiers;
+        var apiItemNullability = def.ApiItemNullability;
         var clrType = def.ClrType;
 
-        return new ApiCollectionType(apiItemTypeExpression, apiItemTypeModifiers, clrType);
+        return new ApiCollectionType(apiItemTypeExpression, apiItemNullability, clrType);
     }
 
     private static ApiEnumType BuildApiEnumType(ApiEnumTypeDef def)
@@ -579,7 +579,7 @@ public static partial class ApiSchemaFactory
     {
         var apiName = def.ApiName;
         var apiTypeExpression = BuildApiTypeExpression(def.ApiTypeExpression)!;
-        var apiTypeModifiers = def.ApiTypeModifiers;
+        var apiNullability = def.ApiNullability;
         var clrValueMember = BuildClrMemberReference(def.ClrValueMember) ?? new ClrMemberReference
         (
             clrKind: null,
@@ -593,7 +593,7 @@ public static partial class ApiSchemaFactory
             )
         );
 
-        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrValueMember);
+        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiNullability, clrValueMember);
 
         AttachExtensions(apiProperty, def);
 
@@ -653,7 +653,7 @@ public static partial class ApiSchemaFactory
         var apiName = def.ApiName;
         var apiInputParameters = def.ApiInputParameters.Select(BuildApiQuerySourceParameter);
         var apiOutputTypeExpression = BuildApiTypeExpression(def.ApiOutputTypeExpression)!;
-        var apiOutputTypeModifiers = def.ApiOutputTypeModifiers;
+        var apiOutputNullability = def.ApiOutputNullability;
         var apiOutputComposition = def.ApiOutputComposition;
 
         var apiQuerySource = new ApiQuerySource
@@ -661,7 +661,7 @@ public static partial class ApiSchemaFactory
             apiName,
             apiInputParameters,
             apiOutputTypeExpression,
-            apiOutputTypeModifiers,
+            apiOutputNullability,
             apiOutputComposition
         );
 
@@ -674,15 +674,15 @@ public static partial class ApiSchemaFactory
     {
         var apiName = def.ApiName;
         var apiTypeExpression = BuildApiTypeExpression(def.ApiTypeExpression)!;
-        var apiTypeModifiers = def.ApiTypeModifiers;
-        var apiRequiresArgument = def.ApiRequiresArgument;
+        var apiNullability = def.ApiNullability;
+        var apiPresence = def.ApiPresence;
 
         var apiQuerySourceParameter = new ApiQuerySourceParameter
         (
             apiName,
             apiTypeExpression,
-            apiTypeModifiers,
-            apiRequiresArgument
+            apiNullability,
+            apiPresence
         );
 
         AttachExtensions(apiQuerySourceParameter, def);

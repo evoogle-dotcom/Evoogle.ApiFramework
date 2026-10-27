@@ -14,8 +14,8 @@ public sealed record ApiTypeAnnotationResult(string? ApiName);
 
 /// <summary>Describes a property-level annotation result.</summary>
 /// <param name="ApiName">The optional API property name.</param>
-/// <param name="Modifiers">The optional API type modifiers.</param>
-public sealed record ApiPropertyAnnotationResult(string? ApiName, ApiTypeModifiers? Modifiers);
+/// <param name="ApiNullability">The optional API value nullability.</param>
+public sealed record ApiPropertyAnnotationResult(string? ApiName, ApiNullability? ApiNullability);
 
 /// <summary>Describes an enum-value annotation result.</summary>
 /// <param name="ApiName">The optional API enum-value name.</param>

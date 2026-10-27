@@ -177,7 +177,7 @@ public partial class ApiSchemaTests
                                 "ApiName": "Items",
                                 "ApiType": {
                                     "ApiKind": "Collection",
-                                    "ApiItemTypeModifiers": "Required",
+                                    "ApiItemNullability": "NonNullable",
                                     "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ClrValueMember": {
@@ -227,7 +227,7 @@ public partial class ApiSchemaTests
                                         "ApiKind": "Scalar",
                                         "ApiName": "String"
                                     },
-                                    "ApiItemTypeModifiers": "Required",
+                                    "ApiItemNullability": "NonNullable",
                                     "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ClrValueMember": {
@@ -754,7 +754,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "RequiredName"
@@ -806,7 +806,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": ""
@@ -858,7 +858,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Field",
                                     "ClrName": "Value"
@@ -910,7 +910,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Value"
@@ -962,7 +962,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NonExistentProperty"
@@ -1004,7 +1004,7 @@ public partial class ApiSchemaTests
                         "ApiProperties": [
                             {
                                 "ApiName": "RequiredName",
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "RequiredName"
@@ -1058,10 +1058,10 @@ public partial class ApiSchemaTests
                                         "ApiKind": "Scalar",
                                         "ApiName": "Byte"
                                     },
-                                    "ApiItemTypeModifiers": "Required",
+                                    "ApiItemNullability": "NonNullable",
                                     "ClrType": "System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Field",
                                     "ClrName": "SpanField"
@@ -1075,10 +1075,10 @@ public partial class ApiSchemaTests
                                         "ApiKind": "Scalar",
                                         "ApiName": "Byte"
                                     },
-                                    "ApiItemTypeModifiers": "Required",
+                                    "ApiItemNullability": "NonNullable",
                                     "ClrType": "System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "SpanProperty"
@@ -1132,7 +1132,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "RequiredName"
@@ -1176,7 +1176,7 @@ public partial class ApiSchemaTests
                                 "ApiType": {
                                     "ClrType": "System.String, System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "RequiredName"
@@ -1218,7 +1218,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "RequiredName",
                                 "ApiType": {},
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "RequiredName"
@@ -1260,7 +1260,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "RequiredName",
                                 "ApiType": { "ApiKind": "Scalar" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "RequiredName"
@@ -1312,7 +1312,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Byte"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Field",
                                     "ClrName": "PointerField"
@@ -1324,7 +1324,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Byte"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "PointerProperty"
@@ -1404,7 +1404,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1416,7 +1416,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NameAlt"
@@ -1468,7 +1468,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1480,7 +1480,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "String"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1917,7 +1917,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Name",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1926,7 +1926,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "NameAlt",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NameAlt"
@@ -1942,7 +1942,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Name",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -1999,7 +1999,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Name",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -2008,7 +2008,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "NameAlt",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NameAlt"
@@ -2024,7 +2024,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Name",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "Name"
@@ -2033,7 +2033,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "NameAlt",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NameAlt"
@@ -2760,7 +2760,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -2774,7 +2774,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2819,7 +2819,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2863,7 +2863,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -2913,7 +2913,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -2959,7 +2959,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3005,7 +3005,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3019,7 +3019,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3075,7 +3075,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3089,7 +3089,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3137,7 +3137,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3151,8 +3151,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelAssociation",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
-                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
@@ -3197,7 +3197,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3211,8 +3211,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelAssociation",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
-                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
@@ -3257,7 +3257,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3308,7 +3308,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3322,7 +3322,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipalB",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3336,8 +3336,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelAssociation",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
-                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
@@ -3396,7 +3396,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3410,7 +3410,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipalB",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3424,8 +3424,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelAssociation",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
-                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
+                            { "ApiName": "PrincipalAId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalAId" }},
+                            { "ApiName": "PrincipalBId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalBId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"
                     }
@@ -3484,7 +3484,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3498,8 +3498,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }},
-                            { "ApiName": "PrincipalId2", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId2" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }},
+                            { "ApiName": "PrincipalId2", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId2" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3553,7 +3553,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3567,7 +3567,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalCode", "ApiType": { "ApiKind": "Scalar", "ApiName": "String" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalCode" }}
+                            { "ApiName": "PrincipalCode", "ApiType": { "ApiKind": "Scalar", "ApiName": "String" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalCode" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3619,7 +3619,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3633,7 +3633,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3684,8 +3684,8 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelPrincipal",
                         "ApiProperties": [
-                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }},
-                            { "ApiName": "Code", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Code" }}
+                            { "ApiName": "Id", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Id" }},
+                            { "ApiName": "Code", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "Code" }}
                         ],
                         "ApiKeys": [
                             {
@@ -3703,7 +3703,7 @@ public partial class ApiSchemaTests
                         "ApiKind": "Object",
                         "ApiName": "RelDependent",
                         "ApiProperties": [
-                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiTypeModifiers": "Required", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
+                            { "ApiName": "PrincipalId", "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" }, "ApiNullability": "NonNullable", "ClrValueMember": { "ClrKind": "Property" , "ClrName": "PrincipalId" }}
                         ],
                         "ClrType": "Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"
                     }
@@ -3763,7 +3763,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Unknown",
                                     "ClrName": "Value"
@@ -3813,7 +3813,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": null,
                                     "ClrName": "Value"
@@ -3863,7 +3863,7 @@ public partial class ApiSchemaTests
                                     "ApiKind": "Scalar",
                                     "ApiName": "Int32"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrName": "Value"
                                 }
@@ -3911,7 +3911,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Id",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
                             }
                         ]
@@ -3923,7 +3923,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Id",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
                             }
                         ],
@@ -3993,7 +3993,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Id",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
                             }
                         ],
@@ -4006,7 +4006,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Id",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
                             }
                         ]
@@ -4075,7 +4075,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "Id",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "Int32" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": { "ClrKind": "Property", "ClrName": "Id" }
                             }
                         ],
@@ -4163,7 +4163,7 @@ public partial class ApiSchemaTests
                             {
                                 "ApiName": "NullableProp",
                                 "ApiType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NullableProp"
@@ -4181,7 +4181,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableProp\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiPropertyRequiredNullableMismatch,
+                    code: ApiSchemaCompilationCode.ApiPropertyNonNullableNullableMismatch,
                     description: "CLR member 'NullableProp' is nullable but property 'NullableProp' is declared Required",
                     remediation: "Change CLR member 'NullableProp' to a non-nullable type, or change property 'NullableProp' to Optional"
                 ),
@@ -4228,14 +4228,14 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableProp\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiPropertyOptionalNonNullableMismatch,
+                    code: ApiSchemaCompilationCode.ApiPropertyNullableNonNullableMismatch,
                     description: "CLR member 'NonNullableProp' is non-nullable but property 'NonNullableProp' is declared Optional",
                     remediation: "Change CLR member 'NonNullableProp' to a nullable reference type, or change property 'NonNullableProp' to Required"
                 ),
             ]
         },
 
-        // ApiProperty warns if Required item modifier maps to a nullable CLR collection element type
+        // ApiProperty warns if Required item nullability maps to a nullable CLR collection element type
         new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Required Collection Item Maps To Nullable CLR Element Type",
@@ -4260,7 +4260,7 @@ public partial class ApiSchemaTests
                                 "ApiType": {
                                     "ApiKind": "Collection",
                                     "ApiItemType": { "ApiKind": "Scalar", "ApiName": "String" },
-                                    "ApiItemTypeModifiers": "Required",
+                                    "ApiItemNullability": "NonNullable",
                                     "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
                                 "ClrValueMember": {
@@ -4280,14 +4280,14 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableItemsProp\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiCollectionItemRequiredNullableMismatch,
+                    code: ApiSchemaCompilationCode.ApiCollectionItemNonNullableNullableMismatch,
                     description: "CLR collection element in 'NullableItemsProp' is nullable but item is declared Required",
-                    remediation: "Change the CLR element type in 'NullableItemsProp' to non-nullable, or change the item modifier to Optional"
+                    remediation: "Change the CLR element type in 'NullableItemsProp' to non-nullable, or change the item nullability to Optional"
                 ),
             ]
         },
 
-        // ApiProperty warns if Optional item modifier maps to a non-nullable CLR collection element reference type
+        // ApiProperty warns if Optional item nullability maps to a non-nullable CLR collection element reference type
         new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type",
@@ -4314,7 +4314,7 @@ public partial class ApiSchemaTests
                                     "ApiItemType": { "ApiKind": "Scalar", "ApiName": "String" },
                                     "ClrType": "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
                                 },
-                                "ApiTypeModifiers": "Required",
+                                "ApiNullability": "NonNullable",
                                 "ClrValueMember": {
                                     "ClrKind": "Property",
                                     "ClrName": "NonNullableItemsProp"
@@ -4332,9 +4332,9 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableItemsProp\"]",
                     severity: ApiSchemaCompilationSeverity.Warning,
-                    code: ApiSchemaCompilationCode.ApiCollectionItemOptionalNonNullableMismatch,
+                    code: ApiSchemaCompilationCode.ApiCollectionItemNullableNonNullableMismatch,
                     description: "CLR collection element in 'NonNullableItemsProp' is non-nullable but item is declared Optional",
-                    remediation: "Change the CLR element type in 'NonNullableItemsProp' to a nullable reference type, or change the item modifier to Required"
+                    remediation: "Change the CLR element type in 'NonNullableItemsProp' to a nullable reference type, or change the item nullability to Required"
                 ),
             ]
         },

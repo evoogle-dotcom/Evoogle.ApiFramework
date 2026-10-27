@@ -78,15 +78,15 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
 
     #region With Methods
     /// <summary>Configures input nullability independently of argument presence.</summary>
-    /// <param name="apiTypeModifiers">The input type modifiers.</param>
+    /// <param name="apiNullability">The input nullability.</param>
     /// <returns>The current builder.</returns>
-    public ApiQuerySourceParameterBuilder WithModifiers(ApiTypeModifiers apiTypeModifiers)
+    public ApiQuerySourceParameterBuilder WithNullability(ApiNullability apiNullability)
     {
         var source = this.CurrentConfigurationSource;
-        if (source >= _state.ModifiersSource)
+        if (source >= _state.NullabilitySource)
         {
-            _state.ApiTypeModifiers = apiTypeModifiers;
-            _state.ModifiersSource = source;
+            _state.ApiNullability = apiNullability;
+            _state.NullabilitySource = source;
         }
 
         return this;
@@ -95,31 +95,33 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
     /// <summary>Allows a supplied argument value to be null without changing argument presence.</summary>
     /// <returns>The current builder.</returns>
     public ApiQuerySourceParameterBuilder AsNullable()
-        => this.WithModifiers(ApiTypeModifiers.None);
+        => this.WithNullability(ApiNullability.Nullable);
 
     /// <summary>Prohibits null for a supplied argument value without changing argument presence.</summary>
     /// <returns>The current builder.</returns>
     public ApiQuerySourceParameterBuilder AsNonNullable()
-        => this.WithModifiers(ApiTypeModifiers.Required);
+        => this.WithNullability(ApiNullability.NonNullable);
 
     /// <summary>Allows the caller to omit the argument without changing value nullability.</summary>
     /// <returns>The current builder.</returns>
-    public ApiQuerySourceParameterBuilder WithOptionalArgument()
-        => this.WithRequiredArgument(false);
+    public ApiQuerySourceParameterBuilder AsOptional()
+        => this.WithPresence(ApiPresence.Optional);
+
+    /// <summary>Requires an argument without changing value nullability.</summary>
+    /// <returns>The current builder.</returns>
+    public ApiQuerySourceParameterBuilder AsRequired()
+        => this.WithPresence(ApiPresence.Required);
 
     /// <summary>Configures whether an argument must be supplied.</summary>
-    /// <param name="requiresArgument">Whether argument omission is prohibited.</param>
+    /// <param name="apiPresence">The argument presence requirement.</param>
     /// <returns>The current builder.</returns>
-    public ApiQuerySourceParameterBuilder WithRequiredArgument
-    (
-        bool requiresArgument = ApiSchemaDefaults.QuerySourceParameterRequiresArgument
-    )
+    public ApiQuerySourceParameterBuilder WithPresence(ApiPresence apiPresence)
     {
         var source = this.CurrentConfigurationSource;
-        if (source >= _state.ApiRequiresArgumentSource)
+        if (source >= _state.PresenceSource)
         {
-            _state.ApiRequiresArgument = requiresArgument;
-            _state.ApiRequiresArgumentSource = source;
+            _state.ApiPresence = apiPresence;
+            _state.PresenceSource = source;
         }
 
         return this;
@@ -142,15 +144,15 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
         // Build ApiQuerySourceParameter instance from all the configured components.
         var apiName = this.ApiName;
         var apiTypeExpression = new ApiTypeExpression(this.ApiTypeReference);
-        var apiTypeModifiers = _state.ApiTypeModifiers;
-        var apiRequiresArgument = _state.ApiRequiresArgument;
+        var apiNullability = _state.ApiNullability;
+        var apiPresence = _state.ApiPresence;
 
         var apiQuerySourceParameter = new ApiQuerySourceParameter
         (
             apiName,
             apiTypeExpression,
-            apiTypeModifiers,
-            apiRequiresArgument
+            apiNullability,
+            apiPresence
         );
 
         // Add any extensions that were configured.

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Types;
+
 namespace Evoogle.ApiFramework.Schema.Configuration.Types;
 
 /// <summary>
@@ -26,7 +28,7 @@ public static class ApiPropertyBuilderExtensions
     }
 
     /// <summary>
-    ///     Marks this property as non-nullable, overriding any nullability-inferred modifier.
+    ///     Marks this property as non-nullable, overriding any inferred nullability.
     /// </summary>
     /// <param name="builder">The property builder to configure.</param>
     /// <returns>The current builder instance.</returns>
@@ -34,11 +36,11 @@ public static class ApiPropertyBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.WithModifiers(m => m.AsNonNullable());
+        return builder.WithNullability(ApiNullability.NonNullable);
     }
 
     /// <summary>
-    ///     Marks this property as nullable, overriding any nullability-inferred modifier.
+    ///     Marks this property as nullable, overriding any inferred nullability.
     /// </summary>
     /// <param name="builder">The property builder to configure.</param>
     /// <returns>The current builder instance.</returns>
@@ -46,6 +48,6 @@ public static class ApiPropertyBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.WithModifiers(m => m.AsNullable());
+        return builder.WithNullability(ApiNullability.Nullable);
     }
 }

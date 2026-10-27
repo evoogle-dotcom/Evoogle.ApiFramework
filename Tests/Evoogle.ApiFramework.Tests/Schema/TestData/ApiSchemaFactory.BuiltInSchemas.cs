@@ -94,7 +94,7 @@ public static partial class ApiSchemaFactory
             new ApiProperty(
                 name,
                 expression,
-                required ? ApiTypeModifiers.Required : ApiTypeModifiers.None,
+                required ? ApiNullability.NonNullable : ApiNullability.Nullable,
                 new ClrMemberReference(clrMemberKind, name)),
             extensions);
 
@@ -119,9 +119,9 @@ public static partial class ApiSchemaFactory
     {
         public static ApiTypeExpression ClrRef<TClr>() => new(ApiTypeReference.ClrRef<TClr>());
 
-        public static ApiTypeExpression HashSetOf<TClr>(bool required) => ApiTypeExpression.HashSetOf<TClr>(required ? ApiTypeModifiers.Required : ApiTypeModifiers.None);
+        public static ApiTypeExpression HashSetOf<TClr>(bool required) => ApiTypeExpression.HashSetOf<TClr>(required ? ApiNullability.NonNullable : ApiNullability.Nullable);
 
-        public static ApiTypeExpression ListOf<TClr>(bool required) => ApiTypeExpression.ListOf<TClr>(required ? ApiTypeModifiers.Required : ApiTypeModifiers.None);
+        public static ApiTypeExpression ListOf<TClr>(bool required) => ApiTypeExpression.ListOf<TClr>(required ? ApiNullability.NonNullable : ApiNullability.Nullable);
     }
 
     // Query Source Presets
@@ -130,7 +130,7 @@ public static partial class ApiSchemaFactory
         string name,
         IEnumerable<ApiQuerySourceParameter>? inputParameters,
         ApiTypeExpression outputTypeExpression,
-        ApiTypeModifiers outputTypeModifiers = ApiTypeModifiers.None,
+        ApiNullability outputNullability = ApiNullability.Nullable,
         ApiQueryComposition outputComposition = ApiQueryComposition.None,
         OrderedDictionary<Type, object>? extensions = null
     ) => WithExtensions
@@ -140,7 +140,7 @@ public static partial class ApiSchemaFactory
             name,
             inputParameters,
             outputTypeExpression,
-            outputTypeModifiers,
+            outputNullability,
             outputComposition
         ),
         extensions
@@ -150,8 +150,8 @@ public static partial class ApiSchemaFactory
     (
         string name,
         ApiTypeExpression typeExpression,
-        ApiTypeModifiers typeModifiers = ApiTypeModifiers.Required,
-        bool requiresArgument = true,
+        ApiNullability nullability = ApiNullability.NonNullable,
+        ApiPresence apiPresence = ApiPresence.Required,
         OrderedDictionary<Type, object>? extensions = null
     ) => WithExtensions
     (
@@ -159,8 +159,8 @@ public static partial class ApiSchemaFactory
         (
             name,
             typeExpression,
-            typeModifiers,
-            requiresArgument
+            nullability,
+            apiPresence
         ),
         extensions
     );
@@ -553,7 +553,7 @@ public static partial class ApiSchemaFactory
                 name: "CountOrders",
                 inputParameters: [],
                 outputTypeExpression: TE.ClrRef<int>(),
-                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputNullability: ApiNullability.NonNullable,
                 outputComposition: ApiQueryComposition.None
             ),
             QS
@@ -565,12 +565,12 @@ public static partial class ApiSchemaFactory
                     (
                         name: "id",
                         typeExpression: TE.ClrRef<Ulid>(),
-                        typeModifiers: ApiTypeModifiers.Required,
-                        requiresArgument: true
+                        nullability: ApiNullability.NonNullable,
+                        apiPresence: ApiPresence.Required
                     )
                 ],
                 outputTypeExpression: TE.ClrRef<Customer>(),
-                outputTypeModifiers: ApiTypeModifiers.None,
+                outputNullability: ApiNullability.Nullable,
                 outputComposition: ApiQueryComposition.Projection
             ),
             QS
@@ -582,12 +582,12 @@ public static partial class ApiSchemaFactory
                     (
                         name: "orderId",
                         typeExpression: TE.ClrRef<Ulid>(),
-                        typeModifiers: ApiTypeModifiers.Required,
-                        requiresArgument: true
+                        nullability: ApiNullability.NonNullable,
+                        apiPresence: ApiPresence.Required
                     )
                 ],
                 outputTypeExpression: TE.ClrRef<Money>(),
-                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputNullability: ApiNullability.NonNullable,
                 outputComposition: ApiQueryComposition.None
             ),
             QS
@@ -595,7 +595,7 @@ public static partial class ApiSchemaFactory
                 name: "ListCategories",
                 inputParameters: [],
                 outputTypeExpression: TE.ListOf<Category>(required: true),
-                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputNullability: ApiNullability.NonNullable,
                 outputComposition: ApiQueryComposition.Filtering | ApiQueryComposition.Ordering
             ),
             QS
@@ -608,12 +608,12 @@ public static partial class ApiSchemaFactory
                     (
                         name: "status",
                         typeExpression: TE.ClrRef<OrderStatus>(),
-                        typeModifiers: ApiTypeModifiers.Required,
-                        requiresArgument: true
+                        nullability: ApiNullability.NonNullable,
+                        apiPresence: ApiPresence.Required
                     )
                 ],
                 outputTypeExpression: TE.ListOf<Customer>(required: true),
-                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputNullability: ApiNullability.NonNullable,
                 outputComposition:
                     ApiQueryComposition.Projection
                     | ApiQueryComposition.Filtering
@@ -629,7 +629,7 @@ public static partial class ApiSchemaFactory
                     QSP(name: "minimumTotal", typeExpression: TE.ClrRef<decimal>())
                 ],
                 outputTypeExpression: TE.ListOf<Order>(required: true),
-                outputTypeModifiers: ApiTypeModifiers.Required,
+                outputNullability: ApiNullability.NonNullable,
                 outputComposition:
                     ApiQueryComposition.Projection
                     | ApiQueryComposition.Filtering

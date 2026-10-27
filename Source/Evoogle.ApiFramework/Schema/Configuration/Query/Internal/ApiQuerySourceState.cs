@@ -23,7 +23,7 @@ internal sealed class ApiQuerySourceState
 
     internal Func<ApiTypeExpression>? OutputTypeFactory { get; set; }
 
-    internal ApiTypeModifiers ApiOutputTypeModifiers { get; set; } = ApiSchemaDefaults.NullableTypeModifiers;
+    internal ApiNullability ApiOutputNullability { get; set; } = ApiSchemaDefaults.QuerySourceOutputNullability;
 
     internal ApiConfigurationSource OutputSource { get; set; } = ApiConfigurationSource.Convention;
 

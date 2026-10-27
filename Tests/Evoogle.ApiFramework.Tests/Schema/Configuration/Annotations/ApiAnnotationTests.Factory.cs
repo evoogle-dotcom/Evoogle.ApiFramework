@@ -72,7 +72,7 @@ public static class ApiAnnotationTestsFactory
     #endregion
 
     #region Property and Field Attribute Factory Methods
-    public static ApiSchema BuildWithApiPropertyAttributesConfigureNameAndModifiers()
+    public static ApiSchema BuildWithApiPropertyAttributesConfigureNameAndNullability()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")

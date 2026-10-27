@@ -110,11 +110,12 @@ inline type declarations; references to registered schema types remain non-ownin
 lookups use ordinal, case-sensitive source names. Source parameter names are unique within a source.
 
 `ApiQuerySource` presents its constructor parameters and properties in input-to-output order after
-`ApiName`: `ApiInputParameters`, `ApiOutputType`, `ApiOutputTypeModifiers`, and `ApiOutputComposition`.
+`ApiName`: `ApiInputParameters`, `ApiOutputType`, `ApiOutputNullability`, and `ApiOutputComposition`.
 The JSON representation follows the same naming and ordering. `ApiInputParameters` owns the input
-declarations; `ApiOutputType` and `ApiOutputTypeModifiers` describe output type and nullability.
-Each parameter declares `ApiType`, `ApiTypeModifiers`, and `ApiRequiresArgument`; argument presence
-and nullability are independent. Defaults are deferred. `ApiOutputComposition` uses
+declarations; `ApiOutputType` and `ApiOutputNullability` describe output type and nullability.
+Each parameter declares `ApiType`, `ApiNullability`, and `ApiPresence`; argument presence
+and nullability are independent. Presence uses `ApiPresence.Optional` or `ApiPresence.Required`;
+parameters default to required, non-nullable inputs. Argument defaults remain deferred. `ApiOutputComposition` uses
 `ApiQueryComposition` flags for projection, filtering, ordering, and offset pagination; the last
 three require collection output. Declaring permission does not implement execution support.
 
@@ -180,6 +181,16 @@ customer output, projecting `Id` and `Name`. Absence produces successful null da
 multi-level query and command scenario remains the full alpha acceptance target. New runtime
 namespaces will be reviewed as their contracts become concrete; `Runtime/Service` is the provisional
 home for service execution.
+
+## Presence and Nullability Boundaries
+
+Presence and nullability are independent resolved constraints. Source parameters declare argument
+presence with `ApiPresence`; their `IsRequired` and `IsOptional` predicates are derived conveniences.
+`ApiProperty.ApiNullability` constrains supplied or produced values without requiring the property
+in every input or result. Universal property presence is deferred: command-target create/update
+contracts and future object-input contracts establish contextual requirements. Compiled projections
+derive result shapes and preserve selected-versus-absent fields. Collection items retain nullability
+without a separate presence setting, and nullable source output does not imply an output-omission state.
 
 ## Operation Compilation
 

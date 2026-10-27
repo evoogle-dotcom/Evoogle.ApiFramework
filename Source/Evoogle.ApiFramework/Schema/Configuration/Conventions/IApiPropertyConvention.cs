@@ -12,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 ///     after <see cref="IApiObjectTypeConvention"/> instances have run.
 /// </summary>
 /// <remarks>
-///     May configure naming, modifiers, or extensions on the property, or add properties through
+///     May configure naming, nullability, or extensions on the property, or add properties through
 ///     the supplied context. Newly added properties receive property conventions in a later pass;
 ///     properties on newly registered object types are processed only after that type's
 ///     <see cref="IApiObjectTypeConvention"/> instances have run.

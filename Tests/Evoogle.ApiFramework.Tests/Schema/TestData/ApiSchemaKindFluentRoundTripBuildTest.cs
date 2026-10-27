@@ -151,7 +151,7 @@ public class ApiSchemaKindFluentRoundTripBuildTest : ApiSchemaBuildTestBase
             var apiName = apiQuerySource.ApiName;
             var apiInputParameters = apiQuerySource.ApiInputParameters;
             var apiOutputType = apiQuerySource.ApiOutputType;
-            var apiOutputTypeModifiers = apiQuerySource.ApiOutputTypeModifiers;
+            var apiOutputNullability = apiQuerySource.ApiOutputNullability;
             var apiOutputComposition = apiQuerySource.ApiOutputComposition;
 
             builder = builder.AddQuerySource(apiName, x =>
@@ -159,13 +159,13 @@ public class ApiSchemaKindFluentRoundTripBuildTest : ApiSchemaBuildTestBase
                 foreach (var apiInputParameter in apiInputParameters)
                 {
                     var apiName = apiInputParameter.ApiName;
-                    var apiTypeModifiers = apiInputParameter.ApiTypeModifiers;
-                    var apiRequiresArgument = apiInputParameter.ApiRequiresArgument;
+                    var apiNullability = apiInputParameter.ApiNullability;
+                    var apiPresence = apiInputParameter.ApiPresence;
                     var clrType = apiInputParameter.ApiType.ClrType;
 
                     x.AddInputParameter(apiName, clrType, p => p
-                        .WithModifiers(apiTypeModifiers)
-                        .WithRequiredArgument(apiRequiresArgument)
+                        .WithNullability(apiNullability)
+                        .WithPresence(apiPresence)
                         .ConfigureExtensions(apiInputParameter));
                 }
 
@@ -173,14 +173,14 @@ public class ApiSchemaKindFluentRoundTripBuildTest : ApiSchemaBuildTestBase
                 {
                     var apiCollectionType = (ApiCollectionType)apiOutputType;
                     var clrOutputItemType = apiCollectionType.ApiItemType.ClrType;
-                    var apiOutputItemTypeModifiers = apiCollectionType.ApiItemTypeModifiers;
+                    var apiOutputItemNullability = apiCollectionType.ApiItemNullability;
 
-                    x.WithCollectionOutput(clrOutputItemType, apiOutputTypeModifiers, apiOutputItemTypeModifiers);
+                    x.WithCollectionOutput(clrOutputItemType, apiOutputNullability, apiOutputItemNullability);
                 }
                 else
                 {
                     var clrOutputType = apiQuerySource.ApiOutputType.ClrType;
-                    x.WithOutput(clrOutputType, apiOutputTypeModifiers);
+                    x.WithOutput(clrOutputType, apiOutputNullability);
                 }
 
                 x.WithOutputComposition(apiOutputComposition);

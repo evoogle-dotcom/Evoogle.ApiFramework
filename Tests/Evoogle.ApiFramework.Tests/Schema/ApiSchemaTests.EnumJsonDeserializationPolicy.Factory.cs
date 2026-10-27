@@ -14,14 +14,14 @@ namespace Evoogle.ApiFramework.Schema;
 internal static class EnumJsonDeserializationPolicyTestsFactory
 {
     #region Compilation Issue Factory Methods
-    public static void SetFirstPropertyApiTypeModifiersToUnknownString(JsonObject schema)
-        => GetFirstProperty(schema)[nameof(ApiProperty.ApiTypeModifiers)] = "Unknown";
+    public static void SetFirstPropertyApiNullabilityToUnknownString(JsonObject schema)
+        => GetFirstProperty(schema)[nameof(ApiProperty.ApiNullability)] = "Unknown";
 
-    public static void SetFirstPropertyApiTypeModifiersToNull(JsonObject schema)
-        => GetFirstProperty(schema)[nameof(ApiProperty.ApiTypeModifiers)] = null;
+    public static void SetFirstPropertyApiNullabilityToNull(JsonObject schema)
+        => GetFirstProperty(schema)[nameof(ApiProperty.ApiNullability)] = null;
 
-    public static void SetFirstCollectionTypeApiItemTypeModifiersToIncompatibleToken(JsonObject schema)
-        => GetFirstCollectionType(schema)[nameof(ApiCollectionType.ApiItemTypeModifiers)] = 1;
+    public static void SetFirstCollectionTypeApiItemNullabilityToIncompatibleToken(JsonObject schema)
+        => GetFirstCollectionType(schema)[nameof(ApiCollectionType.ApiItemNullability)] = 1;
 
     public static void SetSchemaApiKeyNullHandlingToNull(JsonObject schema)
         => schema[nameof(ApiSchema.ApiOptions)]!.AsObject()[nameof(ApiSchemaOptions.ApiKeyNullHandling)] = null;

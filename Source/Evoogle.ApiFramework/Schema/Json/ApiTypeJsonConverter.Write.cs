@@ -21,20 +21,20 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     private static void WriteApiCollectionType(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> writeContext)
     {
         WriteApiCollectionTypeApiItemTypeExpression(writer, apiCollectionType, writeContext);
-        WriteApiCollectionTypeApiItemTypeModifiers(writer, apiCollectionType, writeContext);
+        WriteApiCollectionTypeApiItemNullability(writer, apiCollectionType, writeContext);
     }
 
     private static void WriteApiCollectionTypeApiItemTypeExpression(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiCollectionType.ApiItemTypeExpression, obj: apiCollectionType.ApiItemTypeExpression, options: writeContext.Options);
 
-    private static void WriteApiCollectionTypeApiItemTypeModifiers(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> writeContext)
+    private static void WriteApiCollectionTypeApiItemNullability(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithConverter
         (
-            propertyName: writeContext.PropertyNames.ApiCollectionType.ApiItemTypeModifiers,
-            value: apiCollectionType.ApiItemTypeModifiers,
+            propertyName: writeContext.PropertyNames.ApiCollectionType.ApiItemNullability,
+            value: apiCollectionType.ApiItemNullability,
             options: writeContext.Options,
-            converter: _apiTypeModifiersJsonConverter,
-            defaultValue: ApiSchemaDefaults.NullableTypeModifiers
+            converter: _apiNullabilityJsonConverter,
+            defaultValue: ApiSchemaDefaults.CollectionItemNullability
         );
 
     // ApiEnumType

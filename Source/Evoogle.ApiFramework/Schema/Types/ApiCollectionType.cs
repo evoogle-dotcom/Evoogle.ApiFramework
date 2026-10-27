@@ -16,12 +16,12 @@ namespace Evoogle.ApiFramework.Schema.Types;
 ///     Initializes a new instance of the <see cref="ApiCollectionType"/> class.
 /// </remarks>
 /// <param name="apiItemTypeExpression">The API type expression of the items in the collection.</param>
-/// <param name="apiItemTypeModifiers">Modifiers applied to the item type (e.g., Required).</param>
+/// <param name="apiItemNullability">Nullability of each collection item.</param>
 /// <param name="clrCollectionType">The CLR type representing the collection type (e.g., List&lt;T&gt;).</param>
 public sealed class ApiCollectionType
 (
     ApiTypeExpression apiItemTypeExpression,
-    ApiTypeModifiers apiItemTypeModifiers,
+    ApiNullability apiItemNullability,
     Type clrCollectionType
 ) : ApiType(clrCollectionType)
 {
@@ -41,18 +41,18 @@ public sealed class ApiCollectionType
     /// </summary>
     public ApiType ApiItemType => this.ApiItemTypeExpression.ApiType;
 
-    /// <summary>Gets the modifiers applied to the item type within the collection (e.g., Required).</summary>
-    public ApiTypeModifiers ApiItemTypeModifiers { get; } = apiItemTypeModifiers;
+    /// <summary>Gets the nullability of each collection item.</summary>
+    public ApiNullability ApiItemNullability { get; } = apiItemNullability;
 
     internal ApiTypeExpression ApiItemTypeExpression { get; } = apiItemTypeExpression;
     #endregion
 
     #region ApiCollectionType Computed Properties
     /// <summary>Gets a value indicating whether collection items permit null values.</summary>
-    public bool IsItemNullable => !this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    public bool IsItemNullable => this.ApiItemNullability == ApiNullability.Nullable;
 
     /// <summary>Gets a value indicating whether collection items prohibit null values.</summary>
-    public bool IsItemNonNullable => this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    public bool IsItemNonNullable => this.ApiItemNullability == ApiNullability.NonNullable;
 
     internal bool IsItemTypeResolved => this.ApiItemTypeExpression.IsResolved;
     #endregion
@@ -62,11 +62,11 @@ public sealed class ApiCollectionType
     public override string ToString()
     {
         var apiItemTypeExpression = this.ApiItemTypeExpression.SafeToString();
-        var apiItemTypeModifiers = this.ApiItemTypeModifiers.SafeToString();
+        var apiItemNullability = this.ApiItemNullability.SafeToString();
         var clrType = this.ClrType.SafeToName();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiCollectionType)} {{{nameof(this.ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(this.ApiItemTypeModifiers)}={apiItemTypeModifiers}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
+        return $"{nameof(ApiCollectionType)} {{{nameof(this.ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(this.ApiItemNullability)}={apiItemNullability}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 
@@ -91,7 +91,7 @@ public sealed class ApiCollectionType
 
         base.CompileCore(context);
 
-        this.ValidateApiItemTypeModifiers(context);
+        this.ValidateApiItemNullability(context);
         this.ValidateApiItemTypeExpression(context);
     }
     #endregion
@@ -114,19 +114,19 @@ public sealed class ApiCollectionType
         this.ApiItemTypeExpression.ResolveForCollection(context);
     }
 
-    private void ValidateApiItemTypeModifiers(ApiSchemaCompilationContext context)
+    private void ValidateApiItemNullability(ApiSchemaCompilationContext context)
     {
-        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiItemTypeModifiers));
-        if (jsonEnumFinding is null)
+        var jsonEnumFinding = this.GetJsonEnumFinding(nameof(this.ApiItemNullability));
+        if (jsonEnumFinding is null && Enum.IsDefined(this.ApiItemNullability))
         {
             return;
         }
 
         var apiPath = this.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemTypeModifiers;
-        var description = jsonEnumFinding.DescribeProblem();
-        var remediation = $"Specify a valid {nameof(this.ApiItemTypeModifiers)} value";
+        var code = ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemNullability;
+        var description = jsonEnumFinding?.DescribeProblem() ?? $"{nameof(this.ApiItemNullability)} is invalid";
+        var remediation = $"Specify {ApiNullability.Nullable} or {ApiNullability.NonNullable} for {nameof(this.ApiItemNullability)}";
 
         context.AddIssue(apiPath, severity, code, description, remediation);
     }

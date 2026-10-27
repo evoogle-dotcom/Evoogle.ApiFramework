@@ -155,53 +155,53 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     /// <summary>Declares the source output using a registered schema type reference.</summary>
     /// <remarks>The type and nullability are configured together at the active precedence.</remarks>
     /// <param name="apiTypeReference">The output type reference.</param>
-    /// <param name="apiTypeModifiers">The output nullability; nullable by default.</param>
+    /// <param name="apiOutputNullability">The output nullability; nullable by default.</param>
     /// <returns>The current builder.</returns>
     public ApiQuerySourceBuilder WithOutput
     (
         ApiTypeReference apiTypeReference,
-        ApiTypeModifiers apiTypeModifiers = ApiSchemaDefaults.NullableTypeModifiers
+        ApiNullability apiOutputNullability = ApiSchemaDefaults.QuerySourceOutputNullability
     )
     {
         ArgumentNullException.ThrowIfNull(apiTypeReference);
-        return this.SetOutput(() => new ApiTypeExpression(apiTypeReference), apiTypeModifiers);
+        return this.SetOutput(() => new ApiTypeExpression(apiTypeReference), apiOutputNullability);
     }
 
     /// <summary>Declares output referencing a registered CLR type.</summary>
     /// <param name="clrType">The registered CLR output type.</param>
-    /// <param name="apiTypeModifiers">The output nullability; nullable by default.</param>
+    /// <param name="apiOutputNullability">The output nullability; nullable by default.</param>
     /// <returns>The current builder.</returns>
     public ApiQuerySourceBuilder WithOutput
     (
         Type clrType,
-        ApiTypeModifiers apiTypeModifiers = ApiSchemaDefaults.NullableTypeModifiers
+        ApiNullability apiOutputNullability = ApiSchemaDefaults.QuerySourceOutputNullability
     )
     {
         ArgumentNullException.ThrowIfNull(clrType);
-        return this.WithOutput(new ApiTypeReference(clrType), apiTypeModifiers);
+        return this.WithOutput(new ApiTypeReference(clrType), apiOutputNullability);
     }
 
     /// <summary>Declares output referencing the registered schema type for a CLR type.</summary>
     /// <typeparam name="TOutput">The registered CLR output type.</typeparam>
-    /// <param name="apiTypeModifiers">The output nullability; nullable by default.</param>
+    /// <param name="apiOutputNullability">The output nullability; nullable by default.</param>
     /// <returns>The current builder.</returns>
     public ApiQuerySourceBuilder WithOutput<TOutput>
     (
-        ApiTypeModifiers apiTypeModifiers = ApiSchemaDefaults.NullableTypeModifiers
+        ApiNullability apiOutputNullability = ApiSchemaDefaults.QuerySourceOutputNullability
     )
-        => this.WithOutput(typeof(TOutput), apiTypeModifiers);
+        => this.WithOutput(typeof(TOutput), apiOutputNullability);
 
     /// <summary>Declares list output using a registered CLR item type.</summary>
     /// <remarks>The item type, item nullability, and collection nullability share one precedence.</remarks>
     /// <param name="clrItemType">The registered CLR item type.</param>
-    /// <param name="apiCollectionTypeModifiers">The collection nullability; non-nullable by default.</param>
-    /// <param name="apiItemTypeModifiers">The item nullability; non-nullable by default.</param>
+    /// <param name="apiCollectionNullability">The collection nullability; non-nullable by default.</param>
+    /// <param name="apiItemNullability">The item nullability; non-nullable by default.</param>
     /// <returns>The current builder.</returns>
     public ApiQuerySourceBuilder WithCollectionOutput
     (
         Type clrItemType,
-        ApiTypeModifiers apiCollectionTypeModifiers = ApiSchemaDefaults.NonNullableTypeModifiers,
-        ApiTypeModifiers apiItemTypeModifiers = ApiSchemaDefaults.NonNullableTypeModifiers
+        ApiNullability apiCollectionNullability = ApiSchemaDefaults.QuerySourceCollectionOutputNullability,
+        ApiNullability apiItemNullability = ApiSchemaDefaults.QuerySourceCollectionOutputItemNullability
     )
     {
         ArgumentNullException.ThrowIfNull(clrItemType);
@@ -212,23 +212,23 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
             () => new ApiTypeExpression(new ApiCollectionType
             (
                 new ApiTypeExpression(new ApiTypeReference(clrItemType)),
-                apiItemTypeModifiers,
+                apiItemNullability,
                 clrCollectionType
             )),
-            apiCollectionTypeModifiers
+            apiCollectionNullability
         );
     }
 
     /// <summary>Declares list output with independently configured collection and item nullability.</summary>
     /// <typeparam name="TItem">The registered CLR item type.</typeparam>
-    /// <param name="apiCollectionTypeModifiers">The collection nullability.</param>
-    /// <param name="apiItemTypeModifiers">The item nullability.</param>
+    /// <param name="apiCollectionNullability">The collection nullability.</param>
+    /// <param name="apiItemNullability">The item nullability.</param>
     /// <returns>The current builder.</returns>
     public ApiQuerySourceBuilder WithCollectionOutput<TItem>
     (
-        ApiTypeModifiers apiCollectionTypeModifiers = ApiSchemaDefaults.NonNullableTypeModifiers,
-        ApiTypeModifiers apiItemTypeModifiers = ApiSchemaDefaults.NonNullableTypeModifiers
-    ) => this.WithCollectionOutput(typeof(TItem), apiCollectionTypeModifiers, apiItemTypeModifiers);
+        ApiNullability apiCollectionNullability = ApiSchemaDefaults.QuerySourceCollectionOutputNullability,
+        ApiNullability apiItemNullability = ApiSchemaDefaults.QuerySourceCollectionOutputItemNullability
+    ) => this.WithCollectionOutput(typeof(TItem), apiCollectionNullability, apiItemNullability);
 
     /// <summary>Declares which query composition operations are allowed over the source output.</summary>
     /// <remarks>Replaces the allowed operations at the active precedence; does not apply them to the output.</remarks>
@@ -264,7 +264,7 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
         var apiName = this.ApiName;
         var apiInputParameters = _state.InputParameterBuilders.Select(parameter => parameter.Build());
         var apiOutputType = _state.OutputTypeFactory?.Invoke()!;
-        var apiOutputTypeModifiers = _state.ApiOutputTypeModifiers;
+        var apiOutputNullability = _state.ApiOutputNullability;
         var apiOutputComposition = _state.ApiOutputComposition;
 
         var apiQuerySource = new ApiQuerySource
@@ -272,7 +272,7 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
             apiName,
             apiInputParameters,
             apiOutputType,
-            apiOutputTypeModifiers,
+            apiOutputNullability,
             apiOutputComposition
         );
 
@@ -291,14 +291,14 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     private ApiQuerySourceBuilder SetOutput
     (
         Func<ApiTypeExpression> outputTypeFactory,
-        ApiTypeModifiers apiTypeModifiers
+        ApiNullability apiOutputNullability
     )
     {
         var source = this.CurrentConfigurationSource;
         if (source >= _state.OutputSource)
         {
             _state.OutputTypeFactory = outputTypeFactory;
-            _state.ApiOutputTypeModifiers = apiTypeModifiers;
+            _state.ApiOutputNullability = apiOutputNullability;
             _state.OutputSource = source;
         }
 

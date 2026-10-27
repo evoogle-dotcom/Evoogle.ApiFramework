@@ -52,7 +52,7 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
                 RequiredEnumIdentity.Collection => new ApiCollectionType
                 (
                     new ApiTypeExpression(new ApiScalarType("Text", typeof(string))),
-                    ApiTypeModifiers.None,
+                    ApiNullability.Nullable,
                     typeof(List<string>)
                 ),
                 RequiredEnumIdentity.OneToOne => new ApiRelationshipOneToOne
@@ -127,7 +127,7 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
 
             var optionalName = this.Identity switch
             {
-                RequiredEnumIdentity.Collection => nameof(ApiCollectionType.ApiItemTypeModifiers),
+                RequiredEnumIdentity.Collection => nameof(ApiCollectionType.ApiItemNullability),
                 RequiredEnumIdentity.OneToOne => nameof(ApiRelationship.ApiDeleteBehavior),
                 _ => null
             };
@@ -137,7 +137,8 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
                     .Where(property => property.Name == GetJsonName(optionalName, this.Options!))
                     .ToArray();
                 var expectedOptionalCount = this.IgnoreCondition == JsonIgnoreCondition.WhenWritingDefault ? 0 : 1;
-                this.WriteLine($"Optional Default Property: {GetJsonName(optionalName, this.Options!)}=None");
+                var expectedOptionalValue = this.Identity == RequiredEnumIdentity.Collection ? "Nullable" : "None";
+                this.WriteLine($"Optional Default Property: {GetJsonName(optionalName, this.Options!)}={expectedOptionalValue}");
                 this.WriteLine($"Expected Optional Property Count: {expectedOptionalCount}; Actual: {optionalProperties.Length}");
                 foreach (var optionalProperty in optionalProperties)
                 {
@@ -152,7 +153,7 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
                 else
                 {
                     optionalProperties.Should().ContainSingle();
-                    optionalProperties[0].Value.GetString().Should().Be("None");
+                    optionalProperties[0].Value.GetString().Should().Be(expectedOptionalValue);
                 }
             }
 
@@ -173,7 +174,7 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
                     var collection = this.ActualMetadata.Should().BeOfType<ApiCollectionType>().Which;
                     collection.ApiKind.Should().Be(ApiTypeKind.Collection);
                     collection.ClrType.Should().Be<List<string>>();
-                    collection.ApiItemTypeModifiers.Should().Be(ApiTypeModifiers.None);
+                    collection.ApiItemNullability.Should().Be(ApiNullability.Nullable);
                     collection.ApiItemTypeExpression.IsInline.Should().BeTrue();
                     collection.ApiItemTypeExpression.ApiTypeReference.Should().BeNull();
 
@@ -262,7 +263,7 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
                 this.WriteLine();
                 collection.ApiKind.Should().Be(ApiTypeKind.Collection);
                 collection.ClrType.Should().Be(sourceCollection.ClrType);
-                collection.ApiItemTypeModifiers.Should().Be(sourceCollection.ApiItemTypeModifiers);
+                collection.ApiItemNullability.Should().Be(sourceCollection.ApiItemNullability);
                 collection.ApiItemType.ApiKind.Should().Be(sourceCollection.ApiItemType.ApiKind);
                 collection.ApiItemType.ClrType.Should().Be(sourceCollection.ApiItemType.ClrType);
             }

@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Types;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
@@ -12,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
 ///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
-internal sealed class ApiPropertyNullabilityModifierConvention : IApiPropertyConvention
+internal sealed class ApiPropertyNullabilityConvention : IApiPropertyConvention
 {
     #region Properties
     /// <inheritdoc />
@@ -31,10 +32,10 @@ internal sealed class ApiPropertyNullabilityModifierConvention : IApiPropertyCon
         switch (context.ClrMemberNullableInfo.Nullability)
         {
             case MemberNullability.NonNullable:
-                builder.SetModifiersConvention(static m => m.AsNonNullable());
+                builder.SetNullabilityConvention(ApiNullability.NonNullable);
                 break;
             case MemberNullability.Nullable:
-                builder.SetModifiersConvention(static m => m.AsNullable());
+                builder.SetNullabilityConvention(ApiNullability.Nullable);
                 break;
             default:
                 // MemberNullability.Unknown — no inference possible; leave as-is.

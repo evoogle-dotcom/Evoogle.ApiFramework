@@ -84,24 +84,24 @@ public enum ApiSchemaCompilationCode
     ApiCollectionTypeItemTypeReferenceUnresolved,
 
     /// <summary>
-    ///     The collection type's item type modifiers could not be read from schema JSON.
+    ///     The collection type's item nullability is invalid.
     /// </summary>
-    [EnumMember(Value = "API_COLLECTION_TYPE_INVALID_API_ITEM_TYPE_MODIFIERS")]
-    ApiCollectionTypeInvalidApiItemTypeModifiers,
+    [EnumMember(Value = "API_COLLECTION_TYPE_INVALID_API_ITEM_NULLABILITY")]
+    ApiCollectionTypeInvalidApiItemNullability,
 
     /// <summary>
-    ///     The collection item is declared Required but the CLR element type is nullable.
-    ///     The API contract demands a value, but the CLR element type permits null.
+    ///     The collection item is declared non-nullable but the CLR element type is nullable.
+    ///     The API contract prohibits null, but the CLR element type permits null.
     /// </summary>
-    [EnumMember(Value = "API_COLLECTION_ITEM_REQUIRED_NULLABLE_MISMATCH")]
-    ApiCollectionItemRequiredNullableMismatch,
+    [EnumMember(Value = "API_COLLECTION_ITEM_NON_NULLABLE_NULLABLE_MISMATCH")]
+    ApiCollectionItemNonNullableNullableMismatch,
 
     /// <summary>
-    ///     The collection item is declared Optional but the CLR element type is a non-nullable reference type.
-    ///     An absent Optional item may assign null to a CLR element that cannot hold it.
+    ///     The collection item is declared nullable but the CLR element type is a non-nullable reference type.
+    ///     A nullable item may assign null to a CLR element that cannot hold it.
     /// </summary>
-    [EnumMember(Value = "API_COLLECTION_ITEM_OPTIONAL_NON_NULLABLE_MISMATCH")]
-    ApiCollectionItemOptionalNonNullableMismatch,
+    [EnumMember(Value = "API_COLLECTION_ITEM_NULLABLE_NON_NULLABLE_MISMATCH")]
+    ApiCollectionItemNullableNonNullableMismatch,
     #endregion
 
     #region ApiConfiguration Compilation Codes
@@ -278,10 +278,10 @@ public enum ApiSchemaCompilationCode
     ApiPropertyInvalidApiName,
 
     /// <summary>
-    ///     The property's type modifiers could not be read from schema JSON.
+    ///     The property's nullability is invalid.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_INVALID_API_TYPE_MODIFIERS")]
-    ApiPropertyInvalidApiTypeModifiers,
+    [EnumMember(Value = "API_PROPERTY_INVALID_API_NULLABILITY")]
+    ApiPropertyInvalidApiNullability,
 
     /// <summary>
     ///     The property's type was not specified, either in the JSON or by the builder.
@@ -296,18 +296,18 @@ public enum ApiSchemaCompilationCode
     ApiPropertyTypeReferenceUnresolved,
 
     /// <summary>
-    ///     The property is declared Required but the CLR member is nullable.
-    ///     The API contract demands a value, but the CLR type permits null.
+    ///     The property is declared non-nullable but the CLR member is nullable.
+    ///     The API contract prohibits null, but the CLR type permits null.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_REQUIRED_NULLABLE_MISMATCH")]
-    ApiPropertyRequiredNullableMismatch,
+    [EnumMember(Value = "API_PROPERTY_NON_NULLABLE_NULLABLE_MISMATCH")]
+    ApiPropertyNonNullableNullableMismatch,
 
     /// <summary>
-    ///     The property is declared Optional but the CLR member is a non-nullable reference type.
-    ///     An absent Optional property may assign null to a CLR member that cannot hold it.
+    ///     The property is declared nullable but the CLR member is a non-nullable reference type.
+    ///     A nullable property may assign null to a CLR member that cannot hold it.
     /// </summary>
-    [EnumMember(Value = "API_PROPERTY_OPTIONAL_NON_NULLABLE_MISMATCH")]
-    ApiPropertyOptionalNonNullableMismatch,
+    [EnumMember(Value = "API_PROPERTY_NULLABLE_NON_NULLABLE_MISMATCH")]
+    ApiPropertyNullableNonNullableMismatch,
     #endregion
 
     #region ApiPropertyReference Compilation Codes
@@ -344,10 +344,10 @@ public enum ApiSchemaCompilationCode
     ApiQuerySourceOutputTypeReferenceUnresolved,
 
     /// <summary>
-    ///     The query source output type modifiers are invalid.
+    ///     The query source output nullability is invalid.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_OUTPUT_TYPE_MODIFIERS")]
-    ApiQuerySourceInvalidOutputTypeModifiers,
+    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_OUTPUT_NULLABILITY")]
+    ApiQuerySourceInvalidOutputNullability,
 
     /// <summary>
     ///     The allowed composition is invalid or incompatible with the output type.
@@ -374,10 +374,14 @@ public enum ApiSchemaCompilationCode
     ApiQuerySourceParameterTypeReferenceUnresolved,
 
     /// <summary>
-    ///     The query source parameter type modifiers are invalid.
+    ///     The query source parameter nullability is invalid.
     /// </summary>
-    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_TYPE_MODIFIERS")]
-    ApiQuerySourceParameterInvalidTypeModifiers,
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_NULLABILITY")]
+    ApiQuerySourceParameterInvalidNullability,
+
+    /// <summary>The query source parameter presence requirement is invalid.</summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_PARAMETER_INVALID_PRESENCE")]
+    ApiQuerySourceParameterInvalidPresence,
     #endregion
 
     #region ApiRelationship Compilation Codes
