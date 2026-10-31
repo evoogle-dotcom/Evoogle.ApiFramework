@@ -12,18 +12,26 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 /// </summary>
 public enum ApiNamingConventionTarget
 {
-    /// <summary>An <see cref="ApiObjectType"/> API name.</summary>
-    ObjectType,
-
+    #region Values
     /// <summary>An <see cref="ApiScalarType"/> API name.</summary>
     ScalarType,
 
     /// <summary>An <see cref="ApiEnumType"/> API name.</summary>
     EnumType,
 
+    /// <summary>An <see cref="ApiEnumValue"/> API name.</summary>
+    EnumValue,
+
+    /// <summary>An <see cref="ApiObjectType"/> API name.</summary>
+    ObjectType,
+
     /// <summary>An <see cref="ApiProperty"/> API name.</summary>
     Property,
 
-    /// <summary>An <see cref="ApiEnumValue"/> API name.</summary>
-    EnumValue,
+    /// <summary>An API query source name.</summary>
+    QuerySource,
+
+    /// <summary>An API query-source parameter name.</summary>
+    QuerySourceParameter,
+    #endregion
 }

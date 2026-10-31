@@ -484,6 +484,142 @@ internal sealed class ApiAnnotationReaderSet
         return results;
     }
 
+    internal IReadOnlyList<ApiQuerySourceAnnotationResult> ReadQuerySourceAnnotations
+    (
+        Assembly assembly,
+        Func<Type, bool>? filter
+    )
+    {
+        var scan = ApiAssemblyTypeScanner.Scan(assembly, filter);
+        _issues.AddRange(scan.Issues);
+
+        var scannedTypes = scan.Types.ToHashSet();
+        Func<Type, bool>? readerFilter = filter is null && scan.Issues.Count == 0
+            ? null
+            : scannedTypes.Contains;
+        var results = new List<ApiQuerySourceAnnotationResult>();
+        var discoveredDelegates = new Dictionary<Type, ApiQuerySourceAnnotationResult>();
+        var assemblyApiPath = assembly.GetName().Name ?? assembly.FullName ?? assembly.ToString();
+
+        foreach (var reader in _readers)
+        {
+            if (reader is not IApiQuerySourceAnnotationReader querySourceReader)
+            {
+                continue;
+            }
+
+            ApiAnnotationReaderResult<ApiQuerySourceAnnotationResult>? readerResult;
+            try
+            {
+                readerResult = querySourceReader.ReadQuerySourceAnnotations(assembly, readerFilter);
+            }
+            catch (Exception exception)
+            {
+                this.AddReaderIssue(querySourceReader, assemblyApiPath, exception);
+                continue;
+            }
+
+            if (readerResult is null)
+            {
+                this.AddInvalidContributionIssue
+                (querySourceReader, assemblyApiPath, "A query-source annotation reader returned null.");
+                continue;
+            }
+
+            this.ApplyReaderDiagnostics(querySourceReader, assemblyApiPath, readerResult.Diagnostics);
+            if (readerResult.Contributions is null)
+            {
+                this.AddInvalidContributionIssue
+                (querySourceReader, assemblyApiPath, "A query-source annotation reader returned null contributions.");
+                continue;
+            }
+
+            foreach (var result in readerResult.Contributions)
+            {
+                if (result?.ClrDelegateType is null || !scannedTypes.Contains(result.ClrDelegateType))
+                {
+                    this.AddInvalidContributionIssue
+                    (
+                        querySourceReader,
+                        assemblyApiPath,
+                        "A query-source annotation reader returned an ineligible delegate declaration."
+                    );
+                    continue;
+                }
+
+                var invalidReason = ApiQuerySourceAnnotationValidation.GetInvalidDeclarationReason
+                    (result.ClrDelegateType);
+                if (invalidReason is not null)
+                {
+                    this.AddInvalidContributionIssue
+                    (
+                        querySourceReader,
+                        result.ClrDelegateType.FullName ?? result.ClrDelegateType.Name,
+                        invalidReason,
+                        ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
+                    );
+                    continue;
+                }
+
+                var invokeParameters = result.ClrDelegateType.GetMethod(nameof(Action.Invoke))!.GetParameters();
+                var contributedParameters = result.ApiInputParameters?
+                    .Select(parameter => parameter?.ClrParameterInfo)
+                    .ToArray();
+                if (contributedParameters is null ||
+                    contributedParameters.Length != invokeParameters.Length ||
+                    !contributedParameters.SequenceEqual(invokeParameters))
+                {
+                    this.AddInvalidContributionIssue
+                    (
+                        querySourceReader,
+                        result.ClrDelegateType.FullName ?? result.ClrDelegateType.Name,
+                        "A query-source contribution must include every delegate parameter in declaration order."
+                    );
+                    continue;
+                }
+
+                if (discoveredDelegates.TryGetValue(result.ClrDelegateType, out var existing))
+                {
+                    if (!Equals(existing, result))
+                    {
+                        this.AddInvalidContributionIssue
+                        (
+                            querySourceReader,
+                            result.ClrDelegateType.FullName ?? result.ClrDelegateType.Name,
+                            "Multiple annotation readers returned conflicting query-source declarations",
+                            ApiSchemaCompilationCode.ApiAnnotationQuerySourceDiscoveryConflict
+                        );
+                    }
+
+                    continue;
+                }
+
+                discoveredDelegates.Add(result.ClrDelegateType, result);
+                results.Add(result);
+            }
+        }
+
+        return results;
+    }
+
+    internal void AddQuerySourceDiscoveryConflict
+    (
+        string apiName,
+        Type firstClrDelegateType,
+        Type conflictingClrDelegateType
+    )
+    {
+        var apiPath = apiName;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiAnnotationQuerySourceDiscoveryConflict;
+        var description = $"Annotated delegates '{firstClrDelegateType.FullName ?? firstClrDelegateType.Name}' and " +
+            $"'{conflictingClrDelegateType.FullName ?? conflictingClrDelegateType.Name}' resolve to query source " +
+            $"API name '{apiName}'";
+        var remediation = "Assign distinct query-source API names or change the active naming conventions";
+
+        _issues.Add(new ApiSchemaCompilationIssue(apiPath, severity, code, description, remediation));
+    }
+
     #endregion
 
     #region Version Methods

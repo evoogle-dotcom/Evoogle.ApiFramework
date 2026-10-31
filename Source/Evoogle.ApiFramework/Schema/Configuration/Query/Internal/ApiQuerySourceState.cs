@@ -25,7 +25,9 @@ internal sealed class ApiQuerySourceState
 
     internal ApiNullability ApiOutputNullability { get; set; } = ApiSchemaDefaults.QuerySourceOutputNullability;
 
-    internal ApiConfigurationSource OutputSource { get; set; } = ApiConfigurationSource.Convention;
+    internal ApiConfigurationSource OutputTypeSource { get; set; } = ApiConfigurationSource.Convention;
+
+    internal ApiConfigurationSource OutputNullabilitySource { get; set; } = ApiConfigurationSource.Convention;
 
     internal ApiQueryComposition ApiOutputComposition { get; set; } = ApiSchemaDefaults.QuerySourceOutputComposition;
 

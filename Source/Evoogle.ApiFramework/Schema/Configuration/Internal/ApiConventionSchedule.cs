@@ -22,6 +22,8 @@ internal sealed class ApiConventionSchedule
     internal IReadOnlyList<IApiEnumTypeConvention> EnumTypeConfigurationConventions { get; }
     internal IReadOnlyList<IApiEnumValueConvention> EnumValueConfigurationConventions { get; }
     internal IReadOnlyList<IApiPropertyConvention> PropertyConfigurationConventions { get; }
+    internal IReadOnlyList<IApiQuerySourceConvention> QuerySourceConfigurationConventions { get; }
+    internal IReadOnlyList<IApiQuerySourceParameterConvention> QuerySourceParameterConfigurationConventions { get; }
     internal IReadOnlyList<IApiRelationshipConvention> RelationshipConventions { get; }
     #endregion
 
@@ -80,6 +82,18 @@ internal sealed class ApiConventionSchedule
         (
             conventionSet.RelationshipConventions,
             ApiConventionPhase.Relationship
+        );
+
+        this.QuerySourceConfigurationConventions = ValidatePhase
+        (
+            conventionSet.QuerySourceConventions,
+            ApiConventionPhase.Configuration
+        );
+
+        this.QuerySourceParameterConfigurationConventions = ValidatePhase
+        (
+            conventionSet.QuerySourceParameterConventions,
+            ApiConventionPhase.Configuration
         );
     }
     #endregion

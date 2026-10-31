@@ -1,4 +1,6 @@
-﻿namespace Evoogle.ApiFramework;
+﻿using Evoogle.ApiFramework.Schema.Relationships;
+
+namespace Evoogle.ApiFramework;
 
 [ApiObject(ApiName = "AnnotatedPoco")]
 [ApiKey(ApiName = "AnnotatedPocoKey", ClrPath = nameof(Id))]

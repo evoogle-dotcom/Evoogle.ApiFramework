@@ -68,6 +68,12 @@ public sealed class ApiConventionSet
     ///     annotations have settled.
     /// </summary>
     public IList<IApiRelationshipConvention> RelationshipConventions { get; } = [];
+
+    /// <summary>Gets query-source configuration conventions.</summary>
+    public IList<IApiQuerySourceConvention> QuerySourceConventions { get; } = [];
+
+    /// <summary>Gets query-source-parameter configuration conventions.</summary>
+    public IList<IApiQuerySourceParameterConvention> QuerySourceParameterConventions { get; } = [];
     #endregion
 
     #region Factory Methods
@@ -119,6 +125,9 @@ public sealed class ApiConventionSet
 
         this.ObjectTypeConventions.Add(convention);
         this.PropertyConventions.Add(convention);
+
+        this.QuerySourceConventions.Add(convention);
+        this.QuerySourceParameterConventions.Add(convention);
     }
     #endregion
 }

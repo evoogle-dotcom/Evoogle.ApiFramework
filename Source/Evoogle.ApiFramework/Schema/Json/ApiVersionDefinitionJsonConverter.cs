@@ -4,9 +4,11 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
+
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.Json;
+
 using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Json;
@@ -44,8 +46,8 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
             {
                 ApiVersionDefinition = new ApiVersionDefinitionPropertyNames
                 {
-                    ApiPropertyReference = policy.ConvertName(nameof(Schema.Version.ApiVersionDefinition.ApiProperty)), // Mapping property name from ApiPropertyReference to ApiProperty by design
-                    ClrType = policy.ConvertName(nameof(Schema.Version.ApiVersionDefinition.ClrType)),
+                    ApiPropertyReference = policy.ConvertName(nameof(Version.ApiVersionDefinition.ApiProperty)), // Mapping property name from ApiPropertyReference to ApiProperty by design
+                    ClrType = policy.ConvertName(nameof(Version.ApiVersionDefinition.ClrType)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -162,10 +164,7 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
 
         if (apiVersionDefinitionReadData.HasApiPropertyReference && apiVersionDefinitionReadData.ApiPropertyReference is null)
         {
-            throw new JsonException
-            (
-                $"{nameof(ApiVersionDefinition.ApiPropertyReference)} is required."
-            );
+            throw new JsonException($"{nameof(ApiVersionDefinition.ApiPropertyReference)} is required.");
         }
 
         var apiVersionDefinition = apiVersionDefinitionReadData.HasApiPropertyReference

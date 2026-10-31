@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Types;
+using Evoogle.ApiFramework.Schema.Configuration.Query;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 
@@ -18,12 +19,66 @@ public abstract class ApiNamingConvention(ApiNamingConventionTargets targets = A
     IApiScalarTypeConvention,
     IApiEnumTypeConvention,
     IApiEnumValueConvention,
-    IApiPropertyConvention
+    IApiPropertyConvention,
+    IApiQuerySourceConvention,
+    IApiQuerySourceParameterConvention
 {
 
     #region Properties
     /// <summary>Gets the schema element kinds to which the convention applies.</summary>
     protected ApiNamingConventionTargets Targets { get; } = ValidateTargets(targets);
+    #endregion
+
+    #region IApiQuerySourceConvention Methods
+    /// <inheritdoc />
+    public void Apply(ApiQuerySourceBuilder builder, ApiQuerySourceConventionContext context)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(context);
+
+        if (!this.IsTargeted(ApiNamingConventionTargets.QuerySource))
+        {
+            return;
+        }
+
+        var namingContext = new ApiNamingConventionContext
+        (
+            ApiNamingConventionTarget.QuerySource,
+            context.ClrDelegateType ?? throw new InvalidOperationException
+                ("Query-source naming requires a CLR delegate declaration."),
+            null,
+            context,
+            null
+        );
+
+        builder.SetApiNameConvention(this.ConvertName(builder.ApiName, namingContext));
+    }
+    #endregion
+
+    #region IApiQuerySourceParameterConvention Methods
+    /// <inheritdoc />
+    public void Apply(ApiQuerySourceParameterBuilder builder, ApiQuerySourceParameterConventionContext context)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(context);
+
+        if (!this.IsTargeted(ApiNamingConventionTargets.QuerySourceParameter))
+        {
+            return;
+        }
+
+        var namingContext = new ApiNamingConventionContext
+        (
+            ApiNamingConventionTarget.QuerySourceParameter,
+            context.ApiQuerySourceContext.ClrDelegateType ?? throw new InvalidOperationException
+                ("Query-source-parameter naming requires a CLR delegate declaration."),
+            context.ClrParameterInfo?.Name,
+            context.ApiQuerySourceContext,
+            context
+        );
+
+        builder.SetApiNameConvention(this.ConvertName(builder.ApiName, namingContext));
+    }
     #endregion
 
     #region IApiConvention Properties

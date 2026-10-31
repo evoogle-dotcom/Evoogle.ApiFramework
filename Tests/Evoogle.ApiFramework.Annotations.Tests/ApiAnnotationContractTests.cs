@@ -6,7 +6,11 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using Evoogle.ApiFramework.Schema.Query;
+using Evoogle.ApiFramework.Schema.Relationships;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.XUnit;
+using Evoogle.XUnit.Json;
 
 using FluentAssertions;
 
@@ -30,10 +34,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
 
         protected override void Act()
         {
-            this.ActualConstructors = this.AnnotationType.GetConstructors
-            (
-                BindingFlags.Instance | BindingFlags.Public
-            );
+            this.ActualConstructors = this.AnnotationType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
 
             this.WriteLine($"Constructor count: {this.ActualConstructors.Length}");
         }
@@ -86,6 +87,129 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
                 .Should()
                 .Contain(typeof(IsExternalInit));
         }
+        #endregion
+    }
+
+    private class AnnotationUsageTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        public required AttributeTargets ExpectedTargets { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private AttributeUsageAttribute? ActualUsage { get; set; }
+        private AnnotationUsageTest RestoredTest { get; set; } = null!;
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Annotation Type:  {this.AnnotationType}");
+            this.WriteLine($"Expected Targets: {this.ExpectedTargets}");
+            this.WriteLine();
+            this.WriteLine("Expected Multiple:  False");
+            this.WriteLine("Expected Inherited: False");
+
+            var serializer = new XUnitTestSerializer();
+            this.RestoredTest = (AnnotationUsageTest)serializer.Deserialize
+                (this.GetType(), serializer.Serialize(this));
+        }
+
+        protected override void Act()
+        {
+            this.ActualUsage = this.RestoredTest.AnnotationType.GetCustomAttribute<AttributeUsageAttribute>();
+
+            this.WriteLine();
+            this.WriteLine($"Actual Targets:   {this.ActualUsage?.ValidOn}");
+            this.WriteLine($"Actual Multiple:  {this.ActualUsage?.AllowMultiple}");
+            this.WriteLine($"Actual Inherited: {this.ActualUsage?.Inherited}");
+        }
+
+        protected override void Assert()
+        {
+            this.ActualUsage.Should().NotBeNull();
+            this.ActualUsage.ValidOn.Should().Be(this.RestoredTest.ExpectedTargets);
+            this.ActualUsage.AllowMultiple.Should().BeFalse();
+            this.ActualUsage.Inherited.Should().BeFalse();
+        }
+        #endregion
+    }
+
+    private class AnnotationDeclaredPropertiesTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        public required IReadOnlyList<string> ExpectedProperties { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private IReadOnlyList<string>? ActualProperties { get; set; }
+        private AnnotationDeclaredPropertiesTest RestoredTest { get; set; } = null!;
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Annotation Type: {this.AnnotationType}");
+            this.WriteLine();
+            this.WriteLine($"Expected Properties: {string.Join(", ", this.ExpectedProperties)}");
+
+            var serializer = new XUnitTestSerializer();
+            this.RestoredTest = (AnnotationDeclaredPropertiesTest)serializer.Deserialize
+                (this.GetType(), serializer.Serialize(this));
+        }
+
+        protected override void Act()
+        {
+            this.ActualProperties = this.RestoredTest.AnnotationType.GetProperties
+                (BindingFlags.Instance | BindingFlags.Public)
+                .Where(property => property.DeclaringType == this.RestoredTest.AnnotationType)
+                .Select(property => property.Name)
+                .Order()
+                .ToArray();
+
+            this.WriteLine();
+            this.WriteLine($"Actual Properties: {string.Join(", ", this.ActualProperties)}");
+        }
+
+        protected override void Assert() => this.ActualProperties.Should()
+            .Equal(this.RestoredTest.ExpectedProperties.Order());
+        #endregion
+    }
+
+    private class AnnotationReferencedTypeAssemblyTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        public required Type ReferencedType { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private AnnotationReferencedTypeAssemblyTest RestoredTest { get; set; } = null!;
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Annotation Type: {this.AnnotationType}");
+            this.WriteLine($"Referenced Type: {this.ReferencedType}");
+            this.WriteLine();
+            this.WriteLine($"Expected Assembly: {this.AnnotationType.Assembly.GetName().Name}");
+
+            var serializer = new XUnitTestSerializer();
+            this.RestoredTest = (AnnotationReferencedTypeAssemblyTest)serializer.Deserialize
+                (this.GetType(), serializer.Serialize(this));
+        }
+
+        protected override void Act()
+        {
+            this.WriteLine();
+            this.WriteLine($"Actual Assembly: {this.RestoredTest.ReferencedType.Assembly.GetName().Name}");
+        }
+
+        protected override void Assert() => ((object)this.RestoredTest.ReferencedType.Assembly).Should()
+            .BeSameAs(this.RestoredTest.AnnotationType.Assembly);
         #endregion
     }
 
@@ -273,8 +397,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         },
         new AnnotationConstructorTest
         {
-            Name =
-                $"{nameof(ApiRelationshipDefinitionAttribute)} has a parameterless constructor",
+            Name = $"{nameof(ApiRelationshipDefinitionAttribute)} has a parameterless constructor",
             AnnotationType = typeof(ApiRelationshipDefinitionAttribute)
         },
         new AnnotationConstructorTest
@@ -284,39 +407,48 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         },
         new AnnotationConstructorTest
         {
-            Name =
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)} " +
-                    "has a parameterless constructor",
+            Name = $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)} has a parameterless constructor",
             AnnotationType = typeof(ApiManyToManyRelationshipDefinitionAttribute)
-        }
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiQuerySourceAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiQuerySourceAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiQuerySourceParameterAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiQuerySourceParameterAttribute)
+        },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] AnnotationPropertyInitTheoryData =>
     [
+        // ApiNamedElementAttribute properties
         new AnnotationPropertyInitTest
         {
             Name = $"{nameof(ApiNamedElementAttribute)}.{nameof(ApiNamedElementAttribute.ApiName)} uses init",
             AnnotationType = typeof(ApiNamedElementAttribute),
             PropertyName = nameof(ApiNamedElementAttribute.ApiName)
         },
-        new AnnotationPropertyInitTest
-        {
-            Name = $"{nameof(ApiObjectAttribute)}.{nameof(ApiObjectAttribute.ApiName)} uses init",
-            AnnotationType = typeof(ApiObjectAttribute),
-            PropertyName = nameof(ApiObjectAttribute.ApiName)
-        },
+
+        // ApiScalarAttribute properties
         new AnnotationPropertyInitTest
         {
             Name = $"{nameof(ApiScalarAttribute)}.{nameof(ApiScalarAttribute.ApiName)} uses init",
             AnnotationType = typeof(ApiScalarAttribute),
             PropertyName = nameof(ApiScalarAttribute.ApiName)
         },
+
+        // ApiEnumAttribute properties
         new AnnotationPropertyInitTest
         {
             Name = $"{nameof(ApiEnumAttribute)}.{nameof(ApiEnumAttribute.ApiName)} uses init",
             AnnotationType = typeof(ApiEnumAttribute),
             PropertyName = nameof(ApiEnumAttribute.ApiName)
         },
+
+        // ApiEnumValueAttribute properties
         new AnnotationPropertyInitTest
         {
             Name = $"{nameof(ApiEnumValueAttribute)}.{nameof(ApiEnumValueAttribute.ApiName)} uses init",
@@ -329,11 +461,21 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             AnnotationType = typeof(ApiPropertyAttribute),
             PropertyName = nameof(ApiPropertyAttribute.ApiName)
         },
+
+        // ApiObjectAttribute properties
         new AnnotationPropertyInitTest
         {
-            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.IsNonNullable)} uses init",
+            Name = $"{nameof(ApiObjectAttribute)}.{nameof(ApiObjectAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiObjectAttribute),
+            PropertyName = nameof(ApiObjectAttribute.ApiName)
+        },
+
+        // ApiPropertyAttribute properties
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.ApiName)} uses init",
             AnnotationType = typeof(ApiPropertyAttribute),
-            PropertyName = nameof(ApiPropertyAttribute.IsNonNullable)
+            PropertyName = nameof(ApiPropertyAttribute.ApiName)
         },
         new AnnotationPropertyInitTest
         {
@@ -341,6 +483,8 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             AnnotationType = typeof(ApiPropertyAttribute),
             PropertyName = nameof(ApiPropertyAttribute.IsNullable)
         },
+
+        // ApiKeyAttribute properties
         new AnnotationPropertyInitTest
         {
             Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.ApiName)} uses init",
@@ -365,13 +509,16 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             AnnotationType = typeof(ApiKeyAttribute),
             PropertyName = nameof(ApiKeyAttribute.ClrPath)
         },
+
+        // ApiVersionAttribute properties
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiVersionAttribute)}.{nameof(ApiVersionAttribute.ClrType)} uses init",
+            Name = $"{nameof(ApiVersionAttribute)}.{nameof(ApiVersionAttribute.ClrType)} uses init",
             AnnotationType = typeof(ApiVersionAttribute),
             PropertyName = nameof(ApiVersionAttribute.ClrType)
         },
+
+        // ApiRelationshipAttribute properties
         new AnnotationPropertyInitTest
         {
             Name = $"{nameof(ApiRelationshipAttribute)}.{nameof(ApiRelationshipAttribute.ApiName)} uses init",
@@ -396,54 +543,46 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             AnnotationType = typeof(ApiRelationshipAttribute),
             PropertyName = nameof(ApiRelationshipAttribute.DeleteBehavior)
         },
+
+        // ApiRelationshipDefinitionAttribute properties
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiRelationshipDefinitionAttribute.ApiName)} uses init",
+            Name = $"{nameof(ApiRelationshipDefinitionAttribute)}.{nameof(ApiRelationshipDefinitionAttribute.ApiName)} uses init",
             AnnotationType = typeof(ApiRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiRelationshipDefinitionAttribute.ApiName)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiRelationshipDefinitionAttribute.PrincipalType)} uses init",
+            Name = $"{nameof(ApiRelationshipDefinitionAttribute)}.{nameof(ApiRelationshipDefinitionAttribute.PrincipalType)} uses init",
             AnnotationType = typeof(ApiRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiRelationshipDefinitionAttribute.PrincipalType)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiRelationshipDefinitionAttribute.DependentType)} uses init",
+            Name = $"{nameof(ApiRelationshipDefinitionAttribute)}.{nameof(ApiRelationshipDefinitionAttribute.DependentType)} uses init",
             AnnotationType = typeof(ApiRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiRelationshipDefinitionAttribute.DependentType)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiRelationshipDefinitionAttribute.Kind)} uses init",
+            Name = $"{nameof(ApiRelationshipDefinitionAttribute)}.{nameof(ApiRelationshipDefinitionAttribute.Kind)} uses init",
             AnnotationType = typeof(ApiRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiRelationshipDefinitionAttribute.Kind)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiRelationshipDefinitionAttribute.ForeignKey)} uses init",
+            Name = $"{nameof(ApiRelationshipDefinitionAttribute)}.{nameof(ApiRelationshipDefinitionAttribute.ForeignKey)} uses init",
             AnnotationType = typeof(ApiRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiRelationshipDefinitionAttribute.ForeignKey)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiRelationshipDefinitionAttribute.DeleteBehavior)} uses init",
+            Name = $"{nameof(ApiRelationshipDefinitionAttribute)}.{nameof(ApiRelationshipDefinitionAttribute.DeleteBehavior)} uses init",
             AnnotationType = typeof(ApiRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiRelationshipDefinitionAttribute.DeleteBehavior)
         },
+
+        // ApiManyToManyRelationshipAttribute properties
         new AnnotationPropertyInitTest
         {
             Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.ApiName)} uses init",
@@ -474,53 +613,159 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
             PropertyName = nameof(ApiManyToManyRelationshipAttribute.ForeignKeyB)
         },
+
+        // ApiManyToManyRelationshipDefinitionAttribute properties
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute.ApiName)} uses init",
+            Name = $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}.{nameof(ApiManyToManyRelationshipDefinitionAttribute.ApiName)} uses init",
             AnnotationType = typeof(ApiManyToManyRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiManyToManyRelationshipDefinitionAttribute.ApiName)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute.PrincipalTypeA)} uses init",
+            Name = $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}.{nameof(ApiManyToManyRelationshipDefinitionAttribute.PrincipalTypeA)} uses init",
             AnnotationType = typeof(ApiManyToManyRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiManyToManyRelationshipDefinitionAttribute.PrincipalTypeA)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute.PrincipalTypeB)} uses init",
+            Name = $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}.{nameof(ApiManyToManyRelationshipDefinitionAttribute.PrincipalTypeB)} uses init",
             AnnotationType = typeof(ApiManyToManyRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiManyToManyRelationshipDefinitionAttribute.PrincipalTypeB)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute.AssociationType)} uses init",
+            Name = $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}.{nameof(ApiManyToManyRelationshipDefinitionAttribute.AssociationType)} uses init",
             AnnotationType = typeof(ApiManyToManyRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiManyToManyRelationshipDefinitionAttribute.AssociationType)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute.ForeignKeyA)} uses init",
+            Name = $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}.{nameof(ApiManyToManyRelationshipDefinitionAttribute.ForeignKeyA)} uses init",
             AnnotationType = typeof(ApiManyToManyRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiManyToManyRelationshipDefinitionAttribute.ForeignKeyA)
         },
         new AnnotationPropertyInitTest
         {
-            Name =
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}." +
-                $"{nameof(ApiManyToManyRelationshipDefinitionAttribute.ForeignKeyB)} uses init",
+            Name = $"{nameof(ApiManyToManyRelationshipDefinitionAttribute)}.{nameof(ApiManyToManyRelationshipDefinitionAttribute.ForeignKeyB)} uses init",
             AnnotationType = typeof(ApiManyToManyRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiManyToManyRelationshipDefinitionAttribute.ForeignKeyB)
+        },
+
+        // ApiQuerySourceAttribute properties
+        new AnnotationPropertyInitTest
+        {
+            Name =
+                $"{nameof(ApiQuerySourceAttribute)}." +
+                $"{nameof(ApiQuerySourceAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiQuerySourceAttribute),
+            PropertyName = nameof(ApiQuerySourceAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name =
+                $"{nameof(ApiQuerySourceAttribute)}." +
+                $"{nameof(ApiQuerySourceAttribute.ApiOutputNullability)} uses init",
+            AnnotationType = typeof(ApiQuerySourceAttribute),
+            PropertyName = nameof(ApiQuerySourceAttribute.ApiOutputNullability)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name =
+                $"{nameof(ApiQuerySourceAttribute)}." +
+                $"{nameof(ApiQuerySourceAttribute.ApiOutputComposition)} uses init",
+            AnnotationType = typeof(ApiQuerySourceAttribute),
+            PropertyName = nameof(ApiQuerySourceAttribute.ApiOutputComposition)
+        },
+
+        // ApiQuerySourceParameterAttribute properties
+        new AnnotationPropertyInitTest
+        {
+            Name =
+                $"{nameof(ApiQuerySourceParameterAttribute)}." +
+                $"{nameof(ApiQuerySourceParameterAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiQuerySourceParameterAttribute),
+            PropertyName = nameof(ApiQuerySourceParameterAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name =
+                $"{nameof(ApiQuerySourceParameterAttribute)}." +
+                $"{nameof(ApiQuerySourceParameterAttribute.ApiNullability)} uses init",
+            AnnotationType = typeof(ApiQuerySourceParameterAttribute),
+            PropertyName = nameof(ApiQuerySourceParameterAttribute.ApiNullability)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name =
+                $"{nameof(ApiQuerySourceParameterAttribute)}." +
+                $"{nameof(ApiQuerySourceParameterAttribute.ApiPresence)} uses init",
+            AnnotationType = typeof(ApiQuerySourceParameterAttribute),
+            PropertyName = nameof(ApiQuerySourceParameterAttribute.ApiPresence)
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] AnnotationUsageTheoryData =>
+    [
+        new AnnotationUsageTest
+        {
+            Name = $"{nameof(ApiQuerySourceAttribute)} targets delegates",
+            AnnotationType = typeof(ApiQuerySourceAttribute),
+            ExpectedTargets = AttributeTargets.Delegate
+        },
+        new AnnotationUsageTest
+        {
+            Name = $"{nameof(ApiQuerySourceParameterAttribute)} targets parameters",
+            AnnotationType = typeof(ApiQuerySourceParameterAttribute),
+            ExpectedTargets = AttributeTargets.Parameter
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] AnnotationDeclaredPropertiesTheoryData =>
+    [
+        new AnnotationDeclaredPropertiesTest
+        {
+            Name = $"{nameof(ApiQuerySourceAttribute)} declares the expected properties",
+            AnnotationType = typeof(ApiQuerySourceAttribute),
+            ExpectedProperties =
+            [
+                nameof(ApiQuerySourceAttribute.ApiName),
+                nameof(ApiQuerySourceAttribute.ApiOutputComposition),
+                nameof(ApiQuerySourceAttribute.ApiOutputNullability)
+            ]
+        },
+        new AnnotationDeclaredPropertiesTest
+        {
+            Name = $"{nameof(ApiQuerySourceParameterAttribute)} declares the expected properties",
+            AnnotationType = typeof(ApiQuerySourceParameterAttribute),
+            ExpectedProperties =
+            [
+                nameof(ApiQuerySourceParameterAttribute.ApiName),
+                nameof(ApiQuerySourceParameterAttribute.ApiNullability),
+                nameof(ApiQuerySourceParameterAttribute.ApiPresence)
+            ]
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] AnnotationReferencedTypeAssemblyTheoryData =>
+    [
+        new AnnotationReferencedTypeAssemblyTest
+        {
+            Name = $"{nameof(ApiNullability)} is available from the annotations assembly",
+            AnnotationType = typeof(ApiQuerySourceAttribute),
+            ReferencedType = typeof(ApiNullability)
+        },
+        new AnnotationReferencedTypeAssemblyTest
+        {
+            Name = $"{nameof(ApiPresence)} is available from the annotations assembly",
+            AnnotationType = typeof(ApiQuerySourceParameterAttribute),
+            ReferencedType = typeof(ApiPresence)
+        },
+        new AnnotationReferencedTypeAssemblyTest
+        {
+            Name = $"{nameof(ApiQueryComposition)} is available from the annotations assembly",
+            AnnotationType = typeof(ApiQuerySourceAttribute),
+            ReferencedType = typeof(ApiQueryComposition)
         }
     ];
 
@@ -725,6 +970,20 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
                 $"{nameof(ApiManyToManyRelationshipDefinitionAttribute.ForeignKeyB)} is nullable",
             AnnotationType = typeof(ApiManyToManyRelationshipDefinitionAttribute),
             PropertyName = nameof(ApiManyToManyRelationshipDefinitionAttribute.ForeignKeyB)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiQuerySourceAttribute)}.{nameof(ApiQuerySourceAttribute.ApiName)} is nullable",
+            AnnotationType = typeof(ApiQuerySourceAttribute),
+            PropertyName = nameof(ApiQuerySourceAttribute.ApiName)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name =
+                $"{nameof(ApiQuerySourceParameterAttribute)}." +
+                $"{nameof(ApiQuerySourceParameterAttribute.ApiName)} is nullable",
+            AnnotationType = typeof(ApiQuerySourceParameterAttribute),
+            PropertyName = nameof(ApiQuerySourceParameterAttribute.ApiName)
         }
     ];
 
@@ -892,6 +1151,18 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
     [Theory]
     [MemberData(nameof(AnnotationPropertyInitTheoryData))]
     public void AnnotationPropertyInit(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(AnnotationUsageTheoryData))]
+    public void AnnotationUsage(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(AnnotationDeclaredPropertiesTheoryData))]
+    public void AnnotationDeclaredProperties(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(AnnotationReferencedTypeAssemblyTheoryData))]
+    public void AnnotationReferencedTypeAssembly(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(RequiredAnnotationPropertyTheoryData))]
@@ -1074,5 +1345,36 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         [ApiEnumValue(ApiName = "first")]
         First
     }
+
+    public static class QuerySources
+    {
+        [ApiQuerySource
+        (
+            ApiName = "Customers",
+            ApiOutputNullability = ApiNullability.NonNullable,
+            ApiOutputComposition = ApiQueryComposition.Projection
+        )]
+        public delegate IReadOnlyList<QueryAnnotationCustomer> Customers
+        (
+            [ApiQuerySourceParameter
+            (
+                ApiName = "status",
+                ApiNullability = ApiNullability.Nullable,
+                ApiPresence = ApiPresence.Optional
+            )]
+            string? status
+        );
+    }
+
+    public sealed class SubjectQuerySources
+    {
+        [ApiQuerySource]
+        public delegate QueryAnnotationCustomer CustomerById(int id);
+    }
+
+    public sealed class QueryAnnotationCustomer;
     #endregion
 }
+
+[ApiQuerySource]
+public delegate ApiAnnotationContractTests.QueryAnnotationCustomer ApiAnnotationContractNamespaceCustomerById(int id);

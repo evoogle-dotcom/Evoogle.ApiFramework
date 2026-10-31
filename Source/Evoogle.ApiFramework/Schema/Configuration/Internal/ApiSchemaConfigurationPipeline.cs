@@ -185,10 +185,70 @@ internal sealed class ApiSchemaConfigurationPipeline
 
         var structuralBuilderCounts = this.GetStructuralBuilderCounts();
 
+        this.ApplyQuerySourceConventions();
         this.ApplyRelationshipAnnotations(objectBuilders);
         this.ApplyRelationshipConventions();
 
         this.ThrowIfRelationshipStageAddedStructuralBuilders(structuralBuilderCounts);
+    }
+    #endregion
+
+    #region Query Source Methods
+    private void ApplyQuerySourceConventions()
+    {
+        var querySourceBuilders = _context.ApiQuerySourceBuilders.ToList();
+        foreach (var querySourceBuilder in querySourceBuilders)
+        {
+            var querySourceContext = _context.GetQuerySourceConventionContext
+                (querySourceBuilder, _schemaBuilder);
+            foreach (var convention in _schedule.QuerySourceConfigurationConventions)
+            {
+                if (convention is ApiNamingConvention)
+                {
+                    continue;
+                }
+
+                this.ApplyConvention
+                (
+                    () => querySourceBuilder.ApplyConfiguration
+                    (
+                        ApiConfigurationSource.Convention,
+                        () => convention.Apply(querySourceBuilder, querySourceContext)
+                    )
+                );
+            }
+        }
+
+        foreach (var querySourceBuilder in querySourceBuilders)
+        {
+            var querySourceContext = _context.GetQuerySourceConventionContext
+                (querySourceBuilder, _schemaBuilder);
+            foreach (var parameterBuilder in querySourceBuilder.InputParameterBuilders)
+            {
+                var parameterContext = _context.GetQuerySourceParameterConventionContext
+                (
+                    parameterBuilder,
+                    querySourceBuilder,
+                    querySourceContext
+                );
+                foreach (var convention in _schedule.QuerySourceParameterConfigurationConventions)
+                {
+                    if (convention is ApiNamingConvention)
+                    {
+                        continue;
+                    }
+
+                    this.ApplyConvention
+                    (
+                        () => parameterBuilder.ApplyConfiguration
+                        (
+                            ApiConfigurationSource.Convention,
+                            () => convention.Apply(parameterBuilder, parameterContext)
+                        )
+                    );
+                }
+            }
+        }
     }
     #endregion
 

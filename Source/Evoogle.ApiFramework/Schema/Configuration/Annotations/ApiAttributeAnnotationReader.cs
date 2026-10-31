@@ -7,8 +7,11 @@ using System.Reflection;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
+using Evoogle.ApiFramework.Schema.Configuration.Annotations.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Key.Internal;
+using Evoogle.ApiFramework.Schema.Query;
+using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Reflection;
 
@@ -24,7 +27,8 @@ public sealed class ApiAttributeAnnotationReader :
     IApiEnumValueAnnotationReader,
     IApiKeyAnnotationReader,
     IApiVersionAnnotationReader,
-    IApiRelationshipAnnotationReader
+    IApiRelationshipAnnotationReader,
+    IApiQuerySourceAnnotationReader
 {
     #region IApiTypeAnnotationReader Methods
     /// <inheritdoc/>
@@ -59,6 +63,98 @@ public sealed class ApiAttributeAnnotationReader :
     }
     #endregion
 
+    #region IApiQuerySourceAnnotationReader Methods
+    /// <inheritdoc/>
+    public ApiAnnotationReaderResult<ApiQuerySourceAnnotationResult> ReadQuerySourceAnnotations
+    (
+        Assembly assembly,
+        Func<Type, bool>? filter
+    )
+    {
+        ArgumentNullException.ThrowIfNull(assembly);
+
+        var contributions = new List<ApiQuerySourceAnnotationResult>();
+        var diagnostics = new List<ApiAnnotationReaderDiagnostic>();
+        var scan = ApiAssemblyTypeScanner.Scan(assembly, filter);
+        foreach (var issue in scan.Issues)
+        {
+            var code = issue.Code;
+            var apiPath = issue.ApiPath;
+            var description = issue.Description;
+            var remediation = issue.Remediation;
+            var exception = issue.Exception;
+            var severity = issue.Severity;
+
+            diagnostics.Add(new(code, apiPath, description, remediation, exception, severity));
+        }
+
+        foreach (var clrDelegateType in scan.Types)
+        {
+            var attribute = clrDelegateType.GetCustomAttribute<ApiQuerySourceAttribute>(inherit: false);
+            if (attribute is null)
+            {
+                continue;
+            }
+
+            var invalidReason = ApiQuerySourceAnnotationValidation.GetInvalidDeclarationReason(clrDelegateType);
+            if (invalidReason is not null)
+            {
+                diagnostics.Add(CreateInvalidQuerySourceDiagnostic(clrDelegateType, invalidReason));
+                continue;
+            }
+
+            var invokeMethod = clrDelegateType.GetMethod(nameof(Action.Invoke))!;
+            var parameters = new List<ApiQuerySourceParameterAnnotationResult>();
+            var hasInvalidParameter = false;
+            foreach (var parameter in invokeMethod.GetParameters())
+            {
+                if (parameter.Name is null)
+                {
+                    diagnostics.Add
+                    (
+                        CreateInvalidQuerySourceDiagnostic(clrDelegateType, "A query-source delegate parameter must have a CLR metadata name")
+                    );
+                    hasInvalidParameter = true;
+                    break;
+                }
+
+                var parameterAttribute = parameter.GetCustomAttribute<ApiQuerySourceParameterAttribute>(inherit: false);
+                var parameterAttributeData = parameter.CustomAttributes.FirstOrDefault(data => data.AttributeType == typeof(ApiQuerySourceParameterAttribute));
+                parameters.Add
+                (
+                    new
+                    (
+                        parameter,
+                        parameterAttribute?.ApiName,
+                        GetNamedEnum<ApiNullability>(parameterAttributeData, nameof(ApiQuerySourceParameterAttribute.ApiNullability)),
+                        GetNamedEnum<ApiPresence>(parameterAttributeData, nameof(ApiQuerySourceParameterAttribute.ApiPresence))
+                    )
+                );
+            }
+
+            if (hasInvalidParameter)
+            {
+                continue;
+            }
+
+            var attributeData = clrDelegateType.CustomAttributes.First(data => data.AttributeType == typeof(ApiQuerySourceAttribute));
+            contributions.Add
+            (
+                new
+                (
+                    clrDelegateType,
+                    attribute.ApiName,
+                    GetNamedEnum<ApiNullability>(attributeData, nameof(ApiQuerySourceAttribute.ApiOutputNullability)),
+                    GetNamedEnum<ApiQueryComposition>(attributeData, nameof(ApiQuerySourceAttribute.ApiOutputComposition)),
+                    parameters
+                )
+            );
+        }
+
+        return new(contributions, diagnostics);
+    }
+    #endregion
+
     #region IApiTypeAnnotationDiagnosticReader Methods
     /// <inheritdoc/>
     public IReadOnlyList<ApiAnnotationReaderDiagnostic> ReadTypeAnnotationDiagnostics(Type clrType)
@@ -79,21 +175,17 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
-                    clrType.FullName ?? clrType.Name,
-                    $"A type-level {nameof(ApiVersionAttribute)} requires " +
-                    $"{nameof(ApiVersionAttribute.ClrType)}",
-                    $"Set {nameof(ApiVersionAttribute.ClrType)} to the exact CLR version type"
+                    Code: ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
+                    ApiPath: clrType.FullName ?? clrType.Name,
+                    Description: $"A type-level {nameof(ApiVersionAttribute)} requires {nameof(ApiVersionAttribute.ClrType)}",
+                    Remediation: $"Set {nameof(ApiVersionAttribute.ClrType)} to the exact CLR version type"
                 )
             );
         }
 
         foreach (var member in GetPublicInstanceMembers(clrType))
         {
-            var memberVersionAttribute = member.GetCustomAttribute<ApiVersionAttribute>
-            (
-                inherit: true
-            );
+            var memberVersionAttribute = member.GetCustomAttribute<ApiVersionAttribute>(inherit: true);
             if (memberVersionAttribute?.ClrType == null)
             {
                 continue;
@@ -103,11 +195,10 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
-                    $"{clrType.FullName ?? clrType.Name}.{member.Name}",
-                    $"A member-level {nameof(ApiVersionAttribute)} cannot specify " +
-                    $"{nameof(ApiVersionAttribute.ClrType)}",
-                    $"Remove {nameof(ApiVersionAttribute.ClrType)} from the member annotation"
+                    Code: ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
+                    ApiPath: $"{clrType.FullName ?? clrType.Name}.{member.Name}",
+                    Description: $"A member-level {nameof(ApiVersionAttribute)} cannot specify {nameof(ApiVersionAttribute.ClrType)}",
+                    Remediation: $"Remove {nameof(ApiVersionAttribute.ClrType)} from the member annotation"
                 )
             );
         }
@@ -118,11 +209,7 @@ public sealed class ApiAttributeAnnotationReader :
 
     #region IApiTypeDiscoveryAnnotationReader Methods
     /// <inheritdoc/>
-    public ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult> ReadTypeDiscoveryAnnotations
-    (
-        Assembly assembly,
-        Func<Type, bool>? filter
-    )
+    public ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult> ReadTypeDiscoveryAnnotations(Assembly assembly, Func<Type, bool>? filter)
     {
         ArgumentNullException.ThrowIfNull(assembly);
 
@@ -133,8 +220,7 @@ public sealed class ApiAttributeAnnotationReader :
             assembly,
             filter == null
                 ? null
-                : type => type.IsClass || type.IsValueType ?
-                    !type.IsAbstract && filter(type) : false
+                : type => (type.IsClass || type.IsValueType) && !type.IsAbstract && filter(type)
         );
         foreach (var clrType in scan.Types)
         {
@@ -213,10 +299,10 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    keyAttribute.ApiName,
-                    keyAttribute.Order,
-                    clrRootType,
-                    GetClrPath(keyAttribute, clrType, memberName: null)
+                    ApiName: keyAttribute.ApiName,
+                    Order: keyAttribute.Order,
+                    ClrRootType: clrRootType,
+                    ClrMemberNames: GetClrPath(keyAttribute, clrType, memberName: null)
                 )
             );
         }
@@ -230,10 +316,10 @@ public sealed class ApiAttributeAnnotationReader :
                 (
                     new
                     (
-                        keyAttribute.ApiName,
-                        keyAttribute.Order,
-                        clrRootType,
-                        GetClrPath(keyAttribute, clrType, member.Name)
+                        ApiName: keyAttribute.ApiName,
+                        Order: keyAttribute.Order,
+                        ClrRootType: clrRootType,
+                        ClrMemberNames: GetClrPath(keyAttribute, clrType, member.Name)
                     )
                 );
             }
@@ -252,7 +338,7 @@ public sealed class ApiAttributeAnnotationReader :
         var typeAttribute = clrType.GetCustomAttribute<ApiVersionAttribute>(inherit: true);
         if (typeAttribute?.ClrType != null)
         {
-            results.Add(new(typeAttribute.ClrType));
+            results.Add(new(clrType: typeAttribute.ClrType));
         }
 
         foreach (var member in GetPublicInstanceMembers(clrType))
@@ -265,7 +351,7 @@ public sealed class ApiAttributeAnnotationReader :
 
             if (memberAttribute.ClrType == null)
             {
-                results.Add(new(member.Name));
+                results.Add(new(clrMemberName: member.Name));
             }
         }
 
@@ -293,11 +379,11 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    attr.ApiName,
-                    clrType,
-                    dependentType,
-                    attr.ForeignKey,
-                    attr.DeleteBehavior
+                    ApiName: attr.ApiName,
+                    PrincipalType: clrType,
+                    DependentType: dependentType,
+                    ForeignKey: attr.ForeignKey,
+                    DeleteBehavior: attr.DeleteBehavior
                 )
             );
         }
@@ -310,11 +396,11 @@ public sealed class ApiAttributeAnnotationReader :
                 (
                     new
                     (
-                        attr.ApiName,
-                        attr.PrincipalType,
-                        attr.DependentType,
-                        attr.ForeignKey,
-                        attr.DeleteBehavior
+                        ApiName: attr.ApiName,
+                        PrincipalType: attr.PrincipalType,
+                        DependentType: attr.DependentType,
+                        ForeignKey: attr.ForeignKey,
+                        DeleteBehavior: attr.DeleteBehavior
                     )
                 );
             }
@@ -340,11 +426,11 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    attr.ApiName,
-                    clrType,
-                    GetMemberType(member),
-                    attr.ForeignKey,
-                    attr.DeleteBehavior
+                    ApiName: attr.ApiName,
+                    PrincipalType: clrType,
+                    DependentType: GetMemberType(member),
+                    ForeignKey: attr.ForeignKey,
+                    DeleteBehavior: attr.DeleteBehavior
                 )
             );
         }
@@ -357,11 +443,11 @@ public sealed class ApiAttributeAnnotationReader :
                 (
                     new
                     (
-                        attr.ApiName,
-                        attr.PrincipalType,
-                        attr.DependentType,
-                        attr.ForeignKey,
-                        attr.DeleteBehavior
+                        ApiName: attr.ApiName,
+                        PrincipalType: attr.PrincipalType,
+                        DependentType: attr.DependentType,
+                        ForeignKey: attr.ForeignKey,
+                        DeleteBehavior: attr.DeleteBehavior
                     )
                 );
             }
@@ -387,12 +473,12 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    attr.ApiName,
-                    clrType,
-                    attr.OtherPrincipalType,
-                    attr.AssociationType,
-                    attr.ForeignKeyA,
-                    attr.ForeignKeyB
+                    ApiName: attr.ApiName,
+                    PrincipalTypeA: clrType,
+                    PrincipalTypeB: attr.OtherPrincipalType,
+                    AssociationType: attr.AssociationType,
+                    ForeignKeyA: attr.ForeignKeyA,
+                    ForeignKeyB: attr.ForeignKeyB
                 )
             );
         }
@@ -403,12 +489,12 @@ public sealed class ApiAttributeAnnotationReader :
             (
                 new
                 (
-                    attr.ApiName,
-                    attr.PrincipalTypeA,
-                    attr.PrincipalTypeB,
-                    attr.AssociationType,
-                    attr.ForeignKeyA,
-                    attr.ForeignKeyB
+                    ApiName: attr.ApiName,
+                    PrincipalTypeA: attr.PrincipalTypeA,
+                    PrincipalTypeB: attr.PrincipalTypeB,
+                    AssociationType: attr.AssociationType,
+                    ForeignKeyA: attr.ForeignKeyA,
+                    ForeignKeyB: attr.ForeignKeyB
                 )
             );
         }
@@ -418,6 +504,27 @@ public sealed class ApiAttributeAnnotationReader :
     #endregion
 
     #region Private Methods
+    private static ApiAnnotationReaderDiagnostic CreateInvalidQuerySourceDiagnostic(Type clrDelegateType, string description)
+    => new
+    (
+        ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
+        clrDelegateType.FullName ?? clrDelegateType.Name,
+        description,
+        $"Correct or remove {nameof(ApiQuerySourceAttribute)} from the delegate declaration"
+    );
+
+    private static TEnum? GetNamedEnum<TEnum>(CustomAttributeData? attributeData, string propertyName)
+        where TEnum : struct, Enum
+    {
+        var namedArgument = attributeData?.NamedArguments.FirstOrDefault(argument => argument.MemberName == propertyName);
+        if (namedArgument is null || namedArgument.Value.TypedValue.Value is null)
+        {
+            return null;
+        }
+
+        return (TEnum)Enum.ToObject(typeof(TEnum), namedArgument.Value.TypedValue.Value);
+    }
+
     private static bool HasConflictingTypeMarkers(Type clrType)
     {
         return clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false) &&
@@ -428,17 +535,14 @@ public sealed class ApiAttributeAnnotationReader :
     {
         return new
         (
-            ApiSchemaCompilationCode.ApiAnnotationTypeMarkerConflict,
-            clrType.FullName ?? clrType.Name,
-            "A CLR type cannot be marked as both an API object and an API scalar",
-            "Remove either the API object marker or the API scalar marker"
+            Code: ApiSchemaCompilationCode.ApiAnnotationTypeMarkerConflict,
+            ApiPath: clrType.FullName ?? clrType.Name,
+            Description: "A CLR type cannot be marked as both an API object and an API scalar",
+            Remediation: "Remove either the API object marker or the API scalar marker"
         );
     }
 
-    private static ApiAnnotationReaderDiagnostic? CreateTypeMarkerConflictDiagnosticOrNull
-    (
-        Type clrType
-    )
+    private static ApiAnnotationReaderDiagnostic? CreateTypeMarkerConflictDiagnosticOrNull(Type clrType)
     {
         return HasConflictingTypeMarkers(clrType)
             ? CreateTypeMarkerConflictDiagnostic(clrType)

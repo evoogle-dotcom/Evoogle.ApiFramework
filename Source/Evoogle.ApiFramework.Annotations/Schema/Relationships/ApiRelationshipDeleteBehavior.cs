@@ -3,7 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-namespace Evoogle.ApiFramework;
+namespace Evoogle.ApiFramework.Schema.Relationships;
 
 /// <summary>
 ///     Defines the behavior applied to related objects when either end of a relationship is affected by

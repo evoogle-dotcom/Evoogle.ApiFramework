@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Query.Internal;
-using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -19,8 +18,9 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Query;
 public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySourceParameterBuilder>
 {
     #region Fields
-    private readonly string _apiName;
-    private readonly ApiTypeReference _apiTypeReference;
+    private string _apiName;
+    private readonly object _apiTypeIdentity;
+    private readonly Func<ApiTypeExpression> _apiTypeExpressionFactory;
     private readonly ApiQuerySourceParameterState _state = new();
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     #endregion
@@ -30,12 +30,24 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
     /// <param name="apiName">The parameter API name, unique within its source.</param>
     /// <param name="apiTypeReference">The registered input type reference.</param>
     public ApiQuerySourceParameterBuilder(string apiName, ApiTypeReference apiTypeReference)
+        : this(apiName, apiTypeReference, () => new ApiTypeExpression(apiTypeReference))
+    {
+    }
+
+    internal ApiQuerySourceParameterBuilder
+    (
+        string apiName,
+        object apiTypeIdentity,
+        Func<ApiTypeExpression> apiTypeExpressionFactory
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
-        ArgumentNullException.ThrowIfNull(apiTypeReference);
+        ArgumentNullException.ThrowIfNull(apiTypeIdentity);
+        ArgumentNullException.ThrowIfNull(apiTypeExpressionFactory);
 
         _apiName = apiName;
-        _apiTypeReference = apiTypeReference;
+        _apiTypeIdentity = apiTypeIdentity;
+        _apiTypeExpressionFactory = apiTypeExpressionFactory;
     }
 
     /// <summary>Creates a required, non-null input parameter builder using a registered CLR type.</summary>
@@ -48,17 +60,24 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
     #endregion
 
     #region Properties
-    /// <summary>Gets the fixed parameter API name.</summary>
-    internal string ApiName => _apiName;
+    /// <summary>Gets the configured parameter API name.</summary>
+    public string ApiName => _apiName;
 
-    /// <summary>Gets the fixed input type reference.</summary>
-    internal ApiTypeReference ApiTypeReference => _apiTypeReference;
+    /// <summary>Gets the identity used to compare the configured input type.</summary>
+    internal object ApiTypeIdentity => _apiTypeIdentity;
 
     /// <summary>Gets the source associated with the active configuration callback.</summary>
     internal ApiConfigurationSource CurrentConfigurationSource => _configurationSourceScope.CurrentSource;
 
     /// <summary>Gets the highest-precedence source that registered this parameter.</summary>
     internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
+
+    /// <summary>Sets the API name while resolving a convention-derived declaration name.</summary>
+    internal void SetApiNameConvention(string apiName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+        _apiName = apiName;
+    }
     #endregion
 
     #region Configuration Source Methods
@@ -143,7 +162,7 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
     {
         // Build ApiQuerySourceParameter instance from all the configured components.
         var apiName = this.ApiName;
-        var apiTypeExpression = new ApiTypeExpression(this.ApiTypeReference);
+        var apiTypeExpression = _apiTypeExpressionFactory();
         var apiNullability = _state.ApiNullability;
         var apiPresence = _state.ApiPresence;
 

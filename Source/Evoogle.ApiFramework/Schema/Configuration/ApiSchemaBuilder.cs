@@ -12,9 +12,11 @@ using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
+using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Logging;
+using Evoogle.Reflection;
 
 using Microsoft.Extensions.Logging;
 
@@ -532,9 +534,132 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
                             break;
                     }
                 }
+
+                this.ApplyAnnotationQuerySourceDiscovery(readerSet, assembly, filter);
             }
         );
     }
+
+    private void ApplyAnnotationQuerySourceDiscovery
+    (
+        Annotations.Internal.ApiAnnotationReaderSet readerSet,
+        System.Reflection.Assembly assembly,
+        Func<Type, bool>? filter
+    )
+    {
+        var sourceNamingConventions = _state.ConventionSet?.QuerySourceConventions
+            .OfType<ApiNamingConvention>() ?? [];
+        var parameterNamingConventions = _state.ConventionSet?.QuerySourceParameterConventions
+            .OfType<ApiNamingConvention>() ?? [];
+
+        foreach (var result in readerSet.ReadQuerySourceAnnotations(assembly, filter))
+        {
+            var invokeMethod = result.ClrDelegateType.GetMethod(nameof(Action.Invoke))!;
+            var outputNullableInfo = ParameterReflection.GetNullabilityInfo(invokeMethod.ReturnParameter);
+            var sourceContext = new ApiQuerySourceConventionContext
+            (
+                result.ClrDelegateType,
+                outputNullableInfo,
+                this
+            );
+            var sourceNameBuilder = new ApiQuerySourceBuilder(result.ClrDelegateType.Name);
+            foreach (var namingConvention in sourceNamingConventions)
+            {
+                namingConvention.Apply(sourceNameBuilder, sourceContext);
+            }
+
+            var apiName = result.ApiName ?? sourceNameBuilder.ApiName;
+            if (!_context.TryRegisterAnnotatedQuerySource(result.ClrDelegateType, apiName, out var conflictingType))
+            {
+                if (conflictingType is not null)
+                {
+                    readerSet.AddQuerySourceDiscoveryConflict(apiName, conflictingType, result.ClrDelegateType);
+                }
+
+                continue;
+            }
+
+            ApiQuerySourceBuilder? querySourceBuilder = null;
+            this.AddQuerySourceCore
+            (
+                apiName,
+                source =>
+                {
+                    querySourceBuilder = source;
+                    source.SetOutputTypeDataAnnotation(() => ApiTypeExpressionBuilder.Build(outputNullableInfo));
+                    if (outputNullableInfo.Nullability != MemberNullability.Unknown)
+                    {
+                        source.SetOutputNullabilityDataAnnotation
+                        (
+                            ToApiNullability(outputNullableInfo.Nullability)
+                        );
+                    }
+
+                    if (result.ApiOutputNullability is { } apiOutputNullability)
+                    {
+                        source.SetOutputNullabilityDataAnnotation(apiOutputNullability);
+                    }
+
+                    if (result.ApiOutputComposition is { } apiOutputComposition)
+                    {
+                        source.WithOutputComposition(apiOutputComposition);
+                    }
+
+                    foreach (var parameterResult in result.ApiInputParameters)
+                    {
+                        var parameterInfo = parameterResult.ClrParameterInfo;
+                        var parameterNullableInfo = ParameterReflection.GetNullabilityInfo(parameterInfo);
+                        var parameterNameBuilder = new ApiQuerySourceParameterBuilder(parameterInfo.Name!, parameterInfo.ParameterType);
+                        var parameterContext = new ApiQuerySourceParameterConventionContext
+                        (
+                            parameterInfo,
+                            parameterNullableInfo,
+                            source,
+                            sourceContext
+                        );
+                        foreach (var namingConvention in parameterNamingConventions)
+                        {
+                            namingConvention.Apply(parameterNameBuilder, parameterContext);
+                        }
+
+                        var parameterApiName = parameterResult.ApiName ?? parameterNameBuilder.ApiName;
+                        var parameterBuilder = source.AddInputParameterDataAnnotation
+                        (
+                            parameterApiName,
+                            parameterInfo.ParameterType,
+                            () => ApiTypeExpressionBuilder.Build(parameterNullableInfo),
+                            parameter =>
+                            {
+                                if (parameterNullableInfo.Nullability != MemberNullability.Unknown)
+                                {
+                                    parameter.WithNullability(ToApiNullability(parameterNullableInfo.Nullability));
+                                }
+
+                                if (parameterResult.ApiNullability is { } apiNullability)
+                                {
+                                    parameter.WithNullability(apiNullability);
+                                }
+
+                                if (parameterResult.ApiPresence is { } apiPresence)
+                                {
+                                    parameter.WithPresence(apiPresence);
+                                }
+                            }
+                        );
+                        _context.SetQuerySourceParameterConventionContext(parameterBuilder, parameterContext);
+                    }
+                },
+                ApiConfigurationSource.DataAnnotation
+            );
+
+            _context.SetQuerySourceConventionContext(querySourceBuilder!, sourceContext);
+        }
+    }
+
+    private static ApiNullability ToApiNullability(MemberNullability clrNullability) =>
+        clrNullability == MemberNullability.NonNullable
+            ? ApiNullability.NonNullable
+            : ApiNullability.Nullable;
     #endregion
 
     #region AddTypes Methods
@@ -649,6 +774,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     public ApiSchemaCompilationResult BuildResult()
     {
         _context.ResetConfigurationIssues();
+        _context.ResetQuerySourceAnnotationDiscovery();
         _state.AnnotationReaderSet?.ResetIssues();
 
         if (_state.ConventionSet is not null || _state.AnnotationReaderSet is not null)

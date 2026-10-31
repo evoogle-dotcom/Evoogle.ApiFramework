@@ -40,6 +40,10 @@ binds. The operation-side family uses `ApiQuery` and `ApiQueryParameter`; source
 and operation parameters are separate concepts with separate ownership and lifecycles.
 Query sources use `ApiInputParameters`, `ApiOutputType`, `ApiOutputNullability`, and
 `ApiOutputComposition`, in that order after `ApiName`, for both the API and serialized properties.
+Delegate declarations use the delegate type name as the query-source naming candidate and CLR
+parameter names as parameter naming candidates. `ApiQuerySourceAttribute.ApiName` and
+`ApiQuerySourceParameterAttribute.ApiName` are explicit data-annotation overrides. Query-source and
+parameter naming conventions apply only to inferred candidates; they do not transform explicit names.
 Use **binding** for connecting an operation to a query source and its parameter declarations.
 Reserve **materialization** for producing actual values or objects, such as an `ApiKey` from a POCO.
 

@@ -49,7 +49,8 @@ public sealed class ApiAnnotationReaderSetBuilder
                 IApiKeyAnnotationReader or
                 IApiVersionAnnotationReader or
                 IApiRelationshipAnnotationReader or
-                IApiTypeDiscoveryAnnotationReader
+                IApiTypeDiscoveryAnnotationReader or
+                IApiQuerySourceAnnotationReader
             ))
         {
             throw new ArgumentException

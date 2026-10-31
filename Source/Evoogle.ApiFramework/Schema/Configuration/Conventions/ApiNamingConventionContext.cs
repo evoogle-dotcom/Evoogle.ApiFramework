@@ -69,6 +69,32 @@ public sealed class ApiNamingConventionContext
         this.ApiPropertyConventionContext = apiPropertyConventionContext;
         this.ApiEnumValueConventionContext = apiEnumValueConventionContext;
     }
+
+    /// <summary>Creates a naming context for a query source or query-source parameter.</summary>
+    /// <param name="target">The query naming target.</param>
+    /// <param name="clrType">The annotated delegate type.</param>
+    /// <param name="clrName">The CLR parameter name, or null for a query source.</param>
+    /// <param name="apiQuerySourceConventionContext">The query-source convention context.</param>
+    /// <param name="apiQuerySourceParameterConventionContext">
+    ///     The parameter context, or null for a query source.
+    /// </param>
+    public ApiNamingConventionContext
+    (
+        ApiNamingConventionTarget target,
+        Type clrType,
+        string? clrName,
+        ApiQuerySourceConventionContext apiQuerySourceConventionContext,
+        ApiQuerySourceParameterConventionContext? apiQuerySourceParameterConventionContext
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiQuerySourceConventionContext);
+
+        this.Target = target;
+        this.ClrType = clrType ?? throw new ArgumentNullException(nameof(clrType));
+        this.ClrName = clrName;
+        this.ApiQuerySourceConventionContext = apiQuerySourceConventionContext;
+        this.ApiQuerySourceParameterConventionContext = apiQuerySourceParameterConventionContext;
+    }
     #endregion
 
     #region Properties
@@ -86,15 +112,21 @@ public sealed class ApiNamingConventionContext
     public string? ClrName { get; }
 
     /// <summary>
+    ///     Gets the enum-value convention context when <see cref="Target"/> is
+    ///     <see cref="ApiNamingConventionTarget.EnumValue"/>, or <see langword="null"/> otherwise.
+    /// </summary>
+    public ApiEnumValueConventionContext? ApiEnumValueConventionContext { get; }
+
+    /// <summary>
     ///     Gets the property convention context when <see cref="Target"/> is
     ///     <see cref="ApiNamingConventionTarget.Property"/>, or <see langword="null"/> otherwise.
     /// </summary>
     public ApiPropertyConventionContext? ApiPropertyConventionContext { get; }
 
-    /// <summary>
-    ///     Gets the enum-value convention context when <see cref="Target"/> is
-    ///     <see cref="ApiNamingConventionTarget.EnumValue"/>, or <see langword="null"/> otherwise.
-    /// </summary>
-    public ApiEnumValueConventionContext? ApiEnumValueConventionContext { get; }
+    /// <summary>Gets the query-source convention context, or null for non-query targets.</summary>
+    public ApiQuerySourceConventionContext? ApiQuerySourceConventionContext { get; }
+
+    /// <summary>Gets the query-source-parameter context, or null for other targets.</summary>
+    public ApiQuerySourceParameterConventionContext? ApiQuerySourceParameterConventionContext { get; }
     #endregion
 }

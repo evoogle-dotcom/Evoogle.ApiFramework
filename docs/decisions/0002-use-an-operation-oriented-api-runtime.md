@@ -124,6 +124,14 @@ nullable `Customer`, and permits projection. The source has no repository, key l
 or execution delegate; those belong to a later service binding. Future operation compilation
 will enforce source composition permissions and bind authored inputs to these declarations.
 
+On 2026-10-27, declaration-only delegate annotations were adopted as an additional query-source
+authoring form. A public delegate marked with `ApiQuerySourceAttribute` supplies its output and input
+signature through reflection; optional parameter annotations override name, nullability, or presence.
+The delegate type is never instantiated and does not identify an execution method. Assembly annotation
+scanning registers the resulting source metadata at data-annotation precedence, while query-source and
+parameter conventions may configure unset settings at convention precedence. Execution bindings,
+asynchronous wrappers, streaming outputs, and argument default values remain separate deferred work.
+
 #### Compiled operations
 
 `ApiOperation` is the immutable, normalized, schema-bound canonical IR produced by operation

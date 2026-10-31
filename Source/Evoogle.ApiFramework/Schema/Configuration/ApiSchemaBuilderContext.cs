@@ -4,6 +4,7 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
@@ -26,6 +27,10 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     private readonly Dictionary<Type, ApiObjectTypeBuilder> _apiObjectTypeBuilders = [];
     private readonly Dictionary<string, ApiRelationshipBuilder> _apiRelationshipBuilders = new(ApiNameComparer.Instance);
     private readonly Dictionary<string, ApiQuerySourceBuilder> _apiQuerySourceBuilders = new(ApiNameComparer.Instance);
+    private readonly Dictionary<ApiQuerySourceBuilder, ApiQuerySourceConventionContext> _apiQuerySourceConventionContexts = [];
+    private readonly Dictionary<ApiQuerySourceParameterBuilder, ApiQuerySourceParameterConventionContext> _apiQuerySourceParameterConventionContexts = [];
+    private readonly Dictionary<string, Type> _annotatedQuerySourceClrTypes = new(ApiNameComparer.Instance);
+    private readonly HashSet<Type> _discoveredQuerySourceClrTypes = [];
 
     private readonly Queue<ApiObjectTypeBuilder> _pendingObjectBuilders = new();
     private readonly Queue<ApiScalarTypeBuilder> _pendingScalarBuilders = new();
@@ -87,6 +92,57 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     #region Methods
     /// <summary>Clears configuration-discovery issues for a new schema build.</summary>
     internal void ResetConfigurationIssues() => _configurationIssues.Clear();
+
+    /// <summary>Resets per-build query-source annotation discovery and convention metadata.</summary>
+    internal void ResetQuerySourceAnnotationDiscovery()
+    {
+        _apiQuerySourceConventionContexts.Clear();
+        _apiQuerySourceParameterConventionContexts.Clear();
+        _annotatedQuerySourceClrTypes.Clear();
+        _discoveredQuerySourceClrTypes.Clear();
+    }
+
+    internal bool TryRegisterAnnotatedQuerySource(Type clrDelegateType, string apiName, out Type? conflictingType)
+    {
+        if (!_discoveredQuerySourceClrTypes.Add(clrDelegateType))
+        {
+            conflictingType = null;
+            return false;
+        }
+
+        if (_annotatedQuerySourceClrTypes.TryGetValue(apiName, out conflictingType))
+        {
+            return false;
+        }
+
+        _annotatedQuerySourceClrTypes.Add(apiName, clrDelegateType);
+        return true;
+    }
+
+    internal void SetQuerySourceConventionContext
+    (
+        ApiQuerySourceBuilder builder,
+        ApiQuerySourceConventionContext context
+    ) => _apiQuerySourceConventionContexts[builder] = context;
+
+    internal ApiQuerySourceConventionContext GetQuerySourceConventionContext
+    (
+        ApiQuerySourceBuilder builder,
+        ApiSchemaBuilder schemaBuilder
+    ) => _apiQuerySourceConventionContexts.GetValueOrDefault(builder) ?? new ApiQuerySourceConventionContext(null, null, schemaBuilder);
+
+    internal void SetQuerySourceParameterConventionContext
+    (
+        ApiQuerySourceParameterBuilder builder,
+        ApiQuerySourceParameterConventionContext context
+    ) => _apiQuerySourceParameterConventionContexts[builder] = context;
+
+    internal ApiQuerySourceParameterConventionContext GetQuerySourceParameterConventionContext
+    (
+        ApiQuerySourceParameterBuilder builder,
+        ApiQuerySourceBuilder querySourceBuilder,
+        ApiQuerySourceConventionContext querySourceContext
+    ) => _apiQuerySourceParameterConventionContexts.GetValueOrDefault(builder) ?? new ApiQuerySourceParameterConventionContext(null, null, querySourceBuilder, querySourceContext);
 
     /// <summary>Records a configuration-discovery issue for the current schema build.</summary>
     internal void AddConfigurationIssue(ApiSchemaCompilationIssue issue)

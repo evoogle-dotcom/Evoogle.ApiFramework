@@ -326,6 +326,44 @@ These declarations establish schema contracts; operation compilation, argument p
 service bindings, and repository execution are subsequent runtime work. An operation **binds**
 to a source; the source does not itself materialize a query.
 
+Query sources may also be declared with public delegate signatures. The delegate is reflection-only
+schema metadata: ApiFramework never creates an instance, assigns a method, or treats the declaration
+as an execution binding. Delegates may be namespace-level or nested in a public class or static class:
+
+```csharp
+public static class CustomerQuerySources
+{
+    [ApiQuerySource]
+    public delegate Customer? CustomerById(int id);
+
+    [ApiQuerySource(ApiOutputComposition =
+        ApiQueryComposition.Projection | ApiQueryComposition.Filtering)]
+    public delegate IReadOnlyList<Customer> Customers
+    (
+        [ApiQuerySourceParameter(ApiPresence = ApiPresence.Optional)]
+        string? name
+    );
+}
+```
+
+Configure `UseDefaultAnnotations()` and `UseAssemblyAnnotationScanning(...)` to discover these
+declarations. Every delegate parameter becomes an input declaration; its attribute is needed only
+for name, nullability, or presence overrides. CLR names and nullable metadata supply convention
+candidates, while attribute values apply at data-annotation precedence and explicit fluent settings
+remain authoritative. Naming conventions can independently target `QuerySource` and
+`QuerySourceParameter`. Repeated discovery of the same delegate is idempotent. Different annotated
+delegates resolving to the same API name produce a discovery conflict, while an existing fluent
+source with that name is merged according to normal configuration precedence.
+
+Annotated delegates must be public, closed, return a value, and avoid pointer or by-reference
+signatures. `Task`, `ValueTask`, and `IAsyncEnumerable` outputs are rejected because asynchronous
+execution and streaming are not schema output types. Signature types must still be registered in
+the schema; discovery does not expose or register them automatically.
+
+`ApiNullability`, `ApiPresence`, and `ApiQueryComposition` are defined by the annotations assembly
+so annotations-only POCO projects can use the exact schema contract enums. Their namespaces and
+values are unchanged, but consumers compiled against an earlier assembly location must rebuild.
+
 ## Naming Conventions
 
 Built-in API naming conventions are opt-in through `ApiSchemaBuilder` extension methods. They

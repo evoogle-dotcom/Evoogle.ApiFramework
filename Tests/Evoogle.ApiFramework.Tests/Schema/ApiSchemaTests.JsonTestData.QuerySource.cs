@@ -161,6 +161,192 @@ public partial class ApiSchemaTests
                 ]
             }
             """
+        },
+        new ApiSchemaJsonTestCase
+        {
+            Name = $"{nameof(ApiSchema)} With scalar {nameof(ApiQuerySource)} output and no parameters",
+            FactoryArgument = new ApiSchemaDef
+            (
+                ApiName: "ScalarQuerySource",
+                ApiNamedTypes:
+                [
+                    new ApiScalarTypeDef
+                    (
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
+                    )
+                ],
+                ApiQuerySources:
+                [
+                    new ApiQuerySourceDef
+                    (
+                        ApiName: "CurrentName",
+                        ApiInputParameters: [],
+                        ApiOutputTypeExpression: new ApiTypeExpressionDef
+                        (
+                            ApiTypeDef: null,
+                            ApiTypeReferenceDef: new ApiTypeReferenceDef
+                            (
+                                ApiKind: ApiTypeKind.Scalar,
+                                ApiName: nameof(String),
+                                ClrType: null
+                            )
+                        ),
+                        ApiOutputNullability: ApiNullability.Nullable,
+                        ApiOutputComposition: ApiQueryComposition.Projection
+                    )
+                ]
+            ),
+            Json = """
+            {
+                "ApiName": "ScalarQuerySource",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
+                },
+                "ApiScalarTypes": [
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
+                    }
+                ],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [],
+                "ApiRelationships": [],
+                "ApiQuerySources": [
+                    {
+                        "ApiName": "CurrentName",
+                        "ApiInputParameters": [],
+                        "ApiOutputType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
+                        },
+                        "ApiOutputNullability": "Nullable",
+                        "ApiOutputComposition": "Projection"
+                    }
+                ]
+            }
+            """
+        },
+        new ApiSchemaJsonTestCase
+        {
+            Name = $"{nameof(ApiSchema)} With collection {nameof(ApiQuerySourceParameter)}",
+            FactoryArgument = new ApiSchemaDef
+            (
+                ApiName: "CollectionQuerySourceParameter",
+                ApiNamedTypes:
+                [
+                    new ApiScalarTypeDef
+                    (
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
+                    ),
+                    new ApiScalarTypeDef
+                    (
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
+                    )
+                ],
+                ApiQuerySources:
+                [
+                    new ApiQuerySourceDef
+                    (
+                        ApiName: "NamesByIds",
+                        ApiInputParameters:
+                        [
+                            new ApiQuerySourceParameterDef
+                            (
+                                ApiName: "ids",
+                                ApiTypeExpression: new ApiTypeExpressionDef
+                                (
+                                    ApiTypeDef: new ApiCollectionTypeDef
+                                    (
+                                        ClrType: typeof(int[]),
+                                        ApiItemTypeExpression: new ApiTypeExpressionDef
+                                        (
+                                            ApiTypeDef: null,
+                                            ApiTypeReferenceDef: new ApiTypeReferenceDef
+                                            (
+                                                ApiKind: ApiTypeKind.Scalar,
+                                                ApiName: nameof(Int32),
+                                                ClrType: null
+                                            )
+                                        ),
+                                        ApiItemNullability: ApiNullability.NonNullable
+                                    ),
+                                    ApiTypeReferenceDef: null
+                                ),
+                                ApiNullability: ApiNullability.NonNullable,
+                                ApiPresence: ApiPresence.Required
+                            )
+                        ],
+                        ApiOutputTypeExpression: new ApiTypeExpressionDef
+                        (
+                            ApiTypeDef: null,
+                            ApiTypeReferenceDef: new ApiTypeReferenceDef
+                            (
+                                ApiKind: ApiTypeKind.Scalar,
+                                ApiName: nameof(String),
+                                ClrType: null
+                            )
+                        ),
+                        ApiOutputNullability: ApiNullability.Nullable,
+                        ApiOutputComposition: ApiQueryComposition.Projection
+                    )
+                ]
+            ),
+            Json = """
+            {
+                "ApiName": "CollectionQuerySourceParameter",
+                "ApiVersion": "0.1.0",
+                "ApiOptions": {
+                    "ApiKeyNullHandling": "UseEmptyOnNull"
+                },
+                "ApiScalarTypes": [
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "Int32",
+                        "ClrType": "System.Int32, System.Private.CoreLib"
+                    },
+                    {
+                        "ApiKind": "Scalar",
+                        "ApiName": "String",
+                        "ClrType": "System.String, System.Private.CoreLib"
+                    }
+                ],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [],
+                "ApiRelationships": [],
+                "ApiQuerySources": [
+                    {
+                        "ApiName": "NamesByIds",
+                        "ApiInputParameters": [
+                            {
+                                "ApiName": "ids",
+                                "ApiType": {
+                                    "ApiKind": "Collection",
+                                    "ApiItemType": {
+                                        "ApiKind": "Scalar",
+                                        "ApiName": "Int32"
+                                    },
+                                    "ApiItemNullability": "NonNullable",
+                                    "ClrType": "System.Int32[], System.Private.CoreLib"
+                                },
+                                "ApiNullability": "NonNullable",
+                                "ApiPresence": "Required"
+                            }
+                        ],
+                        "ApiOutputType": {
+                            "ApiKind": "Scalar",
+                            "ApiName": "String"
+                        },
+                        "ApiOutputNullability": "Nullable",
+                        "ApiOutputComposition": "Projection"
+                    }
+                ]
+            }
+            """
         }
     ];
 
@@ -222,6 +408,7 @@ public partial class ApiSchemaTests
             Json = """
             {
                 "ApiName": "QuerySourceDefaults",
+                "ApiOptions": {},
                 "ApiScalarTypes": [
                     {
                         "ApiKind": "Scalar",
@@ -229,6 +416,9 @@ public partial class ApiSchemaTests
                         "ClrType": "System.String, System.Private.CoreLib"
                     }
                 ],
+                "ApiEnumTypes": [],
+                "ApiObjectTypes": [],
+                "ApiRelationships": [],
                 "ApiQuerySources": [
                     {
                         "ApiName": "Echo",

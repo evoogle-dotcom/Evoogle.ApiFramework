@@ -11,24 +11,32 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 [Flags]
 public enum ApiNamingConventionTargets
 {
+    #region Values
     /// <summary>No schema element kinds.</summary>
     None = 0,
 
-    /// <summary>API object type names.</summary>
-    ObjectType = 1 << 0,
-
     /// <summary>API scalar type names.</summary>
-    ScalarType = 1 << 1,
+    ScalarType = 1 << 0,
 
     /// <summary>API enumeration type names.</summary>
-    EnumType = 1 << 2,
-
-    /// <summary>API property names.</summary>
-    Property = 1 << 3,
+    EnumType = 1 << 1,
 
     /// <summary>API enumeration value names.</summary>
-    EnumValue = 1 << 4,
+    EnumValue = 1 << 2,
+
+    /// <summary>API object type names.</summary>
+    ObjectType = 1 << 3,
+
+    /// <summary>API property names.</summary>
+    Property = 1 << 4,
+
+    /// <summary>API query source names.</summary>
+    QuerySource = 1 << 5,
+
+    /// <summary>API query-source parameter names.</summary>
+    QuerySourceParameter = 1 << 6,
 
     /// <summary>All supported schema element kinds.</summary>
-    All = ObjectType | ScalarType | EnumType | Property | EnumValue,
+    All = ScalarType | EnumType | EnumValue | ObjectType | Property | QuerySource | QuerySourceParameter,
+    #endregion
 }

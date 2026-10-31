@@ -18,6 +18,8 @@ public sealed class ApiConventionSetBuilder
     private readonly List<IApiEnumValueConvention> _enumValueConventions = [];
     private readonly List<IApiPropertyConvention> _propertyConventions = [];
     private readonly List<IApiRelationshipConvention> _relationshipConventions = [];
+    private readonly List<IApiQuerySourceConvention> _querySourceConventions = [];
+    private readonly List<IApiQuerySourceParameterConvention> _querySourceParameterConventions = [];
     #endregion
 
     #region Constructors
@@ -44,6 +46,8 @@ public sealed class ApiConventionSetBuilder
         _enumValueConventions.AddRange(existing.EnumValueConventions);
         _propertyConventions.AddRange(existing.PropertyConventions);
         _relationshipConventions.AddRange(existing.RelationshipConventions);
+        _querySourceConventions.AddRange(existing.QuerySourceConventions);
+        _querySourceParameterConventions.AddRange(existing.QuerySourceParameterConventions);
     }
     #endregion
 
@@ -65,6 +69,8 @@ public sealed class ApiConventionSetBuilder
         AddConventionIfSupported(convention, _enumValueConventions);
         AddConventionIfSupported(convention, _propertyConventions);
         AddConventionIfSupported(convention, _relationshipConventions);
+        AddConventionIfSupported(convention, _querySourceConventions);
+        AddConventionIfSupported(convention, _querySourceParameterConventions);
 
         return this;
     }
@@ -84,6 +90,8 @@ public sealed class ApiConventionSetBuilder
         _enumValueConventions.RemoveAll(c => c is TConvention);
         _propertyConventions.RemoveAll(c => c is TConvention);
         _relationshipConventions.RemoveAll(c => c is TConvention);
+        _querySourceConventions.RemoveAll(c => c is TConvention);
+        _querySourceParameterConventions.RemoveAll(c => c is TConvention);
         return this;
     }
 
@@ -128,6 +136,16 @@ public sealed class ApiConventionSetBuilder
         foreach (var c in _relationshipConventions)
         {
             set.RelationshipConventions.Add(c);
+        }
+
+        foreach (var c in _querySourceConventions)
+        {
+            set.QuerySourceConventions.Add(c);
+        }
+
+        foreach (var c in _querySourceParameterConventions)
+        {
+            set.QuerySourceParameterConventions.Add(c);
         }
 
         return set;

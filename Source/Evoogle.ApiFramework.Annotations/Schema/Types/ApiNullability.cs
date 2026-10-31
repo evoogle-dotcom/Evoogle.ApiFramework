@@ -5,9 +5,7 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Types;
 
-/// <summary>
-///     Specifies whether a value permits null in a particular API context.
-/// </summary>
+/// <summary>Specifies whether a value permits null in a particular API context.</summary>
 public enum ApiNullability
 {
     #region Values

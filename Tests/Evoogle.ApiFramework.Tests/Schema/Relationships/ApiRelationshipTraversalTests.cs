@@ -324,8 +324,8 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
                (ConflictKind.PropertyApiName, new[] { ApiNameConflict }),
                (ConflictKind.PropertyClrMember, new[] { ClrMemberConflict }),
                (ConflictKind.BothPropertyConflicts, new[] { ApiNameConflict, ClrMemberConflict }),
-               (ConflictKind.DifferentApiNameCase, System.Array.Empty<ExpectedDiagnostic>()),
-               (ConflictKind.DifferentClrNameCase, System.Array.Empty<ExpectedDiagnostic>())
+               (ConflictKind.DifferentApiNameCase, Array.Empty<ExpectedDiagnostic>()),
+               (ConflictKind.DifferentClrNameCase, Array.Empty<ExpectedDiagnostic>())
            }
            from usesJson in new[] { false, true }
            select (TheoryDataRow<IXUnitTest>)new CompilationTest

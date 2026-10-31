@@ -20,7 +20,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Query;
 public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuilder>
 {
     #region Fields
-    private readonly string _apiName;
+    private string _apiName;
     private readonly ApiQuerySourceState _state = new();
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     #endregion
@@ -36,14 +36,24 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     #endregion
 
     #region Properties
-    /// <summary>Gets the fixed query source API name.</summary>
-    internal string ApiName => _apiName;
+    /// <summary>Gets the configured query source API name.</summary>
+    public string ApiName => _apiName;
+
+    /// <summary>Gets the configured parameter builders in declaration order.</summary>
+    internal IReadOnlyList<ApiQuerySourceParameterBuilder> InputParameterBuilders => _state.InputParameterBuilders;
 
     /// <summary>Gets the source associated with the active configuration callback.</summary>
     internal ApiConfigurationSource CurrentConfigurationSource => _configurationSourceScope.CurrentSource;
 
     /// <summary>Gets the highest-precedence source that registered this query source.</summary>
     internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
+
+    /// <summary>Sets the API name while resolving a convention-derived declaration name.</summary>
+    internal void SetApiNameConvention(string apiName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+        _apiName = apiName;
+    }
 
     #endregion
 
@@ -83,13 +93,53 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
         ArgumentNullException.ThrowIfNull(apiTypeReference);
 
+        return this.AddInputParameterCore
+        (
+            apiName,
+            apiTypeReference,
+            () => new ApiTypeExpression(apiTypeReference),
+            configure
+        );
+    }
+
+    /// <summary>Adds or configures a parameter from an annotation-derived type expression.</summary>
+    internal ApiQuerySourceParameterBuilder AddInputParameterDataAnnotation
+    (
+        string apiName,
+        object apiTypeIdentity,
+        Func<ApiTypeExpression> apiTypeExpressionFactory,
+        Action<ApiQuerySourceParameterBuilder>? configure
+    )
+    {
+        this.ApplyConfiguration
+        (
+            ApiConfigurationSource.DataAnnotation,
+            () => this.AddInputParameterCore(apiName, apiTypeIdentity, apiTypeExpressionFactory, configure)
+        );
+
+        return _state.InputParameterBuilders.First
+            (parameter => ApiNameComparer.Instance.Equals(parameter.ApiName, apiName));
+    }
+
+    private ApiQuerySourceBuilder AddInputParameterCore
+    (
+        string apiName,
+        object apiTypeIdentity,
+        Func<ApiTypeExpression> apiTypeExpressionFactory,
+        Action<ApiQuerySourceParameterBuilder>? configure
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+        ArgumentNullException.ThrowIfNull(apiTypeIdentity);
+        ArgumentNullException.ThrowIfNull(apiTypeExpressionFactory);
+
         var source = this.CurrentConfigurationSource;
         var parameterIndex = _state.InputParameterBuilders.FindIndex
             (parameter => ApiNameComparer.Instance.Equals(parameter.ApiName, apiName));
         if (parameterIndex >= 0)
         {
             var existing = _state.InputParameterBuilders[parameterIndex];
-            if (existing.ApiTypeReference == apiTypeReference)
+            if (Equals(existing.ApiTypeIdentity, apiTypeIdentity))
             {
                 existing.SetRegistrationSource(source);
                 if (configure is not null)
@@ -106,7 +156,7 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
             }
         }
 
-        var builder = new ApiQuerySourceParameterBuilder(apiName, apiTypeReference);
+        var builder = new ApiQuerySourceParameterBuilder(apiName, apiTypeIdentity, apiTypeExpressionFactory);
         builder.SetRegistrationSource(source);
         if (configure is not null)
         {
@@ -294,15 +344,46 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
         ApiNullability apiOutputNullability
     )
     {
-        var source = this.CurrentConfigurationSource;
-        if (source >= _state.OutputSource)
-        {
-            _state.OutputTypeFactory = outputTypeFactory;
-            _state.ApiOutputNullability = apiOutputNullability;
-            _state.OutputSource = source;
-        }
+        this.SetOutputType(outputTypeFactory);
+        this.SetOutputNullability(apiOutputNullability);
 
         return this;
+    }
+
+    internal void SetOutputTypeDataAnnotation(Func<ApiTypeExpression> outputTypeFactory)
+        => this.ApplyConfiguration
+        (
+            ApiConfigurationSource.DataAnnotation,
+            () => this.SetOutputType(outputTypeFactory)
+        );
+
+    internal void SetOutputNullabilityDataAnnotation(ApiNullability apiOutputNullability)
+        => this.ApplyConfiguration
+        (
+            ApiConfigurationSource.DataAnnotation,
+            () => this.SetOutputNullability(apiOutputNullability)
+        );
+
+    private void SetOutputType(Func<ApiTypeExpression> outputTypeFactory)
+    {
+        ArgumentNullException.ThrowIfNull(outputTypeFactory);
+
+        var source = this.CurrentConfigurationSource;
+        if (source >= _state.OutputTypeSource)
+        {
+            _state.OutputTypeFactory = outputTypeFactory;
+            _state.OutputTypeSource = source;
+        }
+    }
+
+    private void SetOutputNullability(ApiNullability apiOutputNullability)
+    {
+        var source = this.CurrentConfigurationSource;
+        if (source >= _state.OutputNullabilitySource)
+        {
+            _state.ApiOutputNullability = apiOutputNullability;
+            _state.OutputNullabilitySource = source;
+        }
     }
     #endregion
 }

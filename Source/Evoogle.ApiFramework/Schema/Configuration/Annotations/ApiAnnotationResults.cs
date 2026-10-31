@@ -3,6 +3,10 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Reflection;
+
+using Evoogle.ApiFramework.Schema.Query;
+using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
@@ -117,4 +121,32 @@ public sealed record ApiManyToManyRelationshipAnnotationResult
 /// <param name="ClrType">The discovered CLR type.</param>
 /// <param name="ApiKind">The API type kind to register.</param>
 public sealed record ApiTypeDiscoveryAnnotationResult(Type ClrType, ApiTypeKind ApiKind);
+
+/// <summary>Describes annotation overrides for one delegate parameter.</summary>
+/// <param name="ClrParameterInfo">The reflected delegate parameter.</param>
+/// <param name="ApiName">The optional API name override.</param>
+/// <param name="ApiNullability">The optional nullability override.</param>
+/// <param name="ApiPresence">The optional presence override.</param>
+public sealed record ApiQuerySourceParameterAnnotationResult
+(
+    ParameterInfo ClrParameterInfo,
+    string? ApiName,
+    ApiNullability? ApiNullability,
+    ApiPresence? ApiPresence
+);
+
+/// <summary>Describes an annotated query-source delegate declaration.</summary>
+/// <param name="ClrDelegateType">The annotated delegate type.</param>
+/// <param name="ApiName">The optional API name override.</param>
+/// <param name="ApiOutputNullability">The optional output-nullability override.</param>
+/// <param name="ApiOutputComposition">The optional output-composition override.</param>
+/// <param name="ApiInputParameters">The delegate parameter declarations.</param>
+public sealed record ApiQuerySourceAnnotationResult
+(
+    Type ClrDelegateType,
+    string? ApiName,
+    ApiNullability? ApiOutputNullability,
+    ApiQueryComposition? ApiOutputComposition,
+    IReadOnlyList<ApiQuerySourceParameterAnnotationResult> ApiInputParameters
+);
 #endregion
