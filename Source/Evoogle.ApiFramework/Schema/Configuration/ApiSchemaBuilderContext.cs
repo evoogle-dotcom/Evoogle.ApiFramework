@@ -26,7 +26,9 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     private readonly Dictionary<Type, ApiEnumTypeBuilder> _apiEnumTypeBuilders = [];
     private readonly Dictionary<Type, ApiObjectTypeBuilder> _apiObjectTypeBuilders = [];
     private readonly Dictionary<string, ApiRelationshipBuilder> _apiRelationshipBuilders = new(ApiNameComparer.Instance);
+    
     private readonly Dictionary<string, ApiQuerySourceBuilder> _apiQuerySourceBuilders = new(ApiNameComparer.Instance);
+    private Dictionary<string, ApiQuerySourceBuilder>? _buildApiQuerySourceBuilders;
     private readonly Dictionary<ApiQuerySourceBuilder, ApiQuerySourceConventionContext> _apiQuerySourceConventionContexts = [];
     private readonly Dictionary<ApiQuerySourceParameterBuilder, ApiQuerySourceParameterConventionContext> _apiQuerySourceParameterConventionContexts = [];
     private readonly Dictionary<string, Type> _annotatedQuerySourceClrTypes = new(ApiNameComparer.Instance);
@@ -49,8 +51,11 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     internal IEnumerable<ApiEnumTypeBuilder> ApiEnumTypeBuilders => _apiEnumTypeBuilders.Values;
     internal IEnumerable<ApiObjectTypeBuilder> ApiObjectTypeBuilders => _apiObjectTypeBuilders.Values;
     internal IEnumerable<ApiRelationshipBuilder> ApiRelationshipBuilders => _apiRelationshipBuilders.Values;
-    internal IEnumerable<ApiQuerySourceBuilder> ApiQuerySourceBuilders => _apiQuerySourceBuilders.Values;
+    internal IEnumerable<ApiQuerySourceBuilder> ApiQuerySourceBuilders => this.CurrentApiQuerySourceBuilders.Values;
     internal IReadOnlyList<ApiSchemaCompilationIssue> ConfigurationIssues => _configurationIssues;
+
+    private Dictionary<string, ApiQuerySourceBuilder> CurrentApiQuerySourceBuilders =>
+        _buildApiQuerySourceBuilders ?? _apiQuerySourceBuilders;
 
     /// <summary>Gets the source associated with the active configuration callback.</summary>
     internal ApiConfigurationSource CurrentConfigurationSource =>
@@ -101,6 +106,25 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
         _annotatedQuerySourceClrTypes.Clear();
         _discoveredQuerySourceClrTypes.Clear();
     }
+
+    /// <summary>Creates the isolated query-source configuration used by one schema build.</summary>
+    internal void BeginQuerySourceBuild()
+    {
+        if (_buildApiQuerySourceBuilders is not null)
+        {
+            throw new InvalidOperationException("A query-source schema build is already active.");
+        }
+
+        _buildApiQuerySourceBuilders = new Dictionary<string, ApiQuerySourceBuilder>(ApiNameComparer.Instance);
+        foreach (var builder in _apiQuerySourceBuilders.Values)
+        {
+            var buildBuilder = builder.CreateBuildSnapshot();
+            _buildApiQuerySourceBuilders.Add(buildBuilder.ApiName, buildBuilder);
+        }
+    }
+
+    /// <summary>Discards the isolated query-source configuration for the completed schema build.</summary>
+    internal void EndQuerySourceBuild() => _buildApiQuerySourceBuilders = null;
 
     internal bool TryRegisterAnnotatedQuerySource(Type clrDelegateType, string apiName, out Type? conflictingType)
     {
@@ -233,10 +257,11 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <summary>Gets or adds a query source builder at the supplied configuration source.</summary>
     internal ApiQuerySourceBuilder GetOrAddQuerySourceBuilder(string apiName, ApiConfigurationSource source)
     {
-        if (!_apiQuerySourceBuilders.TryGetValue(apiName, out var builder))
+        var builders = this.CurrentApiQuerySourceBuilders;
+        if (!builders.TryGetValue(apiName, out var builder))
         {
             builder = new ApiQuerySourceBuilder(apiName);
-            _apiQuerySourceBuilders[apiName] = builder;
+            builders[apiName] = builder;
         }
 
         builder.SetRegistrationSource(source);

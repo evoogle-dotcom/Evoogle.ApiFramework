@@ -57,6 +57,15 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
         : this(apiName, new ApiTypeReference(clrType ?? throw new ArgumentNullException(nameof(clrType))))
     {
     }
+
+    private ApiQuerySourceParameterBuilder(ApiQuerySourceParameterBuilder source)
+    {
+        _apiName = source._apiName;
+        _apiTypeIdentity = source._apiTypeIdentity;
+        _apiTypeExpressionFactory = source._apiTypeExpressionFactory;
+        _state = new ApiQuerySourceParameterState(source._state);
+        source.CopyExtensionsTo(this);
+    }
     #endregion
 
     #region Properties
@@ -157,6 +166,9 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
     #endregion
 
     #region Build Methods
+    /// <summary>Creates an independent builder snapshot for one schema build.</summary>
+    internal ApiQuerySourceParameterBuilder CreateBuildSnapshot() => new(this);
+
     /// <summary>Builds a fresh parameter declaration and type expression.</summary>
     internal ApiQuerySourceParameter Build()
     {

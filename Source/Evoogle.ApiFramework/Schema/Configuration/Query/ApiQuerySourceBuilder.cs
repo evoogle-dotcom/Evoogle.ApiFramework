@@ -33,6 +33,13 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
         _apiName = apiName;
     }
+
+    private ApiQuerySourceBuilder(ApiQuerySourceBuilder source)
+    {
+        _apiName = source._apiName;
+        _state = new ApiQuerySourceState(source._state);
+        source.CopyExtensionsTo(this);
+    }
     #endregion
 
     #region Properties
@@ -307,6 +314,9 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     #endregion
 
     #region Build Methods
+    /// <summary>Creates an independent builder snapshot for one schema build.</summary>
+    internal ApiQuerySourceBuilder CreateBuildSnapshot() => new(this);
+
     /// <summary>Builds a fresh query source and its owned parameter declarations.</summary>
     internal ApiQuerySource Build()
     {

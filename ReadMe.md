@@ -356,9 +356,11 @@ delegates resolving to the same API name produce a discovery conflict, while an 
 source with that name is merged according to normal configuration precedence.
 
 Annotated delegates must be public, closed, return a value, and avoid pointer or by-reference
-signatures. `Task`, `ValueTask`, and `IAsyncEnumerable` outputs are rejected because asynchronous
-execution and streaming are not schema output types. Signature types must still be registered in
-the schema; discovery does not expose or register them automatically.
+signatures. `Task`, task-derived, `ValueTask`, and `IAsyncEnumerable`-implementing outputs are rejected
+because asynchronous execution and streaming are not schema output types. Signature types must still
+be registered in the schema; discovery does not expose or register them automatically. Annotation
+discovery is recomputed for each build, so changing naming conventions does not retain obsolete
+annotation-derived query sources.
 
 `ApiNullability`, `ApiPresence`, and `ApiQueryComposition` are defined by the annotations assembly
 so annotations-only POCO projects can use the exact schema contract enums. Their namespaces and

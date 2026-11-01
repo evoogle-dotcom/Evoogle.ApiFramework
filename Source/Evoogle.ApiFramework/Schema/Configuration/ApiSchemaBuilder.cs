@@ -13,6 +13,7 @@ using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
+using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Logging;
@@ -573,7 +574,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
             {
                 if (conflictingType is not null)
                 {
-                    readerSet.AddQuerySourceDiscoveryConflict(apiName, conflictingType, result.ClrDelegateType);
+                    var apiSchemaPath = ApiSchemaPathFormatting.BuildPath
+                        (null, nameof(ApiSchema), _state.ApiName);
+                    var apiPath = ApiSchemaPathFormatting.BuildPath
+                        (apiSchemaPath, nameof(ApiQuerySource), apiName);
+                    readerSet.AddQuerySourceDiscoveryConflict
+                        (apiPath, apiName, conflictingType, result.ClrDelegateType);
                 }
 
                 continue;
@@ -776,55 +782,63 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         _context.ResetConfigurationIssues();
         _context.ResetQuerySourceAnnotationDiscovery();
         _state.AnnotationReaderSet?.ResetIssues();
+        _context.BeginQuerySourceBuild();
 
-        if (_state.ConventionSet is not null || _state.AnnotationReaderSet is not null)
+        try
         {
-            var configurationPipeline = new ApiSchemaConfigurationPipeline
+            if (_state.ConventionSet is not null || _state.AnnotationReaderSet is not null)
+            {
+                var configurationPipeline = new ApiSchemaConfigurationPipeline
+                (
+                    _state.ConventionSet,
+                    _state.AnnotationReaderSet,
+                    _context,
+                    this
+                );
+
+                configurationPipeline.Run();
+            }
+
+            // Build ApiSchema instance from all the configured components.
+            var apiName = _state.ApiName!;
+            var apiVersion = _state.ApiVersion;
+            var apiOptions = this.BuildOptions();
+            var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
+            var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
+            var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
+            var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build());
+            var apiQuerySources = _context.ApiQuerySourceBuilders.Select(b => b.Build());
+
+            this.RemoveDiscoveredNavigationProperties(apiRelationships);
+
+            var apiSchema = new ApiSchema
             (
-                _state.ConventionSet,
-                _state.AnnotationReaderSet,
-                _context,
-                this
+                apiName,
+                apiVersion,
+                apiOptions,
+                apiScalarTypes,
+                apiEnumTypes,
+                apiObjectTypes,
+                apiRelationships,
+                apiQuerySources
             );
 
-            configurationPipeline.Run();
+            // Add any extensions that were configured.
+            var extensions = this.BuildExtensions();
+            if (extensions is not null)
+            {
+                apiSchema.AttachExtensions(extensions);
+            }
+
+            var annotationIssues = _state.AnnotationReaderSet?.Issues;
+            var configurationIssues = _context.ConfigurationIssues;
+            var preliminaryIssues = (annotationIssues ?? []).Concat(configurationIssues);
+            return ApiSchemaCompiler.Compile(apiSchema, preliminaryIssues);
         }
-
-        // Build ApiSchema instance from all the configured components.
-        var apiName = _state.ApiName!;
-        var apiVersion = _state.ApiVersion;
-        var apiOptions = this.BuildOptions();
-        var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
-        var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
-        var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
-        var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build());
-        var apiQuerySources = _context.ApiQuerySourceBuilders.Select(b => b.Build());
-
-        this.RemoveDiscoveredNavigationProperties(apiRelationships);
-
-        var apiSchema = new ApiSchema
-        (
-            apiName,
-            apiVersion,
-            apiOptions,
-            apiScalarTypes,
-            apiEnumTypes,
-            apiObjectTypes,
-            apiRelationships,
-            apiQuerySources
-        );
-
-        // Add any extensions that were configured.
-        var extensions = this.BuildExtensions();
-        if (extensions is not null)
+        finally
         {
-            apiSchema.AttachExtensions(extensions);
+            _context.EndQuerySourceBuild();
         }
-
-        var annotationIssues = _state.AnnotationReaderSet?.Issues;
-        var configurationIssues = _context.ConfigurationIssues;
-        var preliminaryIssues = (annotationIssues ?? []).Concat(configurationIssues);
-        return ApiSchemaCompiler.Compile(apiSchema, preliminaryIssues);
     }
 
     private void RemoveDiscoveredNavigationProperties(IEnumerable<ApiRelationship> relationships)

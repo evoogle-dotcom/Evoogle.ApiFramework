@@ -38,6 +38,12 @@ public static class ApiQuerySourceAnnotationTestsFactory
     public delegate IAsyncEnumerable<QueryAnnotationCustomer> InvalidAsyncEnumerableQuery();
 
     [ApiQuerySource]
+    public delegate QueryAnnotationTask InvalidDerivedTaskQuery();
+
+    [ApiQuerySource]
+    public delegate QueryAnnotationStream InvalidAsyncEnumerableImplementationQuery();
+
+    [ApiQuerySource]
     public delegate void InvalidVoidQuery();
 
     [ApiQuerySource]
@@ -125,7 +131,11 @@ public static class ApiQuerySourceAnnotationTestsFactory
         }
     }
 
-    private sealed class TestQuerySourceAnnotationReader : IApiQuerySourceAnnotationReader
+    private sealed class TestQuerySourceAnnotationReader
+    (
+        ApiQueryComposition apiOutputComposition =
+            ApiQueryComposition.Projection | ApiQueryComposition.Filtering
+    ) : IApiQuerySourceAnnotationReader
     {
         public ApiAnnotationReaderResult<ApiQuerySourceAnnotationResult> ReadQuerySourceAnnotations
         (
@@ -148,7 +158,7 @@ public static class ApiQuerySourceAnnotationTestsFactory
                         clrDelegateType,
                         "customerSearch",
                         ApiNullability.NonNullable,
-                        ApiQueryComposition.Projection | ApiQueryComposition.Filtering,
+                        apiOutputComposition,
                         [
                             new(parameters[0], "customerName", ApiNullability.Nullable, ApiPresence.Optional),
                             new(parameters[1], "ids", null, null)
@@ -156,6 +166,37 @@ public static class ApiQuerySourceAnnotationTestsFactory
                     )
                 ],
                 []
+            );
+        }
+    }
+
+    private sealed class FailOnceQuerySourceAnnotationReader : IApiQuerySourceAnnotationReader
+    {
+        private bool HasFailed { get; set; }
+
+        public ApiAnnotationReaderResult<ApiQuerySourceAnnotationResult> ReadQuerySourceAnnotations
+        (
+            Assembly assembly,
+            Func<Type, bool>? filter
+        )
+        {
+            if (this.HasFailed)
+            {
+                return new([], []);
+            }
+
+            this.HasFailed = true;
+            return new
+            (
+                [],
+                [
+                    new ApiAnnotationReaderDiagnostic
+                    (
+                        ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
+                        assembly.GetName().Name!,
+                        "Intentional first-build annotation diagnostic"
+                    )
+                ]
             );
         }
     }
@@ -258,6 +299,12 @@ public static class ApiQuerySourceAnnotationTestsFactory
     public static ApiSchemaCompilationResult BuildInvalidAsyncEnumerableDeclaration() => BuildInvalidDeclaration
         (typeof(InvalidAsyncEnumerableQuery));
 
+    public static ApiSchemaCompilationResult BuildInvalidDerivedTaskDeclaration() => BuildInvalidDeclaration
+        (typeof(InvalidDerivedTaskQuery));
+
+    public static ApiSchemaCompilationResult BuildInvalidAsyncEnumerableImplementationDeclaration() =>
+        BuildInvalidDeclaration(typeof(InvalidAsyncEnumerableImplementationQuery));
+
     public static ApiSchemaCompilationResult BuildInvalidVoidDeclaration() => BuildInvalidDeclaration
         (typeof(InvalidVoidQuery));
 
@@ -295,6 +342,40 @@ public static class ApiQuerySourceAnnotationTestsFactory
         (
             typeof(ApiQuerySourceAnnotationTestsFactory).Assembly,
             type => type == typeof(FirstDuplicate) || type == typeof(SecondDuplicate)
+        )
+        .BuildResult();
+
+    public static ApiSchemaCompilationResult BuildRepeatedReaders() => new ApiSchemaBuilder()
+        .WithName("RepeatedQuerySourceReaders")
+        .AddScalar<int>()
+        .AddScalar<string>()
+        .AddObject<QueryAnnotationCustomer>(customer => customer.AddProperty(property => property.Id))
+        .UseDefaultAnnotations()
+        .UseDefaultAnnotations()
+        .UseCamelCaseNaming
+        (
+            ApiNamingConventionTargets.QuerySource |
+            ApiNamingConventionTargets.QuerySourceParameter
+        )
+        .UseAssemblyAnnotationScanning
+        (
+            typeof(ApiQuerySourceAnnotationTestsFactory).Assembly,
+            type => type == typeof(CustomerSearch)
+        )
+        .BuildResult();
+
+    public static ApiSchemaCompilationResult BuildConflictingReaders() => new ApiSchemaBuilder()
+        .WithName("ConflictingQuerySourceReaders")
+        .AddScalar<int>()
+        .AddScalar<string>()
+        .AddObject<QueryAnnotationCustomer>(customer => customer.AddProperty(property => property.Id))
+        .UseAnnotations(readers => readers
+            .AddReader(new TestQuerySourceAnnotationReader(ApiQueryComposition.Projection))
+            .AddReader(new TestQuerySourceAnnotationReader(ApiQueryComposition.Filtering)))
+        .UseAssemblyAnnotationScanning
+        (
+            typeof(ApiQuerySourceAnnotationTestsFactory).Assembly,
+            type => type == typeof(CustomReaderQuery)
         )
         .BuildResult();
 
@@ -363,7 +444,71 @@ public static class ApiQuerySourceAnnotationTestsFactory
             .UseAssemblyAnnotationScanning(assembly, type => type == typeof(CustomerSearch))
             .Build();
     }
+
+    public static string BuildAfterNamingConventionChange()
+    {
+        var builder = CreateRepeatedBuildBuilder();
+        var firstSchema = builder.Build();
+
+        builder.UseCamelCaseNaming
+        (
+            ApiNamingConventionTargets.QuerySource |
+            ApiNamingConventionTargets.QuerySourceParameter
+        );
+        var secondSchema = builder.Build();
+
+        return $"{JoinQuerySourceNames(firstSchema)}|{JoinQuerySourceNames(secondSchema)}";
+    }
+
+    public static string BuildAfterFailedAnnotationBuild()
+    {
+        var builder = CreateRepeatedBuildBuilder()
+            .UseAnnotations(readers => readers.AddReader(new FailOnceQuerySourceAnnotationReader()));
+        var failedResult = builder.BuildResult();
+        if (failedResult.IsValid)
+        {
+            throw new InvalidOperationException("The first schema build was expected to fail.");
+        }
+
+        builder.UseCamelCaseNaming
+        (
+            ApiNamingConventionTargets.QuerySource |
+            ApiNamingConventionTargets.QuerySourceParameter
+        );
+        var schema = builder.Build();
+        return JoinQuerySourceNames(schema);
+    }
+
+    private static ApiSchemaBuilder CreateRepeatedBuildBuilder() => new ApiSchemaBuilder()
+        .WithName("RepeatedQuerySourceBuild")
+        .AddScalar<int>()
+        .AddScalar<string>()
+        .AddObject<QueryAnnotationCustomer>(customer => customer.AddProperty(property => property.Id))
+        .AddQuerySource("ExplicitSource", source => source.WithOutput<string>())
+        .UseDefaultAnnotations()
+        .UseAssemblyAnnotationScanning
+        (
+            typeof(ApiQuerySourceAnnotationTestsFactory).Assembly,
+            type => type == typeof(CustomerSearch)
+        );
+
+    private static string JoinQuerySourceNames(ApiSchema schema) =>
+        string.Join(",", schema.ApiQuerySources.Select(source => source.ApiName));
     #endregion
+}
+
+public sealed class QueryAnnotationTask : Task
+{
+    public QueryAnnotationTask()
+        : base(static () => { })
+    {
+    }
+}
+
+public abstract class QueryAnnotationStream : IAsyncEnumerable<QueryAnnotationCustomer>
+{
+    public abstract IAsyncEnumerator<QueryAnnotationCustomer> GetAsyncEnumerator
+        (CancellationToken cancellationToken = default);
 }
 
 public sealed class QueryAnnotationCustomer

@@ -55,5 +55,17 @@ public abstract class ExtensionBuilder<TBuilder>
     /// </summary>
     internal OrderedDictionary<Type, object>? BuildExtensions() =>
         _extensionState.Extensions.Count > 0 ? new OrderedDictionary<Type, object>(_extensionState.Extensions) : null;
+
+    /// <summary>Copies the configured extension registrations into another builder snapshot.</summary>
+    internal void CopyExtensionsTo(TBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        var target = (ExtensionBuilder<TBuilder>)builder;
+        foreach (var (extensionType, extension) in _extensionState.Extensions)
+        {
+            target._extensionState.Extensions.Add(extensionType, extension);
+        }
+    }
     #endregion
 }

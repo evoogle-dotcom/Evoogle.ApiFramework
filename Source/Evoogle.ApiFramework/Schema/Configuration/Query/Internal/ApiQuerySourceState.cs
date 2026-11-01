@@ -16,6 +16,24 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Query.Internal;
 /// </summary>
 internal sealed class ApiQuerySourceState
 {
+    #region Constructors
+    internal ApiQuerySourceState()
+    {
+    }
+
+    internal ApiQuerySourceState(ApiQuerySourceState source)
+    {
+        this.RegistrationSource = source.RegistrationSource;
+        this.InputParameterBuilders.AddRange(source.InputParameterBuilders.Select(builder => builder.CreateBuildSnapshot()));
+        this.OutputTypeFactory = source.OutputTypeFactory;
+        this.ApiOutputNullability = source.ApiOutputNullability;
+        this.OutputTypeSource = source.OutputTypeSource;
+        this.OutputNullabilitySource = source.OutputNullabilitySource;
+        this.ApiOutputComposition = source.ApiOutputComposition;
+        this.OutputCompositionSource = source.OutputCompositionSource;
+    }
+    #endregion
+
     #region Properties
     internal ApiConfigurationSource RegistrationSource { get; set; } = ApiConfigurationSource.Convention;
 

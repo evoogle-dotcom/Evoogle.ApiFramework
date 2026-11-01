@@ -580,7 +580,7 @@ internal sealed class ApiAnnotationReaderSet
 
                 if (discoveredDelegates.TryGetValue(result.ClrDelegateType, out var existing))
                 {
-                    if (!Equals(existing, result))
+                    if (!AreQuerySourceAnnotationsEquivalent(existing, result))
                     {
                         this.AddInvalidContributionIssue
                         (
@@ -604,12 +604,12 @@ internal sealed class ApiAnnotationReaderSet
 
     internal void AddQuerySourceDiscoveryConflict
     (
+        string apiPath,
         string apiName,
         Type firstClrDelegateType,
         Type conflictingClrDelegateType
     )
     {
-        var apiPath = apiName;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiAnnotationQuerySourceDiscoveryConflict;
         var description = $"Annotated delegates '{firstClrDelegateType.FullName ?? firstClrDelegateType.Name}' and " +
@@ -618,6 +618,37 @@ internal sealed class ApiAnnotationReaderSet
         var remediation = "Assign distinct query-source API names or change the active naming conventions";
 
         _issues.Add(new ApiSchemaCompilationIssue(apiPath, severity, code, description, remediation));
+    }
+
+    private static bool AreQuerySourceAnnotationsEquivalent
+    (
+        ApiQuerySourceAnnotationResult first,
+        ApiQuerySourceAnnotationResult second
+    )
+    {
+        if (first.ClrDelegateType != second.ClrDelegateType ||
+            !StringComparer.Ordinal.Equals(first.ApiName, second.ApiName) ||
+            first.ApiOutputNullability != second.ApiOutputNullability ||
+            first.ApiOutputComposition != second.ApiOutputComposition ||
+            first.ApiInputParameters.Count != second.ApiInputParameters.Count)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < first.ApiInputParameters.Count; ++i)
+        {
+            var firstParameter = first.ApiInputParameters[i];
+            var secondParameter = second.ApiInputParameters[i];
+            if (!Equals(firstParameter.ClrParameterInfo, secondParameter.ClrParameterInfo) ||
+                !StringComparer.Ordinal.Equals(firstParameter.ApiName, secondParameter.ApiName) ||
+                firstParameter.ApiNullability != secondParameter.ApiNullability ||
+                firstParameter.ApiPresence != secondParameter.ApiPresence)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     #endregion

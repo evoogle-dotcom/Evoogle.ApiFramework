@@ -43,20 +43,26 @@ internal static class ApiQuerySourceAnnotationValidation
 
     private static bool IsUnsupportedQueryOutput(Type clrType)
     {
-        if (clrType == typeof(Task) || clrType == typeof(ValueTask))
+        if (typeof(Task).IsAssignableFrom(clrType) || clrType == typeof(ValueTask))
         {
             return true;
         }
 
-        if (!clrType.IsGenericType)
+        if (clrType.IsGenericType)
         {
-            return false;
+            var genericTypeDefinition = clrType.GetGenericTypeDefinition();
+            if (genericTypeDefinition == typeof(ValueTask<>) ||
+                genericTypeDefinition == typeof(IAsyncEnumerable<>))
+            {
+                return true;
+            }
         }
 
-        var genericTypeDefinition = clrType.GetGenericTypeDefinition();
-        return genericTypeDefinition == typeof(Task<>) ||
-            genericTypeDefinition == typeof(ValueTask<>) ||
-            genericTypeDefinition == typeof(IAsyncEnumerable<>);
+        return clrType.GetInterfaces().Any
+        (
+            interfaceType => interfaceType.IsGenericType &&
+                interfaceType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)
+        );
     }
     #endregion
 }

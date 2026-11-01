@@ -22,6 +22,7 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
         public required bool ExpectedSuccess { get; init; }
 
         public ApiSchemaCompilationCode? ExpectedCode { get; init; }
+        public string? ExpectedApiPath { get; init; }
         public string ExpectedApiName { get; init; } = "customerSearch";
         public string ExpectedFirstParameterApiName { get; init; } = "customerName";
 
@@ -33,7 +34,9 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             this.WriteLine($"Scenario:         {this.Name}");
             this.WriteLine($"Build Expression: {this.BuildExpression}");
             this.WriteLine();
-            this.WriteLine($"Expected Success: {this.ExpectedSuccess}");
+            this.WriteLine($"Expected Success:  {this.ExpectedSuccess}");
+            this.WriteLine($"Expected Code:     {this.ExpectedCode}");
+            this.WriteLine($"Expected API Path: {this.ExpectedApiPath}");
 
             var serializer = new XUnitTestSerializer();
             var restored = (BuildAnnotatedQuerySourceTest)serializer.Deserialize
@@ -51,6 +54,7 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             foreach (var issue in this.ActualResult.Issues)
             {
                 this.WriteLine($"Issue:          {issue.Code}: {issue.Description}");
+                this.WriteLine($"Issue API Path: {issue.ApiPath}");
             }
         }
 
@@ -61,6 +65,15 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             {
                 this.ActualResult.Issues.Should().Contain
                     (issue => issue.Code == this.ExpectedCode);
+                if (this.ExpectedApiPath is not null)
+                {
+                    this.ActualResult.Issues.Should().Contain
+                    (
+                        issue => issue.Code == this.ExpectedCode &&
+                            issue.ApiPath == this.ExpectedApiPath
+                    );
+                }
+
                 return;
             }
 
@@ -157,6 +170,45 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             source.ApiInputParameters.Should().HaveCount(2);
         }
     }
+
+    private sealed class BuildQuerySourceIsolationTest : XUnitTest
+    {
+        [JsonConverter(typeof(ExpressionFuncJsonConverter<string>))]
+        public required Expression<Func<string>> BuildExpression { get; init; }
+
+        public required string ExpectedQuerySourceNames { get; init; }
+
+        private Expression<Func<string>> RestoredBuildExpression { get; set; } = null!;
+        private string ActualQuerySourceNames { get; set; } = null!;
+
+        protected override void Arrange()
+        {
+            this.WriteLine($"Scenario:         {this.Name}");
+            this.WriteLine($"Build Expression: {this.BuildExpression}");
+            this.WriteLine();
+
+            this.WriteLine($"Expected Query Sources: {this.ExpectedQuerySourceNames}");
+            this.WriteLine("Expected Exception:     None");
+
+            var serializer = new XUnitTestSerializer();
+            var restored = (BuildQuerySourceIsolationTest)serializer.Deserialize
+                (this.GetType(), serializer.Serialize(this));
+            this.RestoredBuildExpression = restored.BuildExpression;
+        }
+
+        protected override void Act()
+        {
+            this.ActualQuerySourceNames = this.RestoredBuildExpression.Compile()();
+
+            this.WriteLine();
+            this.WriteLine($"Actual Query Sources: {this.ActualQuerySourceNames}");
+        }
+
+        protected override void Assert()
+        {
+            this.ActualQuerySourceNames.Should().Be(this.ExpectedQuerySourceNames);
+        }
+    }
     #endregion
 
     #region Theory Data
@@ -242,6 +294,22 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
         },
         new BuildAnnotatedQuerySourceTest
         {
+            Name = "Task-derived output reports an invalid annotation declaration",
+            BuildExpression = static () =>
+                ApiQuerySourceAnnotationTestsFactory.BuildInvalidDerivedTaskDeclaration(),
+            ExpectedSuccess = false,
+            ExpectedCode = ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
+        },
+        new BuildAnnotatedQuerySourceTest
+        {
+            Name = "Async enumerable implementation output reports an invalid annotation declaration",
+            BuildExpression = static () => ApiQuerySourceAnnotationTestsFactory
+                .BuildInvalidAsyncEnumerableImplementationDeclaration(),
+            ExpectedSuccess = false,
+            ExpectedCode = ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration
+        },
+        new BuildAnnotatedQuerySourceTest
+        {
             Name = "Void output reports an invalid annotation declaration",
             BuildExpression = static () => ApiQuerySourceAnnotationTestsFactory.BuildInvalidVoidDeclaration(),
             ExpectedSuccess = false,
@@ -288,6 +356,21 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             Name = "Duplicate resolved API names report an annotation discovery conflict",
             BuildExpression = static () => ApiQuerySourceAnnotationTestsFactory.BuildDuplicateDeclarations(),
             ExpectedSuccess = false,
+            ExpectedCode = ApiSchemaCompilationCode.ApiAnnotationQuerySourceDiscoveryConflict,
+            ExpectedApiPath =
+                "ApiSchema[\"DuplicateQuerySourceAnnotations\"].ApiQuerySource[\"Duplicate\"]"
+        },
+        new BuildAnnotatedQuerySourceTest
+        {
+            Name = "Repeated identical readers contribute one query source",
+            BuildExpression = static () => ApiQuerySourceAnnotationTestsFactory.BuildRepeatedReaders(),
+            ExpectedSuccess = true
+        },
+        new BuildAnnotatedQuerySourceTest
+        {
+            Name = "Semantically different reader contributions report a discovery conflict",
+            BuildExpression = static () => ApiQuerySourceAnnotationTestsFactory.BuildConflictingReaders(),
+            ExpectedSuccess = false,
             ExpectedCode = ApiSchemaCompilationCode.ApiAnnotationQuerySourceDiscoveryConflict
         }
     ];
@@ -319,6 +402,25 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             BuildExpression = static () => ApiQuerySourceAnnotationTestsFactory.BuildRepeatedScan()
         }
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] BuildQuerySourceIsolationTheoryData =>
+    [
+        new BuildQuerySourceIsolationTest
+        {
+            Name = "Naming convention changes replace annotation-only state across builds",
+            BuildExpression = static () =>
+                ApiQuerySourceAnnotationTestsFactory.BuildAfterNamingConventionChange(),
+            ExpectedQuerySourceNames =
+                "CustomerSearch,ExplicitSource|ExplicitSource,customerSearch"
+        },
+        new BuildQuerySourceIsolationTest
+        {
+            Name = "A failed build discards its annotation-derived query sources",
+            BuildExpression = static () =>
+                ApiQuerySourceAnnotationTestsFactory.BuildAfterFailedAnnotationBuild(),
+            ExpectedQuerySourceNames = "ExplicitSource,customerSearch"
+        }
+    ];
     #endregion
 
     #region Test Methods
@@ -330,6 +432,11 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
     [Theory]
     [MemberData(nameof(BuildQuerySourcePrecedenceTheoryData))]
     public void BuildPreservesQuerySourcePrecedenceAndConventionBehavior(IXUnitTest test)
+        => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(BuildQuerySourceIsolationTheoryData))]
+    public void BuildIsolatesAnnotationDerivedQuerySourceState(IXUnitTest test)
         => test.Execute(this);
     #endregion
 }
