@@ -19,10 +19,10 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonAnnotated>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Email))
+            .AddObject<PersonAnnotated>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Email))
             .UseDefaultAnnotations()
             .Build();
 
@@ -42,7 +42,7 @@ public static class ApiAnnotationTestsFactory
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<OrderStatusAnnotated>(x => x
+            .AddEnum<OrderStatusAnnotated>(static x => x
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1))
             .UseDefaultAnnotations()
@@ -64,7 +64,7 @@ public static class ApiAnnotationTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .UseDefaultAnnotations()
-            .AddEnum<OrderStatusValueAnnotated>(x => x
+            .AddEnum<OrderStatusValueAnnotated>(static x => x
                 .AddValue("explicit_pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1))
             .Build();
@@ -78,11 +78,11 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithPropertyAnnotations>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.NonNullableButOptional)
-                .AddProperty(p => p.RequiredWins))
+            .AddObject<PersonWithPropertyAnnotations>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.NonNullableButOptional)
+                .AddProperty(static p => p.RequiredWins))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -107,9 +107,9 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithKeyAnnotation>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name))
+            .AddObject<PersonWithKeyAnnotation>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -120,9 +120,9 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<ScalarKeyAnnotationObject>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name))
+            .AddObject<ScalarKeyAnnotationObject>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -134,10 +134,10 @@ public static class ApiAnnotationTestsFactory
             .AddScalar<Guid>()
             .AddScalar<long>()
             .AddScalar<string>()
-            .AddObject<CompositeKeyObject>(x => x
-                .AddProperty(p => p.OrderId)
-                .AddProperty(p => p.LineItemNumber)
-                .AddProperty(p => p.Description))
+            .AddObject<CompositeKeyObject>(static x => x
+                .AddProperty(static p => p.OrderId)
+                .AddProperty(static p => p.LineItemNumber)
+                .AddProperty(static p => p.Description))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -149,11 +149,11 @@ public static class ApiAnnotationTestsFactory
             .AddScalar<Guid>()
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<ThreePartCompositeKeyObject>(x => x
-                .AddProperty(p => p.Id1)
-                .AddProperty(p => p.Id2)
-                .AddProperty(p => p.Id3)
-                .AddProperty(p => p.Description))
+            .AddObject<ThreePartCompositeKeyObject>(static x => x
+                .AddProperty(static p => p.Id1)
+                .AddProperty(static p => p.Id2)
+                .AddProperty(static p => p.Id3)
+                .AddProperty(static p => p.Description))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -164,9 +164,9 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<NestedKeyPartAnnotation>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Description))
+            .AddObject<NestedKeyPartAnnotation>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Description))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -177,9 +177,9 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<OwnerKeyAnnotation>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Description))
+            .AddObject<OwnerKeyAnnotation>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Description))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -202,12 +202,12 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<NestedKeyPartAnnotation>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Description))
-            .AddObject<NestedCompositeKeyAnnotation>(x => x
-                .AddProperty(p => p.NestedPart)
-                .AddProperty(p => p.Name))
+            .AddObject<NestedKeyPartAnnotation>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Description))
+            .AddObject<NestedCompositeKeyAnnotation>(static x => x
+                .AddProperty(static p => p.NestedPart)
+                .AddProperty(static p => p.Name))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -218,12 +218,12 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<OwnerKeyAnnotation>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Description))
-            .AddObject<OwnedCompositeKeyAnnotation>(x => x
-                .AddProperty(p => p.LineNumber)
-                .AddProperty(p => p.Description))
+            .AddObject<OwnerKeyAnnotation>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Description))
+            .AddObject<OwnedCompositeKeyAnnotation>(static x => x
+                .AddProperty(static p => p.LineNumber)
+                .AddProperty(static p => p.Description))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -234,11 +234,11 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<OwnerKeyAnnotation>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Description))
-            .AddObject<OwnedDependentKeyAnnotation>(x => x
-                .AddProperty(p => p.Description))
+            .AddObject<OwnerKeyAnnotation>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Description))
+            .AddObject<OwnedDependentKeyAnnotation>(static x => x
+                .AddProperty(static p => p.Description))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -248,7 +248,7 @@ public static class ApiAnnotationTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddObject<DuplicatePathKeyAnnotation>(x => x.AddProperty(p => p.Id))
+            .AddObject<DuplicatePathKeyAnnotation>(static x => x.AddProperty(static p => p.Id))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -258,7 +258,7 @@ public static class ApiAnnotationTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddObject<MissingTypeLevelKeyPathAnnotation>(x => x.AddProperty(p => p.Id))
+            .AddObject<MissingTypeLevelKeyPathAnnotation>(static x => x.AddProperty(static p => p.Id))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -268,7 +268,7 @@ public static class ApiAnnotationTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddObject<MalformedTypeLevelKeyPathAnnotation>(x => x.AddProperty(p => p.Id))
+            .AddObject<MalformedTypeLevelKeyPathAnnotation>(static x => x.AddProperty(static p => p.Id))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -278,7 +278,7 @@ public static class ApiAnnotationTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddObject<UnresolvedTypeLevelKeyPathAnnotation>(x => x.AddProperty(p => p.Id))
+            .AddObject<UnresolvedTypeLevelKeyPathAnnotation>(static x => x.AddProperty(static p => p.Id))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -330,7 +330,7 @@ public static class ApiAnnotationTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .UseDefaultConventions()
-            .UseAnnotations(x => x.AddReader(new BuildObservableEnumValueAnnotationReader()))
+            .UseAnnotations(static x => x.AddReader(new BuildObservableEnumValueAnnotationReader()))
             .AddEnum<OrderStatusValueAnnotated>()
             .Build();
     }
@@ -344,13 +344,13 @@ public static class ApiAnnotationTestsFactory
             .AddScalar<Guid>()
             .AddScalar<string>()
             .AddScalar<decimal>()
-            .AddObject<Customer>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name))
-            .AddObject<Order>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.CustomerId)
-                .AddProperty(p => p.Total))
+            .AddObject<Customer>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name))
+            .AddObject<Order>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.CustomerId)
+                .AddProperty(static p => p.Total))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -361,12 +361,12 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<decimal>()
-            .AddObject<Order>(x => x
-                .AddProperty(p => p.Id))
-            .AddObject<Invoice>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.OrderId)
-                .AddProperty(p => p.Amount))
+            .AddObject<Order>(static x => x
+                .AddProperty(static p => p.Id))
+            .AddObject<Invoice>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.OrderId)
+                .AddProperty(static p => p.Amount))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -378,13 +378,13 @@ public static class ApiAnnotationTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<Guid>()
-            .AddObject<Product>(x => x
-                .AddProperty(p => p.Id))
-            .AddObject<Tag>(x => x
-                .AddProperty(p => p.Id))
-            .AddObject<ProductTag>(x => x
-                .AddProperty(p => p.ProductId)
-                .AddProperty(p => p.TagId))
+            .AddObject<Product>(static x => x
+                .AddProperty(static p => p.Id))
+            .AddObject<Tag>(static x => x
+                .AddProperty(static p => p.Id))
+            .AddObject<ProductTag>(static x => x
+                .AddProperty(static p => p.ProductId)
+                .AddProperty(static p => p.TagId))
             .UseDefaultAnnotations()
             .Build();
     }
@@ -394,13 +394,13 @@ public static class ApiAnnotationTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<Guid>()
-            .AddObject<Category>(x => x
-                .AddProperty(p => p.Id))
-            .AddObject<Label>(x => x
-                .AddProperty(p => p.Id))
-            .AddObject<ProductTagFromType>(x => x
-                .AddProperty(p => p.ProductId)
-                .AddProperty(p => p.TagId))
+            .AddObject<Category>(static x => x
+                .AddProperty(static p => p.Id))
+            .AddObject<Label>(static x => x
+                .AddProperty(static p => p.Id))
+            .AddObject<ProductTagFromType>(static x => x
+                .AddProperty(static p => p.ProductId)
+                .AddProperty(static p => p.TagId))
             .UseDefaultAnnotations()
             .Build();
     }

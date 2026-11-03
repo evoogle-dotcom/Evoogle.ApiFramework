@@ -24,7 +24,7 @@ internal sealed class ApiQuerySourceState
     internal ApiQuerySourceState(ApiQuerySourceState source)
     {
         this.RegistrationSource = source.RegistrationSource;
-        this.InputParameterBuilders.AddRange(source.InputParameterBuilders.Select(builder => builder.CreateBuildSnapshot()));
+        this.InputParameterBuilders.AddRange(source.InputParameterBuilders.Select(static builder => builder.CreateBuildSnapshot()));
         this.OutputTypeFactory = source.OutputTypeFactory;
         this.ApiOutputNullability = source.ApiOutputNullability;
         this.OutputTypeSource = source.OutputTypeSource;

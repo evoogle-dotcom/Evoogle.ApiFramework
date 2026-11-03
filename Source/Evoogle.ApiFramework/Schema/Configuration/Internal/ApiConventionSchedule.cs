@@ -25,6 +25,7 @@ internal sealed class ApiConventionSchedule
     internal IReadOnlyList<IApiQuerySourceConvention> QuerySourceConfigurationConventions { get; }
     internal IReadOnlyList<IApiQuerySourceParameterConvention> QuerySourceParameterConfigurationConventions { get; }
     internal IReadOnlyList<IApiRelationshipConvention> RelationshipConventions { get; }
+    internal IReadOnlyList<IApiRelationshipTraversalConvention> RelationshipTraversalConfigurationConventions { get; }
     #endregion
 
     #region Constructors
@@ -82,6 +83,12 @@ internal sealed class ApiConventionSchedule
         (
             conventionSet.RelationshipConventions,
             ApiConventionPhase.Relationship
+        );
+
+        this.RelationshipTraversalConfigurationConventions = ValidatePhase
+        (
+            conventionSet.RelationshipTraversalConventions,
+            ApiConventionPhase.Configuration
         );
 
         this.QuerySourceConfigurationConventions = ValidatePhase

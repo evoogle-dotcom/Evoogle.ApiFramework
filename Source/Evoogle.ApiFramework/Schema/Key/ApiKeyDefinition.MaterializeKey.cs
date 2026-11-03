@@ -193,7 +193,8 @@ public partial class ApiKeyDefinition
         return ApiKey.Empty;
     }
 
-    private static string GetPathName(ApiKeyPath path) => string.Join(".", path.ApiSegments.Select(static s => s.ClrMemberName));
+    private static string GetPathName(ApiKeyPath path)
+        => string.Join(".", path.ApiSegments.Select(static s => s.ClrMemberName));
 
     private static ApiKeyKind GetExpectedScalarKind(Type clrType, string pathName)
     {

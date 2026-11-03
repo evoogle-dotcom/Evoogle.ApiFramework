@@ -64,8 +64,8 @@ public partial class ApiObjectTypeTests
                 this.UsesJsonDeserialization
             );
             this.RootType = schema.ApiObjectTypes.Single();
-            this.InlineTypes = schema.SelfAndDescendants(TraversalStrategy.DepthFirst)
-                .OfType<ApiObjectType>().Where(objectType => !ReferenceEquals(objectType, this.RootType)).ToArray();
+            this.InlineTypes = [.. schema.SelfAndDescendants(TraversalStrategy.DepthFirst)
+                .OfType<ApiObjectType>().Where(objectType => !ReferenceEquals(objectType, this.RootType))];
             this.WriteLine($"Inline Object Shape:    {this.Shape}");
             this.WriteLine($"Compilation Path:       {(this.UsesJsonDeserialization ? "Root JSON" : "Descriptors")}");
             this.WriteLine("Queried Name:           MissingTraversal");
@@ -97,7 +97,7 @@ public partial class ApiObjectTypeTests
                 ? new[] { (nameof(InlineContainer), typeof(InlineContainer)), (nameof(InlineLeaf), typeof(InlineLeaf)) }
                 : new[] { (nameof(InlineLeaf), typeof(InlineLeaf)) };
             this.WriteLine($"Expected Inline Object Count: {expectedInlineTypes.Length}; Actual: {this.InlineTypes!.Length}");
-            this.InlineTypes.Select(objectType => (objectType.ApiName, objectType.ClrType))
+            this.InlineTypes.Select(static objectType => (objectType.ApiName, objectType.ClrType))
                 .Should().Equal(expectedInlineTypes);
             this.ActualLookups.Should().HaveCount(expectedInlineTypes.Length + 1);
             foreach (var (objectType, hasTraversal, traversal) in this.ActualLookups!)
@@ -254,27 +254,31 @@ public partial class ApiObjectTypeTests
     #region Traversal Lookup Test Methods
     [Theory]
     [MemberData(nameof(EmptyTraversalLookupTheoryData))]
-    public void TryGetTraversalByApiNameReturnsFalseForObjectsWithoutTraversals(IXUnitTest test) => test.Execute(this);
+    public void TryGetTraversalByApiNameReturnsFalseForObjectsWithoutTraversals(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MatchingTraversalLookupTheoryData))]
-    public void TryGetTraversalByApiNameReturnsMatchingTraversal(IXUnitTest test) => test.Execute(this);
+    public void TryGetTraversalByApiNameReturnsMatchingTraversal(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MissingTraversalLookupTheoryData))]
-    public void TryGetTraversalByApiNameReturnsFalseWhenNameIsMissing(IXUnitTest test) => test.Execute(this);
+    public void TryGetTraversalByApiNameReturnsFalseWhenNameIsMissing(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(CaseSensitiveTraversalLookupTheoryData))]
-    public void TryGetTraversalByApiNameReturnsFalseWhenNameCaseDiffers(IXUnitTest test) => test.Execute(this);
+    public void TryGetTraversalByApiNameReturnsFalseWhenNameCaseDiffers(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Traversal Lookup Implementation Methods
     private static TheoryDataRow<IXUnitTest>[] CreatePopulatedTraversalLookupTheoryData
     (
         TraversalLookupName lookupName
-    ) =>
-    [
+    )
+        => [
         .. from sourceEndKind in new[] { ApiRelationshipEndKind.Principal, ApiRelationshipEndKind.Dependent }
            from usesJsonDeserialization in new[] { false, true }
            select (TheoryDataRow<IXUnitTest>)new PopulatedTraversalLookupTest
@@ -301,7 +305,8 @@ public partial class ApiObjectTypeTests
             ?? throw new InvalidOperationException("Root schema JSON deserialization failed."), sourceJson);
     }
 
-    private static ApiSchemaDef CreatePopulatedTraversalSchemaDefinition() => new
+    private static ApiSchemaDef CreatePopulatedTraversalSchemaDefinition()
+        => new
     (
         ApiName: "TraversalLookup",
         ApiNamedTypes:
@@ -337,7 +342,8 @@ public partial class ApiObjectTypeTests
         ]
     );
 
-    private static ApiObjectTypeDef CreateTraversalObjectTypeDefinition(string apiName, Type clrType) => new
+    private static ApiObjectTypeDef CreateTraversalObjectTypeDefinition(string apiName, Type clrType)
+        => new
     (
         ApiName: apiName,
         ClrType: clrType,

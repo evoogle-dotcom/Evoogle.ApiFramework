@@ -56,16 +56,16 @@ public partial class ApiConventionTests
                 .AddScalar<Guid>()
                 .AddScalar<string>()
                 .AddScalar<CustomScalar>()
-                .AddEnum<PipelineStatus>(x => x
+                .AddEnum<PipelineStatus>(static x => x
                     .AddValue(PipelineStatus.Active, "ExplicitEnumValue")
                     .AddValue(PipelineStatus.InProgress))
-                .AddObject<PersonWithId>(x => x
-                    .AddProperty(p => p.Id)
-                    .AddProperty(p => p.Name)
-                    .AddProperty(p => p.Email, "ExplicitProperty"))
-                .AddObject<OrderWithPersonId>(x => x
+                .AddObject<PersonWithId>(static x => x
+                    .AddProperty(static p => p.Id)
+                    .AddProperty(static p => p.Name)
+                    .AddProperty(static p => p.Email, "ExplicitProperty"))
+                .AddObject<OrderWithPersonId>(static x => x
                     .WithName("ExplicitObject")
-                    .AddProperty(p => p.OrderId));
+                    .AddProperty(static p => p.OrderId));
 
             this.WriteLine($"Style: {this.Style}; Targets: {this.Targets}");
         }
@@ -149,7 +149,7 @@ public partial class ApiConventionTests
             };
 
             var scalarType = apiSchema.ApiScalarTypes
-                .Single(x => x.ClrType == typeof(CustomScalar));
+                .Single(static x => x.ClrType == typeof(CustomScalar));
             scalarType.ApiName.Should().Be
             (
                 this.GetExpectedApiName
@@ -160,7 +160,7 @@ public partial class ApiConventionTests
                 )
             );
 
-            var enumType = apiSchema.ApiEnumTypes.Single(x => x.ClrType == typeof(PipelineStatus));
+            var enumType = apiSchema.ApiEnumTypes.Single(static x => x.ClrType == typeof(PipelineStatus));
             enumType.ApiName.Should().Be
             (
                 this.GetExpectedApiName
@@ -172,7 +172,7 @@ public partial class ApiConventionTests
             );
 
             var inferredEnumValue = enumType.ApiEnumValues
-                .Single(x => x.ClrName == nameof(PipelineStatus.InProgress));
+                .Single(static x => x.ClrName == nameof(PipelineStatus.InProgress));
             inferredEnumValue.ApiName.Should().Be
             (
                 this.GetExpectedApiName
@@ -184,11 +184,11 @@ public partial class ApiConventionTests
             );
 
             var explicitEnumValue = enumType.ApiEnumValues
-                .Single(x => x.ClrName == nameof(PipelineStatus.Active));
+                .Single(static x => x.ClrName == nameof(PipelineStatus.Active));
             explicitEnumValue.ApiName.Should().Be("ExplicitEnumValue");
 
             var objectType = apiSchema.ApiObjectTypes
-                .Single(x => x.ClrType == typeof(PersonWithId));
+                .Single(static x => x.ClrType == typeof(PersonWithId));
             objectType.ApiName.Should().Be
             (
                 this.GetExpectedApiName
@@ -200,7 +200,7 @@ public partial class ApiConventionTests
             );
 
             var inferredProperty = objectType.ApiProperties
-                .Single(x => x.ClrName == nameof(PersonWithId.Id));
+                .Single(static x => x.ClrName == nameof(PersonWithId.Id));
             inferredProperty.ApiName.Should().Be
             (
                 this.GetExpectedApiName
@@ -212,7 +212,7 @@ public partial class ApiConventionTests
             );
 
             var inferredNameProperty = objectType.ApiProperties
-                .Single(x => x.ClrName == nameof(PersonWithId.Name));
+                .Single(static x => x.ClrName == nameof(PersonWithId.Name));
             inferredNameProperty.ApiName.Should().Be
             (
                 this.GetExpectedApiName
@@ -236,11 +236,11 @@ public partial class ApiConventionTests
             );
 
             var explicitProperty = objectType.ApiProperties
-                .Single(x => x.ClrName == nameof(PersonWithId.Email));
+                .Single(static x => x.ClrName == nameof(PersonWithId.Email));
             explicitProperty.ApiName.Should().Be("ExplicitProperty");
 
             var explicitObject = apiSchema.ApiObjectTypes
-                .Single(x => x.ClrType == typeof(OrderWithPersonId));
+                .Single(static x => x.ClrType == typeof(OrderWithPersonId));
             explicitObject.ApiName.Should().Be("ExplicitObject");
         }
 
@@ -374,7 +374,8 @@ public partial class ApiConventionTests
             }
         }
 
-        protected override void Assert() => this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
+        protected override void Assert()
+            => this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
         #endregion
     }
     #endregion
@@ -574,18 +575,22 @@ public partial class ApiConventionTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuiltInNamingTheoryData))]
-    public void BuiltInNaming(IXUnitTest test) => test.Execute(this);
+    public void BuiltInNaming(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NamingConventionValidationTheoryData))]
-    public void NamingConventionValidation(IXUnitTest test) => test.Execute(this);
+    public void NamingConventionValidation(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(BuiltInNamingTargetTheoryData))]
-    public void BuiltInNamingTargetSelection(IXUnitTest test) => test.Execute(this);
+    public void BuiltInNamingTargetSelection(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NamingConventionTargetValidationTheoryData))]
-    public void NamingConventionTargetValidation(IXUnitTest test) => test.Execute(this);
+    public void NamingConventionTargetValidation(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

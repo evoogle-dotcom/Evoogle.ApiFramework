@@ -471,7 +471,7 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiEnumTypeEnumValueDiscoveryConvention()));
+        return builder.UseConventions(static c => c.AddConvention(new ApiEnumTypeEnumValueDiscoveryConvention()));
     }
 
     /// <summary>
@@ -484,7 +484,7 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiObjectTypePropertyDiscoveryConvention()));
+        return builder.UseConventions(static c => c.AddConvention(new ApiObjectTypePropertyDiscoveryConvention()));
     }
 
     /// <summary>
@@ -497,7 +497,7 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiPropertyNullabilityConvention()));
+        return builder.UseConventions(static c => c.AddConvention(new ApiPropertyNullabilityConvention()));
     }
 
     /// <summary>
@@ -510,7 +510,7 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiObjectTypePrimaryKeyInferenceConvention()));
+        return builder.UseConventions(static c => c.AddConvention(new ApiObjectTypePrimaryKeyInferenceConvention()));
     }
     #endregion
 }

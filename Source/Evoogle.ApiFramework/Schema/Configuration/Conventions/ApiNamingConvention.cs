@@ -4,14 +4,14 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Types;
+using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Query;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 
 /// <summary>
-///     Base class for naming conventions that apply to named schema type builders, enum-value
-///     builders, and property builders by transforming the current candidate API name or deriving
-///     a replacement from CLR metadata.
+///     Base class for naming conventions that transform candidate API names for types, enum values,
+///     properties, query sources, parameters, and relationship traversals, or derive names from CLR metadata.
 /// </summary>
 public abstract class ApiNamingConvention(ApiNamingConventionTargets targets = ApiNamingConventionTargets.All) :
     IApiNamingConvention,
@@ -21,7 +21,8 @@ public abstract class ApiNamingConvention(ApiNamingConventionTargets targets = A
     IApiEnumValueConvention,
     IApiPropertyConvention,
     IApiQuerySourceConvention,
-    IApiQuerySourceParameterConvention
+    IApiQuerySourceParameterConvention,
+    IApiRelationshipTraversalConvention
 {
 
     #region Properties
@@ -44,8 +45,7 @@ public abstract class ApiNamingConvention(ApiNamingConventionTargets targets = A
         var namingContext = new ApiNamingConventionContext
         (
             ApiNamingConventionTarget.QuerySource,
-            context.ClrDelegateType ?? throw new InvalidOperationException
-                ("Query-source naming requires a CLR delegate declaration."),
+            context.ClrDelegateType,
             null,
             context,
             null
@@ -70,13 +70,29 @@ public abstract class ApiNamingConvention(ApiNamingConventionTargets targets = A
         var namingContext = new ApiNamingConventionContext
         (
             ApiNamingConventionTarget.QuerySourceParameter,
-            context.ApiQuerySourceContext.ClrDelegateType ?? throw new InvalidOperationException
-                ("Query-source-parameter naming requires a CLR delegate declaration."),
+            context.ApiQuerySourceContext.ClrDelegateType,
             context.ClrParameterInfo?.Name,
             context.ApiQuerySourceContext,
             context
         );
 
+        builder.SetApiNameConvention(this.ConvertName(builder.ApiName, namingContext));
+    }
+    #endregion
+
+    #region IApiRelationshipTraversalConvention Methods
+    /// <inheritdoc />
+    public void Apply(ApiRelationshipTraversalBuilder builder, ApiRelationshipTraversalConventionContext context)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(context);
+
+        if (!this.IsTargeted(ApiNamingConventionTargets.RelationshipTraversal))
+        {
+            return;
+        }
+
+        var namingContext = new ApiNamingConventionContext(context);
         builder.SetApiNameConvention(this.ConvertName(builder.ApiName, namingContext));
     }
     #endregion
@@ -209,7 +225,8 @@ public abstract class ApiNamingConvention(ApiNamingConventionTargets targets = A
     /// </summary>
     /// <param name="target">The target to check.</param>
     /// <returns>True if the target is included in the convention's targets; otherwise, false.</returns>
-    private bool IsTargeted(ApiNamingConventionTargets target) => (this.Targets & target) != ApiNamingConventionTargets.None;
+    internal bool IsTargeted(ApiNamingConventionTargets target)
+        => (this.Targets & target) != ApiNamingConventionTargets.None;
 
     /// <summary>
     ///     Validates that the specified targets contain only known convention target values.

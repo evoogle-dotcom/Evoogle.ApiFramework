@@ -21,6 +21,16 @@ internal sealed class ApiKeyPathState
     internal ApiTypeReference? ApiRootObjectTypeReference { get; } =
         apiRootObjectTypeReference;
 
-    internal List<ApiKeyPathSegmentBuilder> SegmentBuilders { get; } = [.. segmentBuilders ?? throw new ArgumentNullException(nameof(segmentBuilders))];
+    internal List<ApiKeyPathSegmentBuilder> SegmentBuilders { get; private set; } =
+        [.. segmentBuilders ?? throw new ArgumentNullException(nameof(segmentBuilders))];
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiKeyPathState CreateBuildCopy()
+    {
+        var copy = (ApiKeyPathState)this.MemberwiseClone();
+        copy.SegmentBuilders = [.. this.SegmentBuilders.Select(static builder => builder.CreateBuildCopy())];
+        return copy;
+    }
     #endregion
 }

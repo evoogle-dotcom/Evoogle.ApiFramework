@@ -44,6 +44,7 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
-    public void Build(IXUnitTest test) => test.Execute(this);
+    public void Build(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

@@ -44,7 +44,8 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         #endregion
 
         #region IApiSchemaExtension Methods
-        public IApiSchemaExtension CreateFrozenSnapshot() => new SnapshotExtension
+        public IApiSchemaExtension CreateFrozenSnapshot()
+            => new SnapshotExtension
         {
             Value = this.Value
         };
@@ -54,15 +55,16 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
     private sealed class FailingExtension : IApiSchemaExtension
     {
         #region IApiSchemaExtension Methods
-        public IApiSchemaExtension CreateFrozenSnapshot() =>
-            throw new InvalidOperationException("Snapshot failure.");
+        public IApiSchemaExtension CreateFrozenSnapshot()
+            => throw new InvalidOperationException("Snapshot failure.");
         #endregion
     }
 
     private sealed class ReusingExtension : IApiSchemaExtension
     {
         #region IApiSchemaExtension Methods
-        public IApiSchemaExtension CreateFrozenSnapshot() => this;
+        public IApiSchemaExtension CreateFrozenSnapshot()
+            => this;
         #endregion
     }
 
@@ -80,14 +82,14 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             typeof(ApiSchema).GetConstructors(BindingFlags.Instance | BindingFlags.Public)
                 .Should().BeEmpty();
             typeof(ApiSchema).GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .Should().NotContain(method => method.Name == "Compile");
+                .Should().NotContain(static method => method.Name == "Compile");
             typeof(ApiSchema).GetMethods(BindingFlags.Static | BindingFlags.Public)
-                .Should().NotContain(method => method.Name == "Create");
+                .Should().NotContain(static method => method.Name == "Create");
 
             typeof(ApiKeyDefinition).GetConstructors(BindingFlags.Instance | BindingFlags.Public)
                 .Should().BeEmpty();
             typeof(ApiKeyDefinition).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
-                .Should().ContainSingle(constructor => constructor.IsAssembly);
+                .Should().ContainSingle(static constructor => constructor.IsAssembly);
             typeof(ApiSchemaOptions).IsSealed.Should().BeTrue();
             typeof(ApiObjectTypeOptions).IsSealed.Should().BeTrue();
         }
@@ -147,13 +149,13 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             this.ErrorResult.HasErrors.Should().BeTrue();
             this.ErrorResult.Errors.Should().Contain
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidApiName
+                static issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidApiName
             );
             this.Exception.Should().NotBeNull();
             this.Exception!.Result.Schema.Should().BeNull();
             this.Exception.Result.Errors.Should().Contain
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidApiName
+                static issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidApiName
             );
         }
         #endregion
@@ -170,7 +172,8 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange() => this.ExtensionSource = new SnapshotExtension { Value = 42 };
+        protected override void Arrange()
+            => this.ExtensionSource = new SnapshotExtension { Value = 42 };
 
         protected override void Act()
         {
@@ -189,7 +192,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             var firstElements = this.FirstSchema.SelfAndDescendants(TraversalStrategy.DepthFirst).ToArray();
             var secondElements = this.SecondSchema.SelfAndDescendants(TraversalStrategy.DepthFirst).ToArray();
             firstElements.Should().HaveSameCount(secondElements);
-            firstElements.Zip(secondElements).Should().OnlyContain(pair => !ReferenceEquals(pair.First, pair.Second));
+            firstElements.Zip(secondElements).Should().OnlyContain(static pair => !ReferenceEquals(pair.First, pair.Second));
 
             foreach (var lookupField in GetLookupFields(typeof(ApiSchema)))
             {
@@ -223,7 +226,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
 
             Action attach = () => this.FirstSchema.AttachExtension(typeof(Uri), new Uri("https://example.com"));
             Action detach = () => this.FirstSchema.DetachExtension<SnapshotExtension>();
-            Action modify = () => this.FirstSchema.ModifyExtension<SnapshotExtension>(extension => extension.Value++);
+            Action modify = () => this.FirstSchema.ModifyExtension<SnapshotExtension>(static extension => extension.Value++);
             attach.Should().Throw<InvalidOperationException>();
             detach.Should().Throw<InvalidOperationException>();
             modify.Should().Throw<InvalidOperationException>();
@@ -259,18 +262,18 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
 
         protected override void Assert()
         {
-            this.Results.Should().OnlyContain(result => result.Schema == null);
+            this.Results.Should().OnlyContain(static result => result.Schema == null);
             this.Results[0].Errors.Should().ContainSingle
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionNotFreezable
+                static issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionNotFreezable
             );
             this.Results[1].Errors.Should().ContainSingle
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionSnapshotFailed
+                static issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionSnapshotFailed
             );
             this.Results[2].Errors.Should().ContainSingle
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionInvalidSnapshot
+                static issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionInvalidSnapshot
             );
         }
         #endregion
@@ -299,7 +302,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         {
             this.Schema = CreateBuilder("Concurrent")
                 .AddSchemaExtension(new SnapshotExtension { Value = 42 })
-                .AddQuerySource("EntityById", source => source.WithOutput<FrozenEntity>().AddInputParameter<int>("id"))
+                .AddQuerySource("EntityById", static source => source.WithOutput<FrozenEntity>().AddInputParameter<int>("id"))
                 .Build();
             this.LookupFields =
             [
@@ -316,12 +319,10 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         protected override void Act()
         {
             var schema = this.Schema!;
-            this.OriginalElements = schema
-                .SelfAndDescendants(TraversalStrategy.DepthFirst)
-                .ToArray();
+            this.OriginalElements = [.. schema.SelfAndDescendants(TraversalStrategy.DepthFirst)];
             var objectType = schema.ApiObjectTypes.Single();
             var keyDefinition = objectType.ApiKeys.Single();
-            var replacementTask = Task.Run(() => CreateBuilder("Replacement").Build());
+            var replacementTask = Task.Run(static () => CreateBuilder("Replacement").Build());
 
             this.ConcurrentReadsSucceeded = Task.WhenAll
             (
@@ -376,7 +377,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                         )
                     )
                 )
-            ).GetAwaiter().GetResult().All(result => result);
+            ).GetAwaiter().GetResult().All(static result => result);
             this.ReplacementSchema = replacementTask.GetAwaiter().GetResult();
             this.WriteLine($"Actual lookup count: {this.LookupFields!.Length}");
             this.WriteLine($"Concurrent reads succeeded: {this.ConcurrentReadsSucceeded}");
@@ -388,7 +389,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             this.LookupFields.Should().HaveCount(this.ExpectedLookupCount);
             this.LookupFields.Should().OnlyContain
             (
-                field => field.FieldType.IsGenericType &&
+                static field => field.FieldType.IsGenericType &&
                     field.FieldType.GetGenericTypeDefinition() == typeof(FrozenDictionary<,>)
             );
 
@@ -402,7 +403,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                 field.GetValue(this.Schema!.GetQuerySourceByApiName("EntityById")).Should().NotBeNull();
             }
 
-            var objectType = this.Schema!.ApiObjectTypes.First(type => type.ApiKeys.Length > 0);
+            var objectType = this.Schema!.ApiObjectTypes.First(static type => type.ApiKeys.Length > 0);
             foreach (var field in GetLookupFields(typeof(ApiObjectType)))
             {
                 field.GetValue(objectType).Should().NotBeNull();
@@ -415,7 +416,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             }
 
             objectType.ApiKeyApiNames.IsDefault.Should().BeFalse();
-            objectType.ApiKeyApiNames.Should().Equal(objectType.ApiKeys.Select(type => type.ApiName));
+            objectType.ApiKeyApiNames.Should().Equal(objectType.ApiKeys.Select(static type => type.ApiName));
             this.ConcurrentReadsSucceeded.Should().BeTrue();
             this.ReplacementSchema.Should().NotBeSameAs(this.Schema);
             this.Schema.SelfAndDescendants(TraversalStrategy.DepthFirst).Should().Equal(this.OriginalElements!);
@@ -423,10 +424,10 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
         #endregion
 
         #region Implementation Methods
-        private static FieldInfo[] GetLookupFields(Type type) =>
-        [
+        private static FieldInfo[] GetLookupFields(Type type)
+            => [
             .. type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .Where(field => field.Name.EndsWith("Lookup", StringComparison.Ordinal))
+                .Where(static field => field.Name.EndsWith("Lookup", StringComparison.Ordinal))
         ];
         #endregion
     }
@@ -450,32 +451,34 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
     #region Test Methods
     [Theory]
     [MemberData(nameof(FrozenLifecycleTheoryData))]
-    public void FrozenLifecycle(IXUnitTest test) => test.Execute(this);
+    public void FrozenLifecycle(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Implementation Methods
-    private static ApiSchemaBuilder CreateBuilder(string apiName) => new ApiSchemaBuilder()
+    private static ApiSchemaBuilder CreateBuilder(string apiName)
+        => new ApiSchemaBuilder()
         .WithName(apiName)
         .AddScalar<int>()
-        .AddEnum<FrozenStatus>(builder => builder.AddAllValues())
+        .AddEnum<FrozenStatus>(static builder => builder.AddAllValues())
         .AddObject<FrozenEntity>
         (
-            builder => builder
-                .AddProperty(entity => entity.Id)
-                .AddKey("PK_FrozenEntity", entity => entity.Id)
+            static builder => builder
+                .AddProperty(static entity => entity.Id)
+                .AddKey("PK_FrozenEntity", static entity => entity.Id)
         )
         .AddOneToManyRelationship
         (
             "REL_FrozenEntity_FrozenEntity",
-            builder => builder
+            static builder => builder
                 .From<FrozenEntity>()
-                .To<FrozenEntity>(end => end.WithForeignKey(entity => entity.Id))
+                .To<FrozenEntity>(static end => end.WithForeignKey(static entity => entity.Id))
         );
 
-    private static FieldInfo[] GetLookupFields(Type type) =>
-    [
+    private static FieldInfo[] GetLookupFields(Type type)
+        => [
         .. type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-            .Where(field => field.Name.EndsWith("Lookup", StringComparison.Ordinal))
+            .Where(static field => field.Name.EndsWith("Lookup", StringComparison.Ordinal))
     ];
     #endregion
 }

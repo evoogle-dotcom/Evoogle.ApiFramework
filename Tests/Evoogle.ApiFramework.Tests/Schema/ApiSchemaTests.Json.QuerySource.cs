@@ -27,7 +27,7 @@ public partial class ApiSchemaTests
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeQuerySourceTheoryData =>
     [
         .. QuerySourceJsonTestCases.Union(QuerySourceDefaultJsonTestCases)
-        .Select(c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
+        .Select(static c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
         {
             Name = c.Name,
             SourceJson = c.Json,
@@ -38,7 +38,7 @@ public partial class ApiSchemaTests
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripQuerySourceTheoryData =>
     [
         .. QuerySourceJsonTestCases.Union(QuerySourceDefaultJsonTestCases)
-        .Select(c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
+        .Select(static c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
         {
             Name = c.Name,
             ExpectedFactoryArgument = c.FactoryArgument
@@ -47,14 +47,14 @@ public partial class ApiSchemaTests
 
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeQuerySourceTheoryData =>
     [
-        .. QuerySourceJsonTestCases.Select(c => (TheoryDataRow<IXUnitTest>)new JsonSerializeTest
+        .. QuerySourceJsonTestCases.Select(static c => (TheoryDataRow<IXUnitTest>)new JsonSerializeTest
         {
             Name = c.Name,
             SourceFactoryArgument = c.FactoryArgument,
             ExpectedJson = c.Json
         }),
         .. QuerySourceDefaultJsonTestCases.Select
-        (c => (TheoryDataRow<IXUnitTest>)new JsonSerializeQuerySourceDefaultsTest
+        (static c => (TheoryDataRow<IXUnitTest>)new JsonSerializeQuerySourceDefaultsTest
         {
             Name = c.Name,
             SourceFactoryArgument = c.FactoryArgument,
@@ -66,14 +66,17 @@ public partial class ApiSchemaTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(JsonDeserializeQuerySourceTheoryData))]
-    public void JsonDeserialize_QuerySource(IXUnitTest test) => test.Execute(this);
+    public void JsonDeserialize_QuerySource(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripQuerySourceTheoryData))]
-    public void JsonRoundtrip_QuerySource(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtrip_QuerySource(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonSerializeQuerySourceTheoryData))]
-    public void JsonSerialize_QuerySource(IXUnitTest test) => test.Execute(this);
+    public void JsonSerialize_QuerySource(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

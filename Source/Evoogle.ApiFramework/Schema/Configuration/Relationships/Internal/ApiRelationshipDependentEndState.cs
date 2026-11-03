@@ -19,4 +19,13 @@ internal sealed class ApiRelationshipDependentEndState
 
     internal ApiConfigurationSource ForeignKeyBuilderSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
+
+    #region Build Copy Methods
+    internal ApiRelationshipDependentEndState CreateBuildCopy()
+    {
+        var copy = (ApiRelationshipDependentEndState)this.MemberwiseClone();
+        copy.ForeignKeyBuilder = this.ForeignKeyBuilder?.CreateBuildCopy();
+        return copy;
+    }
+    #endregion
 }

@@ -12,6 +12,7 @@ internal sealed class BuildObservableEnumValueAnnotationReader : IApiEnumValueAn
     public IReadOnlyList<ApiEnumValueAnnotationResult> ReadEnumValueAnnotations
     (
         System.Reflection.FieldInfo clrField
-    ) => [new($"reader_{clrField.Name}")];
+    )
+        => [new($"reader_{clrField.Name}")];
     #endregion
 }

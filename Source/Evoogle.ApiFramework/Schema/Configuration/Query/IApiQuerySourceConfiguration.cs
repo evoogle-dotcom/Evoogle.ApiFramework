@@ -6,7 +6,7 @@
 namespace Evoogle.ApiFramework.Schema.Configuration.Query;
 
 /// <summary>
-///     Identifies and configures an API schema query source by its API name.
+///     Declares an independent fluent query source with an initial API naming candidate.
 /// </summary>
 /// <remarks>
 ///     Register an instance with <see cref="ApiSchemaBuilder.AddQuerySource(IApiQuerySourceConfiguration)"/>

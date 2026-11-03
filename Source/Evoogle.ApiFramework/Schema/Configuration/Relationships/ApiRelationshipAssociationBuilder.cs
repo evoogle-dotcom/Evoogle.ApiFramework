@@ -24,10 +24,10 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
     : ExtensionBuilder<ApiRelationshipAssociationBuilder>
 {
     #region Fields
-    private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
+    private ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly ApiTypeReference _apiObjectTypeReference = apiObjectTypeReference ??
         throw new ArgumentNullException(nameof(apiObjectTypeReference));
-    private readonly ApiRelationshipAssociationState _state = new();
+    private ApiRelationshipAssociationState _state = new();
     #endregion
 
     #region Properties
@@ -59,7 +59,8 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipAssociationBuilder AddRelationshipAssociationExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiRelationshipAssociationBuilder AddRelationshipAssociationExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region WithForeignKey Methods
@@ -176,7 +177,8 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
 
     #region Configuration Source Methods
     /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
-    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
+        => _configurationSourceScope.Apply(source, configure);
     #endregion
 
     #region Build Methods
@@ -199,6 +201,16 @@ public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeRef
         }
 
         return apiRelationshipAssociation;
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiRelationshipAssociationBuilder CreateBuildCopy()
+    {
+        var copy = this.CreateExtensionBuildCopy();
+        copy._state = _state.CreateBuildCopy();
+        copy._configurationSourceScope = new ApiConfigurationSourceScope();
+        return copy;
     }
     #endregion
 }

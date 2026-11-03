@@ -6,7 +6,7 @@
 namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 
 /// <summary>
-///     Identifies an API schema relationship configuration by its API name.
+///     Supplies the initial API name for an independent relationship declaration.
 /// </summary>
 public interface IApiRelationshipConfiguration : IApiConfiguration
 {

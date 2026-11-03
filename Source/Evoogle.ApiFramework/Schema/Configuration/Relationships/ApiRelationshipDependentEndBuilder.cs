@@ -24,15 +24,19 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     : ExtensionBuilder<ApiRelationshipDependentEndBuilder>
 {
     #region Fields
-    private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
+    private ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly ApiTypeReference _apiObjectTypeReference = apiObjectTypeReference ??
         throw new ArgumentNullException(nameof(apiObjectTypeReference));
-    private readonly ApiRelationshipDependentEndState _state = new();
-    private ApiRelationshipTraversalState? _traversalState;
+    private ApiRelationshipDependentEndState _state = new();
+    private ApiRelationshipTraversalBuilder? _traversalBuilder;
+    private ClrMemberReference? _authoritativeNavigation;
+    private bool _hasNavigationConflict;
     private ApiConfigurationSource _traversalSource = ApiConfigurationSource.Convention;
     #endregion
 
     #region Properties
+    internal ApiRelationshipTraversalBuilder? TraversalBuilder => _traversalBuilder;
+
     /// <summary>Gets the object-type reference represented by this dependent end.</summary>
     internal ApiTypeReference ApiObjectTypeReference => _apiObjectTypeReference;
 
@@ -57,7 +61,8 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region WithTraversal Methods
@@ -91,7 +96,8 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
         string apiName,
         string clrNavigationMemberName,
         ClrMemberKind clrNavigationMemberKind = ClrMemberKind.Property
-    ) => this.WithTraversal
+    )
+        => this.WithTraversal
     (
         apiName,
         new ClrMemberReference(clrNavigationMemberKind, clrNavigationMemberName)
@@ -107,7 +113,13 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
         var source = this.CurrentConfigurationSource;
         if (source >= _traversalSource)
         {
-            _traversalState = new ApiRelationshipTraversalState(apiName, clrNavigationMember);
+            if (_authoritativeNavigation is not null && clrNavigationMember is not null &&
+                _authoritativeNavigation != clrNavigationMember)
+            {
+                _hasNavigationConflict = true;
+            }
+            _traversalBuilder = new ApiRelationshipTraversalBuilder
+                (apiName, _authoritativeNavigation ?? clrNavigationMember, source);
             _traversalSource = source;
         }
         return this;
@@ -171,9 +183,9 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        if (builder._traversalState is not null && builder._traversalSource >= _traversalSource)
+        if (builder._traversalBuilder is not null && builder._traversalSource >= _traversalSource)
         {
-            _traversalState = builder._traversalState;
+            _traversalBuilder = builder._traversalBuilder.CreateBuildCopy();
             _traversalSource = builder._traversalSource;
         }
 
@@ -191,7 +203,8 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
 
     #region Configuration Source Methods
     /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
-    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
+        => _configurationSourceScope.Apply(source, configure);
     #endregion
 
     #region Build Methods
@@ -205,7 +218,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
         var end = new ApiRelationshipDependentEnd
         (
             _apiObjectTypeReference,
-            _traversalState?.Build(),
+            _traversalBuilder?.Build(),
             apiForeignKey
         );
 
@@ -216,6 +229,41 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
         }
 
         return end;
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiRelationshipDependentEndBuilder CreateBuildCopy()
+    {
+        var copy = this.CreateExtensionBuildCopy();
+        copy._state = _state.CreateBuildCopy();
+        copy._traversalBuilder = _traversalBuilder?.CreateBuildCopy();
+        copy._configurationSourceScope = new ApiConfigurationSourceScope();
+        return copy;
+    }
+    #endregion
+
+    #region Properties
+    internal bool HasNavigationConflict => _hasNavigationConflict;
+    #endregion
+
+    #region Navigation Methods
+    internal void BindNavigation(ClrMemberReference navigation)
+    {
+        if (_traversalBuilder?.ClrNavigationMember is { } configured && configured != navigation)
+        {
+            _hasNavigationConflict = true;
+        }
+        _authoritativeNavigation = navigation;
+        if (_traversalBuilder is null)
+        {
+            _traversalBuilder = new ApiRelationshipTraversalBuilder
+                (navigation.ClrName, navigation, ApiConfigurationSource.Convention);
+        }
+        else
+        {
+            _traversalBuilder.BindNavigation(navigation);
+        }
     }
     #endregion
 }

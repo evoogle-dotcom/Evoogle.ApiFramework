@@ -195,10 +195,12 @@ public partial class ApiKeyTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(FromScalarTheoryData))]
-    public void FromScalar(IXUnitTest test) => test.Execute(this);
+    public void FromScalar(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TryParseTheoryData))]
-    public void TryParse(IXUnitTest test) => test.Execute(this);
+    public void TryParse(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

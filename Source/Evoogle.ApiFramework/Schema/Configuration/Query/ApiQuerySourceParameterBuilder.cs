@@ -12,13 +12,25 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Query;
 
 /// <summary>Configures a schema-owned query source parameter.</summary>
 /// <remarks>
-/// The API name and type reference are fixed. Nullability and argument presence are configured independently,
+/// The declaration name and type reference are stable.
+/// API naming, nullability, and presence are configured independently,
 /// using convention, data-annotation, and explicit precedence, in that order.
 /// </remarks>
 public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySourceParameterBuilder>
 {
     #region Fields
     private string _apiName;
+    private ApiConfigurationSource _apiNameSource = ApiConfigurationSource.Convention;
+    private ApiNullability? _itemNullability;
+    private ApiConfigurationSource _itemNullabilitySource = ApiConfigurationSource.Convention;
+    #endregion
+
+    #region Properties
+    internal System.Reflection.ParameterInfo? ClrParameterInfo { get; set; }
+    internal string DeclarationName { get; }
+    #endregion
+
+    #region Fields
     private readonly object _apiTypeIdentity;
     private readonly Func<ApiTypeExpression> _apiTypeExpressionFactory;
     private readonly ApiQuerySourceParameterState _state = new();
@@ -46,6 +58,7 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
         ArgumentNullException.ThrowIfNull(apiTypeExpressionFactory);
 
         _apiName = apiName;
+        this.DeclarationName = apiName;
         _apiTypeIdentity = apiTypeIdentity;
         _apiTypeExpressionFactory = apiTypeExpressionFactory;
     }
@@ -61,6 +74,11 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
     private ApiQuerySourceParameterBuilder(ApiQuerySourceParameterBuilder source)
     {
         _apiName = source._apiName;
+        this.DeclarationName = source.DeclarationName;
+        _apiNameSource = source._apiNameSource;
+        _itemNullability = source._itemNullability;
+        _itemNullabilitySource = source._itemNullabilitySource;
+        this.ClrParameterInfo = source.ClrParameterInfo;
         _apiTypeIdentity = source._apiTypeIdentity;
         _apiTypeExpressionFactory = source._apiTypeExpressionFactory;
         _state = new ApiQuerySourceParameterState(source._state);
@@ -80,12 +98,17 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
 
     /// <summary>Gets the highest-precedence source that registered this parameter.</summary>
     internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
+    #endregion
 
+    #region Naming Methods
     /// <summary>Sets the API name while resolving a convention-derived declaration name.</summary>
     internal void SetApiNameConvention(string apiName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
-        _apiName = apiName;
+        if (_apiNameSource <= ApiConfigurationSource.Convention)
+        {
+            _apiName = apiName;
+        }
     }
     #endregion
 
@@ -167,14 +190,16 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
 
     #region Build Methods
     /// <summary>Creates an independent builder snapshot for one schema build.</summary>
-    internal ApiQuerySourceParameterBuilder CreateBuildSnapshot() => new(this);
+    internal ApiQuerySourceParameterBuilder CreateBuildSnapshot()
+        => new(this);
 
     /// <summary>Builds a fresh parameter declaration and type expression.</summary>
     internal ApiQuerySourceParameter Build()
     {
         // Build ApiQuerySourceParameter instance from all the configured components.
         var apiName = this.ApiName;
-        var apiTypeExpression = _apiTypeExpressionFactory();
+        var apiTypeExpression = ApiQuerySourceBuilder.ApplyItemNullability
+            (_apiTypeExpressionFactory(), _itemNullability);
         var apiNullability = _state.ApiNullability;
         var apiPresence = _state.ApiPresence;
 
@@ -195,5 +220,39 @@ public sealed class ApiQuerySourceParameterBuilder : ExtensionBuilder<ApiQuerySo
 
         return apiQuerySourceParameter;
     }
+    #endregion
+
+    #region With Methods
+    /// <summary>Sets the parameter API name without changing its CLR declaration identity.</summary>
+    /// <param name="apiName">The parameter API name.</param>
+    /// <returns>The current builder.</returns>
+    public ApiQuerySourceParameterBuilder WithName(string apiName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+        if (this.CurrentConfigurationSource >= _apiNameSource)
+        {
+            _apiName = apiName;
+            _apiNameSource = this.CurrentConfigurationSource;
+        }
+        return this;
+    }
+
+    /// <summary>Sets nullability for items of a collection parameter.</summary>
+    /// <param name="apiItemNullability">The collection-item nullability.</param>
+    /// <returns>The current builder.</returns>
+    public ApiQuerySourceParameterBuilder WithItemNullability(ApiNullability apiItemNullability)
+    {
+        if (this.CurrentConfigurationSource >= _itemNullabilitySource)
+        {
+            _itemNullability = apiItemNullability;
+            _itemNullabilitySource = this.CurrentConfigurationSource;
+        }
+        return this;
+    }
+    #endregion
+
+    #region Properties
+    internal bool HasInvalidItemNullability =>
+        _itemNullability is not null && _apiTypeExpressionFactory().ApiInlineType is not ApiCollectionType;
     #endregion
 }

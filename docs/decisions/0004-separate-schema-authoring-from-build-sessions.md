@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted on 2026-11-01. Implementation is pending.
+Accepted and implemented on 2026-11-01.
 
 ## Context and Problem Statement
 
@@ -149,7 +149,10 @@ schemaBuilder.ConfigureQuerySource(registration, source => /* configure further 
 
 Registration handles are immutable, non-serializable, and owned by the `ApiSchemaBuilder` that
 created them. Using a handle with another builder fails immediately with a configuration exception.
-Relationship handles must retain relationship-kind safety.
+Relationship handles must retain relationship-kind safety. Public `Declare` methods issue durable
+handles only during authoring; calling them during an active build is a configuration error.
+Discovery and conventions use `Add` methods for session-local declarations and may configure copies
+of existing durable registrations.
 
 ## Discovery Idempotency
 
@@ -225,6 +228,10 @@ schemas remain immutable and safe for concurrent reads under their existing cont
 - Exact internal type names and file organization remain implementation-level decisions.
 
 ## Confirmation
+
+Implemented and covered by the [build-session regression suite](../../Tests/Evoogle.ApiFramework.Tests/Schema/Configuration/ApiSchemaBuildSessionTests.cs).
+Final validation passed 1,664 runtime tests and 117 annotation tests with no skips. Production and test
+builds completed with zero warnings and errors; diff, UTF-8 BOM, CRLF, and final-newline checks passed.
 
 The decision is confirmed when tests demonstrate:
 

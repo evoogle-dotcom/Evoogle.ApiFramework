@@ -8,6 +8,8 @@ using System.Reflection;
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Configuration.Annotations.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
+using Evoogle.ApiFramework.Schema.Configuration.Relationships;
+using Evoogle.ApiFramework.Schema.Configuration.Relationships.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Reflection;
@@ -18,7 +20,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
 ///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
-internal sealed class ApiSchemaConfigurationPipeline
+internal sealed partial class ApiSchemaConfigurationPipeline
 {
     #region Fields
     private const int _maxIterations = 100;
@@ -45,7 +47,7 @@ internal sealed class ApiSchemaConfigurationPipeline
     }
     #endregion
 
-    #region Methods
+    #region Pipeline Methods
     /// <summary>Runs the complete schema configuration pipeline.</summary>
     internal void Run()
     {
@@ -185,70 +187,14 @@ internal sealed class ApiSchemaConfigurationPipeline
 
         var structuralBuilderCounts = this.GetStructuralBuilderCounts();
 
+        _schemaBuilder.ApplyRegisteredQuerySourceAnnotations();
         this.ApplyQuerySourceConventions();
         this.ApplyRelationshipAnnotations(objectBuilders);
         this.ApplyRelationshipConventions();
+        this.ApplyRelationshipNavigationBindings();
+        this.ApplyRelationshipTraversalConventions();
 
         this.ThrowIfRelationshipStageAddedStructuralBuilders(structuralBuilderCounts);
-    }
-    #endregion
-
-    #region Query Source Methods
-    private void ApplyQuerySourceConventions()
-    {
-        var querySourceBuilders = _context.ApiQuerySourceBuilders.ToList();
-        foreach (var querySourceBuilder in querySourceBuilders)
-        {
-            var querySourceContext = _context.GetQuerySourceConventionContext
-                (querySourceBuilder, _schemaBuilder);
-            foreach (var convention in _schedule.QuerySourceConfigurationConventions)
-            {
-                if (convention is ApiNamingConvention)
-                {
-                    continue;
-                }
-
-                this.ApplyConvention
-                (
-                    () => querySourceBuilder.ApplyConfiguration
-                    (
-                        ApiConfigurationSource.Convention,
-                        () => convention.Apply(querySourceBuilder, querySourceContext)
-                    )
-                );
-            }
-        }
-
-        foreach (var querySourceBuilder in querySourceBuilders)
-        {
-            var querySourceContext = _context.GetQuerySourceConventionContext
-                (querySourceBuilder, _schemaBuilder);
-            foreach (var parameterBuilder in querySourceBuilder.InputParameterBuilders)
-            {
-                var parameterContext = _context.GetQuerySourceParameterConventionContext
-                (
-                    parameterBuilder,
-                    querySourceBuilder,
-                    querySourceContext
-                );
-                foreach (var convention in _schedule.QuerySourceParameterConfigurationConventions)
-                {
-                    if (convention is ApiNamingConvention)
-                    {
-                        continue;
-                    }
-
-                    this.ApplyConvention
-                    (
-                        () => parameterBuilder.ApplyConfiguration
-                        (
-                            ApiConfigurationSource.Convention,
-                            () => convention.Apply(parameterBuilder, parameterContext)
-                        )
-                    );
-                }
-            }
-        }
     }
     #endregion
 
@@ -276,7 +222,7 @@ internal sealed class ApiSchemaConfigurationPipeline
     }
     #endregion
 
-    #region Annotation Methods
+    #region Type Annotation Methods
     private void ApplyObjectTypeAnnotations
     (
         ApiObjectTypeBuilder builder,
@@ -313,54 +259,6 @@ internal sealed class ApiSchemaConfigurationPipeline
         }
     }
 
-    private void ApplyPropertyAnnotations
-    (
-        IReadOnlyCollection<ApiObjectTypeBuilder> objectBuilders,
-        HashSet<ApiPropertyBuilder> annotatedBuilders
-    )
-    {
-        var iterations = 0;
-
-        while (true)
-        {
-            var hasUnannotatedProperties = false;
-
-            foreach (var objectBuilder in objectBuilders)
-            {
-                foreach (var propertyBuilder in objectBuilder.ApiPropertyBuilders.ToList())
-                {
-                    if (!annotatedBuilders.Add(propertyBuilder))
-                    {
-                        continue;
-                    }
-
-                    hasUnannotatedProperties = true;
-                    _annotationReaderSet?.ApplyPropertyAnnotations
-                    (
-                        propertyBuilder,
-                        objectBuilder
-                    );
-                }
-            }
-
-            if (!hasUnannotatedProperties)
-            {
-                return;
-            }
-
-            if (iterations++ >= _maxIterations)
-            {
-                throw new ApiSchemaConfigurationException
-                (
-                    $"The property annotation pipeline exceeded {_maxIterations} iterations. " +
-                    "This usually indicates that an annotation reader is adding properties in " +
-                    "a cycle. Check annotation-reader capability implementations for unconditional " +
-                    "property registrations."
-                );
-            }
-        }
-    }
-
     private void ApplyRemainingTypeAnnotations
     (
         HashSet<ApiObjectTypeBuilder> annotatedObjectBuilders,
@@ -383,29 +281,87 @@ internal sealed class ApiSchemaConfigurationPipeline
             this.ApplyEnumTypeAnnotations(enumBuilder, annotatedEnumBuilders);
         }
     }
+    #endregion
 
-    private void ApplyRelationshipAnnotations
+    #region Enum Value Methods
+    private void ApplyEnumValueConventions
     (
-        IReadOnlyCollection<ApiObjectTypeBuilder> objectBuilders
+        IReadOnlyCollection<ApiEnumTypeBuilder> enumBuilders,
+        HashSet<ApiEnumValueBuilder> processedBuilders
     )
     {
-        if (_annotationReaderSet == null)
-        {
-            return;
-        }
+        var iterations = 0;
 
-        foreach (var objectBuilder in objectBuilders)
+        while (true)
         {
-            _annotationReaderSet.ApplyRelationshipAnnotations
-            (
-                _schemaBuilder,
-                objectBuilder.ClrType
-            );
+            var hasUnprocessedEnumValues = false;
+
+            foreach (var enumBuilder in enumBuilders)
+            {
+                foreach (var enumValueBuilder in enumBuilder.ApiEnumValueBuilders.ToList())
+                {
+                    if (!processedBuilders.Add(enumValueBuilder))
+                    {
+                        continue;
+                    }
+
+                    hasUnprocessedEnumValues = true;
+                    var context = this.BuildEnumValueContext(enumValueBuilder, enumBuilder);
+
+                    _annotationReaderSet?.ApplyEnumValueAnnotations(enumBuilder, enumValueBuilder);
+
+                    foreach (var convention in _schedule.EnumValueConfigurationConventions)
+                    {
+                        this.ApplyConvention
+                        (
+                            () => convention.Apply(enumValueBuilder, context)
+                        );
+                    }
+                }
+            }
+
+            if (!hasUnprocessedEnumValues)
+            {
+                return;
+            }
+
+            if (iterations++ >= _maxIterations)
+            {
+                throw new ApiSchemaConfigurationException
+                (
+                    $"The enum-value convention pipeline exceeded {_maxIterations} iterations. " +
+                    "This usually indicates that an enum-value convention is adding values in " +
+                    "a cycle. Check IApiEnumValueConvention implementations for unconditional " +
+                    "value registrations."
+                );
+            }
         }
+    }
+
+    private ApiEnumValueConventionContext BuildEnumValueContext
+    (
+        ApiEnumValueBuilder enumValueBuilder,
+        ApiEnumTypeBuilder enumBuilder
+    )
+    {
+        var clrEnumType = enumBuilder.ClrType;
+        var clrMemberInfo = clrEnumType.GetField
+        (
+            enumValueBuilder.ClrName,
+            BindingFlags.Public | BindingFlags.Static
+        );
+
+        return new ApiEnumValueConventionContext
+        (
+            clrMemberInfo,
+            clrEnumType,
+            enumBuilder,
+            _schemaBuilder
+        );
     }
     #endregion
 
-    #region Configuration Convention Methods
+    #region Property Methods
     private void ApplyPropertyPipeline
     (
         IReadOnlyCollection<ApiObjectTypeBuilder> objectBuilders,
@@ -468,43 +424,37 @@ internal sealed class ApiSchemaConfigurationPipeline
         }
     }
 
-    private void ApplyEnumValueConventions
+    private void ApplyPropertyAnnotations
     (
-        IReadOnlyCollection<ApiEnumTypeBuilder> enumBuilders,
-        HashSet<ApiEnumValueBuilder> processedBuilders
+        IReadOnlyCollection<ApiObjectTypeBuilder> objectBuilders,
+        HashSet<ApiPropertyBuilder> annotatedBuilders
     )
     {
         var iterations = 0;
 
         while (true)
         {
-            var hasUnprocessedEnumValues = false;
+            var hasUnannotatedProperties = false;
 
-            foreach (var enumBuilder in enumBuilders)
+            foreach (var objectBuilder in objectBuilders)
             {
-                foreach (var enumValueBuilder in enumBuilder.ApiEnumValueBuilders.ToList())
+                foreach (var propertyBuilder in objectBuilder.ApiPropertyBuilders.ToList())
                 {
-                    if (!processedBuilders.Add(enumValueBuilder))
+                    if (!annotatedBuilders.Add(propertyBuilder))
                     {
                         continue;
                     }
 
-                    hasUnprocessedEnumValues = true;
-                    var context = this.BuildEnumValueContext(enumValueBuilder, enumBuilder);
-
-                    _annotationReaderSet?.ApplyEnumValueAnnotations(enumBuilder, enumValueBuilder);
-
-                    foreach (var convention in _schedule.EnumValueConfigurationConventions)
-                    {
-                        this.ApplyConvention
-                        (
-                            () => convention.Apply(enumValueBuilder, context)
-                        );
-                    }
+                    hasUnannotatedProperties = true;
+                    _annotationReaderSet?.ApplyPropertyAnnotations
+                    (
+                        propertyBuilder,
+                        objectBuilder
+                    );
                 }
             }
 
-            if (!hasUnprocessedEnumValues)
+            if (!hasUnannotatedProperties)
             {
                 return;
             }
@@ -513,95 +463,13 @@ internal sealed class ApiSchemaConfigurationPipeline
             {
                 throw new ApiSchemaConfigurationException
                 (
-                    $"The enum-value convention pipeline exceeded {_maxIterations} iterations. " +
-                    "This usually indicates that an enum-value convention is adding values in " +
-                    "a cycle. Check IApiEnumValueConvention implementations for unconditional " +
-                    "value registrations."
+                    $"The property annotation pipeline exceeded {_maxIterations} iterations. " +
+                    "This usually indicates that an annotation reader is adding properties in " +
+                    "a cycle. Check annotation-reader capability implementations for unconditional " +
+                    "property registrations."
                 );
             }
         }
-    }
-
-    private void ApplyRelationshipConventions()
-    {
-        foreach (var convention in _schedule.RelationshipConventions)
-        {
-            this.ApplyConvention
-            (
-                () => _schemaBuilder.ApplyRelationshipConvention(convention)
-            );
-        }
-    }
-
-    private void ApplyConvention(Action apply) => _context.ApplyConfiguration(ApiConfigurationSource.Convention, apply);
-    #endregion
-
-    #region Validation Methods
-    private (int ObjectTypes, int ScalarTypes, int EnumTypes, int Properties, int EnumValues)
-        GetStructuralBuilderCounts()
-    {
-        return
-        (
-            _context.ApiObjectTypeBuilders.Count(),
-            _context.ApiScalarTypeBuilders.Count(),
-            _context.ApiEnumTypeBuilders.Count(),
-            _context.ApiObjectTypeBuilders.Sum
-            (
-                builder => builder.ApiPropertyBuilders.Count()
-            ),
-            _context.ApiEnumTypeBuilders.Sum
-            (
-                builder => builder.ApiEnumValueBuilders.Count()
-            )
-        );
-    }
-
-    private void ThrowIfRelationshipStageAddedStructuralBuilders
-    (
-        (
-            int ObjectTypes,
-            int ScalarTypes,
-            int EnumTypes,
-            int Properties,
-            int EnumValues
-        ) previousCounts
-    )
-    {
-        var currentCounts = this.GetStructuralBuilderCounts();
-        if (!_context.HasPendingBuilders && currentCounts == previousCounts)
-        {
-            return;
-        }
-
-        throw new ApiSchemaConfigurationException
-        (
-            "Relationship conventions cannot register schema types, properties, or enum values. " +
-            "Register structural builders during discovery or configuration conventions instead."
-        );
-    }
-    #endregion
-
-    #region Context Methods
-    private ApiEnumValueConventionContext BuildEnumValueContext
-    (
-        ApiEnumValueBuilder enumValueBuilder,
-        ApiEnumTypeBuilder enumBuilder
-    )
-    {
-        var clrEnumType = enumBuilder.ClrType;
-        var clrMemberInfo = clrEnumType.GetField
-        (
-            enumValueBuilder.ClrName,
-            BindingFlags.Public | BindingFlags.Static
-        );
-
-        return new ApiEnumValueConventionContext
-        (
-            clrMemberInfo,
-            clrEnumType,
-            enumBuilder,
-            _schemaBuilder
-        );
     }
 
     private ApiPropertyConventionContext BuildPropertyContext
@@ -653,5 +521,203 @@ internal sealed class ApiSchemaConfigurationPipeline
             _schemaBuilder
         );
     }
+    #endregion
+
+    #region Query Source Methods
+    private void ApplyQuerySourceConventions()
+    {
+        var querySourceBuilders = _context.ApiQuerySourceBuilders.ToList();
+        foreach (var querySourceBuilder in querySourceBuilders)
+        {
+            var querySourceContext = _context.GetQuerySourceConventionContext
+                (querySourceBuilder, _schemaBuilder);
+            foreach (var convention in _schedule.QuerySourceConfigurationConventions)
+            {
+                this.ApplyConvention
+                (
+                    () => querySourceBuilder.ApplyConfiguration
+                    (
+                        ApiConfigurationSource.Convention,
+                        () => convention.Apply(querySourceBuilder, querySourceContext)
+                    )
+                );
+            }
+        }
+
+        foreach (var querySourceBuilder in querySourceBuilders)
+        {
+            var querySourceContext = _context.GetQuerySourceConventionContext
+                (querySourceBuilder, _schemaBuilder);
+            foreach (var parameterBuilder in querySourceBuilder.InputParameterBuilders)
+            {
+                var parameterContext = ApiSchemaBuilderContext.GetQuerySourceParameterConventionContext
+                (
+                    parameterBuilder,
+                    querySourceBuilder,
+                    querySourceContext
+                );
+                foreach (var convention in _schedule.QuerySourceParameterConfigurationConventions)
+                {
+                    this.ApplyConvention
+                    (
+                        () => parameterBuilder.ApplyConfiguration
+                        (
+                            ApiConfigurationSource.Convention,
+                            () => convention.Apply(parameterBuilder, parameterContext)
+                        )
+                    );
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Relationship Methods
+    private void ApplyRelationshipAnnotations
+    (
+        IReadOnlyCollection<ApiObjectTypeBuilder> objectBuilders
+    )
+    {
+        if (_annotationReaderSet == null)
+        {
+            return;
+        }
+
+        foreach (var objectBuilder in objectBuilders)
+        {
+            _annotationReaderSet.ApplyRelationshipAnnotations
+            (
+                _schemaBuilder,
+                objectBuilder.ClrType
+            );
+        }
+    }
+
+    private void ApplyRelationshipConventions()
+    {
+        foreach (var convention in _schedule.RelationshipConventions)
+        {
+            this.ApplyConvention
+            (
+                () => _schemaBuilder.ApplyRelationshipConvention(convention)
+            );
+        }
+    }
+
+    private void ApplyRelationshipNavigationBindings()
+    {
+        foreach (var relationship in _context.ApiRelationshipBuilders)
+        {
+            ApiRelationshipNavigationValidation.Apply(relationship, _context);
+        }
+    }
+
+    private void ApplyRelationshipTraversalConventions()
+    {
+        foreach (var relationship in _context.ApiRelationshipBuilders.ToArray())
+        {
+            var ends = relationship.EndsState;
+            if (ends.PrincipalEndA?.TraversalBuilder is { } principalTraversalA)
+            {
+                this.ApplyRelationshipTraversalConventions
+                    (relationship, principalTraversalA, ends.PrincipalEndA.ApiObjectTypeReference, 0);
+            }
+            if (ends.PrincipalEndB?.TraversalBuilder is { } principalTraversalB)
+            {
+                this.ApplyRelationshipTraversalConventions
+                    (relationship, principalTraversalB, ends.PrincipalEndB.ApiObjectTypeReference, 1);
+            }
+            if (ends.DependentEnd?.TraversalBuilder is { } dependentTraversal)
+            {
+                this.ApplyRelationshipTraversalConventions
+                    (relationship, dependentTraversal, ends.DependentEnd.ApiObjectTypeReference, 1);
+            }
+        }
+    }
+
+    private void ApplyRelationshipTraversalConventions
+    (
+        ApiRelationshipBuilder relationship,
+        ApiRelationshipTraversalBuilder traversal,
+        ApiTypeReference apiObjectTypeReference,
+        int endIndex
+    )
+    {
+        var locator = relationship.NavigationBindings.FirstOrDefault(binding => binding.EndIndex == endIndex)?.Locator;
+        var clrType = locator?.SourceType ?? apiObjectTypeReference.ClrType;
+        var clrMember = locator?.ClrMember;
+        if (clrMember is null && clrType is not null && traversal.ClrNavigationMember is { } reference)
+        {
+            clrMember = reference.NullableClrKind switch
+            {
+                ClrMemberKind.Property => TypeReflection.GetProperty(clrType, reference.ClrName),
+                ClrMemberKind.Field => TypeReflection.GetField(clrType, reference.ClrName),
+                _ => null,
+            };
+        }
+        var context = new ApiRelationshipTraversalConventionContext
+            (clrType, clrMember, apiObjectTypeReference, relationship, _schemaBuilder);
+        foreach (var convention in _schedule.RelationshipTraversalConfigurationConventions)
+        {
+            this.ApplyConvention
+            (
+                () => traversal.ApplyConfiguration
+                (
+                    ApiConfigurationSource.Convention,
+                    () => convention.Apply(traversal, context)
+                )
+            );
+        }
+    }
+    #endregion
+
+    #region Validation Methods
+    private (int ObjectTypes, int ScalarTypes, int EnumTypes, int Properties, int EnumValues)
+        GetStructuralBuilderCounts()
+    {
+        return
+        (
+            _context.ApiObjectTypeBuilders.Count(),
+            _context.ApiScalarTypeBuilders.Count(),
+            _context.ApiEnumTypeBuilders.Count(),
+            _context.ApiObjectTypeBuilders.Sum
+            (
+                static builder => builder.ApiPropertyBuilders.Count()
+            ),
+            _context.ApiEnumTypeBuilders.Sum
+            (
+                static builder => builder.ApiEnumValueBuilders.Count()
+            )
+        );
+    }
+
+    private void ThrowIfRelationshipStageAddedStructuralBuilders
+    (
+        (
+            int ObjectTypes,
+            int ScalarTypes,
+            int EnumTypes,
+            int Properties,
+            int EnumValues
+        ) previousCounts
+    )
+    {
+        var currentCounts = this.GetStructuralBuilderCounts();
+        if (!_context.HasPendingBuilders && currentCounts == previousCounts)
+        {
+            return;
+        }
+
+        throw new ApiSchemaConfigurationException
+        (
+            "Relationship conventions cannot register schema types, properties, or enum values. " +
+            "Register structural builders during discovery or configuration conventions instead."
+        );
+    }
+    #endregion
+
+    #region Configuration Source Methods
+    private void ApplyConvention(Action apply)
+        => _context.ApplyConfiguration(ApiConfigurationSource.Convention, apply);
     #endregion
 }

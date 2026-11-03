@@ -77,7 +77,8 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
         #endregion
 
         #region BuildTestCore Methods
-        protected virtual IEnumerable<Type> GetExtensionTypes() => [];
+        protected virtual IEnumerable<Type> GetExtensionTypes()
+            => [];
         #endregion
     }
 
@@ -175,22 +176,22 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
                     var name = apiPropertyName;
                     if (apiProperty.IsNonNullable)
                     {
-                        builder.AddProperty(name, property => property.AsNonNullable());
+                        builder.AddProperty(name, static property => property.AsNonNullable());
                     }
                     else
                     {
-                        builder.AddProperty(name, property => property.AsNullable());
+                        builder.AddProperty(name, static property => property.AsNullable());
                     }
                 }
                 else
                 {
                     if (apiProperty.IsNonNullable)
                     {
-                        builder.AddProperty(apiPropertyName, clrMemberName, property => property.AsNonNullable());
+                        builder.AddProperty(apiPropertyName, clrMemberName, static property => property.AsNonNullable());
                     }
                     else
                     {
-                        builder.AddProperty(apiPropertyName, clrMemberName, property => property.AsNullable());
+                        builder.AddProperty(apiPropertyName, clrMemberName, static property => property.AsNullable());
                     }
                 }
             }
@@ -239,22 +240,22 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
                     var name = apiPropertyName;
                     if (apiProperty.IsNonNullable)
                     {
-                        builder.AddProperty(name, x => x.AsNonNullable());
+                        builder.AddProperty(name, static x => x.AsNonNullable());
                     }
                     else
                     {
-                        builder.AddProperty(name, x => x.AsNullable());
+                        builder.AddProperty(name, static x => x.AsNullable());
                     }
                 }
                 else
                 {
                     if (apiProperty.IsNonNullable)
                     {
-                        builder.AddProperty(apiPropertyName, clrMemberName, x => x.AsNonNullable());
+                        builder.AddProperty(apiPropertyName, clrMemberName, static x => x.AsNonNullable());
                     }
                     else
                     {
-                        builder.AddProperty(apiPropertyName, clrMemberName, x => x.AsNullable());
+                        builder.AddProperty(apiPropertyName, clrMemberName, static x => x.AsNullable());
                     }
                 }
             }
@@ -410,6 +411,7 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
-    public void Build(IXUnitTest test) => test.Execute(this);
+    public void Build(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

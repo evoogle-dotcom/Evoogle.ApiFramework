@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Types;
 public sealed class ApiEnumValueBuilder
 {
     #region Fields
-    private readonly ApiEnumValueState _state;
+    private ApiEnumValueState _state;
     #endregion
 
     #region Constructors
@@ -62,13 +62,16 @@ public sealed class ApiEnumValueBuilder
     /// </summary>
     /// <param name="apiName">The explicit API name to use.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumValueBuilder WithName(string apiName) => this.SetApiName(apiName, ApiConfigurationSource.Explicit);
+    public ApiEnumValueBuilder WithName(string apiName)
+        => this.SetApiName(apiName, ApiConfigurationSource.Explicit);
+    #endregion
+
+    #region Properties
+    /// <summary>Gets the configuration source that established the current API name.</summary>
+    internal ApiConfigurationSource ApiNameSource => _state.ApiNameSource;
     #endregion
 
     #region Internal Convention Methods
-    /// <summary>Gets the configuration source that established the current API name.</summary>
-    internal ApiConfigurationSource ApiNameSource => _state.ApiNameSource;
-
     /// <summary>
     ///     Sets the API name at data-annotation precedence.
     ///     Has no effect if an explicit value has already been applied.
@@ -108,6 +111,15 @@ public sealed class ApiEnumValueBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name, paramName);
         return name;
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiEnumValueBuilder CreateBuildCopy()
+    {
+        var copy = (ApiEnumValueBuilder)this.MemberwiseClone();
+        copy._state = _state.CreateBuildCopy();
+        return copy;
     }
     #endregion
 }

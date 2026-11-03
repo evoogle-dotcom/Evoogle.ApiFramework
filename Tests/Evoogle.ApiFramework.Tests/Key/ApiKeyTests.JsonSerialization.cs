@@ -1213,18 +1213,22 @@ public partial class ApiKeyTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(JsonDeserializeTheoryData))]
-    public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
+    public void JsonDeserialize(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonDeserializeExceptionTheoryData))]
-    public void JsonDeserializeException(IXUnitTest test) => test.Execute(this);
+    public void JsonDeserializeException(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripTheoryData))]
-    public void JsonRoundtrip(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtrip(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonSerializeTheoryData))]
-    public void JsonSerialize(IXUnitTest test) => test.Execute(this);
+    public void JsonSerialize(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

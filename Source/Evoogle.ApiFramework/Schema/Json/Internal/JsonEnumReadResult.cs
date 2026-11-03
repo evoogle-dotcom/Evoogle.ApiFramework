@@ -16,6 +16,7 @@ internal readonly record struct JsonEnumReadResult<TEnum>(JsonEnumReadStatus Sta
     where TEnum : struct, Enum
 {
     #region Methods
-    public TEnum ValueOr(TEnum fallbackValue) => this.Value ?? fallbackValue;
+    public TEnum ValueOr(TEnum fallbackValue)
+        => this.Value ?? fallbackValue;
     #endregion
 }

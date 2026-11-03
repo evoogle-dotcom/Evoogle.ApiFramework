@@ -43,7 +43,7 @@ public enum ApiSchemaCompilationCode
     ApiAnnotationMultipleVersionDeclarations,
 
     /// <summary>
-    ///     Multiple annotated delegates resolve to the same query-source API name.
+    ///     Annotation readers contribute incompatible declarations for the same query-source delegate.
     /// </summary>
     [EnumMember(Value = "API_ANNOTATION_QUERY_SOURCE_DISCOVERY_CONFLICT")]
     ApiAnnotationQuerySourceDiscoveryConflict,
@@ -309,6 +309,14 @@ public enum ApiSchemaCompilationCode
     #endregion
 
     #region ApiQuerySource Compilation Codes
+    /// <summary>Query-source configuration requests an incompatible API-facing facet.</summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_CONFIGURATION_CONFLICT")]
+    ApiQuerySourceConfigurationConflict,
+
+    /// <summary>Configuration attempts to change an authoritative delegate signature.</summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_DECLARATION_CONFLICT")]
+    ApiQuerySourceDeclarationConflict,
+
     /// <summary>
     ///     Multiple parameters of one source have the same API name.
     /// </summary>
@@ -332,6 +340,10 @@ public enum ApiSchemaCompilationCode
     /// </summary>
     [EnumMember(Value = "API_QUERY_SOURCE_INVALID_API_OUTPUT_NULLABILITY")]
     ApiQuerySourceInvalidApiOutputNullability,
+
+    /// <summary>A query source requires a supported public closed delegate declaration.</summary>
+    [EnumMember(Value = "API_QUERY_SOURCE_INVALID_DELEGATE")]
+    ApiQuerySourceInvalidDelegate,
 
     /// <summary>
     ///     The query source has no output type.
@@ -375,6 +387,14 @@ public enum ApiSchemaCompilationCode
     #endregion
 
     #region ApiRelationship Compilation Codes
+    /// <summary>Relationship configuration conflicts with authoritative navigation structure.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_CONFIGURATION_CONFLICT")]
+    ApiRelationshipConfigurationConflict,
+
+    /// <summary>Navigation locators identify different relationship declarations.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_DECLARATION_CONFLICT")]
+    ApiRelationshipDeclarationConflict,
+
     /// <summary>
     ///     The relationship's delete behavior could not be read from schema JSON.
     /// </summary>
@@ -386,6 +406,10 @@ public enum ApiSchemaCompilationCode
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_INVALID_API_NAME")]
     ApiRelationshipInvalidApiName,
+
+    /// <summary>A relationship navigation locator is invalid or unresolved.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_INVALID_NAVIGATION_LOCATOR")]
+    ApiRelationshipInvalidNavigationLocator,
 
     /// <summary>
     ///     The relationship has no dependent end.

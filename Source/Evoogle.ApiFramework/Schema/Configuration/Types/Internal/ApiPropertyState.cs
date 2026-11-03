@@ -23,4 +23,9 @@ internal sealed class ApiPropertyState(string apiName, ApiConfigurationSource ap
 
     internal ApiConfigurationSource NullabilitySource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
+
+    #region Build Copy Methods
+    internal ApiPropertyState CreateBuildCopy()
+        => (ApiPropertyState)this.MemberwiseClone();
+    #endregion
 }

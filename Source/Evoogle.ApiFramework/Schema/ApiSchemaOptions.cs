@@ -73,7 +73,8 @@ public sealed record class ApiSchemaOptions
         => other is not null && this.ApiKeyNullHandling == other.ApiKeyNullHandling;
 
     /// <inheritdoc/>
-    public override int GetHashCode() => this.ApiKeyNullHandling.GetHashCode();
+    public override int GetHashCode()
+        => this.ApiKeyNullHandling.GetHashCode();
 
     /// <inheritdoc/>
     public override string ToString()

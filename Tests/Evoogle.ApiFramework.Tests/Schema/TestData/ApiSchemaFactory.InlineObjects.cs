@@ -139,7 +139,8 @@ public static partial class ApiSchemaFactory
         );
     }
 
-    private static ApiPropertyDef CreateInlineObjectProperty(string clrName, ApiTypeExpressionDef typeExpression) => new
+    private static ApiPropertyDef CreateInlineObjectProperty(string clrName, ApiTypeExpressionDef typeExpression)
+        => new
     (
         ApiName: clrName,
         ApiTypeExpression: typeExpression,

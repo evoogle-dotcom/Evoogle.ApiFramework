@@ -29,14 +29,16 @@ internal readonly record struct ApiClrMemberAccessDescription
     #endregion
 
     #region Factory Methods
-    public static ApiClrMemberAccessDescription ForProperty(string clrMemberName) => new
+    public static ApiClrMemberAccessDescription ForProperty(string clrMemberName)
+        => new
     (
         $"property '{clrMemberName}'",
         "The CLR value member may not support the operation, or the schema may not have compiled successfully.",
         wrapUnavailableException: false
     );
 
-    public static ApiClrMemberAccessDescription ForTraversal(string apiName, string clrMemberName) => new
+    public static ApiClrMemberAccessDescription ForTraversal(string apiName, string clrMemberName)
+        => new
     (
         $"traversal '{apiName}' CLR navigation member '{clrMemberName}'",
         "The traversal may not have a CLR navigation member reference, the CLR navigation member may not support " +
@@ -46,7 +48,7 @@ internal readonly record struct ApiClrMemberAccessDescription
     #endregion
 
     #region Methods
-    public string CreateUnavailableMessage(string operation, string accessorKind) =>
-        $"Cannot {operation} value for {this.Subject}: no compiled {accessorKind} available. {this.UnavailableReason}";
+    public string CreateUnavailableMessage(string operation, string accessorKind)
+        => $"Cannot {operation} value for {this.Subject}: no compiled {accessorKind} available. {this.UnavailableReason}";
     #endregion
 }

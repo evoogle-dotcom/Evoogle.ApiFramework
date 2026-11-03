@@ -48,6 +48,7 @@ public partial class ApiSchemaBuilderTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildGenericTheoryData))]
-    public void BuildGeneric(IXUnitTest test) => test.Execute(this);
+    public void BuildGeneric(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

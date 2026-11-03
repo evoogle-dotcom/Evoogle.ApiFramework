@@ -28,7 +28,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 ///       </item>
 ///       <item>
 ///         Relationship annotations are applied, followed by
-///         <see cref="ApiConventionPhase.Relationship"/> conventions.
+///         <see cref="ApiConventionPhase.Relationship"/> conventions. Traversal configuration conventions
+///         then configure bound traversals.
 ///       </item>
 ///     </list>
 ///     Registration order is preserved within each target and phase. A later convention may
@@ -68,6 +69,9 @@ public sealed class ApiConventionSet
     ///     annotations have settled.
     /// </summary>
     public IList<IApiRelationshipConvention> RelationshipConventions { get; } = [];
+
+    /// <summary>Gets traversal configuration conventions, run after relationship inference and binding.</summary>
+    public IList<IApiRelationshipTraversalConvention> RelationshipTraversalConventions { get; } = [];
 
     /// <summary>Gets query-source configuration conventions.</summary>
     public IList<IApiQuerySourceConvention> QuerySourceConventions { get; } = [];
@@ -128,6 +132,7 @@ public sealed class ApiConventionSet
 
         this.QuerySourceConventions.Add(convention);
         this.QuerySourceParameterConventions.Add(convention);
+        this.RelationshipTraversalConventions.Add(convention);
     }
     #endregion
 }

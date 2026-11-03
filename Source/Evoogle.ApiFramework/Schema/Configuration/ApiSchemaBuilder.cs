@@ -12,12 +12,9 @@ using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Query;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
-using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
-using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Logging;
-using Evoogle.Reflection;
 
 using Microsoft.Extensions.Logging;
 
@@ -30,18 +27,39 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Builder instances are mutable, exclusive construction-time objects and are not safe for
 ///     concurrent use. Each build materializes and compiles an independent schema graph.
 /// </remarks>
-public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) : ExtensionBuilder<ApiSchemaBuilder>, IHasLogger
+public sealed partial class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null)
+    : ExtensionBuilder<ApiSchemaBuilder>, IHasLogger
 {
     #region Fields
+    private readonly ApiSchemaBuildGuard _buildGuard = new();
+    private readonly object _registrationOwner = new();
     private readonly ApiSchemaBuilderState _state = new();
 
     private readonly ApiSchemaBuilderContext _context = new(logger);
     #endregion
 
+    #region Constructors
+    private ApiSchemaBuilder(ApiSchemaBuilder source) : this()
+    {
+        _state = source._state.CreateBuildCopy();
+        _context = source._context.CreateBuildCopy();
+        _buildGuard = source._buildGuard;
+        _registrationOwner = source._registrationOwner;
+        source.CopyExtensionsTo(this);
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiSchemaBuilder CreateBuildSessionBuilder()
+        => new(this);
+    #endregion
+
     #region IHasLogger Properties
     /// <inheritdoc/>
     public ILogger Logger => _context.Logger;
+    #endregion
 
+    #region Properties
     internal ApiSchemaBuilderContext Context => _context;
     #endregion
 
@@ -74,7 +92,6 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         return this.AddEnum(configuration.ClrType, configuration.Configure);
     }
-
     #endregion
 
     #region AddExtension Methods
@@ -84,7 +101,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddSchemaExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiSchemaBuilder AddSchemaExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddObject Methods
@@ -116,18 +134,17 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         return this.AddObject(configuration.ClrType, configuration.Configure);
     }
-
     #endregion
 
     #region AddQuerySource Methods
-    /// <summary>Adds or configures a named query source independently of object-type registration.</summary>
+    /// <summary>Declares an independent fluent query source using an initial naming candidate.</summary>
     /// <param name="apiName">The query source API name.</param>
     /// <param name="configure">The source configuration.</param>
     /// <returns>The current schema builder.</returns>
     public ApiSchemaBuilder AddQuerySource(string apiName, Action<ApiQuerySourceBuilder> configure)
         => this.AddQuerySourceCore(apiName, configure, _context.CurrentConfigurationSource);
 
-    /// <summary>Adds or configures a query source using a self-identifying configuration.</summary>
+    /// <summary>Declares an independent fluent source using a reusable configuration instance.</summary>
     /// <param name="configuration">The query source configuration.</param>
     /// <returns>The current schema builder.</returns>
     public ApiSchemaBuilder AddQuerySource(IApiQuerySourceConfiguration configuration)
@@ -165,11 +182,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        return this.AddOneToOneRelationship
-        (
-            configuration.ApiName,
-            builder => configuration.Configure(builder)
-        );
+        return this.AddOneToOneRelationship(configuration.ApiName, configuration.Configure);
     }
 
     /// <summary>
@@ -198,11 +211,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        return this.AddOneToManyRelationship
-        (
-            configuration.ApiName,
-            builder => configuration.Configure(builder)
-        );
+        return this.AddOneToManyRelationship(configuration.ApiName, configuration.Configure);
     }
 
     /// <summary>
@@ -231,11 +240,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        return this.AddManyToManyRelationship
-        (
-            configuration.ApiName,
-            builder => configuration.Configure(builder)
-        );
+        return this.AddManyToManyRelationship(configuration.ApiName, configuration.Configure);
     }
     #endregion
 
@@ -268,11 +273,10 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         return this.AddScalar(configuration.ClrType, configuration.Configure);
     }
-
     #endregion
 
     #region Internal Query Source Configuration Methods
-    /// <summary>Adds or configures a query source at the supplied precedence.</summary>
+    /// <summary>Declares an independent fluent source at the supplied precedence.</summary>
     internal ApiSchemaBuilder AddQuerySourceCore
     (
         string apiName,
@@ -283,7 +287,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
         ArgumentNullException.ThrowIfNull(configure);
 
-        var builder = _context.GetOrAddQuerySourceBuilder(apiName, source);
+        var builder = _context.DeclareQuerySourceBuilder(apiName, source);
         _context.ApplyConfiguration
         (
             source,
@@ -306,15 +310,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
-        var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName, source);
-        if (builder != null)
-        {
-            _context.ApplyConfiguration
-            (
-                source,
-                () => builder.ApplyConfiguration(source, () => configure(builder))
-            );
-        }
+        var builder = _context.DeclareOneToOneRelationshipBuilder(apiName, source);
+        _context.ApplyConfiguration
+        (
+            source,
+            () => builder.ApplyConfiguration(source, () => configure(builder))
+        );
 
         return this;
     }
@@ -330,15 +331,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
-        var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName, source);
-        if (builder != null)
-        {
-            _context.ApplyConfiguration
-            (
-                source,
-                () => builder.ApplyConfiguration(source, () => configure(builder))
-            );
-        }
+        var builder = _context.DeclareOneToManyRelationshipBuilder(apiName, source);
+        _context.ApplyConfiguration
+        (
+            source,
+            () => builder.ApplyConfiguration(source, () => configure(builder))
+        );
 
         return this;
     }
@@ -354,15 +352,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
-        var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName, source);
-        if (builder != null)
-        {
-            _context.ApplyConfiguration
-            (
-                source,
-                () => builder.ApplyConfiguration(source, () => configure(builder))
-            );
-        }
+        var builder = _context.DeclareManyToManyRelationshipBuilder(apiName, source);
+        _context.ApplyConfiguration
+        (
+            source,
+            () => builder.ApplyConfiguration(source, () => configure(builder))
+        );
 
         return this;
     }
@@ -499,7 +494,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     <see cref="ApiVersionAttribute"/>, etc.).
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder UseDefaultAnnotations() => this.UseAnnotations(a => a.AddReader(new ApiAttributeAnnotationReader()));
+    public ApiSchemaBuilder UseDefaultAnnotations()
+        => this.UseAnnotations(static a => a.AddReader(new ApiAttributeAnnotationReader()));
     #endregion
 
     #region Internal Annotation Discovery Methods
@@ -548,133 +544,55 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         Func<Type, bool>? filter
     )
     {
-        var sourceNamingConventions = _state.ConventionSet?.QuerySourceConventions
-            .OfType<ApiNamingConvention>() ?? [];
-        var parameterNamingConventions = _state.ConventionSet?.QuerySourceParameterConventions
-            .OfType<ApiNamingConvention>() ?? [];
-
         foreach (var result in readerSet.ReadQuerySourceAnnotations(assembly, filter))
         {
-            var invokeMethod = result.ClrDelegateType.GetMethod(nameof(Action.Invoke))!;
-            var outputNullableInfo = ParameterReflection.GetNullabilityInfo(invokeMethod.ReturnParameter);
-            var sourceContext = new ApiQuerySourceConventionContext
-            (
-                result.ClrDelegateType,
-                outputNullableInfo,
-                this
-            );
-            var sourceNameBuilder = new ApiQuerySourceBuilder(result.ClrDelegateType.Name);
-            foreach (var namingConvention in sourceNamingConventions)
+            if (!_context.TryBeginQuerySourceAnnotation(result.ClrDelegateType))
             {
-                namingConvention.Apply(sourceNameBuilder, sourceContext);
-            }
-
-            var apiName = result.ApiName ?? sourceNameBuilder.ApiName;
-            if (!_context.TryRegisterAnnotatedQuerySource(result.ClrDelegateType, apiName, out var conflictingType))
-            {
-                if (conflictingType is not null)
-                {
-                    var apiSchemaPath = ApiSchemaPathFormatting.BuildPath
-                        (null, nameof(ApiSchema), _state.ApiName);
-                    var apiPath = ApiSchemaPathFormatting.BuildPath
-                        (apiSchemaPath, nameof(ApiQuerySource), apiName);
-                    readerSet.AddQuerySourceDiscoveryConflict
-                        (apiPath, apiName, conflictingType, result.ClrDelegateType);
-                }
-
                 continue;
             }
-
-            ApiQuerySourceBuilder? querySourceBuilder = null;
-            this.AddQuerySourceCore
-            (
-                apiName,
-                source =>
+            var builder = _context.GetOrAddDelegateQuerySourceBuilder(result.ClrDelegateType);
+            builder.ApplyConfiguration(ApiConfigurationSource.DataAnnotation, () =>
+            {
+                if (result.ApiName is { } apiName)
                 {
-                    querySourceBuilder = source;
-                    source.SetOutputTypeDataAnnotation(() => ApiTypeExpressionBuilder.Build(outputNullableInfo));
-                    if (outputNullableInfo.Nullability != MemberNullability.Unknown)
+                    builder.WithName(apiName);
+                }
+                if (result.ApiOutputNullability is { } nullability)
+                {
+                    builder.WithOutputNullability(nullability);
+                }
+                if (result.ApiOutputComposition is { } composition)
+                {
+                    builder.WithOutputComposition(composition);
+                }
+                foreach (var parameter in result.ApiInputParameters)
+                {
+                    builder.ConfigureInputParameter(parameter.ClrParameterInfo.Name!, parameterBuilder =>
                     {
-                        source.SetOutputNullabilityDataAnnotation
-                        (
-                            ToApiNullability(outputNullableInfo.Nullability)
-                        );
-                    }
-
-                    if (result.ApiOutputNullability is { } apiOutputNullability)
-                    {
-                        source.SetOutputNullabilityDataAnnotation(apiOutputNullability);
-                    }
-
-                    if (result.ApiOutputComposition is { } apiOutputComposition)
-                    {
-                        source.WithOutputComposition(apiOutputComposition);
-                    }
-
-                    foreach (var parameterResult in result.ApiInputParameters)
-                    {
-                        var parameterInfo = parameterResult.ClrParameterInfo;
-                        var parameterNullableInfo = ParameterReflection.GetNullabilityInfo(parameterInfo);
-                        var parameterNameBuilder = new ApiQuerySourceParameterBuilder(parameterInfo.Name!, parameterInfo.ParameterType);
-                        var parameterContext = new ApiQuerySourceParameterConventionContext
-                        (
-                            parameterInfo,
-                            parameterNullableInfo,
-                            source,
-                            sourceContext
-                        );
-                        foreach (var namingConvention in parameterNamingConventions)
+                        if (parameter.ApiName is { } parameterName)
                         {
-                            namingConvention.Apply(parameterNameBuilder, parameterContext);
+                            parameterBuilder.WithName(parameterName);
                         }
-
-                        var parameterApiName = parameterResult.ApiName ?? parameterNameBuilder.ApiName;
-                        var parameterBuilder = source.AddInputParameterDataAnnotation
-                        (
-                            parameterApiName,
-                            parameterInfo.ParameterType,
-                            () => ApiTypeExpressionBuilder.Build(parameterNullableInfo),
-                            parameter =>
-                            {
-                                if (parameterNullableInfo.Nullability != MemberNullability.Unknown)
-                                {
-                                    parameter.WithNullability(ToApiNullability(parameterNullableInfo.Nullability));
-                                }
-
-                                if (parameterResult.ApiNullability is { } apiNullability)
-                                {
-                                    parameter.WithNullability(apiNullability);
-                                }
-
-                                if (parameterResult.ApiPresence is { } apiPresence)
-                                {
-                                    parameter.WithPresence(apiPresence);
-                                }
-                            }
-                        );
-                        _context.SetQuerySourceParameterConventionContext(parameterBuilder, parameterContext);
-                    }
-                },
-                ApiConfigurationSource.DataAnnotation
-            );
-
-            _context.SetQuerySourceConventionContext(querySourceBuilder!, sourceContext);
+                        if (parameter.ApiNullability is { } parameterNullability)
+                        {
+                            parameterBuilder.WithNullability(parameterNullability);
+                        }
+                        if (parameter.ApiPresence is { } presence)
+                        {
+                            parameterBuilder.WithPresence(presence);
+                        }
+                    });
+                }
+            });
         }
     }
-
-    private static ApiNullability ToApiNullability(MemberNullability clrNullability) =>
-        clrNullability == MemberNullability.NonNullable
-            ? ApiNullability.NonNullable
-            : ApiNullability.Nullable;
     #endregion
 
     #region AddTypes Methods
     /// <summary>
-    ///     Registers one or more CLR types so that conventions and annotations can configure them
-    ///     without any explicit fluent configuration.
-    ///     Object types, scalar types, and enum types may all be mixed in the same call; the
-    ///     method inspects each type and routes it to the correct <c>AddObject</c>, <c>AddScalar</c>,
-    ///     or <c>AddEnum</c> overload.
+    ///     Registers one or more CLR types so that conventions and annotations can configure them without any explicit fluent configuration.
+    ///     Object types, scalar types, and enum types may all be mixed in the same call;
+    ///     the method inspects each type and routes it to the correct <c>AddObject</c>, <c>AddScalar</c>, or <c>AddEnum</c> overload.
     /// </summary>
     /// <param name="clrTypes">The CLR types to register.</param>
     /// <returns>The current builder instance.</returns>
@@ -779,66 +697,70 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The immutable schema build result.</returns>
     public ApiSchemaCompilationResult BuildResult()
     {
-        _context.ResetConfigurationIssues();
-        _context.ResetQuerySourceAnnotationDiscovery();
-        _state.AnnotationReaderSet?.ResetIssues();
-        _context.BeginQuerySourceBuild();
-
+        if (Interlocked.CompareExchange(ref _buildGuard._isBuilding, 1, 0) != 0)
+        {
+            throw new InvalidOperationException("A schema build is already active.");
+        }
         try
         {
-            if (_state.ConventionSet is not null || _state.AnnotationReaderSet is not null)
-            {
-                var configurationPipeline = new ApiSchemaConfigurationPipeline
-                (
-                    _state.ConventionSet,
-                    _state.AnnotationReaderSet,
-                    _context,
-                    this
-                );
-
-                configurationPipeline.Run();
-            }
-
-            // Build ApiSchema instance from all the configured components.
-            var apiName = _state.ApiName!;
-            var apiVersion = _state.ApiVersion;
-            var apiOptions = this.BuildOptions();
-            var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
-            var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
-            var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
-            var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build());
-            var apiQuerySources = _context.ApiQuerySourceBuilders.Select(b => b.Build());
-
-            this.RemoveDiscoveredNavigationProperties(apiRelationships);
-
-            var apiSchema = new ApiSchema
-            (
-                apiName,
-                apiVersion,
-                apiOptions,
-                apiScalarTypes,
-                apiEnumTypes,
-                apiObjectTypes,
-                apiRelationships,
-                apiQuerySources
-            );
-
-            // Add any extensions that were configured.
-            var extensions = this.BuildExtensions();
-            if (extensions is not null)
-            {
-                apiSchema.AttachExtensions(extensions);
-            }
-
-            var annotationIssues = _state.AnnotationReaderSet?.Issues;
-            var configurationIssues = _context.ConfigurationIssues;
-            var preliminaryIssues = (annotationIssues ?? []).Concat(configurationIssues);
-            return ApiSchemaCompiler.Compile(apiSchema, preliminaryIssues);
+            return new ApiSchemaBuildSession(this).BuildResult();
         }
         finally
         {
-            _context.EndQuerySourceBuild();
+            Volatile.Write(ref _buildGuard._isBuilding, 0);
         }
+    }
+
+    internal ApiSchemaCompilationResult BuildSessionResult()
+    {
+        var configurationPipeline = new ApiSchemaConfigurationPipeline
+        (
+            _state.ConventionSet,
+            _state.AnnotationReaderSet,
+            _context,
+            this
+        );
+
+        configurationPipeline.Run();
+
+        _context.CollectRelationshipConfigurationIssues(_state.ApiName);
+        _context.CollectQuerySourceConfigurationIssues(_state.ApiName);
+
+        // Build ApiSchema instance from all the configured components.
+        var apiName = _state.ApiName!;
+        var apiVersion = _state.ApiVersion;
+        var apiOptions = this.BuildOptions();
+        var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(static b => b.Build());
+        var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(static b => b.Build());
+        var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(static b => b.Build());
+        var apiRelationships = _context.ApiRelationshipBuilders.Select(static b => b.Build()).ToArray();
+        var apiQuerySources = _context.ApiQuerySourceBuilders.Select(static b => b.Build());
+
+        this.RemoveDiscoveredNavigationProperties(apiRelationships);
+
+        var apiSchema = new ApiSchema
+        (
+            apiName,
+            apiVersion,
+            apiOptions,
+            apiScalarTypes,
+            apiEnumTypes,
+            apiObjectTypes,
+            apiRelationships,
+            apiQuerySources
+        );
+
+        // Add any extensions that were configured.
+        var extensions = this.BuildExtensions();
+        if (extensions is not null)
+        {
+            apiSchema.AttachExtensions(extensions);
+        }
+
+        var annotationIssues = _state.AnnotationReaderSet?.Issues;
+        var configurationIssues = _context.ConfigurationIssues;
+        var preliminaryIssues = (annotationIssues ?? []).Concat(configurationIssues);
+        return ApiSchemaCompiler.Compile(apiSchema, preliminaryIssues);
     }
 
     private void RemoveDiscoveredNavigationProperties(IEnumerable<ApiRelationship> relationships)
@@ -919,6 +841,24 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var builder = _context.GetOrAddScalarTypeBuilder<TScalar>();
         configure?.Invoke(builder);
         return this;
+    }
+    #endregion
+
+    #region Registered Query Source Annotation Methods
+    internal void ApplyRegisteredQuerySourceAnnotations()
+    {
+        if (_state.AnnotationReaderSet is not { } readers)
+        {
+            return;
+        }
+        var registeredDelegates = _context.ApiQuerySourceBuilders.Select(static builder => builder.ClrDelegateType)
+            .Where(clrType => clrType is not null && !_context.HasQuerySourceAnnotation(clrType))
+            .Cast<Type>().GroupBy(static clrType => clrType.Assembly);
+        foreach (var declarations in registeredDelegates)
+        {
+            var clrDelegateTypes = declarations.ToHashSet();
+            this.ApplyAnnotationQuerySourceDiscovery(readers, declarations.Key, clrDelegateTypes.Contains);
+        }
     }
     #endregion
 }

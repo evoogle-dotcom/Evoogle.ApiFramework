@@ -108,7 +108,7 @@ public class ApiNullabilityTests(ITestOutputHelper output) : XUnitTests(output)
 
             this.WriteLine();
             this.WriteLine($"Actual Success: {this.ActualResult?.IsValid}");
-            var actualCodes = this.ActualResult?.Errors.Select(issue => issue.Code) ?? [];
+            var actualCodes = this.ActualResult?.Errors.Select(static issue => issue.Code) ?? [];
             this.WriteLine($"Actual Issues:  {string.Join(", ", actualCodes)}");
             this.WriteLine();
             this.WriteLine($"Captured Exception: {this.ActualException?.ToString() ?? "None"}");
@@ -287,17 +287,21 @@ public class ApiNullabilityTests(ITestOutputHelper output) : XUnitTests(output)
     #region Test Methods
     [Theory]
     [MemberData(nameof(InvalidNullabilityTheoryData))]
-    public void CompileRejectsInvalidContextualNullability(IXUnitTest test) => test.Execute(this);
+    public void CompileRejectsInvalidContextualNullability(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NestedNullabilityTheoryData))]
-    public void JsonRoundtripPreservesNestedAndContextualNullability(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtripPreservesNestedAndContextualNullability(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Implementation Methods
-    private static ApiTypeExpression TextExpression() => new(new ApiTypeReference(typeof(string)));
+    private static ApiTypeExpression TextExpression()
+        => new(new ApiTypeReference(typeof(string)));
 
-    private static ApiSchema CreateSchema(ApiProperty property, ApiQuerySource source) => new
+    private static ApiSchema CreateSchema(ApiProperty property, ApiQuerySource source)
+        => new
     (
         "NullabilityTests", null, null,
         [new ApiScalarType("String", typeof(string))], [],
@@ -320,7 +324,8 @@ public class ApiNullabilityTests(ITestOutputHelper output) : XUnitTests(output)
         return CreateSchema(property, source);
     }
 
-    private static ApiSchemaCompilationCode GetInvalidCode(NullabilityContext context) => context switch
+    private static ApiSchemaCompilationCode GetInvalidCode(NullabilityContext context)
+        => context switch
     {
         NullabilityContext.Property => ApiSchemaCompilationCode.ApiPropertyInvalidApiNullability,
         NullabilityContext.CollectionItem => ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemNullability,

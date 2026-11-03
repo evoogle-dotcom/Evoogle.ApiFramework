@@ -12,6 +12,15 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 internal sealed class ApiEnumTypeState
 {
     #region Properties
-    internal List<ApiEnumValueBuilder> Values { get; } = [];
+    internal List<ApiEnumValueBuilder> Values { get; private set; } = [];
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiEnumTypeState CreateBuildCopy()
+    {
+        var copy = (ApiEnumTypeState)this.MemberwiseClone();
+        copy.Values = [.. this.Values.Select(static builder => builder.CreateBuildCopy())];
+        return copy;
+    }
     #endregion
 }

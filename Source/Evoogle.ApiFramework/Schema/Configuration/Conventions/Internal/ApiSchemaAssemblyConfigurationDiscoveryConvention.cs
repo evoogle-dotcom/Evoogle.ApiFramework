@@ -94,12 +94,18 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
     #endregion
 
     #region Helper Methods
-    private static bool IsEligibleConfigurationType(Type type) => type.IsClass && !type.IsAbstract && !type.ContainsGenericParameters;
+    private static bool IsEligibleConfigurationType(Type type)
+        => type.IsClass && !type.IsAbstract && !type.ContainsGenericParameters;
 
-    private static string GetTypeName(Type type) => type.FullName ?? type.Name;
+    private static string GetTypeName(Type type)
+        => type.FullName ?? type.Name;
 
     private void ApplyConfigurationType(ApiSchemaBuilder builder, Type configurationType)
     {
+        if (!builder.Context.TryBeginConfigurationDiscovery(configurationType))
+        {
+            return;
+        }
         var configurationTypeName = GetTypeName(configurationType);
         object configuration;
 
@@ -129,7 +135,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
 
         if (configuration is IApiObjectTypeConfiguration objectConfiguration)
         {
-            this.ApplyConfigurationRole
+            ApplyConfigurationRole
             (
                 builder,
                 configurationType,
@@ -140,7 +146,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
 
         if (configuration is IApiScalarTypeConfiguration scalarConfiguration)
         {
-            this.ApplyConfigurationRole
+            ApplyConfigurationRole
             (
                 builder,
                 configurationType,
@@ -151,7 +157,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
 
         if (configuration is IApiEnumTypeConfiguration enumConfiguration)
         {
-            this.ApplyConfigurationRole
+            ApplyConfigurationRole
             (
                 builder,
                 configurationType,
@@ -162,7 +168,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
 
         if (configuration is IApiQuerySourceConfiguration querySourceConfiguration)
         {
-            this.ApplyConfigurationRole
+            ApplyConfigurationRole
             (
                 builder,
                 configurationType,
@@ -171,9 +177,24 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
             );
         }
 
+        foreach (var role in configurationType.GetInterfaces().Where(static role =>
+            role.IsGenericType && role.GetGenericTypeDefinition() == typeof(IApiQuerySourceConfiguration<>))
+            .OrderBy(static role => role.FullName, StringComparer.Ordinal))
+        {
+            ApplyConfigurationRole
+            (
+                builder,
+                configurationType,
+                role.AssemblyQualifiedName!,
+                () => builder.AddQuerySource(role.GenericTypeArguments[0], querySource =>
+                    role.GetMethod(nameof(IApiQuerySourceConfiguration<Delegate>.Configure))!
+                        .Invoke(configuration, [querySource]))
+            );
+        }
+
         if (configuration is IApiRelationshipOneToOneConfiguration oneToOneConfiguration)
         {
-            this.ApplyConfigurationRole
+            ApplyConfigurationRole
             (
                 builder,
                 configurationType,
@@ -184,7 +205,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
 
         if (configuration is IApiRelationshipOneToManyConfiguration oneToManyConfiguration)
         {
-            this.ApplyConfigurationRole
+            ApplyConfigurationRole
             (
                 builder,
                 configurationType,
@@ -195,7 +216,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
 
         if (configuration is IApiRelationshipManyToManyConfiguration manyToManyConfiguration)
         {
-            this.ApplyConfigurationRole
+            ApplyConfigurationRole
             (
                 builder,
                 configurationType,
@@ -208,6 +229,8 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
     private static bool HasConfigurationRole(Type configurationType)
     {
         return
+            configurationType.GetInterfaces().Any(static role => role.IsGenericType &&
+                role.GetGenericTypeDefinition() == typeof(IApiQuerySourceConfiguration<>)) ||
             typeof(IApiEnumTypeConfiguration).IsAssignableFrom(configurationType) ||
             typeof(IApiObjectTypeConfiguration).IsAssignableFrom(configurationType) ||
             typeof(IApiQuerySourceConfiguration).IsAssignableFrom(configurationType) ||
@@ -217,7 +240,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
             typeof(IApiScalarTypeConfiguration).IsAssignableFrom(configurationType);
     }
 
-    private void ApplyConfigurationRole
+    private static void ApplyConfigurationRole
     (
         ApiSchemaBuilder builder,
         Type configurationType,
@@ -225,6 +248,10 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
         Action apply
     )
     {
+        if (!builder.Context.TryBeginConfigurationRole(configurationType, configurationRole))
+        {
+            return;
+        }
         try
         {
             builder.Context.ApplyConfiguration

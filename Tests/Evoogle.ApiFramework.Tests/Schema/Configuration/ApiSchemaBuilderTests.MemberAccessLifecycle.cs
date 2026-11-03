@@ -126,6 +126,7 @@ public partial class ApiSchemaBuilderTests
     #region Member Access Lifecycle Test Methods
     [Theory]
     [MemberData(nameof(RepeatedEndTraversalBuildTheoryData))]
-    public void RepeatedEndBuildsCreateDistinctTraversals(IXUnitTest test) => test.Execute(this);
+    public void RepeatedEndBuildsCreateDistinctTraversals(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

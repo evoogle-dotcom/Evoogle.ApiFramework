@@ -9,7 +9,12 @@ internal static class ApiQuerySourceAnnotationValidation
     {
         if (!typeof(MulticastDelegate).IsAssignableFrom(clrDelegateType.BaseType))
         {
-            return $"{nameof(ApiQuerySourceAttribute)} can only annotate a delegate type";
+            return "A query-source declaration requires a CLR delegate type";
+        }
+
+        if (!clrDelegateType.IsVisible)
+        {
+            return "A query-source delegate must be public";
         }
 
         if (clrDelegateType.ContainsGenericParameters)
@@ -33,7 +38,12 @@ internal static class ApiQuerySourceAnnotationValidation
             return "A query-source delegate cannot declare a by-reference or pointer output";
         }
 
-        if (invokeMethod.GetParameters().Any(parameter => parameter.ParameterType.IsByRef || parameter.ParameterType.IsPointer))
+        if (invokeMethod.GetParameters().Any(static parameter => string.IsNullOrWhiteSpace(parameter.Name)))
+        {
+            return "A query-source delegate parameter must have a CLR metadata name";
+        }
+
+        if (invokeMethod.GetParameters().Any(static parameter => parameter.ParameterType.IsByRef || parameter.ParameterType.IsPointer))
         {
             return "A query-source delegate cannot declare by-reference or pointer parameters";
         }
@@ -60,7 +70,7 @@ internal static class ApiQuerySourceAnnotationValidation
 
         return clrType.GetInterfaces().Any
         (
-            interfaceType => interfaceType.IsGenericType &&
+            static interfaceType => interfaceType.IsGenericType &&
                 interfaceType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)
         );
     }

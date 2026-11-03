@@ -103,10 +103,12 @@ public sealed class ApiVersionAnnotationContractTests(ITestOutputHelper output)
     #region Test Methods
     [Theory]
     [MemberData(nameof(AttributeUsageTheoryData))]
-    public void AttributeUsage(IXUnitTest test) => test.Execute(this);
+    public void AttributeUsage(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(PocoUsageTheoryData))]
-    public void PocoUsage(IXUnitTest test) => test.Execute(this);
+    public void PocoUsage(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

@@ -10,7 +10,6 @@ using Evoogle.ApiFramework.Schema.Query;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.XUnit;
-using Evoogle.XUnit.Json;
 
 using FluentAssertions;
 
@@ -30,7 +29,8 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange() => this.WriteLine($"AnnotationType: {this.AnnotationType}");
+        protected override void Arrange()
+            => this.WriteLine($"AnnotationType: {this.AnnotationType}");
 
         protected override void Act()
         {
@@ -112,8 +112,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.WriteLine("Expected Inherited: False");
 
             var serializer = new XUnitTestSerializer();
-            this.RestoredTest = (AnnotationUsageTest)serializer.Deserialize
-                (this.GetType(), serializer.Serialize(this));
+            this.RestoredTest = (AnnotationUsageTest)serializer.Deserialize(this.GetType(), serializer.Serialize(this));
         }
 
         protected override void Act()
@@ -156,25 +155,23 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.WriteLine($"Expected Properties: {string.Join(", ", this.ExpectedProperties)}");
 
             var serializer = new XUnitTestSerializer();
-            this.RestoredTest = (AnnotationDeclaredPropertiesTest)serializer.Deserialize
-                (this.GetType(), serializer.Serialize(this));
+            this.RestoredTest = (AnnotationDeclaredPropertiesTest)serializer.Deserialize(this.GetType(), serializer.Serialize(this));
         }
 
         protected override void Act()
         {
-            this.ActualProperties = this.RestoredTest.AnnotationType.GetProperties
+            this.ActualProperties = [.. this.RestoredTest.AnnotationType.GetProperties
                 (BindingFlags.Instance | BindingFlags.Public)
                 .Where(property => property.DeclaringType == this.RestoredTest.AnnotationType)
-                .Select(property => property.Name)
-                .Order()
-                .ToArray();
+                .Select(static property => property.Name)
+                .Order()];
 
             this.WriteLine();
             this.WriteLine($"Actual Properties: {string.Join(", ", this.ActualProperties)}");
         }
 
-        protected override void Assert() => this.ActualProperties.Should()
-            .Equal(this.RestoredTest.ExpectedProperties.Order());
+        protected override void Assert()
+            => this.ActualProperties.Should().Equal(this.RestoredTest.ExpectedProperties.Order());
         #endregion
     }
 
@@ -198,8 +195,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.WriteLine($"Expected Assembly: {this.AnnotationType.Assembly.GetName().Name}");
 
             var serializer = new XUnitTestSerializer();
-            this.RestoredTest = (AnnotationReferencedTypeAssemblyTest)serializer.Deserialize
-                (this.GetType(), serializer.Serialize(this));
+            this.RestoredTest = (AnnotationReferencedTypeAssemblyTest)serializer.Deserialize(this.GetType(), serializer.Serialize(this));
         }
 
         protected override void Act()
@@ -208,8 +204,8 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.WriteLine($"Actual Assembly: {this.RestoredTest.ReferencedType.Assembly.GetName().Name}");
         }
 
-        protected override void Assert() => ((object)this.RestoredTest.ReferencedType.Assembly).Should()
-            .BeSameAs(this.RestoredTest.AnnotationType.Assembly);
+        protected override void Assert()
+            => ((object)this.RestoredTest.ReferencedType.Assembly).Should().BeSameAs(this.RestoredTest.AnnotationType.Assembly);
         #endregion
     }
 
@@ -231,7 +227,8 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             this.WriteLine($"PropertyName: {this.PropertyName}");
         }
 
-        protected override void Act() => this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
+        protected override void Act()
+            => this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
 
         protected override void Assert()
         {
@@ -253,25 +250,33 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
 
         #region Calculated Properties
         private PropertyInfo? ActualProperty { get; set; }
+        private OptionalAnnotationPropertyTest RestoredCase { get; set; } = null!;
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
             this.WriteLine($"AnnotationType: {this.AnnotationType}");
-            this.WriteLine($"PropertyName: {this.PropertyName}");
+            this.WriteLine($"PropertyName:   {this.PropertyName}");
+            this.WriteLine("Expected State: Nullable");
+            var serializer = new XUnitTestSerializer();
+            this.RestoredCase = (OptionalAnnotationPropertyTest)serializer.Deserialize(this.GetType(), serializer.Serialize(this));
         }
 
-        protected override void Act() => this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
+        protected override void Act()
+        {
+            this.ActualProperty = this.RestoredCase.AnnotationType.GetProperty(this.RestoredCase.PropertyName);
+            this.WriteLine();
+            this.WriteLine($"Actual Property: {this.ActualProperty}");
+            this.WriteLine($"Actual State:    {new NullabilityInfoContext().Create(this.ActualProperty!).ReadState}");
+        }
 
         protected override void Assert()
         {
             this.ActualProperty.Should().NotBeNull();
 
             var nullabilityContext = new NullabilityInfoContext();
-            nullabilityContext.Create(this.ActualProperty).ReadState
-                .Should()
-                .Be(NullabilityState.Nullable);
+            nullabilityContext.Create(this.ActualProperty).ReadState.Should().Be(NullabilityState.Nullable);
         }
         #endregion
     }
@@ -347,7 +352,8 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             }
         }
 
-        protected override void Assert() => this.ActualException.Should().BeOfType<ArgumentNullException>();
+        protected override void Assert()
+            => this.ActualException.Should().BeOfType<ArgumentNullException>();
         #endregion
     }
     #endregion
@@ -518,6 +524,18 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             PropertyName = nameof(ApiVersionAttribute.ClrType)
         },
 
+        new AnnotationPropertyInitTest
+        {
+            Name = "ApiRelationshipAttribute.InverseNavigation uses init",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            PropertyName = nameof(ApiRelationshipAttribute.InverseNavigation)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = "ApiManyToManyRelationshipAttribute.InverseNavigation uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.InverseNavigation)
+        },
         // ApiRelationshipAttribute properties
         new AnnotationPropertyInitTest
         {
@@ -876,6 +894,18 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
     [
         new OptionalAnnotationPropertyTest
         {
+            Name = "ApiRelationshipAttribute.InverseNavigation is nullable",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            PropertyName = nameof(ApiRelationshipAttribute.InverseNavigation)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = "ApiManyToManyRelationshipAttribute.InverseNavigation is nullable",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.InverseNavigation)
+        },
+        new OptionalAnnotationPropertyTest
+        {
             Name = $"{nameof(ApiNamedElementAttribute)}.{nameof(ApiNamedElementAttribute.ApiName)} is nullable",
             AnnotationType = typeof(ApiNamedElementAttribute),
             PropertyName = nameof(ApiNamedElementAttribute.ApiName)
@@ -1146,39 +1176,48 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
     #region Test Methods
     [Theory]
     [MemberData(nameof(AnnotationConstructorTheoryData))]
-    public void AnnotationConstructor(IXUnitTest test) => test.Execute(this);
+    public void AnnotationConstructor(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(AnnotationPropertyInitTheoryData))]
-    public void AnnotationPropertyInit(IXUnitTest test) => test.Execute(this);
+    public void AnnotationPropertyInit(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(AnnotationUsageTheoryData))]
-    public void AnnotationUsage(IXUnitTest test) => test.Execute(this);
+    public void AnnotationUsage(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(AnnotationDeclaredPropertiesTheoryData))]
-    public void AnnotationDeclaredProperties(IXUnitTest test) => test.Execute(this);
+    public void AnnotationDeclaredProperties(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(AnnotationReferencedTypeAssemblyTheoryData))]
-    public void AnnotationReferencedTypeAssembly(IXUnitTest test) => test.Execute(this);
+    public void AnnotationReferencedTypeAssembly(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(RequiredAnnotationPropertyTheoryData))]
-    public void RequiredAnnotationProperty(IXUnitTest test) => test.Execute(this);
+    public void RequiredAnnotationProperty(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(OptionalAnnotationPropertyTheoryData))]
-    public void OptionalAnnotationProperty(IXUnitTest test) => test.Execute(this);
+    public void OptionalAnnotationProperty(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(RequiredAnnotationApiNameTheoryData))]
-    public void RequiredAnnotationApiName(IXUnitTest test) => test.Execute(this);
+    public void RequiredAnnotationApiName(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(RequiredAnnotationClrTypeTheoryData))]
-    public void RequiredAnnotationClrType(IXUnitTest test) => test.Execute(this);
+    public void RequiredAnnotationClrType(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Private Methods
@@ -1312,6 +1351,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
     )]
     private sealed class AnnotatedPoco
     {
+        #region Properties
         [ApiKey]
         [ApiProperty(ApiName = "id", IsNonNullable = true)]
         public int Id { get; set; }
@@ -1334,6 +1374,7 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             OtherPrincipalType = typeof(AnnotationDependent)
         )]
         public List<AnnotationDependent> Dependents { get; } = [];
+        #endregion
     }
 
     [ApiScalar(ApiName = "AnnotatedScalar")]
@@ -1342,12 +1383,15 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
     [ApiEnum(ApiName = "AnnotatedEnum")]
     private enum AnnotatedEnum
     {
+        #region Values
         [ApiEnumValue(ApiName = "first")]
         First
+        #endregion
     }
 
     public static class QuerySources
     {
+        #region Test Types
         [ApiQuerySource
         (
             ApiName = "Customers",
@@ -1364,12 +1408,15 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             )]
             string? status
         );
+        #endregion
     }
 
     public sealed class SubjectQuerySources
     {
+        #region Test Types
         [ApiQuerySource]
         public delegate QueryAnnotationCustomer CustomerById(int id);
+        #endregion
     }
 
     public sealed class QueryAnnotationCustomer;

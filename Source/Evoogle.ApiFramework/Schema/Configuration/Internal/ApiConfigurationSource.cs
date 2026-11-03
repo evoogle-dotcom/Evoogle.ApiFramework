@@ -23,12 +23,13 @@ internal enum ApiConfigurationSource
     /// </summary>
     Convention = 0,
 
-    /// <summary>Applied by a CLR attribute annotation reader.</summary>
+    /// <summary>
+    ///     Applied by a CLR attribute annotation reader.
+    /// </summary>
     DataAnnotation = 1,
 
     /// <summary>
-    ///     Applied to a value expressly supplied for a configurable facet through a fluent builder
-    ///     call or configuration class.
+    ///     Applied to a value expressly supplied for a configurable facet through a fluent builder call or configuration class.
     /// </summary>
     Explicit = 2,
 }

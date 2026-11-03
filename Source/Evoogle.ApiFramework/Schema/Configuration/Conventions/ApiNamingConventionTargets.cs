@@ -36,7 +36,11 @@ public enum ApiNamingConventionTargets
     /// <summary>API query-source parameter names.</summary>
     QuerySourceParameter = 1 << 6,
 
+    /// <summary>API relationship traversal names.</summary>
+    RelationshipTraversal = 1 << 7,
+
     /// <summary>All supported schema element kinds.</summary>
-    All = ScalarType | EnumType | EnumValue | ObjectType | Property | QuerySource | QuerySourceParameter,
+    All = ScalarType | EnumType | EnumValue | ObjectType | Property | QuerySource | QuerySourceParameter |
+        RelationshipTraversal,
     #endregion
 }

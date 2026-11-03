@@ -220,6 +220,7 @@ public partial class ApiObjectTypeBuilderTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildGenericTheoryData))]
-    public void BuildGeneric(IXUnitTest test) => test.Execute(this);
+    public void BuildGeneric(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

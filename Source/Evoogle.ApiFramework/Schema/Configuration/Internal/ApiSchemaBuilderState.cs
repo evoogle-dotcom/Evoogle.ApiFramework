@@ -25,4 +25,17 @@ internal sealed class ApiSchemaBuilderState
 
     internal ApiAnnotationReaderSet? AnnotationReaderSet { get; set; }
     #endregion
+
+    #region Build Copy Methods
+    internal ApiSchemaBuilderState CreateBuildCopy()
+        => new()
+    {
+        ApiName = this.ApiName,
+        ApiVersion = this.ApiVersion,
+        OptionsConfiguration = this.OptionsConfiguration,
+        ConventionSet = this.ConventionSet is null ? null : new ApiConventionSetBuilder(this.ConventionSet).Build(),
+        AnnotationReaderSet = this.AnnotationReaderSet is null
+            ? null : new ApiAnnotationReaderSet([.. this.AnnotationReaderSet.Readers]),
+    };
+    #endregion
 }

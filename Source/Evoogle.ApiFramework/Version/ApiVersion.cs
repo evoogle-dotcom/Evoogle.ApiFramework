@@ -96,16 +96,11 @@ public readonly struct ApiVersion : IEquatable<ApiVersion>
             ushort typedValue => FromUnsignedInteger(clrType, typedValue),
             uint typedValue => FromUnsignedInteger(clrType, typedValue),
             ulong typedValue => FromUnsignedInteger(clrType, typedValue),
-            Guid typedValue => new(clrType, ApiVersionStorageKind.Guid,
-                ApiVersionValueUnion.FromGuid(typedValue)),
-            Ulid typedValue => new(clrType, ApiVersionStorageKind.Ulid,
-                ApiVersionValueUnion.FromUlid(typedValue)),
-            DateTime typedValue => new(clrType, ApiVersionStorageKind.DateTime,
-                ApiVersionValueUnion.FromDateTime(typedValue)),
-            DateTimeOffset typedValue => new(clrType, ApiVersionStorageKind.DateTimeOffset,
-                ApiVersionValueUnion.FromDateTimeOffset(typedValue)),
-            string typedValue => new(clrType, ApiVersionStorageKind.String,
-                referenceValue: typedValue),
+            Guid typedValue => new(clrType, ApiVersionStorageKind.Guid, ApiVersionValueUnion.FromGuid(typedValue)),
+            Ulid typedValue => new(clrType, ApiVersionStorageKind.Ulid, ApiVersionValueUnion.FromUlid(typedValue)),
+            DateTime typedValue => new(clrType, ApiVersionStorageKind.DateTime, ApiVersionValueUnion.FromDateTime(typedValue)),
+            DateTimeOffset typedValue => new(clrType, ApiVersionStorageKind.DateTimeOffset, ApiVersionValueUnion.FromDateTimeOffset(typedValue)),
+            string typedValue => new(clrType, ApiVersionStorageKind.String, referenceValue: typedValue),
             byte[] typedValue => FromBinary(clrType, typedValue),
             Memory<byte> typedValue => FromBinary(clrType, typedValue.Span),
             ReadOnlyMemory<byte> typedValue => FromBinary(clrType, typedValue.Span),
@@ -217,17 +212,17 @@ public readonly struct ApiVersion : IEquatable<ApiVersion>
 
         if (_clrType == typeof(ReadOnlyMemory<byte>))
         {
-            return new ReadOnlyMemory<byte>(bytes.ToArray());
+            return new ReadOnlyMemory<byte>([.. bytes]);
         }
 
         if (_clrType == typeof(Memory<byte>))
         {
-            return new Memory<byte>(bytes.ToArray());
+            return new Memory<byte>([.. bytes]);
         }
 
         if (_clrType == typeof(ArraySegment<byte>))
         {
-            return new ArraySegment<byte>(bytes.ToArray());
+            return new ArraySegment<byte>([.. bytes]);
         }
 
         return ImmutableArray.Create(bytes);
@@ -262,25 +257,19 @@ public readonly struct ApiVersion : IEquatable<ApiVersion>
         return _storageKind switch
         {
             ApiVersionStorageKind.Empty => true,
-            ApiVersionStorageKind.SignedInteger =>
-                _valueUnion.SignedInteger == other._valueUnion.SignedInteger,
-            ApiVersionStorageKind.UnsignedInteger =>
-                _valueUnion.UnsignedInteger == other._valueUnion.UnsignedInteger,
+            ApiVersionStorageKind.SignedInteger => _valueUnion.SignedInteger == other._valueUnion.SignedInteger,
+            ApiVersionStorageKind.UnsignedInteger => _valueUnion.UnsignedInteger == other._valueUnion.UnsignedInteger,
             ApiVersionStorageKind.Guid => _valueUnion.Guid == other._valueUnion.Guid,
             ApiVersionStorageKind.Ulid => _valueUnion.Ulid == other._valueUnion.Ulid,
-            ApiVersionStorageKind.DateTime =>
-                _valueUnion.DateTime.Ticks == other._valueUnion.DateTime.Ticks &&
-                _valueUnion.DateTime.Kind == other._valueUnion.DateTime.Kind,
-            ApiVersionStorageKind.DateTimeOffset =>
-                _valueUnion.DateTimeOffset.EqualsExact(other._valueUnion.DateTimeOffset),
+            ApiVersionStorageKind.DateTime => _valueUnion.DateTime.Ticks == other._valueUnion.DateTime.Ticks && _valueUnion.DateTime.Kind == other._valueUnion.DateTime.Kind,
+            ApiVersionStorageKind.DateTimeOffset => _valueUnion.DateTimeOffset.EqualsExact(other._valueUnion.DateTimeOffset),
             ApiVersionStorageKind.String => string.Equals
             (
                 (string?)_referenceValue,
                 (string?)other._referenceValue,
                 StringComparison.Ordinal
             ),
-            ApiVersionStorageKind.Binary =>
-                ((byte[])_referenceValue!).AsSpan().SequenceEqual((byte[])other._referenceValue!),
+            ApiVersionStorageKind.Binary => ((byte[])_referenceValue!).AsSpan().SequenceEqual((byte[])other._referenceValue!),
             ApiVersionStorageKind.Object => Equals(_referenceValue, other._referenceValue),
             _ => false
         };
@@ -307,20 +296,12 @@ public readonly struct ApiVersion : IEquatable<ApiVersion>
         return _storageKind switch
         {
             ApiVersionStorageKind.Empty => 0,
-            ApiVersionStorageKind.SignedInteger => HashCode.Combine
-                (_clrType, _valueUnion.SignedInteger),
-            ApiVersionStorageKind.UnsignedInteger => HashCode.Combine
-                (_clrType, _valueUnion.UnsignedInteger),
+            ApiVersionStorageKind.SignedInteger => HashCode.Combine(_clrType, _valueUnion.SignedInteger),
+            ApiVersionStorageKind.UnsignedInteger => HashCode.Combine(_clrType, _valueUnion.UnsignedInteger),
             ApiVersionStorageKind.Guid => HashCode.Combine(_clrType, _valueUnion.Guid),
             ApiVersionStorageKind.Ulid => HashCode.Combine(_clrType, _valueUnion.Ulid),
-            ApiVersionStorageKind.DateTime => HashCode.Combine
-                (_clrType, _valueUnion.DateTime.Ticks, _valueUnion.DateTime.Kind),
-            ApiVersionStorageKind.DateTimeOffset => HashCode.Combine
-                (
-                    _clrType,
-                    _valueUnion.DateTimeOffset.Ticks,
-                    _valueUnion.DateTimeOffset.Offset
-                ),
+            ApiVersionStorageKind.DateTime => HashCode.Combine(_clrType, _valueUnion.DateTime.Ticks, _valueUnion.DateTime.Kind),
+            ApiVersionStorageKind.DateTimeOffset => HashCode.Combine(_clrType, _valueUnion.DateTimeOffset.Ticks, _valueUnion.DateTimeOffset.Offset),
             _ => HashCode.Combine(_clrType, _referenceValue)
         };
     }

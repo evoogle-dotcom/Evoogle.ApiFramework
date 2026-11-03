@@ -41,7 +41,7 @@ public static class ApiObjectTypeExtensions
             return apiKey;
         }
 
-        var availableKeysByApiName = string.Join(',', apiObjectType.ApiKeyApiNames.OrderBy(k => k));
+        var availableKeysByApiName = string.Join(',', apiObjectType.ApiKeyApiNames.OrderBy(static k => k));
         var errorMessage =
             $"{nameof(ApiNamedKeyDefinition)} with name '{apiName.SafeToString()}' not found in " +
             $"{apiObjectType.SafeToString()}. Available {nameof(ApiNamedKeyDefinition)} names are: " +
@@ -70,7 +70,7 @@ public static class ApiObjectTypeExtensions
             return apiProperty;
         }
 
-        var availablePropertiesByApiName = string.Join(',', apiObjectType.ApiProperties.OrderBy(p => p.ApiName).Select(p => p.ApiName));
+        var availablePropertiesByApiName = string.Join(',', apiObjectType.ApiProperties.OrderBy(static p => p.ApiName).Select(static p => p.ApiName));
         var errorMessage =
             $"{nameof(ApiProperty)} with {nameof(ApiProperty.ApiName)} '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
             $"Available {nameof(ApiProperty)} by {nameof(ApiProperty.ApiName)} are: {availablePropertiesByApiName}.";

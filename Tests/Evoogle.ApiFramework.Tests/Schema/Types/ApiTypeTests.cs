@@ -24,7 +24,8 @@ public partial class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ApiType? CreateExpected(ApiTypeDef? descriptor) => BuildApiType(descriptor);
+        protected override ApiType? CreateExpected(ApiTypeDef? descriptor)
+            => BuildApiType(descriptor);
         #endregion
     }
 
@@ -38,14 +39,16 @@ public partial class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ApiType? CreateExpected(ApiTypeDef? descriptor) => BuildApiType(descriptor);
+        protected override ApiType? CreateExpected(ApiTypeDef? descriptor)
+            => BuildApiType(descriptor);
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ApiType, ApiTypeDef>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ApiType? CreateSource(ApiTypeDef? descriptor) => BuildApiType(descriptor);
+        protected override ApiType? CreateSource(ApiTypeDef? descriptor)
+            => BuildApiType(descriptor);
         #endregion
     }
     #endregion

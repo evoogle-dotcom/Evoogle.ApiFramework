@@ -26,7 +26,7 @@ public static class ApiQuerySourceExtensions
         throw new ApiSchemaException
         (
             $"Parameter '{apiName}' was not found in query source '{source.ApiName}'. "
-            + $"Available parameters: {string.Join(", ", source.ApiInputParameters.Select(parameter => parameter.ApiName))}."
+            + $"Available parameters: {string.Join(", ", source.ApiInputParameters.Select(static parameter => parameter.ApiName))}."
         );
     }
     #endregion

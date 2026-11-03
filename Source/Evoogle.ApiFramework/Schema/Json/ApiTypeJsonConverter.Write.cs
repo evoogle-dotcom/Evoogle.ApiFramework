@@ -129,7 +129,8 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         Utf8JsonWriter writer,
         ApiType apiType,
         DefaultWriteContext<PropertyNames> writeContext
-    ) => writer.WritePropertyWithConverter
+    )
+        => writer.WritePropertyWithConverter
     (
         propertyName: writeContext.PropertyNames.ApiType.ApiKind,
         value: apiType.ApiKind,

@@ -64,5 +64,9 @@ public sealed class ApiManyToManyRelationshipAttribute : ApiNamedElementAttribut
     ///     back to <see cref="OtherPrincipalType"/>.
     /// </summary>
     public string? ForeignKeyB { get; init; }
+
+    /// <summary>Gets the public property or field name of the navigation on the opposite CLR endpoint.</summary>
+    /// <remarks>When omitted, this annotation does not associate an inverse navigation locator.</remarks>
+    public string? InverseNavigation { get; init; }
     #endregion
 }

@@ -21,7 +21,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 {
     #region Fields
-    private readonly ApiKeyPathState _state;
+    private ApiKeyPathState _state;
     #endregion
 
     #region Properties
@@ -167,12 +167,14 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     (
         ApiTypeReference apiRootObjectTypeReference,
         params string[] clrMemberNames
-    ) => new(apiRootObjectTypeReference, clrMemberNames);
+    )
+        => new(apiRootObjectTypeReference, clrMemberNames);
 
     /// <summary>
     ///     Creates a builder whose root is inferred from its enclosing schema context.
     /// </summary>
-    public static ApiKeyPathBuilder For(params string[] clrMemberNames) => new(clrMemberNames);
+    public static ApiKeyPathBuilder For(params string[] clrMemberNames)
+        => new(clrMemberNames);
 
     /// <summary>
     ///     Creates a builder for a path that starts from the specified root CLR type, using pre-configured
@@ -198,11 +200,12 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     (
         ApiTypeReference apiRootObjectTypeReference,
         params ApiKeyPathSegmentBuilder[] segmentBuilders
-    ) => new(apiRootObjectTypeReference, segmentBuilders);
+    )
+        => new(apiRootObjectTypeReference, segmentBuilders);
 
     /// <summary>Creates a builder with an inferred root and segment builders.</summary>
-    public static ApiKeyPathBuilder For(params ApiKeyPathSegmentBuilder[] segmentBuilders) =>
-        new(segmentBuilders);
+    public static ApiKeyPathBuilder For(params ApiKeyPathSegmentBuilder[] segmentBuilders)
+        => new(segmentBuilders);
     #endregion
 
     #region AddExtension Methods
@@ -212,7 +215,8 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyPathBuilder AddKeyPathExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiKeyPathBuilder AddKeyPathExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddSegment Methods
@@ -258,7 +262,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// </summary>
     internal ApiKeyPath Build()
     {
-        var segments = _state.SegmentBuilders.Select(b => b.Build());
+        var segments = _state.SegmentBuilders.Select(static b => b.Build());
         var path = new ApiKeyPath(_state.ApiRootObjectTypeReference, segments);
 
         var extensions = this.BuildExtensions();
@@ -324,6 +328,15 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         }
 
         return state;
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiKeyPathBuilder CreateBuildCopy()
+    {
+        var copy = this.CreateExtensionBuildCopy();
+        copy._state = _state.CreateBuildCopy();
+        return copy;
     }
     #endregion
 }

@@ -42,8 +42,8 @@ public sealed class ApiSchemaCompilationResult
     internal ApiSchemaCompilationResult(ApiSchema? schema, IEnumerable<ApiSchemaCompilationIssue>? issues)
     {
         this.Issues = issues is null ? [] : [.. issues];
-        this.Errors = [.. this.Issues.Where(issue => issue.Severity == ApiSchemaCompilationSeverity.Error)];
-        this.Warnings = [.. this.Issues.Where(issue => issue.Severity == ApiSchemaCompilationSeverity.Warning)];
+        this.Errors = [.. this.Issues.Where(static issue => issue.Severity == ApiSchemaCompilationSeverity.Error)];
+        this.Warnings = [.. this.Issues.Where(static issue => issue.Severity == ApiSchemaCompilationSeverity.Warning)];
         this.Schema = this.Errors.IsEmpty
             ? schema ?? throw new ArgumentNullException(nameof(schema))
             : null;

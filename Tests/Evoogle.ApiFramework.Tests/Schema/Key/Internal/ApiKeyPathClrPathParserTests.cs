@@ -30,7 +30,8 @@ public class ApiKeyPathClrPathParserTests(ITestOutputHelper output) : XUnitTests
         protected override void Arrange()
         { }
 
-        protected override void Act() => this.ActualResult = ApiKeyPathClrPathParser.Parse(this.ClrPath);
+        protected override void Act()
+            => this.ActualResult = ApiKeyPathClrPathParser.Parse(this.ClrPath);
 
         protected override void Assert()
         {
@@ -81,6 +82,7 @@ public class ApiKeyPathClrPathParserTests(ITestOutputHelper output) : XUnitTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(ParseTheoryData))]
-    public void Parse(IXUnitTest test) => test.Execute(this);
+    public void Parse(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

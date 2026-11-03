@@ -31,4 +31,9 @@ internal sealed class ApiNamedTypeState
 
     internal ApiConfigurationSource ApiNameSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
+
+    #region Build Copy Methods
+    internal ApiNamedTypeState CreateBuildCopy()
+        => (ApiNamedTypeState)this.MemberwiseClone();
+    #endregion
 }

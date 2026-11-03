@@ -53,7 +53,7 @@ internal sealed class ApiSchemaCompilationContext
         string description,
         string? remediation
     )
-    => this.Session.AddIssue(this.ApiPath, severity, code, description, remediation);
+        => this.Session.AddIssue(this.ApiPath, severity, code, description, remediation);
 
     public void AddIssue
     (
@@ -63,6 +63,6 @@ internal sealed class ApiSchemaCompilationContext
         string description,
         string? remediation
     )
-    => this.Session.AddIssue(apiPath, severity, code, description, remediation);
+        => this.Session.AddIssue(apiPath, severity, code, description, remediation);
     #endregion
 }

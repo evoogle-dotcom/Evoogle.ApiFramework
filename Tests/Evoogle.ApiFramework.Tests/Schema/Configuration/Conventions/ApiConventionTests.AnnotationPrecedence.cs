@@ -42,16 +42,16 @@ public partial class ApiConventionTests
             {
                 AnnotationPrecedenceTestCase.ConventionProperty => builder
                     .AddObject<ConventionPropertyAnnotationTarget>()
-                    .UseConventions(c => c.AddConvention(new AddAnnotatedPropertyConvention()))
+                    .UseConventions(static c => c.AddConvention(new AddAnnotatedPropertyConvention()))
                     .UseDefaultAnnotations(),
                 AnnotationPrecedenceTestCase.ConventionEnumValue => builder
                     .AddEnum<ConventionEnumAnnotationTarget>()
-                    .UseConventions(c => c.AddConvention(new AddAnnotatedEnumValueConvention()))
+                    .UseConventions(static c => c.AddConvention(new AddAnnotatedEnumValueConvention()))
                     .UseDefaultAnnotations(),
                 AnnotationPrecedenceTestCase.ExplicitProperty => builder
                     .AddObject<ConventionPropertyAnnotationTarget>
                     (
-                        x => x.AddProperty
+                        static x => x.AddProperty
                         (
                             "ExplicitPropertyName",
                             nameof(ConventionPropertyAnnotationTarget.Annotated)
@@ -61,7 +61,7 @@ public partial class ApiConventionTests
                 AnnotationPrecedenceTestCase.ExplicitEnumValue => builder
                     .AddEnum<ConventionEnumAnnotationTarget>
                     (
-                        x => x.AddValue
+                        static x => x.AddValue
                         (
                             "ExplicitEnumValueName",
                             nameof(ConventionEnumAnnotationTarget.Annotated),
@@ -77,7 +77,8 @@ public partial class ApiConventionTests
             this.WriteLine();
         }
 
-        protected override void Act() => this.ApiSchemaActual = this.ApiSchemaBuilder!.Build();
+        protected override void Act()
+            => this.ApiSchemaActual = this.ApiSchemaBuilder!.Build();
 
         protected override void Assert()
         {
@@ -135,7 +136,8 @@ public partial class ApiConventionTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(AnnotationPrecedenceTheoryData))]
-    public void AnnotationPrecedence(IXUnitTest test) => test.Execute(this);
+    public void AnnotationPrecedence(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }
 

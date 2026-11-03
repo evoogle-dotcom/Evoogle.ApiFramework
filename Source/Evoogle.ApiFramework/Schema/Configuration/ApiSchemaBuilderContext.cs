@@ -1,12 +1,7 @@
 ﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
-using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
-using Evoogle.ApiFramework.Schema.Configuration.Conventions;
-using Evoogle.ApiFramework.Schema.Configuration.Query;
-using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 using Evoogle.Logging;
 
@@ -19,25 +14,19 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     The context caches builder instances and exposes a consolidated logger to provide consistent diagnostics.
 /// </summary>
 /// <param name="logger">The optional logger used to emit diagnostics during schema construction.</param>
-public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
+public sealed partial class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
 {
     #region Fields
     private readonly Dictionary<Type, ApiScalarTypeBuilder> _apiScalarTypeBuilders = [];
     private readonly Dictionary<Type, ApiEnumTypeBuilder> _apiEnumTypeBuilders = [];
     private readonly Dictionary<Type, ApiObjectTypeBuilder> _apiObjectTypeBuilders = [];
-    private readonly Dictionary<string, ApiRelationshipBuilder> _apiRelationshipBuilders = new(ApiNameComparer.Instance);
-    
-    private readonly Dictionary<string, ApiQuerySourceBuilder> _apiQuerySourceBuilders = new(ApiNameComparer.Instance);
-    private Dictionary<string, ApiQuerySourceBuilder>? _buildApiQuerySourceBuilders;
-    private readonly Dictionary<ApiQuerySourceBuilder, ApiQuerySourceConventionContext> _apiQuerySourceConventionContexts = [];
-    private readonly Dictionary<ApiQuerySourceParameterBuilder, ApiQuerySourceParameterConventionContext> _apiQuerySourceParameterConventionContexts = [];
-    private readonly Dictionary<string, Type> _annotatedQuerySourceClrTypes = new(ApiNameComparer.Instance);
-    private readonly HashSet<Type> _discoveredQuerySourceClrTypes = [];
 
     private readonly Queue<ApiObjectTypeBuilder> _pendingObjectBuilders = new();
     private readonly Queue<ApiScalarTypeBuilder> _pendingScalarBuilders = new();
     private readonly Queue<ApiEnumTypeBuilder> _pendingEnumBuilders = new();
     private readonly List<ApiSchemaCompilationIssue> _configurationIssues = [];
+    private readonly HashSet<Type> _discoveredConfigurationTypes = [];
+    private readonly HashSet<(Type ClrType, string Role)> _discoveredConfigurationRoles = [];
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     #endregion
 
@@ -50,16 +39,10 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     internal IEnumerable<ApiScalarTypeBuilder> ApiScalarTypeBuilders => _apiScalarTypeBuilders.Values;
     internal IEnumerable<ApiEnumTypeBuilder> ApiEnumTypeBuilders => _apiEnumTypeBuilders.Values;
     internal IEnumerable<ApiObjectTypeBuilder> ApiObjectTypeBuilders => _apiObjectTypeBuilders.Values;
-    internal IEnumerable<ApiRelationshipBuilder> ApiRelationshipBuilders => _apiRelationshipBuilders.Values;
-    internal IEnumerable<ApiQuerySourceBuilder> ApiQuerySourceBuilders => this.CurrentApiQuerySourceBuilders.Values;
     internal IReadOnlyList<ApiSchemaCompilationIssue> ConfigurationIssues => _configurationIssues;
 
-    private Dictionary<string, ApiQuerySourceBuilder> CurrentApiQuerySourceBuilders =>
-        _buildApiQuerySourceBuilders ?? _apiQuerySourceBuilders;
-
     /// <summary>Gets the source associated with the active configuration callback.</summary>
-    internal ApiConfigurationSource CurrentConfigurationSource =>
-        _configurationSourceScope.CurrentSource;
+    internal ApiConfigurationSource CurrentConfigurationSource => _configurationSourceScope.CurrentSource;
 
     /// <summary>Returns <c>true</c> when at least one newly registered type builder is awaiting convention processing.</summary>
     internal bool HasPendingBuilders =>
@@ -94,80 +77,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     }
     #endregion
 
-    #region Methods
-    /// <summary>Clears configuration-discovery issues for a new schema build.</summary>
-    internal void ResetConfigurationIssues() => _configurationIssues.Clear();
-
-    /// <summary>Resets per-build query-source annotation discovery and convention metadata.</summary>
-    internal void ResetQuerySourceAnnotationDiscovery()
-    {
-        _apiQuerySourceConventionContexts.Clear();
-        _apiQuerySourceParameterConventionContexts.Clear();
-        _annotatedQuerySourceClrTypes.Clear();
-        _discoveredQuerySourceClrTypes.Clear();
-    }
-
-    /// <summary>Creates the isolated query-source configuration used by one schema build.</summary>
-    internal void BeginQuerySourceBuild()
-    {
-        if (_buildApiQuerySourceBuilders is not null)
-        {
-            throw new InvalidOperationException("A query-source schema build is already active.");
-        }
-
-        _buildApiQuerySourceBuilders = new Dictionary<string, ApiQuerySourceBuilder>(ApiNameComparer.Instance);
-        foreach (var builder in _apiQuerySourceBuilders.Values)
-        {
-            var buildBuilder = builder.CreateBuildSnapshot();
-            _buildApiQuerySourceBuilders.Add(buildBuilder.ApiName, buildBuilder);
-        }
-    }
-
-    /// <summary>Discards the isolated query-source configuration for the completed schema build.</summary>
-    internal void EndQuerySourceBuild() => _buildApiQuerySourceBuilders = null;
-
-    internal bool TryRegisterAnnotatedQuerySource(Type clrDelegateType, string apiName, out Type? conflictingType)
-    {
-        if (!_discoveredQuerySourceClrTypes.Add(clrDelegateType))
-        {
-            conflictingType = null;
-            return false;
-        }
-
-        if (_annotatedQuerySourceClrTypes.TryGetValue(apiName, out conflictingType))
-        {
-            return false;
-        }
-
-        _annotatedQuerySourceClrTypes.Add(apiName, clrDelegateType);
-        return true;
-    }
-
-    internal void SetQuerySourceConventionContext
-    (
-        ApiQuerySourceBuilder builder,
-        ApiQuerySourceConventionContext context
-    ) => _apiQuerySourceConventionContexts[builder] = context;
-
-    internal ApiQuerySourceConventionContext GetQuerySourceConventionContext
-    (
-        ApiQuerySourceBuilder builder,
-        ApiSchemaBuilder schemaBuilder
-    ) => _apiQuerySourceConventionContexts.GetValueOrDefault(builder) ?? new ApiQuerySourceConventionContext(null, null, schemaBuilder);
-
-    internal void SetQuerySourceParameterConventionContext
-    (
-        ApiQuerySourceParameterBuilder builder,
-        ApiQuerySourceParameterConventionContext context
-    ) => _apiQuerySourceParameterConventionContexts[builder] = context;
-
-    internal ApiQuerySourceParameterConventionContext GetQuerySourceParameterConventionContext
-    (
-        ApiQuerySourceParameterBuilder builder,
-        ApiQuerySourceBuilder querySourceBuilder,
-        ApiQuerySourceConventionContext querySourceContext
-    ) => _apiQuerySourceParameterConventionContexts.GetValueOrDefault(builder) ?? new ApiQuerySourceParameterConventionContext(null, null, querySourceBuilder, querySourceContext);
-
+    #region Configuration Methods
     /// <summary>Records a configuration-discovery issue for the current schema build.</summary>
     internal void AddConfigurationIssue(ApiSchemaCompilationIssue issue)
     {
@@ -177,8 +87,11 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     }
 
     /// <summary>Runs a configuration callback at the supplied source precedence.</summary>
-    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
+        => _configurationSourceScope.Apply(source, configure);
+    #endregion
 
+    #region Type Builder Methods
     /// <summary>
     ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder{TScalar}"/> for the CLR type <typeparamref name="TScalar"/>.
     /// </summary>
@@ -186,6 +99,21 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <returns>The corresponding <see cref="ApiScalarTypeBuilder{TScalar}"/>.</returns>
     internal ApiScalarTypeBuilder<TScalar> GetOrAddScalarTypeBuilder<TScalar>()
         => (ApiScalarTypeBuilder<TScalar>)this.GetOrAddScalarTypeBuilder(typeof(TScalar));
+
+    /// <summary>
+    ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder"/> for the specified CLR type.
+    /// </summary>
+    /// <param name="clrType">The CLR scalar type.</param>
+    /// <returns>The corresponding <see cref="ApiScalarTypeBuilder"/>.</returns>
+    internal ApiScalarTypeBuilder GetOrAddScalarTypeBuilder(Type clrType)
+        => GetOrAddBuilder
+        (
+            clrType,
+            _apiScalarTypeBuilders,
+            static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiScalarTypeBuilder>(typeof(ApiScalarTypeBuilder<>), t, ctx),
+            this,
+            _pendingScalarBuilders
+        );
 
     /// <summary>
     ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder{TEnum}"/> for the CLR type <typeparamref name="TEnum"/>.
@@ -200,29 +128,14 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// </summary>
     /// <param name="clrType">The CLR enum type.</param>
     /// <returns>The corresponding <see cref="ApiEnumTypeBuilder"/>.</returns>
-    internal ApiEnumTypeBuilder GetOrAddEnumTypeBuilder(Type clrType) =>
-        GetOrAddBuilder
+    internal ApiEnumTypeBuilder GetOrAddEnumTypeBuilder(Type clrType)
+        => GetOrAddBuilder
         (
             clrType,
             _apiEnumTypeBuilders,
             static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiEnumTypeBuilder>(typeof(ApiEnumTypeBuilder<>), t, ctx),
             this,
             _pendingEnumBuilders
-        );
-
-    /// <summary>
-    ///     Gets existing or adds new <see cref="ApiObjectTypeBuilder"/> for the specified CLR type.
-    /// </summary>
-    /// <param name="clrType">The CLR object type.</param>
-    /// <returns>The corresponding <see cref="ApiObjectTypeBuilder"/>.</returns>
-    internal ApiObjectTypeBuilder GetOrAddObjectTypeBuilder(Type clrType) =>
-        GetOrAddBuilder
-        (
-            clrType,
-            _apiObjectTypeBuilders,
-            static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiObjectTypeBuilder>(typeof(ApiObjectTypeBuilder<>), t, ctx),
-            this,
-            _pendingObjectBuilders
         );
 
     /// <summary>
@@ -234,107 +147,18 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
         => (ApiObjectTypeBuilder<TObject>)this.GetOrAddObjectTypeBuilder(typeof(TObject));
 
     /// <summary>
-    ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder"/> for the specified CLR type.
+    ///     Gets existing or adds new <see cref="ApiObjectTypeBuilder"/> for the specified CLR type.
     /// </summary>
-    /// <param name="clrType">The CLR scalar type.</param>
-    /// <returns>The corresponding <see cref="ApiScalarTypeBuilder"/>.</returns>
-    internal ApiScalarTypeBuilder GetOrAddScalarTypeBuilder(Type clrType) =>
-        GetOrAddBuilder
+    /// <param name="clrType">The CLR object type.</param>
+    /// <returns>The corresponding <see cref="ApiObjectTypeBuilder"/>.</returns>
+    internal ApiObjectTypeBuilder GetOrAddObjectTypeBuilder(Type clrType)
+        => GetOrAddBuilder
         (
             clrType,
-            _apiScalarTypeBuilders,
-            static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiScalarTypeBuilder>(typeof(ApiScalarTypeBuilder<>), t, ctx),
+            _apiObjectTypeBuilders,
+            static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiObjectTypeBuilder>(typeof(ApiObjectTypeBuilder<>), t, ctx),
             this,
-            _pendingScalarBuilders
-        );
-
-    /// <summary>Gets existing or adds new <see cref="ApiQuerySourceBuilder"/> for the specified API name.</summary>
-    /// <param name="apiName">The schema-unique API name of the query source.</param>
-    /// <returns>The corresponding <see cref="ApiQuerySourceBuilder"/>.</returns>
-    internal ApiQuerySourceBuilder GetOrAddQuerySourceBuilder(string apiName)
-        => this.GetOrAddQuerySourceBuilder(apiName, this.CurrentConfigurationSource);
-
-    /// <summary>Gets or adds a query source builder at the supplied configuration source.</summary>
-    internal ApiQuerySourceBuilder GetOrAddQuerySourceBuilder(string apiName, ApiConfigurationSource source)
-    {
-        var builders = this.CurrentApiQuerySourceBuilders;
-        if (!builders.TryGetValue(apiName, out var builder))
-        {
-            builder = new ApiQuerySourceBuilder(apiName);
-            builders[apiName] = builder;
-        }
-
-        builder.SetRegistrationSource(source);
-        return builder;
-    }
-
-    /// <summary>
-    ///     Gets existing or adds new <see cref="ApiRelationshipOneToOneBuilder"/> for the specified API name.
-    /// </summary>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <returns>The corresponding <see cref="ApiRelationshipOneToOneBuilder"/>.</returns>
-    internal ApiRelationshipOneToOneBuilder GetOrAddOneToOneRelationshipBuilder(string apiName)
-        => this.GetOrAddOneToOneRelationshipBuilder(apiName, this.CurrentConfigurationSource)!;
-
-    /// <summary>
-    ///     Gets or adds a one-to-one relationship builder at the supplied configuration source.
-    /// </summary>
-    internal ApiRelationshipOneToOneBuilder? GetOrAddOneToOneRelationshipBuilder
-    (
-        string apiName,
-        ApiConfigurationSource source
-    )
-        => this.GetOrAddTypedRelationshipBuilder
-        (
-            apiName,
-            source,
-            static n => new ApiRelationshipOneToOneBuilder(n)
-        );
-
-    /// <summary>
-    ///     Gets existing or adds new <see cref="ApiRelationshipOneToManyBuilder"/> for the specified API name.
-    /// </summary>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <returns>The corresponding <see cref="ApiRelationshipOneToManyBuilder"/>.</returns>
-    internal ApiRelationshipOneToManyBuilder GetOrAddOneToManyRelationshipBuilder(string apiName)
-        => this.GetOrAddOneToManyRelationshipBuilder(apiName, this.CurrentConfigurationSource)!;
-
-    /// <summary>
-    ///     Gets or adds a one-to-many relationship builder at the supplied configuration source.
-    /// </summary>
-    internal ApiRelationshipOneToManyBuilder? GetOrAddOneToManyRelationshipBuilder
-    (
-        string apiName,
-        ApiConfigurationSource source
-    )
-        => this.GetOrAddTypedRelationshipBuilder
-        (
-            apiName,
-            source,
-            static n => new ApiRelationshipOneToManyBuilder(n)
-        );
-
-    /// <summary>
-    ///     Gets existing or adds new <see cref="ApiRelationshipManyToManyBuilder"/> for the specified API name.
-    /// </summary>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <returns>The corresponding <see cref="ApiRelationshipManyToManyBuilder"/>.</returns>
-    internal ApiRelationshipManyToManyBuilder GetOrAddManyToManyRelationshipBuilder(string apiName)
-        => this.GetOrAddManyToManyRelationshipBuilder(apiName, this.CurrentConfigurationSource)!;
-
-    /// <summary>
-    ///     Gets or adds a many-to-many relationship builder at the supplied configuration source.
-    /// </summary>
-    internal ApiRelationshipManyToManyBuilder? GetOrAddManyToManyRelationshipBuilder
-    (
-        string apiName,
-        ApiConfigurationSource source
-    )
-        => this.GetOrAddTypedRelationshipBuilder
-        (
-            apiName,
-            source,
-            static n => new ApiRelationshipManyToManyBuilder(n)
+            _pendingObjectBuilders
         );
 
     private static TBuilder GetOrAddBuilder<TBuilder>
@@ -354,43 +178,65 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
             builders[clrType] = builder;
             pendingQueue?.Enqueue(builder);
         }
-
-        return builder;
-    }
-
-    private TBuilder? GetOrAddTypedRelationshipBuilder<TBuilder>
-    (
-        string apiName,
-        ApiConfigurationSource source,
-        Func<string, TBuilder> factory
-    )
-        where TBuilder : ApiRelationshipBuilder
-    {
-        if (_apiRelationshipBuilders.TryGetValue(apiName, out var existing))
-        {
-            if (existing is not TBuilder typed)
-            {
-                if (source < existing.RegistrationSource)
-                {
-                    return null;
-                }
-
-                throw new ApiSchemaConfigurationException
-                (
-                    $"Relationship '{apiName}' was already registered as " +
-                    $"{existing.GetType().Name} and cannot be reconfigured as " +
-                    $"{typeof(TBuilder).Name}."
-                );
-            }
-
-            typed.SetRegistrationSource(source);
-            return typed;
-        }
-
-        var builder = factory(apiName);
-        builder.SetRegistrationSource(source);
-        _apiRelationshipBuilders[apiName] = builder;
         return builder;
     }
     #endregion
+
+    #region Build Copy Methods
+    private void CopyConfigurationIssueStateTo(ApiSchemaBuilderContext copy)
+        => copy._configurationIssues.AddRange(_configurationIssues);
+
+    private void CopyEnumTypeStateTo(ApiSchemaBuilderContext copy)
+    {
+        foreach (var (clrType, builder) in _apiEnumTypeBuilders)
+        {
+            var copiedBuilder = builder.CreateBuildCopy(copy);
+            copy._apiEnumTypeBuilders.Add(clrType, copiedBuilder);
+            copy._pendingEnumBuilders.Enqueue(copiedBuilder);
+        }
+    }
+
+    private void CopyObjectTypeStateTo(ApiSchemaBuilderContext copy)
+    {
+        foreach (var (clrType, builder) in _apiObjectTypeBuilders)
+        {
+            var copiedBuilder = builder.CreateBuildCopy(copy);
+            copy._apiObjectTypeBuilders.Add(clrType, copiedBuilder);
+            copy._pendingObjectBuilders.Enqueue(copiedBuilder);
+        }
+    }
+
+    private void CopyScalarTypeStateTo(ApiSchemaBuilderContext copy)
+    {
+        foreach (var (clrType, builder) in _apiScalarTypeBuilders)
+        {
+            var copiedBuilder = builder.CreateBuildCopy(copy);
+            copy._apiScalarTypeBuilders.Add(clrType, copiedBuilder);
+            copy._pendingScalarBuilders.Enqueue(copiedBuilder);
+        }
+    }
+
+    internal ApiSchemaBuilderContext CreateBuildCopy()
+    {
+        var copy = new ApiSchemaBuilderContext(this.Logger);
+
+        this.CopyScalarTypeStateTo(copy);
+        this.CopyEnumTypeStateTo(copy);
+        this.CopyObjectTypeStateTo(copy);
+        this.CopyQuerySourceStateTo(copy);
+        this.CopyRelationshipStateTo(copy);
+        this.CopyConfigurationIssueStateTo(copy);
+
+        return copy;
+    }
+    #endregion
+
+    #region Configuration Discovery Methods
+    internal bool TryBeginConfigurationDiscovery(Type clrType)
+        => _discoveredConfigurationTypes.Add(clrType);
+
+    internal bool TryBeginConfigurationRole(Type clrType, string role)
+        => _discoveredConfigurationRoles.Add((clrType, role));
+    #endregion
+
 }

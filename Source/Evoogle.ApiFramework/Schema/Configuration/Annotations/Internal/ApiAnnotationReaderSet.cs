@@ -37,8 +37,11 @@ internal sealed class ApiAnnotationReaderSet
     internal IReadOnlyList<IApiAnnotationReader> Readers => _readers;
 
     internal IReadOnlyList<ApiSchemaCompilationIssue> Issues => _issues;
+    #endregion
 
-    internal void ResetIssues() => _issues.Clear();
+    #region Issue Methods
+    internal void ResetIssues()
+        => _issues.Clear();
     #endregion
 
     #region Annotation Methods
@@ -324,7 +327,6 @@ internal sealed class ApiAnnotationReaderSet
             this.ApplyManyToManyRelationships(schemaBuilder, clrType, relationshipReader);
         }
     }
-
     #endregion
 
     #region Discovery Methods
@@ -563,7 +565,7 @@ internal sealed class ApiAnnotationReaderSet
 
                 var invokeParameters = result.ClrDelegateType.GetMethod(nameof(Action.Invoke))!.GetParameters();
                 var contributedParameters = result.ApiInputParameters?
-                    .Select(parameter => parameter?.ClrParameterInfo)
+                    .Select(static parameter => parameter?.ClrParameterInfo)
                     .ToArray();
                 if (contributedParameters is null ||
                     contributedParameters.Length != invokeParameters.Length ||
@@ -602,24 +604,6 @@ internal sealed class ApiAnnotationReaderSet
         return results;
     }
 
-    internal void AddQuerySourceDiscoveryConflict
-    (
-        string apiPath,
-        string apiName,
-        Type firstClrDelegateType,
-        Type conflictingClrDelegateType
-    )
-    {
-        var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiAnnotationQuerySourceDiscoveryConflict;
-        var description = $"Annotated delegates '{firstClrDelegateType.FullName ?? firstClrDelegateType.Name}' and " +
-            $"'{conflictingClrDelegateType.FullName ?? conflictingClrDelegateType.Name}' resolve to query source " +
-            $"API name '{apiName}'";
-        var remediation = "Assign distinct query-source API names or change the active naming conventions";
-
-        _issues.Add(new ApiSchemaCompilationIssue(apiPath, severity, code, description, remediation));
-    }
-
     private static bool AreQuerySourceAnnotationsEquivalent
     (
         ApiQuerySourceAnnotationResult first,
@@ -650,7 +634,6 @@ internal sealed class ApiAnnotationReaderSet
 
         return true;
     }
-
     #endregion
 
     #region Version Methods
@@ -841,8 +824,8 @@ internal sealed class ApiAnnotationReaderSet
             }
 
             var duplicateOrders = contribution.Results
-                .GroupBy(result => result.Order)
-                .Where(group => group.Count() > 1)
+                .GroupBy(static result => result.Order)
+                .Where(static group => group.Count() > 1)
                 .ToList();
 
             foreach (var duplicateOrder in duplicateOrders)
@@ -858,15 +841,14 @@ internal sealed class ApiAnnotationReaderSet
             }
 
             var paths = contribution.Results
-                .OrderBy(result => result.Order)
-                .Select(result => (result.ClrRootType, result.ClrMemberNames))
-                .DistinctBy(path => (path.ClrRootType, string.Join("\0", path.ClrMemberNames)))
+                .OrderBy(static result => result.Order)
+                .Select(static result => (result.ClrRootType, result.ClrMemberNames))
+                .DistinctBy(static path => (path.ClrRootType, string.Join("\0", path.ClrMemberNames)))
                 .ToList();
 
             builder.ReplaceKeyFromDataAnnotation(apiName, paths);
         }
     }
-
     #endregion
 
     #region Type and Validation Methods
@@ -988,7 +970,6 @@ internal sealed class ApiAnnotationReaderSet
 
         return true;
     }
-
     #endregion
 
     #region Relationship Methods
@@ -1021,35 +1002,12 @@ internal sealed class ApiAnnotationReaderSet
             return;
         }
 
-        foreach (var result in results)
+        for (var occurrence = 0; occurrence < results.Count; occurrence++)
         {
+            var result = results[occurrence];
             try
             {
-                schemaBuilder.AddOneToManyRelationshipCore
-                (
-                    result.ApiName,
-                    builder =>
-                    {
-                        builder
-                            .WithDeleteBehavior(result.DeleteBehavior)
-                            .From(result.PrincipalType)
-                            .To
-                            (
-                                result.DependentType,
-                                result.ForeignKey == null
-                                    ? null
-                                    : dependent => dependent.WithForeignKey
-                                    (
-                                        foreignKey => foreignKey.AddPath
-                                        (
-                                            result.DependentType,
-                                            result.ForeignKey
-                                        )
-                                    )
-                            );
-                    },
-                    ApiConfigurationSource.DataAnnotation
-                );
+                schemaBuilder.ApplyRelationshipAnnotation(clrType, reader, occurrence, result);
             }
             catch (Exception exception)
             {
@@ -1087,35 +1045,12 @@ internal sealed class ApiAnnotationReaderSet
             return;
         }
 
-        foreach (var result in results)
+        for (var occurrence = 0; occurrence < results.Count; occurrence++)
         {
+            var result = results[occurrence];
             try
             {
-                schemaBuilder.AddOneToOneRelationshipCore
-                (
-                    result.ApiName,
-                    builder =>
-                    {
-                        builder
-                            .WithDeleteBehavior(result.DeleteBehavior)
-                            .From(result.PrincipalType)
-                            .To
-                            (
-                                result.DependentType,
-                                result.ForeignKey == null
-                                    ? null
-                                    : dependent => dependent.WithForeignKey
-                                    (
-                                        foreignKey => foreignKey.AddPath
-                                        (
-                                            result.DependentType,
-                                            result.ForeignKey
-                                        )
-                                    )
-                            );
-                    },
-                    ApiConfigurationSource.DataAnnotation
-                );
+                schemaBuilder.ApplyRelationshipAnnotation(clrType, reader, occurrence, result);
             }
             catch (Exception exception)
             {
@@ -1153,51 +1088,12 @@ internal sealed class ApiAnnotationReaderSet
             return;
         }
 
-        foreach (var result in results)
+        for (var occurrence = 0; occurrence < results.Count; occurrence++)
         {
+            var result = results[occurrence];
             try
             {
-                schemaBuilder.AddManyToManyRelationshipCore
-                (
-                    result.ApiName,
-                    builder =>
-                    {
-                        builder
-                            .Between(result.PrincipalTypeA)
-                            .And(result.PrincipalTypeB)
-                            .WithAssociation
-                            (
-                                result.AssociationType,
-                                association =>
-                                {
-                                    if (result.ForeignKeyA != null)
-                                    {
-                                        association.WithForeignKeyA
-                                        (
-                                            foreignKey => foreignKey.AddPath
-                                            (
-                                                result.AssociationType,
-                                                result.ForeignKeyA
-                                            )
-                                        );
-                                    }
-
-                                    if (result.ForeignKeyB != null)
-                                    {
-                                        association.WithForeignKeyB
-                                        (
-                                            foreignKey => foreignKey.AddPath
-                                            (
-                                                result.AssociationType,
-                                                result.ForeignKeyB
-                                            )
-                                        );
-                                    }
-                                }
-                            );
-                    },
-                    ApiConfigurationSource.DataAnnotation
-                );
+                schemaBuilder.ApplyRelationshipAnnotation(clrType, reader, occurrence, result);
             }
             catch (Exception exception)
             {
@@ -1205,7 +1101,6 @@ internal sealed class ApiAnnotationReaderSet
             }
         }
     }
-
     #endregion
 
     #region Issue Methods
@@ -1380,10 +1275,10 @@ internal sealed class ApiAnnotationReaderSet
             )
         );
     }
-
     #endregion
 
     #region Helper Methods
-    private static bool IsEligibleType(Type type) => !type.IsAbstract && (type.IsClass || type.IsValueType);
+    private static bool IsEligibleType(Type type)
+        => !type.IsAbstract && (type.IsClass || type.IsValueType);
     #endregion
 }

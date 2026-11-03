@@ -49,22 +49,22 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
                 new ApiSchemaBuilderContext()
             )
                 .WithName(nameof(VersionedObject))
-                .AddProperty(x => x.Version, property => property.AsNonNullable());
+                .AddProperty(static x => x.Version, static property => property.AsNonNullable());
 
             if (this.UsesApiNameReference)
             {
                 builder.WithVersion
                 (
                     ApiPropertyReference.ApiRef(nameof(VersionedObject.Version)),
-                    version => version.AddVersionExtension(new GraphQlExtension())
+                    static version => version.AddVersionExtension(new GraphQlExtension())
                 );
             }
             else
             {
                 builder.WithVersion
                 (
-                    x => x.Version,
-                    version => version.AddVersionExtension(new GraphQlExtension())
+                    static x => x.Version,
+                    static version => version.AddVersionExtension(new GraphQlExtension())
                 );
             }
 
@@ -148,6 +148,7 @@ public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitT
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
-    public void Build(IXUnitTest test) => test.Execute(this);
+    public void Build(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

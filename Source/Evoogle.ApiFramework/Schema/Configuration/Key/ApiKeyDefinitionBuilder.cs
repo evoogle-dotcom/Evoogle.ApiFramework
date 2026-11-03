@@ -30,7 +30,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<ApiKeyDefinitionBuilder>
 {
     #region Fields
-    private readonly ApiKeyDefinitionState _state = new() { ApiName = apiName };
+    private ApiKeyDefinitionState _state = new() { ApiName = apiName };
     #endregion
 
     #region AddExtension Methods
@@ -40,7 +40,8 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyDefinitionBuilder AddKeyExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiKeyDefinitionBuilder AddKeyExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddPath Methods
@@ -197,13 +198,15 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
     }
     #endregion
 
-    #region With Methods
+    #region Properties
     /// <summary>Gets the API name currently configured on this key definition builder.</summary>
     internal string? ApiName => _state.ApiName;
 
     /// <summary>Gets the highest source supplied when registering this key, initially convention precedence.</summary>
     internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
+    #endregion
 
+    #region Configuration Source Methods
     /// <summary>Retains the highest source supplied when creating or reusing the key registration.</summary>
     internal void SetRegistrationSource(ApiConfigurationSource source)
     {
@@ -212,8 +215,11 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
             _state.RegistrationSource = source;
         }
     }
+    #endregion
 
-    internal void ClearPaths() => _state.KeyPathBuilders.Clear();
+    #region Path Methods
+    internal void ClearPaths()
+        => _state.KeyPathBuilders.Clear();
 
     /// <summary>
     ///     Returns <c>true</c> when this key definition already contains the specified CLR root type
@@ -242,11 +248,13 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
 
         return _state.KeyPathBuilders.Any(p =>
             p.ApiRootObjectTypeReference == apiRootObjectTypeReference &&
-            p.SegmentBuilders.All(s => s.ApiPropertyReference.IsClrNamedReference) &&
-            p.SegmentBuilders.Select(s => s.ApiPropertyReference.ClrName)
+            p.SegmentBuilders.All(static s => s.ApiPropertyReference.IsClrNamedReference) &&
+            p.SegmentBuilders.Select(static s => s.ApiPropertyReference.ClrName)
                 .SequenceEqual(names, ClrNameComparer.Instance));
     }
+    #endregion
 
+    #region With Methods
     /// <summary>
     ///    Sets the API name used when this builder produces an <see cref="ApiNamedKeyDefinition"/>.
     /// </summary>
@@ -267,7 +275,7 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
     /// </summary>
     internal ApiKeyDefinition Build()
     {
-        var keyPaths = _state.KeyPathBuilders.Select(b => b.Build());
+        var keyPaths = _state.KeyPathBuilders.Select(static b => b.Build());
         var keyDefinition = new ApiKeyDefinition(keyPaths);
 
         this.AttachExtensions(keyDefinition);
@@ -281,7 +289,7 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
     internal ApiNamedKeyDefinition BuildNamed()
     {
         var apiName = _state.ApiName!;
-        var keyPaths = _state.KeyPathBuilders.Select(b => b.Build());
+        var keyPaths = _state.KeyPathBuilders.Select(static b => b.Build());
         var keyDefinition = new ApiNamedKeyDefinition(apiName, keyPaths);
 
         this.AttachExtensions(keyDefinition);
@@ -309,6 +317,15 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
     {
         ArgumentNullException.ThrowIfNull(builder);
         _state.KeyPathBuilders.Add(builder);
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiKeyDefinitionBuilder CreateBuildCopy()
+    {
+        var copy = this.CreateExtensionBuildCopy();
+        copy._state = _state.CreateBuildCopy();
+        return copy;
     }
     #endregion
 }

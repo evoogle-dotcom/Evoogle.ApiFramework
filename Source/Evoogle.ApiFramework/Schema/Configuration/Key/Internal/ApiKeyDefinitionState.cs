@@ -16,8 +16,17 @@ internal sealed class ApiKeyDefinitionState
     #region Properties
     internal string? ApiName { get; set; }
 
-    internal List<ApiKeyPathBuilder> KeyPathBuilders { get; } = [];
+    internal List<ApiKeyPathBuilder> KeyPathBuilders { get; private set; } = [];
 
     internal ApiConfigurationSource RegistrationSource { get; set; } = ApiConfigurationSource.Convention;
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiKeyDefinitionState CreateBuildCopy()
+    {
+        var copy = (ApiKeyDefinitionState)this.MemberwiseClone();
+        copy.KeyPathBuilders = [.. this.KeyPathBuilders.Select(static builder => builder.CreateBuildCopy())];
+        return copy;
+    }
     #endregion
 }

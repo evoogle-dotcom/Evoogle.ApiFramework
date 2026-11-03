@@ -232,8 +232,8 @@ internal sealed class ApiClrMemberAccessor
     #endregion
 
     #region TrySet Methods
-    public bool TrySetValue(object? clrObject, object? clrValue) =>
-        clrObject is not null &&
+    public bool TrySetValue(object? clrObject, object? clrValue)
+        => clrObject is not null &&
         _memberAccessor?.CanWrite == true &&
         _memberAccessor.TrySetValue
         (

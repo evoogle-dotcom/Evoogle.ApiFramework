@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted on 2026-11-01. Implementation is pending.
+Accepted and implemented on 2026-11-01.
 
 ## Context and Problem Statement
 
@@ -175,6 +175,22 @@ A type-level relationship-definition annotation has no CLR navigation locator. E
 a registration-backed declaration. Assembly annotation scanning recreates it within each isolated
 build session; it is not retained in durable authoring state.
 
+Traversal naming participates through `IApiRelationshipTraversalConvention` and the convention pipeline's
+dedicated traversal schedule. Traversal conventions run at convention precedence after relationship inference
+and navigation binding, using `ApiRelationshipTraversalBuilder` and CLR/relationship context. Navigation
+validation does not perform naming or inspect another schema element's convention collection.
+
+### Explicit inverse annotation configuration
+
+Member-level `ApiRelationshipAttribute` and `ApiManyToManyRelationshipAttribute` expose optional
+`InverseNavigation` properties. The value is one public instance property or field name on the
+opposite endpoint. It is resolved and validated during annotation discovery; blank, nested,
+unresolved, or structurally incompatible references produce configuration diagnostics.
+
+Existing principal-end annotation placement remains unchanged for one-to-one and one-to-many
+relationships. Fluent `AssociateInverseNavigation` provides explicit later attachment. Member-targeted
+configuration methods require an already declared relationship.
+
 ## Values That Are Not Identity Locators
 
 The following remain configurable relationship structure and never implicitly establish declaration
@@ -279,6 +295,10 @@ categories with fully qualified schema paths where a compiled declaration path e
 - Service relationship execution remains governed by ADR 0002 and traversal semantics by ADR 0003.
 
 ## Confirmation
+
+Implemented and covered by the [relationship declaration regression suite](../../Tests/Evoogle.ApiFramework.Tests/Schema/Configuration/Relationships/ApiRelationshipDeclarationTests.cs).
+Final validation passed 1,664 runtime tests and 117 annotation tests with no skips. Production and test
+builds completed with zero warnings and errors; diff, UTF-8 BOM, CRLF, and final-newline checks passed.
 
 The decision is confirmed when tests demonstrate:
 

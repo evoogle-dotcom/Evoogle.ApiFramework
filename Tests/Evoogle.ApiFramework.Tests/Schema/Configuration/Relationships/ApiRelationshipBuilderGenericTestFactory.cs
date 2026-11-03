@@ -24,30 +24,30 @@ public static class ApiRelationshipBuilderGenericTestFactory
     public static ApiRelationship BuildExpected_OneToOne_DependentEnd_ScalarPath()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_1to1")
             .From<Customer>()
-            .To<Order>(b => b.WithForeignKey(fk => fk.AddPath(o => o.Id)))
+            .To<Order>(static b => b.WithForeignKey(static fk => fk.AddPath(static o => o.Id)))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToMany_DependentEnd_ScalarPath()
         => new ApiRelationshipOneToManyBuilder("REL_Customer_Order_1toN")
             .From<Customer>()
-            .To<Order>(b => b.WithForeignKey(fk => fk.AddPath(o => o.Id)))
+            .To<Order>(static b => b.WithForeignKey(static fk => fk.AddPath(static o => o.Id)))
             .Build();
 
     public static ApiRelationship BuildExpected_ManyToMany_DependentEnds_ScalarPaths()
         => new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN")
             .Between<Customer>()
             .And<Order>()
-            .WithAssociation<OrderLine>(a => a
-                .WithForeignKeyA(fk => fk.AddPath(ol => ol.OrderId))
-                .WithForeignKeyB(fk => fk.AddPath(ol => ol.OrderId)))
+            .WithAssociation<OrderLine>(static a => a
+                .WithForeignKeyA(static fk => fk.AddPath(static ol => ol.OrderId))
+                .WithForeignKeyB(static fk => fk.AddPath(static ol => ol.OrderId)))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToOne_DependentEnd_MultipleScalarPaths()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_Nested")
             .From<Customer>()
-            .To<Order>(b => b.WithForeignKey(fk => fk
-                .AddPath(o => o.Id)
-                .AddPath(o => o.PlacedAt)))
+            .To<Order>(static b => b.WithForeignKey(static fk => fk
+                .AddPath(static o => o.Id)
+                .AddPath(static o => o.PlacedAt)))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToOne_NavigationalEndTypes()
@@ -67,9 +67,9 @@ public static class ApiRelationshipBuilderGenericTestFactory
         => new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN_Ends")
             .Between<Customer>()
             .And<Order>()
-            .WithAssociation<OrderLine>(a => a
-                .WithForeignKeyA(fk => fk.AddPath(ol => ol.OrderId))
-                .WithForeignKeyB(fk => fk.AddPath(ol => ol.OrderId)))
+            .WithAssociation<OrderLine>(static a => a
+                .WithForeignKeyA(static fk => fk.AddPath(static ol => ol.OrderId))
+                .WithForeignKeyB(static fk => fk.AddPath(static ol => ol.OrderId)))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToMany_ApiNamedReferences()
@@ -94,28 +94,28 @@ public static class ApiRelationshipBuilderGenericTestFactory
     public static ApiRelationship BuildActual_OneToOne_DependentEnd_ScalarPath()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_1to1")
             .From<Customer>()
-            .To<Order>(b => b.WithForeignKey(fk => fk.AddPath(o => o.Id)))
+            .To<Order>(static b => b.WithForeignKey(static fk => fk.AddPath(static o => o.Id)))
             .Build();
 
     public static ApiRelationship BuildActual_OneToMany_DependentEnd_ScalarPath()
         => new ApiRelationshipOneToManyBuilder("REL_Customer_Order_1toN")
             .From<Customer>()
-            .To<Order>(b => b.WithForeignKey(fk => fk.AddPath(o => o.Id)))
+            .To<Order>(static b => b.WithForeignKey(static fk => fk.AddPath(static o => o.Id)))
             .Build();
 
     public static ApiRelationship BuildActual_ManyToMany_DependentEnds_ScalarPaths()
         => new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN")
             .Between<Customer>()
             .And<Order>()
-            .WithAssociation<OrderLine>(a => a
-                .WithForeignKeyA(fk => fk.AddPath(ol => ol.OrderId))
-                .WithForeignKeyB(fk => fk.AddPath(ol => ol.OrderId)))
+            .WithAssociation<OrderLine>(static a => a
+                .WithForeignKeyA(static fk => fk.AddPath(static ol => ol.OrderId))
+                .WithForeignKeyB(static fk => fk.AddPath(static ol => ol.OrderId)))
             .Build();
 
     public static ApiRelationship BuildActual_OneToOne_DependentEnd_MultipleScalarPaths()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_Nested")
             .From<Customer>()
-            .To<Order>(b => b.WithForeignKey(o => o.Id, o => o.PlacedAt))
+            .To<Order>(static b => b.WithForeignKey(static o => o.Id, static o => o.PlacedAt))
             .Build();
 
     public static ApiRelationship BuildActual_OneToOne_NavigationalEndTypes()
@@ -135,9 +135,9 @@ public static class ApiRelationshipBuilderGenericTestFactory
         => new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN_Ends")
             .Between<Customer>()
             .And<Order>()
-            .WithAssociation<OrderLine>(a => a
-                .WithForeignKeyA(fk => fk.AddPath(ol => ol.OrderId))
-                .WithForeignKeyB(fk => fk.AddPath(ol => ol.OrderId)))
+            .WithAssociation<OrderLine>(static a => a
+                .WithForeignKeyA(static fk => fk.AddPath(static ol => ol.OrderId))
+                .WithForeignKeyB(static fk => fk.AddPath(static ol => ol.OrderId)))
             .Build();
 
     public static ApiRelationship BuildActual_OneToMany_ApiNamedReferences()
@@ -146,8 +146,8 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .To
             (
                 new ApiTypeReference(ApiTypeKind.Object, nameof(Order)),
-                dependent => dependent.WithForeignKey
-                    (foreignKey => foreignKey.AddPath(nameof(Order.Id)))
+                static dependent => dependent.WithForeignKey
+                    (static foreignKey => foreignKey.AddPath(nameof(Order.Id)))
             )
             .Build();
     #endregion

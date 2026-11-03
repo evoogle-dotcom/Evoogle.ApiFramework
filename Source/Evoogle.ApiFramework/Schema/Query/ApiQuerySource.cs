@@ -51,7 +51,7 @@ public sealed class ApiQuerySource
 
     /// <summary>Gets the immutable input declarations owned by this source.</summary>
     public ImmutableArray<ApiQuerySourceParameter> ApiInputParameters { get; } =
-        [.. apiInputParameters.EmptyIfNull().Where(x => x is not null)];
+        [.. apiInputParameters.EmptyIfNull().Where(static x => x is not null)];
 
     /// <summary>Gets the resolved output type after successful schema compilation.</summary>
     public ApiType ApiOutputType => this.ApiOutputTypeExpression.ApiType;
@@ -76,7 +76,8 @@ public sealed class ApiQuerySource
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    protected override string BuildPath(string? apiPreviousPath) => ApiSchemaPathFormatting.BuildPath
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaPathFormatting.BuildPath
         (apiPreviousPath, this.ApiElementName, this.ApiName);
 
     /// <inheritdoc/>
@@ -115,7 +116,7 @@ public sealed class ApiQuerySource
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiInputParameters,
-            partKeySelector: parameter => parameter.ApiName,
+            partKeySelector: static parameter => parameter.ApiName,
             partKeyFilter: ApiSchemaNameValidation.IsNameValid,
             partKeyPropertyName: nameof(ApiQuerySourceParameter.ApiName),
             apiPath: this.ApiPath,

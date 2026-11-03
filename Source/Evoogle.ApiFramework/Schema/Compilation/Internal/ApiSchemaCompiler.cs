@@ -65,7 +65,7 @@ internal static class ApiSchemaCompiler
                 }
             }
 
-            if (session.Issues.Any(issue => issue.Severity == ApiSchemaCompilationSeverity.Error))
+            if (session.Issues.Any(static issue => issue.Severity == ApiSchemaCompilationSeverity.Error))
             {
                 return new ApiSchemaCompilationResult(null, session.Issues);
             }

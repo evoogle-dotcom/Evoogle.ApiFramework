@@ -153,7 +153,8 @@ public class SemanticDefaultJsonSerializationTests(ITestOutputHelper output) : X
     #region Test Methods
     [Theory]
     [MemberData(nameof(RoundtripTheoryData))]
-    public void RoundtripPreservesSemanticDefaultsAndExplicitOverrides(IXUnitTest test) => test.Execute(this);
+    public void RoundtripPreservesSemanticDefaultsAndExplicitOverrides(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Factory Methods

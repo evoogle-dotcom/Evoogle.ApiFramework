@@ -133,7 +133,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
             {
                 PrecedenceCase.LaterReader => builder
                     .AddObject<ReaderVersionedType>(ConfigureReaderVersionedType)
-                    .UseAnnotations(annotations => annotations
+                    .UseAnnotations(static annotations => annotations
                         .AddReader
                         (
                             new StaticVersionReader
@@ -155,15 +155,15 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                             )
                         )),
                 PrecedenceCase.ExplicitOverAnnotation => builder
-                    .AddObject<AnnotatedPrecedenceType>(objectType => objectType
-                        .AddProperty(x => x.Version, property => property.AsNonNullable())
+                    .AddObject<AnnotatedPrecedenceType>(static objectType => objectType
+                        .AddProperty(static x => x.Version, static property => property.AsNonNullable())
                         .WithRepositoryVersion<Guid>())
                     .UseDefaultAnnotations(),
                 PrecedenceCase.AnnotationOverConvention => builder
-                    .AddObject<AnnotatedPrecedenceType>(objectType => objectType
-                        .AddProperty(x => x.Version, property => property.AsNonNullable()))
+                    .AddObject<AnnotatedPrecedenceType>(static objectType => objectType
+                        .AddProperty(static x => x.Version, static property => property.AsNonNullable()))
                     .UseDefaultAnnotations()
-                    .UseConventions(conventions => conventions.AddConvention
+                    .UseConventions(static conventions => conventions.AddConvention
                     (
                         new RepositoryVersionConvention()
                     )),
@@ -226,32 +226,32 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                     .AddObject<MissingRepositoryTypeVersion>()
                     .UseDefaultAnnotations(),
                 InvalidCase.MultipleMembers => builder
-                    .AddObject<MultipleMemberVersions>(objectType => objectType
-                        .AddProperty(x => x.First, property => property.AsNonNullable())
-                        .AddProperty(x => x.Second, property => property.AsNonNullable()))
+                    .AddObject<MultipleMemberVersions>(static objectType => objectType
+                        .AddProperty(static x => x.First, static property => property.AsNonNullable())
+                        .AddProperty(static x => x.Second, static property => property.AsNonNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.TypeAndMember => builder
-                    .AddObject<TypeAndMemberVersions>(objectType => objectType
-                        .AddProperty(x => x.Version, property => property.AsNonNullable()))
+                    .AddObject<TypeAndMemberVersions>(static objectType => objectType
+                        .AddProperty(static x => x.Version, static property => property.AsNonNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.MissingProperty => builder
                     .AddObject<MissingPropertyVersion>()
                     .UseDefaultAnnotations(),
                 InvalidCase.NullableProperty => builder
-                    .AddObject<NullablePropertyVersion>(objectType => objectType
-                        .AddProperty(x => x.Version, property => property.AsNullable()))
+                    .AddObject<NullablePropertyVersion>(static objectType => objectType
+                        .AddProperty(static x => x.Version, static property => property.AsNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.MemberClrTypeSpecified => builder
-                    .AddObject<MemberClrTypeSpecifiedVersion>(objectType => objectType
-                        .AddProperty(x => x.Version, property => property.AsNonNullable()))
+                    .AddObject<MemberClrTypeSpecifiedVersion>(static objectType => objectType
+                        .AddProperty(static x => x.Version, static property => property.AsNonNullable()))
                     .UseDefaultAnnotations(),
                 InvalidCase.NullableRepositoryType => builder
                     .AddObject<NullableRepositoryVersion>()
                     .UseDefaultAnnotations(),
                 InvalidCase.UnregisteredScalar => new ApiSchemaBuilder()
                     .WithName("Test")
-                    .AddObject<UnregisteredScalarVersion>(objectType => objectType
-                        .AddProperty(x => x.Version, property => property.AsNonNullable()))
+                    .AddObject<UnregisteredScalarVersion>(static objectType => objectType
+                        .AddProperty(static x => x.Version, static property => property.AsNonNullable()))
                     .UseDefaultAnnotations(),
                 _ => throw new InvalidOperationException($"Unknown test case: {this.TestCase}")
             };
@@ -342,7 +342,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                 .AddScalar<int>()
                 .AddScalar<long>()
                 .AddObject<ReaderVersionedType>(ConfigureReaderVersionedType)
-                .UseAnnotations(annotations => annotations.AddReader
+                .UseAnnotations(static annotations => annotations.AddReader
                 (
                     new InvalidVersionReader(ReaderContractCase.NullList)
                 ));
@@ -527,7 +527,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
     [
         .. Enum.GetValues<ReaderContractCase>().Select
         (
-            testCase => new TheoryDataRow<IXUnitTest>
+            static testCase => new TheoryDataRow<IXUnitTest>
             (
                 new ReaderContractTest
                 {
@@ -553,23 +553,28 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuiltInVersionTheoryData))]
-    public void BuiltInVersion(IXUnitTest test) => test.Execute(this);
+    public void BuiltInVersion(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(PrecedenceTheoryData))]
-    public void Precedence(IXUnitTest test) => test.Execute(this);
+    public void Precedence(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(InvalidTheoryData))]
-    public void Invalid(IXUnitTest test) => test.Execute(this);
+    public void Invalid(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(ReaderContractTheoryData))]
-    public void ReaderContract(IXUnitTest test) => test.Execute(this);
+    public void ReaderContract(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(RepeatedBuildTheoryData))]
-    public void RepeatedBuild(IXUnitTest test) => test.Execute(this);
+    public void RepeatedBuild(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Private Methods
@@ -579,8 +584,8 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
     )
     {
         builder
-            .AddProperty(x => x.First, property => property.AsNonNullable())
-            .AddProperty(x => x.Second, property => property.AsNonNullable());
+            .AddProperty(static x => x.First, static property => property.AsNonNullable())
+            .AddProperty(static x => x.Second, static property => property.AsNonNullable());
     }
 
     private static

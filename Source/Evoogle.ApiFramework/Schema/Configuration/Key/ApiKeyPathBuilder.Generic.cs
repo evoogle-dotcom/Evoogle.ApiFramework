@@ -51,7 +51,7 @@ public sealed class ApiKeyPathBuilder<TRoot> : ApiKeyPathBuilder
         ArgumentNullException.ThrowIfNull(expression);
 
         var names = StaticReflection.GetMemberPath(expression);
-        var segmentBuilders = names.Select(n => new ApiKeyPathSegmentBuilder(n));
+        var segmentBuilders = names.Select(static n => new ApiKeyPathSegmentBuilder(n));
         return new ApiKeyPathBuilder<TRoot>(segmentBuilders);
     }
 
@@ -70,7 +70,7 @@ public sealed class ApiKeyPathBuilder<TRoot> : ApiKeyPathBuilder
         ArgumentNullException.ThrowIfNull(expression);
 
         var names = StaticReflection.GetMemberPath(expression);
-        var segmentBuilders = names.Select(n => new ApiKeyPathSegmentBuilder(n));
+        var segmentBuilders = names.Select(static n => new ApiKeyPathSegmentBuilder(n));
         return new ApiKeyPathBuilder<TRoot>(typeof(TPathRoot), segmentBuilders);
     }
     #endregion

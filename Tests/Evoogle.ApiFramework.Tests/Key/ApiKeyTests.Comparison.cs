@@ -242,10 +242,12 @@ public partial class ApiKeyTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(ComparisonTheoryData))]
-    public void Comparison(IXUnitTest test) => test.Execute(this);
+    public void Comparison(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(EqualityTheoryData))]
-    public void Equality(IXUnitTest test) => test.Execute(this);
+    public void Equality(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

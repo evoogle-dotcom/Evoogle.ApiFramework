@@ -17,16 +17,17 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Query;
 /// Configuration uses convention, data-annotation, and explicit precedence, in that order.
 /// Later settings at the same precedence win. Each build creates an independent schema declaration.
 /// </remarks>
-public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuilder>
+public sealed partial class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuilder>
 {
     #region Fields
     private string _apiName;
+    private ApiConfigurationSource _apiNameSource = ApiConfigurationSource.Convention;
     private readonly ApiQuerySourceState _state = new();
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     #endregion
 
     #region Constructors
-    /// <summary>Creates a query source builder with a fixed API name.</summary>
+    /// <summary>Creates a query source builder with an initial convention naming candidate.</summary>
     /// <param name="apiName">The schema-unique query source API name.</param>
     public ApiQuerySourceBuilder(string apiName)
     {
@@ -37,6 +38,11 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     private ApiQuerySourceBuilder(ApiQuerySourceBuilder source)
     {
         _apiName = source._apiName;
+        _apiNameSource = source._apiNameSource;
+        _clrDelegateType = source._clrDelegateType;
+        _declarationErrors = new Dictionary<string, string>(source._declarationErrors, StringComparer.Ordinal);
+        _outputItemNullability = source._outputItemNullability;
+        _outputItemNullabilitySource = source._outputItemNullabilitySource;
         _state = new ApiQuerySourceState(source._state);
         source.CopyExtensionsTo(this);
     }
@@ -54,14 +60,18 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
 
     /// <summary>Gets the highest-precedence source that registered this query source.</summary>
     internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
+    #endregion
 
+    #region Naming Methods
     /// <summary>Sets the API name while resolving a convention-derived declaration name.</summary>
     internal void SetApiNameConvention(string apiName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
-        _apiName = apiName;
+        if (_apiNameSource <= ApiConfigurationSource.Convention)
+        {
+            _apiName = apiName;
+        }
     }
-
     #endregion
 
     #region Configuration Source Methods
@@ -125,7 +135,7 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
         );
 
         return _state.InputParameterBuilders.First
-            (parameter => ApiNameComparer.Instance.Equals(parameter.ApiName, apiName));
+            (parameter => ApiNameComparer.Instance.Equals(parameter.DeclarationName, apiName));
     }
 
     private ApiQuerySourceBuilder AddInputParameterCore
@@ -140,9 +150,28 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
         ArgumentNullException.ThrowIfNull(apiTypeIdentity);
         ArgumentNullException.ThrowIfNull(apiTypeExpressionFactory);
 
+        if (_clrDelegateType is not null)
+        {
+            var declared = _state.InputParameterBuilders.FirstOrDefault(parameter =>
+                ClrNameComparer.Instance.Equals(parameter.ClrParameterInfo?.Name, apiName));
+            var suppliedType = apiTypeIdentity is Type clrType
+                ? clrType : (apiTypeIdentity as ApiTypeReference)?.ClrType;
+            if (declared is null || declared.ClrParameterInfo!.ParameterType != suppliedType)
+            {
+                _declarationErrors["parameter:" + apiName] =
+                    $"Configuration cannot add or change delegate parameter '{apiName}'";
+                return this;
+            }
+            _declarationErrors.Remove("parameter:" + apiName);
+            if (configure is not null)
+            {
+                declared.ApplyConfiguration(this.CurrentConfigurationSource, () => configure(declared));
+            }
+            return this;
+        }
         var source = this.CurrentConfigurationSource;
         var parameterIndex = _state.InputParameterBuilders.FindIndex
-            (parameter => ApiNameComparer.Instance.Equals(parameter.ApiName, apiName));
+            (parameter => ApiNameComparer.Instance.Equals(parameter.DeclarationName, apiName));
         if (parameterIndex >= 0)
         {
             var existing = _state.InputParameterBuilders[parameterIndex];
@@ -221,7 +250,13 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     )
     {
         ArgumentNullException.ThrowIfNull(apiTypeReference);
-        return this.SetOutput(() => new ApiTypeExpression(apiTypeReference), apiOutputNullability);
+        if (!this.IsCompatibleOutput(apiTypeReference.ClrType))
+        {
+            return this;
+        }
+        return _clrDelegateType is null
+            ? this.SetOutput(() => new ApiTypeExpression(apiTypeReference), apiOutputNullability)
+            : this.WithOutputNullability(apiOutputNullability);
     }
 
     /// <summary>Declares output referencing a registered CLR type.</summary>
@@ -264,6 +299,14 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
         ArgumentNullException.ThrowIfNull(clrItemType);
 
         var clrCollectionType = typeof(List<>).MakeGenericType(clrItemType);
+        if (!this.IsCompatibleOutput(clrCollectionType))
+        {
+            return this;
+        }
+        if (_clrDelegateType is not null)
+        {
+            return this.WithOutputNullability(apiCollectionNullability).WithOutputItemNullability(apiItemNullability);
+        }
         return this.SetOutput
         (
             () => new ApiTypeExpression(new ApiCollectionType
@@ -285,7 +328,8 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
     (
         ApiNullability apiCollectionNullability = ApiSchemaDefaults.QuerySourceCollectionOutputNullability,
         ApiNullability apiItemNullability = ApiSchemaDefaults.QuerySourceCollectionOutputItemNullability
-    ) => this.WithCollectionOutput(typeof(TItem), apiCollectionNullability, apiItemNullability);
+    )
+        => this.WithCollectionOutput(typeof(TItem), apiCollectionNullability, apiItemNullability);
 
     /// <summary>Declares which query composition operations are allowed over the source output.</summary>
     /// <remarks>Replaces the allowed operations at the active precedence; does not apply them to the output.</remarks>
@@ -315,15 +359,16 @@ public sealed class ApiQuerySourceBuilder : ExtensionBuilder<ApiQuerySourceBuild
 
     #region Build Methods
     /// <summary>Creates an independent builder snapshot for one schema build.</summary>
-    internal ApiQuerySourceBuilder CreateBuildSnapshot() => new(this);
+    internal ApiQuerySourceBuilder CreateBuildSnapshot()
+        => new(this);
 
     /// <summary>Builds a fresh query source and its owned parameter declarations.</summary>
     internal ApiQuerySource Build()
     {
         // Build ApiQuerySource instance from all the configured components.
         var apiName = this.ApiName;
-        var apiInputParameters = _state.InputParameterBuilders.Select(parameter => parameter.Build());
-        var apiOutputType = _state.OutputTypeFactory?.Invoke()!;
+        var apiInputParameters = _state.InputParameterBuilders.Select(static parameter => parameter.Build());
+        var apiOutputType = ApplyItemNullability(_state.OutputTypeFactory?.Invoke()!, _outputItemNullability);
         var apiOutputNullability = _state.ApiOutputNullability;
         var apiOutputComposition = _state.ApiOutputComposition;
 

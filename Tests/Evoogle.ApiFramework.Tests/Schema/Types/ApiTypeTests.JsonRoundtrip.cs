@@ -12,7 +12,7 @@ public partial class ApiTypeTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
         [.. JsonTestCases
-            .Select(c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
+            .Select(static c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
             {
                 Name = c.Name,
                 ExpectedFactoryArgument = c.FactoryArgument
@@ -22,6 +22,7 @@ public partial class ApiTypeTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(JsonRoundtripTheoryData))]
-    public void JsonRoundtrip(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtrip(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

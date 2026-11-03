@@ -82,7 +82,7 @@ public partial class ApiConventionTests
                 _hasAddedProperty = true;
                 context.ApiSchemaBuilder.AddObject<PropertyConventionTarget>
                 (
-                    x => x.AddProperty
+                    static x => x.AddProperty
                     (
                         nameof(PropertyConventionTarget.Added),
                         nameof(PropertyConventionTarget.Added)
@@ -136,7 +136,7 @@ public partial class ApiConventionTests
                 _hasRegisteredObject = true;
                 context.ApiSchemaBuilder.AddObject<PropertyConventionRegistered>
                 (
-                    x => x.AddProperty
+                    static x => x.AddProperty
                     (
                         nameof(PropertyConventionRegistered.Id),
                         nameof(PropertyConventionRegistered.Id)
@@ -198,7 +198,7 @@ public partial class ApiConventionTests
                 _hasAddedValue = true;
                 context.ApiSchemaBuilder.AddEnum<PipelineStatus>
                 (
-                    enumBuilder => enumBuilder.AddValue(PipelineStatus.Queued)
+                    static enumBuilder => enumBuilder.AddValue(PipelineStatus.Queued)
                 );
             }
         }
@@ -212,7 +212,8 @@ public partial class ApiConventionTests
         #endregion
 
         #region ApiNamingConvention Methods
-        public override string ConvertName(string apiName, ApiNamingConventionContext context) => apiName + suffix;
+        public override string ConvertName(string apiName, ApiNamingConventionContext context)
+            => apiName + suffix;
         #endregion
     }
 
@@ -317,7 +318,8 @@ public partial class ApiConventionTests
         #endregion
 
         #region IApiEnumValueConvention
-        public void Apply(ApiEnumValueBuilder builder, ApiEnumValueConventionContext context) => builder.WithName("LockedName");
+        public void Apply(ApiEnumValueBuilder builder, ApiEnumValueConventionContext context)
+            => builder.WithName("LockedName");
         #endregion
     }
 
@@ -388,7 +390,8 @@ public partial class ApiConventionTests
         #endregion
 
         #region IApiRelationshipConvention
-        public void Apply(ApiSchemaBuilder builder) => builder.AddObject<PropertyConventionRegistered>();
+        public void Apply(ApiSchemaBuilder builder)
+            => builder.AddObject<PropertyConventionRegistered>();
         #endregion
     }
     #endregion

@@ -27,116 +27,152 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public enum DiscoveryEnum
     {
+        #region Values
         First,
+        #endregion
     }
 
     public sealed class DiscoveryPrincipal
     {
+        #region Properties
         public int Id { get; set; }
+        #endregion
     }
 
     public sealed class DiscoveryDependent
     {
+        #region Properties
         public int Id { get; set; }
 
         public int PrincipalId { get; set; }
+        #endregion
     }
 
     public sealed class DiscoveryAssociation
     {
+        #region Properties
         public int PrincipalId { get; set; }
 
         public int DependentId { get; set; }
+        #endregion
     }
 
     public sealed class AssemblyObjectConfiguration : IApiObjectTypeConfiguration<DiscoveryObject>
     {
-        public void Configure(ApiObjectTypeBuilder<DiscoveryObject> builder) => builder.WithName("DiscoveredObject");
+        #region Configuration Methods
+        public void Configure(ApiObjectTypeBuilder<DiscoveryObject> builder)
+            => builder.WithName("DiscoveredObject");
+        #endregion
     }
 
     public sealed class AssemblyScalarConfiguration : IApiScalarTypeConfiguration<DiscoveryScalar>
     {
-        public void Configure(ApiScalarTypeBuilder<DiscoveryScalar> builder) => builder.WithName("DiscoveredScalar");
+        #region Configuration Methods
+        public void Configure(ApiScalarTypeBuilder<DiscoveryScalar> builder)
+            => builder.WithName("DiscoveredScalar");
+        #endregion
     }
 
     public sealed class AssemblyIntScalarConfiguration : IApiScalarTypeConfiguration<int>
     {
-        public void Configure(ApiScalarTypeBuilder<int> builder) => builder.WithName("Int");
+        #region Configuration Methods
+        public void Configure(ApiScalarTypeBuilder<int> builder)
+            => builder.WithName("Int");
+        #endregion
     }
 
     public sealed class AssemblyEnumConfiguration : IApiEnumTypeConfiguration<DiscoveryEnum>
     {
+        #region Configuration Methods
         public void Configure(ApiEnumTypeBuilder<DiscoveryEnum> builder)
         {
             builder
                 .WithName("DiscoveredEnum")
                 .AddValue("First", nameof(DiscoveryEnum.First), (int)DiscoveryEnum.First);
         }
+        #endregion
     }
 
     public sealed class AssemblyPrincipalConfiguration : IApiObjectTypeConfiguration<DiscoveryPrincipal>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<DiscoveryPrincipal> builder)
         {
             builder
                 .WithName("DiscoveredPrincipal")
-                .AddProperty(p => p.Id)
-                .AddKey("PrimaryKey", p => p.Id);
+                .AddProperty(static p => p.Id)
+                .AddKey("PrimaryKey", static p => p.Id);
         }
+        #endregion
     }
 
     public sealed class AssemblyDependentConfiguration : IApiObjectTypeConfiguration<DiscoveryDependent>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<DiscoveryDependent> builder)
         {
             builder
                 .WithName("DiscoveredDependent")
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.PrincipalId)
-                .AddKey("PrimaryKey", p => p.Id);
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.PrincipalId)
+                .AddKey("PrimaryKey", static p => p.Id);
         }
+        #endregion
     }
 
     public sealed class AssemblyAssociationConfiguration : IApiObjectTypeConfiguration<DiscoveryAssociation>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<DiscoveryAssociation> builder)
         {
             builder
                 .WithName("DiscoveredAssociation")
-                .AddProperty(p => p.PrincipalId)
-                .AddProperty(p => p.DependentId)
-                .AddKey("PrimaryKey", p => p.PrincipalId, p => p.DependentId);
+                .AddProperty(static p => p.PrincipalId)
+                .AddProperty(static p => p.DependentId)
+                .AddKey("PrimaryKey", static p => p.PrincipalId, static p => p.DependentId);
         }
+        #endregion
     }
 
     public sealed class AssemblyOneToOneConfiguration : IApiRelationshipOneToOneConfiguration
     {
+        #region Properties
         public string ApiName => "DiscoveredOneToOne";
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiRelationshipOneToOneBuilder builder)
         {
             builder
                 .From<DiscoveryPrincipal>()
-                .To<DiscoveryDependent>(d => d.WithForeignKey(x => x.PrincipalId));
+                .To<DiscoveryDependent>(static d => d.WithForeignKey(static x => x.PrincipalId));
         }
+        #endregion
     }
 
     public sealed class AssemblyOneToManyConfiguration : IApiRelationshipOneToManyConfiguration
     {
+        #region Properties
         public string ApiName => "DiscoveredOneToMany";
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiRelationshipOneToManyBuilder builder)
         {
             builder
                 .From<DiscoveryPrincipal>()
-                .To<DiscoveryDependent>(d => d.WithForeignKey(x => x.PrincipalId));
+                .To<DiscoveryDependent>(static d => d.WithForeignKey(static x => x.PrincipalId));
         }
+        #endregion
     }
 
     public sealed class AssemblyManyToManyConfiguration : IApiRelationshipManyToManyConfiguration
     {
+        #region Properties
         public string ApiName => "DiscoveredManyToMany";
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiRelationshipManyToManyBuilder builder)
         {
             builder
@@ -144,28 +180,39 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                 .And<DiscoveryDependent>()
                 .WithAssociation<DiscoveryAssociation>
                 (
-                    a => a
-                        .WithForeignKeyA(x => x.PrincipalId)
-                        .WithForeignKeyB(x => x.DependentId)
+                    static a => a
+                        .WithForeignKeyA(static x => x.PrincipalId)
+                        .WithForeignKeyB(static x => x.DependentId)
                 );
         }
+        #endregion
     }
 
     public sealed class FreshInstanceConfiguration : IApiObjectTypeConfiguration<DiscoveryObject>
     {
+        #region Properties
         public static int ConstructorCount { get; set; }
+        #endregion
 
+        #region Constructors
         public FreshInstanceConfiguration()
         {
             ConstructorCount++;
         }
+        #endregion
 
-        public void Configure(ApiObjectTypeBuilder<DiscoveryObject> builder) => builder.WithName("FreshObject");
+        #region Configuration Methods
+        public void Configure(ApiObjectTypeBuilder<DiscoveryObject> builder)
+            => builder.WithName("FreshObject");
+        #endregion
     }
 
     public sealed class EligibleConfiguration : IApiObjectTypeConfiguration<EligibilityObject>
     {
-        public void Configure(ApiObjectTypeBuilder<EligibilityObject> builder) => builder.WithName("EligibleObject");
+        #region Configuration Methods
+        public void Configure(ApiObjectTypeBuilder<EligibilityObject> builder)
+            => builder.WithName("EligibleObject");
+        #endregion
     }
 
     public sealed class EligibilityObject
@@ -174,64 +221,83 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public abstract class AbstractConfiguration : IApiObjectTypeConfiguration<EligibilityObject>
     {
+        #region Configuration Methods
         public abstract void Configure(ApiObjectTypeBuilder<EligibilityObject> builder);
+        #endregion
     }
 
     public struct StructConfiguration : IApiObjectTypeConfiguration<EligibilityObject>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<EligibilityObject> builder)
         {
         }
+        #endregion
     }
 
     public sealed class OpenGenericConfiguration<T> : IApiObjectTypeConfiguration<T>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<T> builder)
         {
         }
+        #endregion
     }
 
     internal sealed class NonPublicConfiguration : IApiObjectTypeConfiguration<EligibilityObject>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<EligibilityObject> builder)
         {
         }
+        #endregion
     }
 
     public sealed class GenericObjectDiscoveryConfiguration : IApiObjectTypeConfiguration<BridgeObject>
     {
+        #region Properties
         public static int ConfigureCount { get; set; }
 
         public static Type? BuilderType { get; set; }
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<BridgeObject> builder)
         {
             ConfigureCount++;
             BuilderType = builder.GetType();
             builder.WithName("BridgeObject");
         }
+        #endregion
     }
 
     public sealed class GenericScalarDiscoveryConfiguration : IApiScalarTypeConfiguration<BridgeScalar>
     {
+        #region Properties
         public static int ConfigureCount { get; set; }
 
         public static Type? BuilderType { get; set; }
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiScalarTypeBuilder<BridgeScalar> builder)
         {
             ConfigureCount++;
             BuilderType = builder.GetType();
             builder.WithName("BridgeScalar");
         }
+        #endregion
     }
 
     public sealed class GenericEnumDiscoveryConfiguration : IApiEnumTypeConfiguration<BridgeEnum>
     {
+        #region Properties
         public static int ConfigureCount { get; set; }
 
         public static Type? BuilderType { get; set; }
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiEnumTypeBuilder<BridgeEnum> builder)
         {
             ConfigureCount++;
@@ -240,6 +306,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                 .WithName("BridgeEnum")
                 .AddValue("First", nameof(BridgeEnum.First), (int)BridgeEnum.First);
         }
+        #endregion
     }
 
     public sealed class BridgeObject
@@ -252,24 +319,33 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public enum BridgeEnum
     {
+        #region Values
         First,
+        #endregion
     }
 
     public sealed class MultiRoleDiscoveryConfiguration :
         IApiObjectTypeConfiguration<MultiRoleObject>,
         IApiRelationshipOneToOneConfiguration
     {
+        #region Properties
         public static int ConstructorCount { get; set; }
 
         public static List<string> AppliedRoles { get; } = [];
+        #endregion
 
+        #region Constructors
         public MultiRoleDiscoveryConfiguration()
         {
             ConstructorCount++;
         }
+        #endregion
 
+        #region Properties
         public string ApiName => "MultiRoleRelationship";
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<MultiRoleObject> builder)
         {
             AppliedRoles.Add("Object");
@@ -281,8 +357,9 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             AppliedRoles.Add("OneToOne");
             builder
                 .From<RolePrincipal>()
-                .To<RoleDependent>(d => d.WithForeignKey(x => x.PrincipalId));
+                .To<RoleDependent>(static d => d.WithForeignKey(static x => x.PrincipalId));
         }
+        #endregion
     }
 
     public sealed class MultiRoleObject
@@ -291,52 +368,66 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public sealed class RolePrincipal
     {
+        #region Properties
         public int Id { get; set; }
+        #endregion
     }
 
     public sealed class RoleDependent
     {
+        #region Properties
         public int Id { get; set; }
 
         public int PrincipalId { get; set; }
+        #endregion
     }
 
     public sealed class RolePrincipalConfiguration : IApiObjectTypeConfiguration<RolePrincipal>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<RolePrincipal> builder)
         {
             builder
                 .WithName("RolePrincipal")
-                .AddProperty(p => p.Id)
-                .AddKey("PrimaryKey", p => p.Id);
+                .AddProperty(static p => p.Id)
+                .AddKey("PrimaryKey", static p => p.Id);
         }
+        #endregion
     }
 
     public sealed class RoleDependentConfiguration : IApiObjectTypeConfiguration<RoleDependent>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<RoleDependent> builder)
         {
             builder
                 .WithName("RoleDependent")
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.PrincipalId)
-                .AddKey("PrimaryKey", p => p.Id);
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.PrincipalId)
+                .AddKey("PrimaryKey", static p => p.Id);
         }
+        #endregion
     }
 
     public sealed class RoleScalarConfiguration : IApiScalarTypeConfiguration<int>
     {
-        public void Configure(ApiScalarTypeBuilder<int> builder) => builder.WithName("RoleInt");
+        #region Configuration Methods
+        public void Configure(ApiScalarTypeBuilder<int> builder)
+            => builder.WithName("RoleInt");
+        #endregion
     }
 
     public sealed class FailingRoleDiscoveryConfiguration :
         IApiObjectTypeConfiguration<FailingRoleObject>,
         IApiRelationshipOneToOneConfiguration
     {
+        #region Properties
         public static List<string> AppliedRoles { get; } = [];
 
         public string ApiName => "FailingRoleRelationship";
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<FailingRoleObject> builder)
         {
             AppliedRoles.Add("Object");
@@ -349,8 +440,9 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             AppliedRoles.Add("OneToOne");
             builder
                 .From<RolePrincipal>()
-                .To<RoleDependent>(d => d.WithForeignKey(x => x.PrincipalId));
+                .To<RoleDependent>(static d => d.WithForeignKey(static x => x.PrincipalId));
         }
+        #endregion
     }
 
     public sealed class FailingRoleObject
@@ -359,22 +451,30 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public sealed class IdentityFailureConfiguration : IApiRelationshipOneToOneConfiguration
     {
+        #region Properties
         public string ApiName => throw new InvalidOperationException("The relationship identity failed.");
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiRelationshipOneToOneBuilder builder)
         {
         }
+        #endregion
     }
 
     public sealed class ActivationFailureConfiguration : IApiObjectTypeConfiguration<ActivationObject>
     {
+        #region Constructors
         public ActivationFailureConfiguration(int value)
         {
         }
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<ActivationObject> builder)
         {
         }
+        #endregion
     }
 
     public sealed class ActivationObject
@@ -387,22 +487,28 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public sealed class ADuplicateObjectConfiguration : IApiObjectTypeConfiguration<DuplicateObject>
     {
+        #region Properties
         public static List<string> AppliedConfigurations { get; } = [];
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<DuplicateObject> builder)
         {
             AppliedConfigurations.Add("First");
             builder.WithName("DuplicateObject");
         }
+        #endregion
     }
 
     public sealed class BDuplicateObjectConfiguration : IApiObjectTypeConfiguration<DuplicateObject>
     {
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<DuplicateObject> builder)
         {
             ADuplicateObjectConfiguration.AppliedConfigurations.Add("Second");
             builder.WithName("DuplicateObject");
         }
+        #endregion
     }
 
     public sealed class DuplicateObject
@@ -411,13 +517,17 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public sealed class RepeatedRegistrationConfiguration : IApiObjectTypeConfiguration<RepeatedObject>
     {
+        #region Properties
         public static int ConfigureCount { get; set; }
+        #endregion
 
+        #region Configuration Methods
         public void Configure(ApiObjectTypeBuilder<RepeatedObject> builder)
         {
             ConfigureCount++;
             builder.WithName("RepeatedObject");
         }
+        #endregion
     }
 
     public sealed class RepeatedObject
@@ -426,7 +536,10 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     public sealed class PrecedenceConfiguration : IApiObjectTypeConfiguration<PrecedenceObject>
     {
-        public void Configure(ApiObjectTypeBuilder<PrecedenceObject> builder) => builder.WithName("ExplicitName");
+        #region Configuration Methods
+        public void Configure(ApiObjectTypeBuilder<PrecedenceObject> builder)
+            => builder.WithName("ExplicitName");
+        #endregion
     }
 
     public sealed class PrecedenceObject
@@ -435,21 +548,28 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     private enum ConfigurationFailureKind
     {
+        #region Values
         Configure,
         Identity,
+        #endregion
     }
 
     private enum NullScanKind
     {
+        #region Values
         ExplicitBuilder,
         ExplicitAssembly,
         MarkerBuilder,
+        #endregion
     }
 
     private sealed class ConventionNameOverride : IApiObjectTypeConvention
     {
+        #region Properties
         public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
 
+        #region Convention Methods
         public void Apply(ApiObjectTypeBuilder builder)
         {
             if (builder.ClrType == typeof(PrecedenceObject))
@@ -457,18 +577,25 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                 builder.SetApiNameConvention("ConventionName");
             }
         }
+        #endregion
     }
     #endregion
 
     #region Test Classes
     private sealed class AssemblyDiscoveryTest : XUnitTest
     {
+        #region User Supplied Properties
         public bool UseMarkerType { get; init; }
+        #endregion
 
+        #region Calculated Properties
         private ApiSchema? ApiSchemaActual { get; set; }
         private bool ReturnedSameBuilder { get; set; }
+        #endregion
 
-        protected override void Arrange() => this.WriteLine($"UseMarkerType: {this.UseMarkerType}");
+        #region XUnitTest Methods
+        protected override void Arrange()
+            => this.WriteLine($"UseMarkerType: {this.UseMarkerType}");
 
         protected override void Act()
         {
@@ -501,30 +628,37 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             this.ApiSchemaActual.Should().NotBeNull();
 
             this.ApiSchemaActual.ApiObjectTypes.Should().HaveCount(4);
-            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredObject");
-            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredPrincipal");
-            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredDependent");
-            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredAssociation");
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(static x => x.ApiName == "DiscoveredObject");
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(static x => x.ApiName == "DiscoveredPrincipal");
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(static x => x.ApiName == "DiscoveredDependent");
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(static x => x.ApiName == "DiscoveredAssociation");
 
             this.ApiSchemaActual.ApiScalarTypes.Should().HaveCount(2);
-            this.ApiSchemaActual.ApiScalarTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredScalar");
-            this.ApiSchemaActual.ApiScalarTypes.Should().ContainSingle(x => x.ApiName == "Int");
+            this.ApiSchemaActual.ApiScalarTypes.Should().ContainSingle(static x => x.ApiName == "DiscoveredScalar");
+            this.ApiSchemaActual.ApiScalarTypes.Should().ContainSingle(static x => x.ApiName == "Int");
 
-            this.ApiSchemaActual.ApiEnumTypes.Should().ContainSingle(x => x.ApiName == "DiscoveredEnum");
+            this.ApiSchemaActual.ApiEnumTypes.Should().ContainSingle(static x => x.ApiName == "DiscoveredEnum");
             this.ApiSchemaActual.ApiRelationships.Should().HaveCount(3);
-            this.ApiSchemaActual.ApiRelationships.Should().ContainSingle(x => x.ApiName == "DiscoveredOneToOne");
-            this.ApiSchemaActual.ApiRelationships.Should().ContainSingle(x => x.ApiName == "DiscoveredOneToMany");
-            this.ApiSchemaActual.ApiRelationships.Should().ContainSingle(x => x.ApiName == "DiscoveredManyToMany");
+            this.ApiSchemaActual.ApiRelationships.Should().ContainSingle(static x => x.ApiName == "DiscoveredOneToOne");
+            this.ApiSchemaActual.ApiRelationships.Should().ContainSingle(static x => x.ApiName == "DiscoveredOneToMany");
+            this.ApiSchemaActual.ApiRelationships.Should().ContainSingle(static x => x.ApiName == "DiscoveredManyToMany");
         }
+        #endregion
     }
 
     private sealed class NullScanArgumentsTest : XUnitTest
     {
+        #region User Supplied Properties
         public required NullScanKind ScanKind { get; init; }
+        #endregion
 
+        #region Calculated Properties
         private ArgumentNullException? ExceptionActual { get; set; }
+        #endregion
 
-        protected override void Arrange() => this.WriteLine($"ScanKind: {this.ScanKind}");
+        #region XUnitTest Methods
+        protected override void Arrange()
+            => this.WriteLine($"ScanKind: {this.ScanKind}");
 
         protected override void Act()
         {
@@ -563,14 +697,19 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                     : "builder"
             );
         }
+        #endregion
     }
 
     private sealed class TypeEligibilityTest : XUnitTest
     {
+        #region Calculated Properties
         private HashSet<Type> ObservedTypes { get; set; } = [];
         private ApiSchema? ApiSchemaActual { get; set; }
+        #endregion
 
-        protected override void Arrange() => this.ObservedTypes = [];
+        #region XUnitTest Methods
+        protected override void Arrange()
+            => this.ObservedTypes = [];
 
         protected override void Act()
         {
@@ -592,21 +731,38 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         protected override void Assert()
         {
             this.ApiSchemaActual.Should().NotBeNull();
-            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "EligibleObject");
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(static x => x.ApiName == "EligibleObject");
             this.ObservedTypes.Should().Contain(typeof(EligibleConfiguration));
             this.ObservedTypes.Should().NotContain(typeof(AbstractConfiguration));
             this.ObservedTypes.Should().NotContain(typeof(StructConfiguration));
             this.ObservedTypes.Should().NotContain(typeof(OpenGenericConfiguration<>));
             this.ObservedTypes.Should().NotContain(typeof(NonPublicConfiguration));
         }
+        #endregion
     }
 
     private sealed class BuildLifecycleTest : XUnitTest
     {
+        #region Calculated Properties
+        private string RestoredScenario { get; set; } = null!;
         private int FirstIssueCount { get; set; }
         private int SecondIssueCount { get; set; }
+        #endregion
 
-        protected override void Arrange() => FreshInstanceConfiguration.ConstructorCount = 0;
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Scenario: {this.Name}");
+            this.WriteLine();
+            this.WriteLine("Expected Exception: None; configuration failures appear in the build result");
+            var serializer = new XUnitTestSerializer();
+            this.RestoredScenario = ((XUnitTest)serializer.Deserialize
+                (this.GetType(), serializer.Serialize(this))).Name;
+            this.WriteLine($"Restored Scenario:  {this.RestoredScenario}");
+            this.WriteLine("Expected Builds:    2");
+            this.WriteLine("Issues Per Build:   1");
+            FreshInstanceConfiguration.ConstructorCount = 0;
+        }
 
         protected override void Act()
         {
@@ -622,25 +778,31 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                     )
                 );
 
-            schemaBuilder.Build();
-            this.FirstIssueCount = schemaBuilder.Context.ConfigurationIssues.Count;
-
-            schemaBuilder.Build();
-            this.SecondIssueCount = schemaBuilder.Context.ConfigurationIssues.Count;
+            this.FirstIssueCount = schemaBuilder.BuildResult().Issues.Count(static issue =>
+                issue.Code == ApiSchemaCompilationCode.ApiConfigurationActivationFailed);
+            this.SecondIssueCount = schemaBuilder.BuildResult().Issues.Count(static issue =>
+                issue.Code == ApiSchemaCompilationCode.ApiConfigurationActivationFailed);
+            this.WriteLine($"First Build Issues:  {this.FirstIssueCount}");
+            this.WriteLine($"Second Build Issues: {this.SecondIssueCount}");
         }
 
         protected override void Assert()
         {
+            this.RestoredScenario.Should().Be(this.Name);
             FreshInstanceConfiguration.ConstructorCount.Should().Be(2);
             this.FirstIssueCount.Should().Be(1);
             this.SecondIssueCount.Should().Be(1);
         }
+        #endregion
     }
 
     private sealed class GenericBridgeTest : XUnitTest
     {
+        #region Calculated Properties
         private ApiSchema? ApiSchemaActual { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
             GenericObjectDiscoveryConfiguration.ConfigureCount = 0;
@@ -678,12 +840,16 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             GenericEnumDiscoveryConfiguration.ConfigureCount.Should().Be(1);
             GenericEnumDiscoveryConfiguration.BuilderType.Should().Be<ApiEnumTypeBuilder<BridgeEnum>>();
         }
+        #endregion
     }
 
     private sealed class MultipleRolesTest : XUnitTest
     {
+        #region Calculated Properties
         private ApiSchema? ApiSchemaActual { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
             MultiRoleDiscoveryConfiguration.ConstructorCount = 0;
@@ -717,21 +883,36 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             MultiRoleDiscoveryConfiguration.AppliedRoles.Should().Equal("Object", "OneToOne");
             this.ApiSchemaActual.ApiRelationships.Should().ContainSingle
             (
-                x => x.ApiName == "MultiRoleRelationship"
+                static x => x.ApiName == "MultiRoleRelationship"
             );
         }
+        #endregion
     }
 
     private sealed class ConfigurationFailureTest : XUnitTest
     {
+        #region User Supplied Properties
         public required ConfigurationFailureKind FailureKind { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ConfigurationFailureTest RestoredCase { get; set; } = null!;
 
         private ApiSchema? ApiSchemaActual { get; set; }
         private IReadOnlyList<ApiSchemaCompilationIssue> IssuesActual { get; set; } = [];
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"FailureKind: {this.FailureKind}");
+            this.WriteLine($"Scenario:     {this.Name}");
+            this.WriteLine($"Failure Kind: {this.FailureKind}");
+            this.WriteLine();
+            this.WriteLine("Expected Code:      ApiConfigurationExecutionFailed");
+            this.WriteLine("Expected Exception: None; failure is a warning in the build result");
+            var serializer = new XUnitTestSerializer();
+            this.RestoredCase = (ConfigurationFailureTest)serializer.Deserialize
+                (this.GetType(), serializer.Serialize(this));
             FailingRoleDiscoveryConfiguration.AppliedRoles.Clear();
         }
 
@@ -755,12 +936,17 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                 .WithName("ConfigurationFailure")
                 .UseConfigurationsFromAssembly(typeof(DiscoveryMarker).Assembly, configurationTypes);
 
-            this.ApiSchemaActual = schemaBuilder.Build();
-            this.IssuesActual = schemaBuilder.Context.ConfigurationIssues;
+            var result = schemaBuilder.BuildResult();
+            this.ApiSchemaActual = result.Schema;
+            this.IssuesActual = [.. result.Issues.Where(static issue =>
+                issue.Code == ApiSchemaCompilationCode.ApiConfigurationExecutionFailed)];
+            this.WriteLine($"Actual Success: {result.IsValid}");
+            this.WriteLine($"Actual Issues:  {this.IssuesActual.Count}");
         }
 
         protected override void Assert()
         {
+            this.RestoredCase.FailureKind.Should().Be(this.FailureKind);
             this.ApiSchemaActual.Should().NotBeNull();
             this.IssuesActual.Should().ContainSingle
             (
@@ -779,11 +965,28 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                 FailingRoleDiscoveryConfiguration.AppliedRoles.Should().Equal("Object", "OneToOne");
             }
         }
+        #endregion
     }
 
     private sealed class ActivationFailureTest : XUnitTest
     {
+        #region Calculated Properties
+        private string RestoredScenario { get; set; } = null!;
         private IReadOnlyList<ApiSchemaCompilationIssue> IssuesActual { get; set; } = [];
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Scenario: {this.Name}");
+            this.WriteLine();
+            this.WriteLine("Expected Exception: None; configuration failures appear in the build result");
+            var serializer = new XUnitTestSerializer();
+            this.RestoredScenario = ((XUnitTest)serializer.Deserialize
+                (this.GetType(), serializer.Serialize(this))).Name;
+            this.WriteLine($"Restored Scenario:  {this.RestoredScenario}");
+            this.WriteLine("Expected Code:      ApiConfigurationActivationFailed");
+        }
 
         protected override void Act()
         {
@@ -795,12 +998,14 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                     IncludeTypes(typeof(ActivationFailureConfiguration))
                 );
 
-            schemaBuilder.Build();
-            this.IssuesActual = schemaBuilder.Context.ConfigurationIssues;
+            this.IssuesActual = [.. schemaBuilder.BuildResult().Issues.Where(static issue =>
+                issue.Code == ApiSchemaCompilationCode.ApiConfigurationActivationFailed)];
+            this.WriteLine($"Activation Issues: {this.IssuesActual.Count}");
         }
 
         protected override void Assert()
         {
+            this.RestoredScenario.Should().Be(this.Name);
             this.IssuesActual.Should().ContainSingle();
             var issue = this.IssuesActual.Single();
             issue.Code.Should().Be(ApiSchemaCompilationCode.ApiConfigurationActivationFailed);
@@ -808,12 +1013,16 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             issue.ApiPath.Should().Be(typeof(ActivationFailureConfiguration).FullName);
             issue.Exception.Should().NotBeNull();
         }
+        #endregion
     }
 
     private sealed class MarkerOnlyTest : XUnitTest
     {
+        #region Calculated Properties
         private ApiSchema? ApiSchemaActual { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Act()
         {
             var schemaBuilder = new ApiSchemaBuilder()
@@ -835,15 +1044,29 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             this.ApiSchemaActual.ApiEnumTypes.Should().BeEmpty();
             this.ApiSchemaActual.ApiRelationships.Should().BeEmpty();
         }
+        #endregion
     }
 
     private sealed class CompositionAndRegistrationTest : XUnitTest
     {
+        #region Calculated Properties
+        private string RestoredScenario { get; set; } = null!;
         private ApiSchema? ApiSchemaActual { get; set; }
         private int RepeatedConfigureCountActual { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
+            this.WriteLine($"Scenario: {this.Name}");
+            this.WriteLine();
+            this.WriteLine("Expected Exception: None; configuration failures appear in the build result");
+            var serializer = new XUnitTestSerializer();
+            this.RestoredScenario = ((XUnitTest)serializer.Deserialize
+                (this.GetType(), serializer.Serialize(this))).Name;
+            this.WriteLine($"Restored Scenario:  {this.RestoredScenario}");
+            this.WriteLine("Scenario:             Compose distinct configurations and deduplicate repeated discovery");
+            this.WriteLine("Expected Role Calls:  1");
             ADuplicateObjectConfiguration.AppliedConfigurations.Clear();
             RepeatedRegistrationConfiguration.ConfigureCount = 0;
         }
@@ -873,21 +1096,27 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
             this.ApiSchemaActual = schemaBuilder.Build();
             this.RepeatedConfigureCountActual = RepeatedRegistrationConfiguration.ConfigureCount;
+            this.WriteLine($"Actual Role Calls: {this.RepeatedConfigureCountActual}");
         }
 
         protected override void Assert()
         {
+            this.RestoredScenario.Should().Be(this.Name);
             this.ApiSchemaActual.Should().NotBeNull();
-            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(x => x.ApiName == "DuplicateObject");
+            this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle(static x => x.ApiName == "DuplicateObject");
             ADuplicateObjectConfiguration.AppliedConfigurations.Should().Equal("First", "Second");
-            this.RepeatedConfigureCountActual.Should().Be(2);
+            this.RepeatedConfigureCountActual.Should().Be(1);
         }
+        #endregion
     }
 
     private sealed class ExplicitPrecedenceTest : XUnitTest
     {
+        #region Calculated Properties
         private ApiSchema? ApiSchemaActual { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Act()
         {
             this.ApiSchemaActual = new ApiSchemaBuilder()
@@ -897,7 +1126,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
                     typeof(DiscoveryMarker).Assembly,
                     IncludeTypes(typeof(PrecedenceConfiguration))
                 )
-                .UseConventions(c => c.AddConvention(new ConventionNameOverride()))
+                .UseConventions(static c => c.AddConvention(new ConventionNameOverride()))
                 .Build();
         }
 
@@ -906,9 +1135,10 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             this.ApiSchemaActual.Should().NotBeNull();
             this.ApiSchemaActual.ApiObjectTypes.Should().ContainSingle
             (
-                x => x.ApiName == "ExplicitName"
+                static x => x.ApiName == "ExplicitName"
             );
         }
+        #endregion
     }
     #endregion
 
@@ -1012,7 +1242,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
     [
         new CompositionAndRegistrationTest
         {
-            Name = "Duplicate identities compose and repeated scans execute",
+            Name = "Distinct configurations compose and repeated scans are idempotent",
         },
     ];
 
@@ -1028,47 +1258,58 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
     #region Test Methods
     [Theory]
     [MemberData(nameof(AssemblyDiscoveryTheoryData))]
-    public void AssemblyDiscovery(IXUnitTest test) => test.Execute(this);
+    public void AssemblyDiscovery(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NullScanArgumentsTheoryData))]
-    public void NullScanArguments(IXUnitTest test) => test.Execute(this);
+    public void NullScanArguments(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TypeEligibilityTheoryData))]
-    public void TypeEligibility(IXUnitTest test) => test.Execute(this);
+    public void TypeEligibility(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(BuildLifecycleTheoryData))]
-    public void BuildLifecycle(IXUnitTest test) => test.Execute(this);
+    public void BuildLifecycle(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(GenericBridgeTheoryData))]
-    public void GenericBridge(IXUnitTest test) => test.Execute(this);
+    public void GenericBridge(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MultipleRolesTheoryData))]
-    public void MultipleRoles(IXUnitTest test) => test.Execute(this);
+    public void MultipleRoles(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(ConfigurationFailureTheoryData))]
-    public void ConfigurationFailure(IXUnitTest test) => test.Execute(this);
+    public void ConfigurationFailure(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(ActivationFailureTheoryData))]
-    public void ActivationFailure(IXUnitTest test) => test.Execute(this);
+    public void ActivationFailure(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MarkerOnlyTheoryData))]
-    public void MarkerOnly(IXUnitTest test) => test.Execute(this);
+    public void MarkerOnly(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(CompositionAndRegistrationTheoryData))]
-    public void CompositionAndRegistration(IXUnitTest test) => test.Execute(this);
+    public void CompositionAndRegistration(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(ExplicitPrecedenceTheoryData))]
-    public void ExplicitPrecedence(IXUnitTest test) => test.Execute(this);
+    public void ExplicitPrecedence(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Helper Methods

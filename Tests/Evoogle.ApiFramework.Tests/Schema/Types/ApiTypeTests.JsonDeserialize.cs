@@ -12,7 +12,7 @@ public partial class ApiTypeTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
         [.. JsonTestCases
-            .Select(c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
+            .Select(static c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
             {
                 Name = c.Name,
                 SourceJson = c.Json,
@@ -23,6 +23,7 @@ public partial class ApiTypeTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(JsonDeserializeTheoryData))]
-    public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
+    public void JsonDeserialize(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

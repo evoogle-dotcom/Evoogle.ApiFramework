@@ -25,7 +25,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     : ApiRelationshipBuilder(apiName, ApiSchemaDefaults.OneToOneRelationshipDeleteBehavior)
 {
     #region Fields
-    private readonly Internal.ApiRelationshipEndsState _endsState = new();
+    private Internal.ApiRelationshipEndsState _endsState = new();
     #endregion
 
     #region AddExtension Methods
@@ -286,6 +286,31 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     (
         ApiConfigurationSource source,
         Action<ApiRelationshipOneToOneBuilder> configure
-    ) => this.ApplyConfiguration(source, () => configure(this));
+    )
+        => this.ApplyConfiguration(source, () => configure(this));
+    #endregion
+
+    #region Build Copy Methods
+    internal override ApiRelationshipBuilder CreateBuildCopy()
+    {
+        var copy = (ApiRelationshipOneToOneBuilder)this.CreateRelationshipBuildCopy();
+        copy._endsState = _endsState.CreateBuildCopy();
+        return copy;
+    }
+    #endregion
+
+    #region With Methods
+    /// <summary>Sets the relationship API name without changing declaration identity.</summary>
+    /// <param name="apiName">The relationship API name.</param>
+    /// <returns>The current builder.</returns>
+    public ApiRelationshipOneToOneBuilder WithName(string apiName)
+    {
+        this.SetApiName(apiName);
+        return this;
+    }
+    #endregion
+
+    #region Properties
+    internal override Internal.ApiRelationshipEndsState EndsState => _endsState;
     #endregion
 }

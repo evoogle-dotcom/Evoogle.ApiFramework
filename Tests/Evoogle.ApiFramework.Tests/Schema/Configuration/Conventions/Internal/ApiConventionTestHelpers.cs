@@ -18,16 +18,16 @@ internal static class ApiConventionTestHelpers
     public static ApiSchemaBuilder WithTestScalars(this ApiSchemaBuilder builder)
     {
         return builder
-            .AddScalar<bool>(x => x.WithName("Boolean"))
-            .AddScalar<byte>(x => x.WithName("Byte"))
-            .AddScalar<decimal>(x => x.WithName("Decimal"))
-            .AddScalar<double>(x => x.WithName("Double"))
-            .AddScalar<float>(x => x.WithName("Single"))
-            .AddScalar<Guid>(x => x.WithName("Guid"))
-            .AddScalar<int>(x => x.WithName("Int32"))
-            .AddScalar<long>(x => x.WithName("Int64"))
-            .AddScalar<short>(x => x.WithName("Int16"))
-            .AddScalar<string>(x => x.WithName("String"));
+            .AddScalar<bool>(static x => x.WithName("Boolean"))
+            .AddScalar<byte>(static x => x.WithName("Byte"))
+            .AddScalar<decimal>(static x => x.WithName("Decimal"))
+            .AddScalar<double>(static x => x.WithName("Double"))
+            .AddScalar<float>(static x => x.WithName("Single"))
+            .AddScalar<Guid>(static x => x.WithName("Guid"))
+            .AddScalar<int>(static x => x.WithName("Int32"))
+            .AddScalar<long>(static x => x.WithName("Int64"))
+            .AddScalar<short>(static x => x.WithName("Int16"))
+            .AddScalar<string>(static x => x.WithName("String"));
     }
     #endregion
 }

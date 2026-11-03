@@ -228,6 +228,7 @@ public partial class ApiClrMemberAccessorTests
     #region Struct Write Test Methods
     [Theory]
     [MemberData(nameof(StructMemberWriteTheoryData))]
-    public void SetValueByRefUpdatesOriginalStructMember(IXUnitTest test) => test.Execute(this);
+    public void SetValueByRefUpdatesOriginalStructMember(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

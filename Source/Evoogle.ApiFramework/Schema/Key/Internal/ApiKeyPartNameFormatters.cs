@@ -20,7 +20,8 @@ internal static class ApiKeyPartNameFormatters
     /// <param name="format">The configured part name format.</param>
     /// <returns>The matching part name formatter implementation.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="format"/> is unsupported.</exception>
-    internal static ApiKeyPartNameFormatterDelegate Resolve(ApiKeyPartNameFormat format) => format switch
+    internal static ApiKeyPartNameFormatterDelegate Resolve(ApiKeyPartNameFormat format)
+        => format switch
     {
         ApiKeyPartNameFormat.None => None,
         ApiKeyPartNameFormat.ClrPathOnly => ClrPathOnly,
@@ -33,7 +34,8 @@ internal static class ApiKeyPartNameFormatters
     /// </summary>
     /// <param name="context">The part naming context.</param>
     /// <returns><see langword="null"/>.</returns>
-    private static string? None(ApiKeyPartNameContext context) => null;
+    private static string? None(ApiKeyPartNameContext context)
+        => null;
 
     /// <summary>
     ///     Creates names from only the dotted CLR member path.

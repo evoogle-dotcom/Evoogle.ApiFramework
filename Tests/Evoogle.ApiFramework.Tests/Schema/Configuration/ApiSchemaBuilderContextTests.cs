@@ -24,11 +24,13 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
         public Type? ClrType { get; init; }
         public string? ApiName { get; init; }
         public bool IsGenericFirst { get; init; }
+        public bool ExpectedSameBuilder { get; init; } = true;
         public Type? ExceptionTypeExpected { get; init; }
         public string? ExceptionMessageExpected { get; init; }
         #endregion
 
         #region Calculated Properties
+        private GetOrAddTest RestoredCase { get; set; } = null!;
         private object? Builder1 { get; set; }
         private object? Builder2 { get; set; }
         private Exception? ExceptionActual { get; set; }
@@ -37,12 +39,17 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"MethodName: {this.MethodName.SafeToString()}");
-            this.WriteLine($"GenericMethodName: {this.GenericMethodName.SafeToString()}");
-            this.WriteLine($"SecondMethodName: {this.SecondMethodName.SafeToString()}");
-            this.WriteLine($"ClrType: {this.ClrType.SafeToName()}");
-            this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
+            this.WriteLine($"MethodName:              {this.MethodName.SafeToString()}");
+            this.WriteLine($"GenericMethodName:       {this.GenericMethodName.SafeToString()}");
+            this.WriteLine($"SecondMethodName:        {this.SecondMethodName.SafeToString()}");
+            this.WriteLine($"ClrType:                 {this.ClrType.SafeToName()}");
+            this.WriteLine($"ApiName:                 {this.ApiName.SafeToString()}");
             this.WriteLine();
+            this.WriteLine($"Expected Same Builder:   {this.ExpectedSameBuilder}");
+            this.WriteLine($"Expected Exception:      {this.ExceptionTypeExpected}");
+            this.WriteLine();
+            var serializer = new XUnitTestSerializer();
+            this.RestoredCase = (GetOrAddTest)serializer.Deserialize(this.GetType(), serializer.Serialize(this));
         }
 
         protected override void Act()
@@ -52,8 +59,8 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
             {
                 if (this.SecondMethodName is not null)
                 {
-                    this.InvokeRelationshipMethod(context, this.MethodName);
-                    this.InvokeRelationshipMethod(context, this.SecondMethodName);
+                    this.Builder1 = this.InvokeRelationshipMethod(context, this.MethodName);
+                    this.Builder2 = this.InvokeRelationshipMethod(context, this.SecondMethodName);
                 }
                 else if (this.GenericMethodName is null)
                 {
@@ -79,10 +86,18 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
             {
                 this.ExceptionActual = exception;
             }
+            this.WriteLine($"Actual Same Builder:     {ReferenceEquals(this.Builder1, this.Builder2)}");
+            this.WriteLine($"Actual Exception:        {this.ExceptionActual}");
         }
 
         protected override void Assert()
         {
+            this.RestoredCase.MethodName.Should().Be(this.MethodName);
+            this.RestoredCase.GenericMethodName.Should().Be(this.GenericMethodName);
+            this.RestoredCase.SecondMethodName.Should().Be(this.SecondMethodName);
+            this.RestoredCase.ClrType.Should().Be(this.ClrType);
+            this.RestoredCase.ApiName.Should().Be(this.ApiName);
+            this.RestoredCase.ExpectedSameBuilder.Should().Be(this.ExpectedSameBuilder);
             if (this.ExceptionTypeExpected is not null)
             {
                 this.ExceptionActual.Should().NotBeNull();
@@ -99,7 +114,7 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
             this.Builder1.Should().NotBeNull();
             this.Builder2.Should().NotBeNull();
 
-            ReferenceEquals(this.Builder1, this.Builder2).Should().BeTrue();
+            ReferenceEquals(this.Builder1, this.Builder2).Should().Be(this.ExpectedSameBuilder);
         }
 
         private object? InvokeBuilderMethod(ApiSchemaBuilderContext context, string methodName, bool isGeneric)
@@ -138,6 +153,7 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
     }
     #endregion
 
+    #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] GetOrAddTheoryData =>
     [
         new GetOrAddTest
@@ -213,15 +229,19 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
         },
         new GetOrAddTest
         {
-            Name = "GetOrAddTypedRelationshipBuilder throws configuration exception when different kind exists",
-            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddOneToOneRelationshipBuilder),
-            SecondMethodName = nameof(ApiSchemaBuilderContext.GetOrAddOneToManyRelationshipBuilder),
+            Name = "Same-name relationship declarations of different kinds remain independent",
+            MethodName = nameof(ApiSchemaBuilderContext.DeclareOneToOneRelationshipBuilder),
+            SecondMethodName = nameof(ApiSchemaBuilderContext.DeclareOneToManyRelationshipBuilder),
             ApiName = "REL_Test",
-            ExceptionTypeExpected = typeof(ApiSchemaConfigurationException)
+            ExpectedSameBuilder = false
         }
     ];
+    #endregion
 
+    #region Test Methods
     [Theory]
     [MemberData(nameof(GetOrAddTheoryData))]
-    public void GetOrAdd(IXUnitTest test) => test.Execute(this);
+    public void GetOrAdd(IXUnitTest test)
+        => test.Execute(this);
+    #endregion
 }

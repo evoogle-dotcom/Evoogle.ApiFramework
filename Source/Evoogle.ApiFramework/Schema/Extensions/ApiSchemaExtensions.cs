@@ -31,7 +31,7 @@ public static class ApiSchemaExtensions
             return result;
         }
 
-        var availableTypesByApiName = string.Join(", ", apiSchema.ApiNamedTypes.OrderBy(t => t.ApiName).Select(t => t.ApiName));
+        var availableTypesByApiName = string.Join(", ", apiSchema.ApiNamedTypes.OrderBy(static t => t.ApiName).Select(static t => t.ApiName));
         var errorMessage =
             $"{nameof(ApiNamedType)} with {nameof(ApiNamedType.ApiName)} '{apiName}' not found in {apiSchema.SafeToString()}. " +
             $"Available {nameof(ApiNamedType)} by {nameof(ApiNamedType.ApiName)} are: {availableTypesByApiName}.";
@@ -89,7 +89,7 @@ public static class ApiSchemaExtensions
             return result;
         }
 
-        var availableEnumTypesByApiName = string.Join(", ", apiSchema.ApiEnumTypes.OrderBy(t => t.ApiName).Select(t => t.ApiName));
+        var availableEnumTypesByApiName = string.Join(", ", apiSchema.ApiEnumTypes.OrderBy(static t => t.ApiName).Select(static t => t.ApiName));
         var errorMessage =
             $"{nameof(ApiEnumType)} with {nameof(ApiEnumType.ApiName)} '{apiName.SafeToString()}' not found in {apiSchema.SafeToString()}. " +
             $"Available {nameof(ApiEnumType)} by {nameof(ApiEnumType.ApiName)} are: {availableEnumTypesByApiName}.";
@@ -147,7 +147,7 @@ public static class ApiSchemaExtensions
             return result;
         }
 
-        var availableObjectTypesByApiName = string.Join(", ", apiSchema.ApiObjectTypes.OrderBy(t => t.ApiName).Select(t => t.ApiName));
+        var availableObjectTypesByApiName = string.Join(", ", apiSchema.ApiObjectTypes.OrderBy(static t => t.ApiName).Select(static t => t.ApiName));
         var errorMessage =
             $"{nameof(ApiObjectType)} with {nameof(ApiObjectType.ApiName)} '{apiName.SafeToString()}' not found in {apiSchema.SafeToString()}. " +
             $"Available {nameof(ApiObjectType)} by {nameof(ApiObjectType.ApiName)} are: {availableObjectTypesByApiName}.";
@@ -203,7 +203,7 @@ public static class ApiSchemaExtensions
             return source;
         }
 
-        var availableQuerySourcesByApiName = string.Join(", ", apiSchema.ApiQuerySources.OrderBy(t => t.ApiName).Select(t => t.ApiName));
+        var availableQuerySourcesByApiName = string.Join(", ", apiSchema.ApiQuerySources.OrderBy(static t => t.ApiName).Select(static t => t.ApiName));
         var errorMessage =
             $"{nameof(ApiQuerySource)} with {nameof(ApiQuerySource.ApiName)} '{apiName}' not found in {apiSchema.SafeToString()}. " +
             $"Available {nameof(ApiQuerySource)} by {nameof(ApiQuerySource.ApiName)} are: {availableQuerySourcesByApiName}.";
@@ -224,7 +224,7 @@ public static class ApiSchemaExtensions
             return result;
         }
 
-        var availableRelationshipsByApiName = string.Join(", ", apiSchema.ApiRelationships.OrderBy(t => t.ApiName).Select(t => t.ApiName));
+        var availableRelationshipsByApiName = string.Join(", ", apiSchema.ApiRelationships.OrderBy(static t => t.ApiName).Select(static t => t.ApiName));
         var errorMessage =
             $"{nameof(ApiRelationship)} with {nameof(ApiRelationship.ApiName)} '{apiName}' not found in {apiSchema.SafeToString()}. " +
             $"Available {nameof(ApiRelationship)} by {nameof(ApiRelationship.ApiName)} are: {availableRelationshipsByApiName}.";
@@ -245,7 +245,7 @@ public static class ApiSchemaExtensions
             return result;
         }
 
-        var availableScalarTypesByApiName = string.Join(", ", apiSchema.ApiScalarTypes.OrderBy(t => t.ApiName).Select(t => t.ApiName));
+        var availableScalarTypesByApiName = string.Join(", ", apiSchema.ApiScalarTypes.OrderBy(static t => t.ApiName).Select(static t => t.ApiName));
         var errorMessage =
             $"{nameof(ApiScalarType)} with {nameof(ApiNamedType.ApiName)} '{apiName}' not found in {apiSchema.SafeToString()}. " +
             $"Available {nameof(ApiScalarType)} by {nameof(ApiScalarType.ApiName)} are: {availableScalarTypesByApiName}.";

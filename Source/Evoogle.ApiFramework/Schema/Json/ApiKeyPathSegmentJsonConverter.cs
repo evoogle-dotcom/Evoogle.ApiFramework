@@ -110,7 +110,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>
@@ -177,7 +177,8 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
         Utf8JsonWriter writer,
         ApiKeyPathSegment apiKeyPathSegment,
         DefaultWriteContext<PropertyNames> writeContext
-    ) => writer.TryWritePropertyWithSerializer
+    )
+        => writer.TryWritePropertyWithSerializer
     (
         propertyName: writeContext.PropertyNames.ApiKeyPathSegment.ApiPropertyReference,
         obj: apiKeyPathSegment.ApiPropertyReference,

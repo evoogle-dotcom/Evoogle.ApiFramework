@@ -172,6 +172,9 @@ dotnet_naming_rule.parameters_camel.severity = error
 # =========================================================
 
 [*.cs]
+# Ensure the analyzer checks for static lambda opportunities
+csharp_prefer_static_anonymous_function = true:error
+
 # Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = error
 

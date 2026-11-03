@@ -88,15 +88,15 @@ public partial class ApiSchemaTests
         {
             var exception = this.ActualException.Should().BeOfType<ApiSchemaCompilationException>().Which;
 
-            exception.Issues.Select(issue => new EnumDiagnostic(issue.Code, issue.Severity, issue.ApiPath)).Should().BeEquivalentTo(this.ExpectedIssues);
+            exception.Issues.Select(static issue => new EnumDiagnostic(issue.Code, issue.Severity, issue.ApiPath)).Should().BeEquivalentTo(this.ExpectedIssues);
             exception.IsValid.Should().BeFalse();
             exception.Result.Schema.Should().BeNull();
 
-            exception.Errors.Should().HaveCount(this.ExpectedIssues.Count(issue => issue.Severity == ApiSchemaCompilationSeverity.Error));
-            exception.Errors.Should().BeEquivalentTo(exception.Issues.Where(issue => issue.Severity == ApiSchemaCompilationSeverity.Error));
+            exception.Errors.Should().HaveCount(this.ExpectedIssues.Count(static issue => issue.Severity == ApiSchemaCompilationSeverity.Error));
+            exception.Errors.Should().BeEquivalentTo(exception.Issues.Where(static issue => issue.Severity == ApiSchemaCompilationSeverity.Error));
 
-            exception.Warnings.Should().HaveCount(this.ExpectedIssues.Count(issue => issue.Severity == ApiSchemaCompilationSeverity.Warning));
-            exception.Warnings.Should().BeEquivalentTo(exception.Issues.Where(issue => issue.Severity == ApiSchemaCompilationSeverity.Warning));
+            exception.Warnings.Should().HaveCount(this.ExpectedIssues.Count(static issue => issue.Severity == ApiSchemaCompilationSeverity.Warning));
+            exception.Warnings.Should().BeEquivalentTo(exception.Issues.Where(static issue => issue.Severity == ApiSchemaCompilationSeverity.Warning));
         }
         #endregion
     }
@@ -127,7 +127,8 @@ public partial class ApiSchemaTests
             this.SourceJson = json.ToJsonString();
         }
 
-        protected override void Act() => this.ActualSchema = JsonSerializer.Deserialize<ApiSchema>(this.SourceJson!);
+        protected override void Act()
+            => this.ActualSchema = JsonSerializer.Deserialize<ApiSchema>(this.SourceJson!);
 
         protected override void Assert()
         {
@@ -189,7 +190,8 @@ public partial class ApiSchemaTests
             }
         }
 
-        protected override void Assert() => this.ActualException.Should().BeOfType<JsonException>();
+        protected override void Assert()
+            => this.ActualException.Should().BeOfType<JsonException>();
         #endregion
     }
     #endregion
@@ -202,14 +204,14 @@ public partial class ApiSchemaTests
             Name = "Property nullability rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiPropertyInvalidApiNullability, "ApiSchema[\"Simple\"].ApiObjectType[\"Company\"].ApiProperty[\"Id\"]"),
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiNullabilityToUnknownString(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiNullabilityToUnknownString(a),
         },
         new CompilationIssueTest
         {
             Name = "Property nullability rejects a JSON null enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiPropertyInvalidApiNullability, "ApiSchema[\"Simple\"].ApiObjectType[\"Company\"].ApiProperty[\"Id\"]"),
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiNullabilityToNull(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiNullabilityToNull(a),
         },
         new CompilationIssueTest
         {
@@ -230,21 +232,21 @@ public partial class ApiSchemaTests
                     "ApiSchema[\"Commerce\"].ApiObjectType[\"Category\"].ApiProperty[\"Children\"]"
                 )
             ],
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstCollectionTypeApiItemNullabilityToIncompatibleToken(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetFirstCollectionTypeApiItemNullabilityToIncompatibleToken(a),
         },
         new CompilationIssueTest
         {
             Name = "Schema key null handling rejects a JSON null enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiSchemaInvalidApiKeyNullHandling, "ApiSchema[\"Simple\"]"),
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetSchemaApiKeyNullHandlingToNull(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetSchemaApiKeyNullHandlingToNull(a),
         },
         new CompilationIssueTest
         {
             Name = "Object key null handling rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiObjectTypeInvalidApiKeyNullHandling, "ApiSchema[\"Simple\"].ApiObjectType[\"Company\"]"),
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstObjectTypeApiKeyNullHandlingToUnknownString(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetFirstObjectTypeApiKeyNullHandlingToUnknownString(a),
         },
         new CompilationIssueTest
         {
@@ -260,14 +262,14 @@ public partial class ApiSchemaTests
                     "\"REL_CatalogItem_OrderLine_1toN_ViaNestedComposite\"]"
                 )
             ],
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstRelationshipApiDeleteBehaviorToIncompatibleToken(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetFirstRelationshipApiDeleteBehaviorToIncompatibleToken(a),
         },
         new CompilationIssueTest
         {
             Name = "Type expression API kind rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedIssues = SimpleEnumIssues(ApiSchemaCompilationCode.ApiTypeReferenceInvalidApiKind, "ApiSchema[\"Simple\"].ApiObjectType[\"Company\"].ApiProperty[\"Id\"]"),
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeApiKindToUnknownString(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeApiKindToUnknownString(a),
         },
     ];
 
@@ -277,14 +279,14 @@ public partial class ApiSchemaTests
         {
             Name = "Omitted schema key null handling uses the default",
             ExpectedSchemaNullHandling = ApiKeyNullHandling.UseEmptyOnNull,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.RemoveSchemaApiKeyNullHandling(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.RemoveSchemaApiKeyNullHandling(a),
         },
         new DefaultAndInheritanceTest
         {
             Name = "Null object key null handling preserves inheritance",
             ExpectedSchemaNullHandling = ApiKeyNullHandling.UseEmptyOnNull,
             ExpectsInheritedObjectNullHandling = true,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstObjectTypeApiKeyNullHandlingToNull(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetFirstObjectTypeApiKeyNullHandlingToNull(a),
         },
     ];
 
@@ -294,61 +296,61 @@ public partial class ApiSchemaTests
         {
             Name = "Type discriminator rejects an omitted JSON enum value",
             IsRelationship = false,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.RemoveApiKind(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.RemoveApiKind(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Type discriminator rejects a JSON null enum value",
             IsRelationship = false,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToNull(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToNull(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Type discriminator rejects a whitespace JSON enum value",
             IsRelationship = false,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToWhitespace(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToWhitespace(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Type discriminator rejects an unknown JSON enum value",
             IsRelationship = false,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToUnknownString(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToUnknownString(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Type discriminator rejects an incompatible JSON enum token",
             IsRelationship = false,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToIncompatibleToken(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToIncompatibleToken(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects an omitted JSON enum value",
             IsRelationship = true,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.RemoveApiKind(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.RemoveApiKind(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects a JSON null enum value",
             IsRelationship = true,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToNull(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToNull(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects a whitespace JSON enum value",
             IsRelationship = true,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToWhitespace(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToWhitespace(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects an unknown JSON enum value",
             IsRelationship = true,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToUnknownString(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToUnknownString(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects an incompatible JSON enum token",
             IsRelationship = true,
-            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToIncompatibleToken(a),
+            UpdateJson = static a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToIncompatibleToken(a),
         },
     ];
     #endregion
@@ -356,20 +358,23 @@ public partial class ApiSchemaTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(EnumJsonCompilationIssueTheoryData))]
-    public void DeserializeInvalidEnumReportsErrorsAtOwningElementPaths(IXUnitTest test) => test.Execute(this);
+    public void DeserializeInvalidEnumReportsErrorsAtOwningElementPaths(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(EnumJsonDefaultAndInheritanceTheoryData))]
-    public void EnumJsonDefaultsAndInheritance(IXUnitTest test) => test.Execute(this);
+    public void EnumJsonDefaultsAndInheritance(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(StructuralEnumJsonDiscriminatorTheoryData))]
-    public void StructuralEnumJsonDiscriminators(IXUnitTest test) => test.Execute(this);
+    public void StructuralEnumJsonDiscriminators(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Helper Methods
-    private static EnumDiagnostic[] SimpleEnumIssues(ApiSchemaCompilationCode code, string apiPath) =>
-    [
+    private static EnumDiagnostic[] SimpleEnumIssues(ApiSchemaCompilationCode code, string apiPath)
+        => [
         new EnumDiagnostic(code, ApiSchemaCompilationSeverity.Error, apiPath),
         new EnumDiagnostic(
             ApiSchemaCompilationCode.ApiObjectTypeMissingProperties,

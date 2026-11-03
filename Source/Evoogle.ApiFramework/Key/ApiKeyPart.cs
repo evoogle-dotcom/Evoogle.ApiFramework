@@ -53,7 +53,8 @@ public readonly record struct ApiKeyPart(string? ApiName, ApiKey ApiValue)
     ///     Use this factory method when building ordered/positional composite keys where
     ///     part order matters and names are not needed.
     /// </remarks>
-    public static ApiKeyPart Create(ApiKey apiValue) => new(null, apiValue);
+    public static ApiKeyPart Create(ApiKey apiValue)
+        => new(null, apiValue);
 
     /// <summary>
     ///     Creates a named key part with the specified API name and value.
@@ -71,11 +72,13 @@ public readonly record struct ApiKeyPart(string? ApiName, ApiKey ApiValue)
     ///     Use this factory method when building named composite keys where each part
     ///     has semantic meaning indicated by its name (e.g., "CustomerId", "OrderNumber").
     /// </remarks>
-    public static ApiKeyPart Create(string? apiName, ApiKey apiValue) => new(apiName, apiValue);
+    public static ApiKeyPart Create(string? apiName, ApiKey apiValue)
+        => new(apiName, apiValue);
     #endregion
 
     #region Object Methods
     /// <inheritdoc/>
-    public override string ToString() => this.ApiName is null ? this.ApiValue.SafeToString() : $"{this.ApiName}={this.ApiValue.SafeToString()}";
+    public override string ToString()
+        => this.ApiName is null ? this.ApiValue.SafeToString() : $"{this.ApiName}={this.ApiValue.SafeToString()}";
     #endregion
 }

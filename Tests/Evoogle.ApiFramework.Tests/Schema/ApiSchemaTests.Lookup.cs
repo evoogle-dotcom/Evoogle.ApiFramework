@@ -110,10 +110,12 @@ public partial class ApiSchemaTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(TryGetByApiNameTheoryData))]
-    public void TryGetByApiName(IXUnitTest test) => test.Execute(this);
+    public void TryGetByApiName(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TryGetByClrTypeTheoryData))]
-    public void TryGetByClrType(IXUnitTest test) => test.Execute(this);
+    public void TryGetByClrType(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

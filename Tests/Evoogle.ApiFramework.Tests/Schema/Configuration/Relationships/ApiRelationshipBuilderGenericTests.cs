@@ -139,6 +139,7 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
     #region Theory Tests
     [Theory]
     [MemberData(nameof(BuildRelationshipTheoryData))]
-    public void BuildRelationship(IXUnitTest test) => test.Execute(this);
+    public void BuildRelationship(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

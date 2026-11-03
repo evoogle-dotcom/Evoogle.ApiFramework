@@ -72,7 +72,8 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
     }
 
     /// <summary>Prevents access through a resolved member that failed consumer-specific compatibility validation.</summary>
-    public void InvalidateAccessor() => _boundClrMemberAccessor = null;
+    public void InvalidateAccessor()
+        => _boundClrMemberAccessor = null;
 
     /// <summary>Attempts to resolve and bind the configured CLR member reference.</summary>
     public bool TryResolveReference
@@ -215,8 +216,8 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
         return GetRootCauseMessage(exception);
     }
 
-    private static string GetRootCauseMessage(Exception exception) =>
-        exception.GetBaseException().Message.TrimEnd('.');
+    private static string GetRootCauseMessage(Exception exception)
+        => exception.GetBaseException().Message.TrimEnd('.');
 
     private static bool ValidateGetter
     (
@@ -283,7 +284,8 @@ internal sealed class ClrMemberBinding(ClrMemberReference? clrMemberReference)
         return true;
     }
 
-    private static bool IsPublicInstancePropertyOrField(MemberInfo clrMemberInfo) => clrMemberInfo switch
+    private static bool IsPublicInstancePropertyOrField(MemberInfo clrMemberInfo)
+        => clrMemberInfo switch
     {
         PropertyInfo propertyInfo =>
             propertyInfo.GetMethod?.IsPublic == true && propertyInfo.GetMethod.IsStatic == false ||

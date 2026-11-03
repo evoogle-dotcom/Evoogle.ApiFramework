@@ -92,31 +92,37 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
     /// <param name="apiKind">The expected kind of the referenced API type.</param>
     /// <param name="apiName">The API name of the referenced type.</param>
     /// <returns>A new API-named reference.</returns>
-    public static ApiTypeReference ApiRef(ApiTypeKind apiKind, string apiName) => new(apiKind, apiName);
+    public static ApiTypeReference ApiRef(ApiTypeKind apiKind, string apiName)
+        => new(apiKind, apiName);
 
     /// <summary>Creates a CLR-backed reference.</summary>
     /// <param name="clrType">The CLR type of the referenced API type.</param>
     /// <returns>A new CLR-backed reference.</returns>
-    public static ApiTypeReference ClrRef(Type clrType) => new(clrType);
+    public static ApiTypeReference ClrRef(Type clrType)
+        => new(clrType);
 
     /// <summary>Creates a CLR-backed reference for <typeparamref name="T"/>.</summary>
     /// <typeparam name="T">The CLR type to reference.</typeparam>
     /// <returns>A new CLR-backed reference.</returns>
-    public static ApiTypeReference ClrRef<T>() => new(typeof(T));
+    public static ApiTypeReference ClrRef<T>()
+        => new(typeof(T));
     #endregion
 
     #region Equality Methods
     /// <inheritdoc/>
-    public bool Equals(ApiTypeReference? other) => other is not null
+    public bool Equals(ApiTypeReference? other)
+        => other is not null
         && this.ApiKind == other.ApiKind
         && ApiNameComparer.Instance.Equals(this.ApiName, other.ApiName)
         && this.ClrType == other.ClrType;
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => this.Equals(obj as ApiTypeReference);
+    public override bool Equals(object? obj)
+        => this.Equals(obj as ApiTypeReference);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine
+    public override int GetHashCode()
+        => HashCode.Combine
     (
         this.ApiKind,
         this.ApiName is null ? 0 : ApiNameComparer.Instance.GetHashCode(this.ApiName),

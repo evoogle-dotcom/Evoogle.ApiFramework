@@ -46,7 +46,7 @@ public partial class ApiKeyDefinition : ApiSchemaElement
     #region Constructors
     internal ApiKeyDefinition(IEnumerable<ApiKeyPath> apiKeyPaths)
     {
-        this.ApiKeyPaths = [.. apiKeyPaths.EmptyIfNull().Where(x => x is not null)];
+        this.ApiKeyPaths = [.. apiKeyPaths.EmptyIfNull().Where(static x => x is not null)];
     }
     #endregion
 

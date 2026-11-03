@@ -13,7 +13,8 @@ public class GraphQlExtension : IApiSchemaExtension
 {
     public int Count { get; set; } = 42;
 
-    public IApiSchemaExtension CreateFrozenSnapshot() => new GraphQlExtension { Count = this.Count };
+    public IApiSchemaExtension CreateFrozenSnapshot()
+        => new GraphQlExtension { Count = this.Count };
 
     public override string ToString()
     {
@@ -27,7 +28,8 @@ public class JsonApiExtension : IApiSchemaExtension
 {
     public string Website { get; set; } = "http://jsonapi.org";
 
-    public IApiSchemaExtension CreateFrozenSnapshot() => new JsonApiExtension { Website = this.Website };
+    public IApiSchemaExtension CreateFrozenSnapshot()
+        => new JsonApiExtension { Website = this.Website };
 
     public override string ToString()
     {
@@ -41,7 +43,8 @@ public class ProtobufExtension : IApiSchemaExtension
 {
     public int Edition { get; set; } = 2024;
 
-    public IApiSchemaExtension CreateFrozenSnapshot() => new ProtobufExtension { Edition = this.Edition };
+    public IApiSchemaExtension CreateFrozenSnapshot()
+        => new ProtobufExtension { Edition = this.Edition };
 
     public override string ToString()
     {
@@ -55,7 +58,8 @@ public class TestExtension : IApiSchemaExtension
 {
     public bool Flag { get; set; } = true;
 
-    public IApiSchemaExtension CreateFrozenSnapshot() => new TestExtension { Flag = this.Flag };
+    public IApiSchemaExtension CreateFrozenSnapshot()
+        => new TestExtension { Flag = this.Flag };
 
     public override string ToString()
     {
@@ -69,7 +73,8 @@ public class TestExtension1 : IApiSchemaExtension
 {
     public string Description { get; set; } = nameof(TestExtension1);
 
-    public IApiSchemaExtension CreateFrozenSnapshot() => new TestExtension1 { Description = this.Description };
+    public IApiSchemaExtension CreateFrozenSnapshot()
+        => new TestExtension1 { Description = this.Description };
 
     public override string ToString()
     {
@@ -84,7 +89,8 @@ public class TestExtension2 : IApiSchemaExtension
     public string Id { get; set; } = "2";
     public string Name { get; set; } = nameof(TestExtension2);
 
-    public IApiSchemaExtension CreateFrozenSnapshot() => new TestExtension2
+    public IApiSchemaExtension CreateFrozenSnapshot()
+        => new TestExtension2
     {
         Id = this.Id,
         Name = this.Name

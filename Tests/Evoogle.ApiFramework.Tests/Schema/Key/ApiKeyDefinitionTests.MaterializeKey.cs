@@ -769,10 +769,12 @@ public partial class ApiKeyDefinitionTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(MaterializeKeyFromInstanceTheoryData))]
-    public void MaterializeKeyFromInstance(IXUnitTest test) => test.Execute(this);
+    public void MaterializeKeyFromInstance(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MaterializeKeyFromValuesTheoryData))]
-    public void MaterializeKeyFromValues(IXUnitTest test) => test.Execute(this);
+    public void MaterializeKeyFromValues(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

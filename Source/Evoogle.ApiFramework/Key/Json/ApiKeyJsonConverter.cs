@@ -239,7 +239,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>
@@ -314,7 +314,8 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
     #endregion
 
     #region Create Implementation Methods
-    private static ApiKey CreateEmpty() => ApiKey.Empty;
+    private static ApiKey CreateEmpty()
+        => ApiKey.Empty;
 
     private static ApiKey CreateComposite(PropertyNames propertyNames, ReadState readState)
     {

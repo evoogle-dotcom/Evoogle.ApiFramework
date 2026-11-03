@@ -68,6 +68,7 @@ public sealed class ApiAnnotationReaderSetBuilder
     ///     Builds the configured <see cref="ApiAnnotationReaderSet"/>.
     /// </summary>
     /// <returns>The built reader set.</returns>
-    internal ApiAnnotationReaderSet Build() => new([.. _readers]);
+    internal ApiAnnotationReaderSet Build()
+        => new([.. _readers]);
     #endregion
 }

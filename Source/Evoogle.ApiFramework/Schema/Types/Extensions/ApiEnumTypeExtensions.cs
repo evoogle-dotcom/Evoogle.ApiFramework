@@ -35,7 +35,7 @@ public static class ApiEnumTypeExtensions
             return apiEnumValue;
         }
 
-        var validValuesByApiName = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(v => v.ApiName).Select(v => v.ApiName));
+        var validValuesByApiName = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(static v => v.ApiName).Select(static v => v.ApiName));
         var errorMessage =
             $"{nameof(ApiEnumValue)} with {nameof(ApiEnumValue.ApiName)} '{apiName.SafeToString()}' not found in {apiEnumType.SafeToString()}. " +
             $"Valid {nameof(ApiEnumValue)} by {nameof(ApiEnumValue.ApiName)} are: {validValuesByApiName}.";
@@ -64,7 +64,7 @@ public static class ApiEnumTypeExtensions
             return apiEnumValue;
         }
 
-        var validValuesByClrName = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(v => v.ClrName).Select(v => v.ClrName));
+        var validValuesByClrName = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(static v => v.ClrName).Select(static v => v.ClrName));
         var errorMessage =
             $"{nameof(ApiEnumValue)} with {nameof(ApiEnumValue.ClrName)} '{clrName}' not found in {apiEnumType.SafeToString()}. " +
             $"Valid {nameof(ApiEnumValue)} by {nameof(ApiEnumValue.ClrName)} are: {validValuesByClrName}.";
@@ -92,7 +92,7 @@ public static class ApiEnumTypeExtensions
             return apiEnumValue;
         }
 
-        var validValuesByClrOrdinal = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(v => v.ClrOrdinal).Select(v => v.ClrOrdinal));
+        var validValuesByClrOrdinal = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(static v => v.ClrOrdinal).Select(static v => v.ClrOrdinal));
         var errorMessage =
             $"{nameof(ApiEnumValue)} with {nameof(ApiEnumValue.ClrOrdinal)} '{clrOrdinal}' not found in {apiEnumType.SafeToString()}. " +
             $"Valid {nameof(ApiEnumValue)} by {nameof(ApiEnumValue.ClrOrdinal)} are: {validValuesByClrOrdinal}.";

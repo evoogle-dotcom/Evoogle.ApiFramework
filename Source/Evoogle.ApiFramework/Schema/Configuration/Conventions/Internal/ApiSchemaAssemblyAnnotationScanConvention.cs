@@ -43,6 +43,7 @@ internal sealed class ApiSchemaAssemblyAnnotationScanConvention : IApiSchemaConv
 
     #region IApiSchemaConvention
     /// <inheritdoc />
-    public void Apply(ApiSchemaBuilder builder) => builder.ApplyAnnotationTypeDiscovery(_assembly, _filter);
+    public void Apply(ApiSchemaBuilder builder)
+        => builder.ApplyAnnotationTypeDiscovery(_assembly, _filter);
     #endregion
 }

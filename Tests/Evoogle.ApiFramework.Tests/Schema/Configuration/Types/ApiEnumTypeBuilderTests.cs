@@ -162,6 +162,7 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
-    public void Build(IXUnitTest test) => test.Execute(this);
+    public void Build(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

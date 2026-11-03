@@ -315,6 +315,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildPathTheoryData))]
-    public void BuildPath(IXUnitTest test) => test.Execute(this);
+    public void BuildPath(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

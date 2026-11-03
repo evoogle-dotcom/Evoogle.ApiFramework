@@ -10,6 +10,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 /// </summary>
 public enum ApiConventionPhase
 {
+    #region Values
     /// <summary>
     ///     Discovers schema structure, such as registered types or object properties, before
     ///     annotations and configuration conventions are applied.
@@ -17,8 +18,8 @@ public enum ApiConventionPhase
     Discovery = 0,
 
     /// <summary>
-    ///     Configures discovered type, enum-value, or property builders after their annotations
-    ///     have been applied.
+    ///     Configures discovered type, enum-value, property, query-source, or traversal builders.
+    ///     Traversal configuration runs after relationship inference and navigation binding.
     /// </summary>
     Configuration = 1,
 
@@ -27,4 +28,5 @@ public enum ApiConventionPhase
     ///     annotations have settled.
     /// </summary>
     Relationship = 2,
+    #endregion
 }

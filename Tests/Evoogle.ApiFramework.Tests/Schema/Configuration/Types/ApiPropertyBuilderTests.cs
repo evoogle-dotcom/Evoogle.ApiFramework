@@ -298,6 +298,7 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildPropertyTheoryData))]
-    public void BuildInfersNullabilityAndAppliesExplicitOverrides(IXUnitTest test) => test.Execute(this);
+    public void BuildInfersNullabilityAndAppliesExplicitOverrides(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

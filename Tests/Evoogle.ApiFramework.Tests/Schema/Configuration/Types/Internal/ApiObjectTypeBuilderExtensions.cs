@@ -26,7 +26,7 @@ internal static class ApiObjectTypeBuilderExtensions
                 foreach (var keyPath in apiKeyDefinition.ApiKeyPaths)
                 {
                     var apiPropertyReferences = keyPath.ApiSegments.Select
-                        (s => s.ApiPropertyReference);
+                        (static s => s.ApiPropertyReference);
                     if (keyPath.ApiRootObjectTypeReference is null)
                     {
                         k.AddPath(apiPropertyReferences);

@@ -12,7 +12,7 @@ public partial class ApiSchemaTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeVersionTheoryData =>
     [
-        .. VersionJsonTestCases.Select(c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
+        .. VersionJsonTestCases.Select(static c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
         {
             Name = c.Name,
             SourceJson = c.Json,
@@ -22,7 +22,7 @@ public partial class ApiSchemaTests
 
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripVersionTheoryData =>
     [
-        .. VersionJsonTestCases.Select(c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
+        .. VersionJsonTestCases.Select(static c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
         {
             Name = c.Name,
             ExpectedFactoryArgument = c.FactoryArgument
@@ -31,7 +31,7 @@ public partial class ApiSchemaTests
 
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeVersionTheoryData =>
     [
-        .. VersionJsonTestCases.Select(c => (TheoryDataRow<IXUnitTest>)new JsonSerializeTest
+        .. VersionJsonTestCases.Select(static c => (TheoryDataRow<IXUnitTest>)new JsonSerializeTest
         {
             Name = c.Name,
             SourceFactoryArgument = c.FactoryArgument,
@@ -43,14 +43,17 @@ public partial class ApiSchemaTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(JsonDeserializeVersionTheoryData))]
-    public void JsonDeserialize_Version(IXUnitTest test) => test.Execute(this);
+    public void JsonDeserialize_Version(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripVersionTheoryData))]
-    public void JsonRoundtrip_Version(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtrip_Version(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonSerializeVersionTheoryData))]
-    public void JsonSerialize_Version(IXUnitTest test) => test.Execute(this);
+    public void JsonSerialize_Version(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

@@ -162,7 +162,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>

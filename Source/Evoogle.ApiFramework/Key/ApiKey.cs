@@ -436,7 +436,7 @@ public readonly struct ApiKey
         }
 
         var clone = apiKeyPartCollection
-            .Select(p => new ApiKeyPart(p.ApiName, p.ApiValue))
+            .Select(static p => new ApiKeyPart(p.ApiName, p.ApiValue))
             .ToArray();
 
         if (clone.Length == 0)
@@ -503,17 +503,20 @@ public readonly struct ApiKey
     /// <summary>Creates an Int32 key.</summary>
     /// <param name="value">The <see cref="int"/> value.</param>
     /// <returns>A new Int32 <see cref="ApiKey"/>.</returns>
-    public static ApiKey FromInt32(int value) => new(ApiKeyKind.Int32, ApiKeyValueUnion.FromInt32(value), null);
+    public static ApiKey FromInt32(int value)
+        => new(ApiKeyKind.Int32, ApiKeyValueUnion.FromInt32(value), null);
 
     /// <summary>Creates an Int64 key.</summary>
     /// <param name="value">The <see cref="long"/> value.</param>
     /// <returns>A new Int64 <see cref="ApiKey"/>.</returns>
-    public static ApiKey FromInt64(long value) => new(ApiKeyKind.Int64, ApiKeyValueUnion.FromInt64(value), null);
+    public static ApiKey FromInt64(long value)
+        => new(ApiKeyKind.Int64, ApiKeyValueUnion.FromInt64(value), null);
 
     /// <summary>Creates a Guid key.</summary>
     /// <param name="value">The <see cref="Guid"/> value.</param>
     /// <returns>A new Guid <see cref="ApiKey"/>.</returns>
-    public static ApiKey FromGuid(Guid value) => new(ApiKeyKind.Guid, ApiKeyValueUnion.FromGuid(value), null);
+    public static ApiKey FromGuid(Guid value)
+        => new(ApiKeyKind.Guid, ApiKeyValueUnion.FromGuid(value), null);
 
     /// <summary>
     ///     Converts the specified <paramref name="value"/> into an <see cref="ApiKey"/>.
@@ -583,7 +586,8 @@ public readonly struct ApiKey
     /// <summary>Creates a Ulid key.</summary>
     /// <param name="value">The <see cref="Ulid"/> value.</param>
     /// <returns>A new Ulid <see cref="ApiKey"/>.</returns>
-    public static ApiKey FromUlid(Ulid value) => new(ApiKeyKind.Ulid, ApiKeyValueUnion.FromUlid(value), null);
+    public static ApiKey FromUlid(Ulid value)
+        => new(ApiKeyKind.Ulid, ApiKeyValueUnion.FromUlid(value), null);
 
     /// <summary>
     ///     Validates the supplied composite <paramref name="parts"/> ensuring no nested composites,
@@ -626,15 +630,15 @@ public readonly struct ApiKey
         if (anyNamed)
         {
             var duplicateNames = parts
-                .GroupBy(p => p.ApiName)
-                .Where(g => g.Count() > 1)
-                .Select(g => g.Key)
+                .GroupBy(static p => p.ApiName)
+                .Where(static g => g.Count() > 1)
+                .Select(static g => g.Key)
                 .ToList();
 
             if (duplicateNames.Count > 0)
             {
                 // Reject duplicate names
-                throw new ApiKeyException($"Duplicate part names in composite {nameof(ApiKey)}: [{duplicateNames.OrderBy(n => n).SafeToDelimitedString(',')}].");
+                throw new ApiKeyException($"Duplicate part names in composite {nameof(ApiKey)}: [{duplicateNames.OrderBy(static n => n).SafeToDelimitedString(',')}].");
             }
         }
     }
@@ -645,7 +649,8 @@ public readonly struct ApiKey
     ///     Gets the compatible scalar CLR types for <see cref="ApiKey"/> conversion.
     /// </summary>
     /// <returns>The compatible scalar CLR types for <see cref="ApiKey"/> conversion.</returns>
-    public static Type[] GetCompatibleScalarTypes() => [.. _scalarTypeKinds.Keys];
+    public static Type[] GetCompatibleScalarTypes()
+        => [.. _scalarTypeKinds.Keys];
 
     /// <summary>
     ///     Gets the compatible scalar CLR type for <see cref="ApiKey"/> conversion.
@@ -741,22 +746,28 @@ public readonly struct ApiKey
 
     #region AsOrThrow Methods
     /// <summary>Gets the string value or throws if the kind is not <see cref="ApiKeyKind.String"/>.</summary>
-    public readonly string AsStringOrThrow() => this.ApiKind == ApiKeyKind.String ? (string)_referenceValue! : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.String)}.");
+    public readonly string AsStringOrThrow()
+        => this.ApiKind == ApiKeyKind.String ? (string)_referenceValue! : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.String)}.");
 
     /// <summary>Gets the Int32 value or throws if the kind is not <see cref="ApiKeyKind.Int32"/>.</summary>
-    public readonly int AsInt32OrThrow() => this.ApiKind == ApiKeyKind.Int32 ? _valueUnion.Int32 : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Int32)}.");
+    public readonly int AsInt32OrThrow()
+        => this.ApiKind == ApiKeyKind.Int32 ? _valueUnion.Int32 : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Int32)}.");
 
     /// <summary>Gets the Int64 value or throws if the kind is not <see cref="ApiKeyKind.Int64"/>.</summary>
-    public readonly long AsInt64OrThrow() => this.ApiKind == ApiKeyKind.Int64 ? _valueUnion.Int64 : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Int64)}.");
+    public readonly long AsInt64OrThrow()
+        => this.ApiKind == ApiKeyKind.Int64 ? _valueUnion.Int64 : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Int64)}.");
 
     /// <summary>Gets the Guid value or throws if the kind is not <see cref="ApiKeyKind.Guid"/>.</summary>
-    public readonly Guid AsGuidOrThrow() => this.ApiKind == ApiKeyKind.Guid ? _valueUnion.Guid : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Guid)}.");
+    public readonly Guid AsGuidOrThrow()
+        => this.ApiKind == ApiKeyKind.Guid ? _valueUnion.Guid : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Guid)}.");
 
     /// <summary>Gets the Ulid value or throws if the kind is not <see cref="ApiKeyKind.Ulid"/>.</summary>
-    public readonly Ulid AsUlidOrThrow() => this.ApiKind == ApiKeyKind.Ulid ? _valueUnion.Ulid : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Ulid)}.");
+    public readonly Ulid AsUlidOrThrow()
+        => this.ApiKind == ApiKeyKind.Ulid ? _valueUnion.Ulid : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Ulid)}.");
 
     /// <summary>Gets the culture value or throws if the kind is not <see cref="ApiKeyKind.Culture"/>.</summary>
-    public readonly CultureInfo AsCultureOrThrow() => this.ApiKind == ApiKeyKind.Culture ? (CultureInfo)_referenceValue! : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Culture)}.");
+    public readonly CultureInfo AsCultureOrThrow()
+        => this.ApiKind == ApiKeyKind.Culture ? (CultureInfo)_referenceValue! : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Culture)}.");
     #endregion
 
     #region TryGet Methods
@@ -897,7 +908,8 @@ public readonly struct ApiKey
     }
 
     /// <summary>Returns a debugger-friendly display string.</summary>
-    internal readonly string ToDebuggerDisplay() => this.HasValue ? $"{this.ApiKind}:{this}" : EmptyDisplayText;
+    internal readonly string ToDebuggerDisplay()
+        => this.HasValue ? $"{this.ApiKind}:{this}" : EmptyDisplayText;
     #endregion
 
     #region Parsing
@@ -1179,7 +1191,8 @@ public readonly struct ApiKey
     }
 
     /// <summary>Determines whether this instance equals the specified object.</summary>
-    public override readonly bool Equals(object? obj) => obj is ApiKey other && this.Equals(other);
+    public override readonly bool Equals(object? obj)
+        => obj is ApiKey other && this.Equals(other);
 
     /// <summary>Returns a hash code for this key.</summary>
     public override readonly int GetHashCode()

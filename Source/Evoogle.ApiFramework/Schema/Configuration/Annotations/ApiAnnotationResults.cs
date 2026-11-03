@@ -76,13 +76,17 @@ public sealed record ApiVersionAnnotationResult
 /// <param name="DependentType">The dependent CLR object type.</param>
 /// <param name="ForeignKey">The optional dependent CLR foreign-key member name.</param>
 /// <param name="DeleteBehavior">The configured delete behavior.</param>
+/// <param name="ClrNavigationMember">The annotated CLR navigation, or null for a type-level declaration.</param>
+/// <param name="InverseNavigation">The optional opposite CLR navigation member name.</param>
 public sealed record ApiOneToManyRelationshipAnnotationResult
 (
     string ApiName,
     Type PrincipalType,
     Type DependentType,
     string? ForeignKey,
-    ApiRelationshipDeleteBehavior DeleteBehavior
+    ApiRelationshipDeleteBehavior DeleteBehavior,
+    MemberInfo? ClrNavigationMember = null,
+    string? InverseNavigation = null
 );
 
 /// <summary>Describes a one-to-one relationship annotation result.</summary>
@@ -91,13 +95,17 @@ public sealed record ApiOneToManyRelationshipAnnotationResult
 /// <param name="DependentType">The dependent CLR object type.</param>
 /// <param name="ForeignKey">The optional dependent CLR foreign-key member name.</param>
 /// <param name="DeleteBehavior">The configured delete behavior.</param>
+/// <param name="ClrNavigationMember">The annotated CLR navigation, or null for a type-level declaration.</param>
+/// <param name="InverseNavigation">The optional opposite CLR navigation member name.</param>
 public sealed record ApiOneToOneRelationshipAnnotationResult
 (
     string ApiName,
     Type PrincipalType,
     Type DependentType,
     string? ForeignKey,
-    ApiRelationshipDeleteBehavior DeleteBehavior
+    ApiRelationshipDeleteBehavior DeleteBehavior,
+    MemberInfo? ClrNavigationMember = null,
+    string? InverseNavigation = null
 );
 
 /// <summary>Describes a many-to-many relationship annotation result.</summary>
@@ -107,6 +115,8 @@ public sealed record ApiOneToOneRelationshipAnnotationResult
 /// <param name="AssociationType">The CLR association object type.</param>
 /// <param name="ForeignKeyA">The optional association member for principal A.</param>
 /// <param name="ForeignKeyB">The optional association member for principal B.</param>
+/// <param name="ClrNavigationMember">The annotated CLR navigation, or null for a type-level declaration.</param>
+/// <param name="InverseNavigation">The optional opposite CLR navigation member name.</param>
 public sealed record ApiManyToManyRelationshipAnnotationResult
 (
     string ApiName,
@@ -114,7 +124,9 @@ public sealed record ApiManyToManyRelationshipAnnotationResult
     Type PrincipalTypeB,
     Type AssociationType,
     string? ForeignKeyA,
-    string? ForeignKeyB
+    string? ForeignKeyB,
+    MemberInfo? ClrNavigationMember = null,
+    string? InverseNavigation = null
 );
 
 /// <summary>Describes a CLR type discovered during assembly annotation scanning.</summary>

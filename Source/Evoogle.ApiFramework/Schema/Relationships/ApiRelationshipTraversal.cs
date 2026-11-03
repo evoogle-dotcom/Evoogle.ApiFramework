@@ -99,8 +99,8 @@ public sealed partial class ApiRelationshipTraversal(string apiName, ClrMemberRe
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    protected override string BuildPath(string? apiPreviousPath) =>
-        ApiSchemaPathFormatting.BuildPath(apiPreviousPath, this.ApiElementName, this.ApiName);
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaPathFormatting.BuildPath(apiPreviousPath, this.ApiElementName, this.ApiName);
 
     /// <inheritdoc/>
     internal override void CompileCore(ApiSchemaCompilationContext context)

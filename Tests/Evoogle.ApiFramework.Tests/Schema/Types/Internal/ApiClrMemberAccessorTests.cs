@@ -233,7 +233,8 @@ public partial class ApiClrMemberAccessorTests(ITestOutputHelper output) : XUnit
                 ? this.Accessor!.GetValue(clrObject!, clrValueType)
                 : this.Accessor!.GetValue<MemberAccessSource, string>(clrObject!);
 
-        private long GetMemberValue() => this.ClrKind == ClrMemberKind.Property
+        private long GetMemberValue()
+            => this.ClrKind == ClrMemberKind.Property
             ? this.ClrObject!.Number : this.ClrObject!.NumberField;
 
         private void SetValue<TValue>(MemberAccessSource? clrObject, TValue clrValue)
@@ -365,36 +366,43 @@ public partial class ApiClrMemberAccessorTests(ITestOutputHelper output) : XUnit
     #region Member Access Test Methods
     [Theory]
     [MemberData(nameof(GetValueUsesSchemaTypeCoercionTheoryData))]
-    public void GetValueUsesSchemaTypeCoercion(IXUnitTest test) => test.Execute(this);
+    public void GetValueUsesSchemaTypeCoercion(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(SetValueUsesSchemaTypeCoercionTheoryData))]
-    public void SetValueUsesSchemaTypeCoercion(IXUnitTest test) => test.Execute(this);
+    public void SetValueUsesSchemaTypeCoercion(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MemberAccessRejectsNullTargetTheoryData))]
-    public void MemberAccessRejectsNullTarget(IXUnitTest test) => test.Execute(this);
+    public void MemberAccessRejectsNullTarget(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MemberAccessWrapsClrMemberFailureTheoryData))]
-    public void MemberAccessWrapsClrMemberFailure(IXUnitTest test) => test.Execute(this);
+    public void MemberAccessWrapsClrMemberFailure(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TryGetValueReturnsFalseWhenAccessFailsTheoryData))]
-    public void TryGetValueReturnsFalseWhenAccessFails(IXUnitTest test) => test.Execute(this);
+    public void TryGetValueReturnsFalseWhenAccessFails(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TrySetValueReturnsFalseWithoutMutatingWhenAccessFailsTheoryData))]
-    public void TrySetValueReturnsFalseWithoutMutatingWhenAccessFails(IXUnitTest test) => test.Execute(this);
+    public void TrySetValueReturnsFalseWithoutMutatingWhenAccessFails(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(UnboundMemberAccessUsesSurfaceSpecificExceptionBoundaryTheoryData))]
-    public void UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary(IXUnitTest test) => test.Execute(this);
+    public void UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Member Access Factory Methods
-    private static TheoryDataRow<IXUnitTest>[] CreateMemberAndOverloadTheoryData(MemberAccessOperation operation) =>
-    [
+    private static TheoryDataRow<IXUnitTest>[] CreateMemberAndOverloadTheoryData(MemberAccessOperation operation)
+        => [
         .. from surface in Enum.GetValues<MemberAccessSurface>()
            from clrMember in new[]
            {
@@ -412,7 +420,8 @@ public partial class ApiClrMemberAccessorTests(ITestOutputHelper output) : XUnit
         MemberAccessOverload overload,
         ClrMemberKind clrKind,
         string clrName
-    ) => new()
+    )
+        => new()
     {
         Name = $"{surface}; {clrKind}; {overload}; {operation}",
         Operation = operation,
@@ -461,7 +470,8 @@ public partial class ApiClrMemberAccessorTests(ITestOutputHelper output) : XUnit
     (
         MemberAccessOperation operation,
         MemberAccessSurface surface
-    ) => operation switch
+    )
+        => operation switch
     {
         MemberAccessOperation.GetValueRejectsNullTarget or
         MemberAccessOperation.SetValueRejectsNullTarget => nameof(ArgumentNullException),
@@ -478,7 +488,8 @@ public partial class ApiClrMemberAccessorTests(ITestOutputHelper output) : XUnit
     (
         MemberAccessOperation operation,
         MemberAccessOverload overload
-    ) => operation switch
+    )
+        => operation switch
     {
         MemberAccessOperation.GetValueUsesSchemaTypeCoercion => typeof(string).SafeToName(),
         MemberAccessOperation.TryGetValueReturnsFalseForNullTarget or
@@ -491,7 +502,8 @@ public partial class ApiClrMemberAccessorTests(ITestOutputHelper output) : XUnit
         _ => "<none>"
     };
 
-    private static string GetSuppliedValue(MemberAccessOperation operation) => operation switch
+    private static string GetSuppliedValue(MemberAccessOperation operation)
+        => operation switch
     {
         MemberAccessOperation.SetValueUsesSchemaTypeCoercion or
         MemberAccessOperation.SetValueRejectsNullTarget => "42 (String)",

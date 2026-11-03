@@ -271,7 +271,7 @@ public partial class ApiPropertyTests
 
     public static TheoryDataRow<IXUnitTest>[] UnboundMemberAccessUsesSurfaceSpecificExceptionBoundaryTheoryData =>
     [
-        .. Enum.GetValues<MemberAccessSurface>().Select(surface => (TheoryDataRow<IXUnitTest>)
+        .. Enum.GetValues<MemberAccessSurface>().Select(static surface => (TheoryDataRow<IXUnitTest>)
             new MemberAccessBoundaryTest
             {
                 Name = $"Compiled {surface} with no bound accessor",
@@ -290,15 +290,18 @@ public partial class ApiPropertyTests
     #region Member Access Test Methods
     [Theory]
     [MemberData(nameof(CompiledMemberAccessTheoryData))]
-    public void CompileWiresPropertyAndTraversalMemberAccessors(IXUnitTest test) => test.Execute(this);
+    public void CompileWiresPropertyAndTraversalMemberAccessors(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(MemberAccessRejectsNullTargetTheoryData))]
-    public void MemberAccessRejectsNullTarget(IXUnitTest test) => test.Execute(this);
+    public void MemberAccessRejectsNullTarget(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(UnboundMemberAccessUsesSurfaceSpecificExceptionBoundaryTheoryData))]
-    public void UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary(IXUnitTest test) => test.Execute(this);
+    public void UnboundMemberAccessUsesSurfaceSpecificExceptionBoundary(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Member Access Factory Methods

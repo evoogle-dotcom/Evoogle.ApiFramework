@@ -20,7 +20,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Types;
 public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 {
     #region Fields
-    private readonly ApiPropertyState _state;
+    private ApiPropertyState _state;
     private readonly string _clrName;
     #endregion
 
@@ -76,7 +76,8 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder AddPropertyExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiPropertyBuilder AddPropertyExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region With Methods
@@ -222,6 +223,15 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name, paramName);
         return name;
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiPropertyBuilder CreateBuildCopy()
+    {
+        var copy = this.CreateExtensionBuildCopy();
+        copy._state = _state.CreateBuildCopy();
+        return copy;
     }
     #endregion
 }

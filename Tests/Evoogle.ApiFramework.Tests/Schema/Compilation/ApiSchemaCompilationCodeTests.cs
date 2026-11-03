@@ -45,7 +45,8 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
             this.WriteLine($"Actual JSON: {this.ActualJson}");
         }
 
-        protected override void Assert() => this.ActualJson.Should().Be
+        protected override void Assert()
+            => this.ActualJson.Should().Be
         (
             $$"""
             "{{this.ExpectedValue}}"
@@ -59,14 +60,15 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
     public static TheoryData<IXUnitTest> SerializationTheoryData => new
     (
         Enum.GetValues<ApiSchemaCompilationCode>()
-            .Select(code => (IXUnitTest)CreateSerializationTest(code, GetExpectedSerializedValue(code)))
+            .Select(static code => (IXUnitTest)CreateSerializationTest(code, GetExpectedSerializedValue(code)))
     );
     #endregion
 
     #region Test Methods
     [Theory]
     [MemberData(nameof(SerializationTheoryData))]
-    public void Serialization(IXUnitTest test) => test.Execute(this);
+    public void Serialization(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Implementation Methods
@@ -74,7 +76,8 @@ public class ApiSchemaCompilationCodeTests(ITestOutputHelper output) : XUnitTest
     (
         ApiSchemaCompilationCode code,
         string expectedValue
-    ) => new()
+    )
+        => new()
     {
         Name = $"{code} Serializes As {expectedValue}",
         Code = code,

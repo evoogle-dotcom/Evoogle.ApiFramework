@@ -33,5 +33,8 @@ public enum ApiNamingConventionTarget
 
     /// <summary>An API query-source parameter name.</summary>
     QuerySourceParameter,
+
+    /// <summary>A relationship traversal API name.</summary>
+    RelationshipTraversal,
     #endregion
 }

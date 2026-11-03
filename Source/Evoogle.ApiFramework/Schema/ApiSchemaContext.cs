@@ -74,6 +74,7 @@ public sealed class ApiSchemaContext
 
     #region Methods
     /// <summary>Creates a logger for the specified category when a logger factory is configured.</summary>
-    internal ILogger<TCategory>? CreateLogger<TCategory>() => this.LoggerFactory?.CreateLogger<TCategory>();
+    internal ILogger<TCategory>? CreateLogger<TCategory>()
+        => this.LoggerFactory?.CreateLogger<TCategory>();
     #endregion
 }

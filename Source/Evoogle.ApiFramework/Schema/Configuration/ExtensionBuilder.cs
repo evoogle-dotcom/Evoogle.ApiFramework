@@ -20,7 +20,7 @@ public abstract class ExtensionBuilder<TBuilder>
     where TBuilder : ExtensionBuilder<TBuilder>
 {
     #region Fields
-    private readonly ApiExtensionState _extensionState = new();
+    private ApiExtensionState _extensionState = new();
     #endregion
 
     #region Methods
@@ -53,8 +53,8 @@ public abstract class ExtensionBuilder<TBuilder>
     /// <summary>
     ///     Builds a new ordered dictionary containing the collected extensions, or <c>null</c> if none exist.
     /// </summary>
-    internal OrderedDictionary<Type, object>? BuildExtensions() =>
-        _extensionState.Extensions.Count > 0 ? new OrderedDictionary<Type, object>(_extensionState.Extensions) : null;
+    internal OrderedDictionary<Type, object>? BuildExtensions()
+        => _extensionState.Extensions.Count > 0 ? new OrderedDictionary<Type, object>(_extensionState.Extensions) : null;
 
     /// <summary>Copies the configured extension registrations into another builder snapshot.</summary>
     internal void CopyExtensionsTo(TBuilder builder)
@@ -66,6 +66,16 @@ public abstract class ExtensionBuilder<TBuilder>
         {
             target._extensionState.Extensions.Add(extensionType, extension);
         }
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal TBuilder CreateExtensionBuildCopy()
+    {
+        var copy = (ExtensionBuilder<TBuilder>)this.MemberwiseClone();
+        copy._extensionState = new ApiExtensionState();
+        this.CopyExtensionsTo((TBuilder)copy);
+        return (TBuilder)copy;
     }
     #endregion
 }

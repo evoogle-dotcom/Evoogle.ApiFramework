@@ -18,7 +18,7 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     where TBuilder : ApiNamedTypeBuilder<TBuilder>
 {
     #region Fields
-    private readonly ApiNamedTypeState _state = new(clrType);
+    private ApiNamedTypeState _state = new(clrType);
     #endregion
 
     #region Properties
@@ -35,7 +35,8 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     /// <summary>
     ///     Gets the shared builder context.
     /// </summary>
-    protected ApiSchemaBuilderContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
+    protected ApiSchemaBuilderContext Context { get; private set; } =
+        context ?? throw new ArgumentNullException(nameof(context));
 
     internal ApiSchemaBuilderContext ConfigurationContext => this.Context;
     #endregion
@@ -80,6 +81,17 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
         }
 
         return (TBuilder)this;
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal TBuilder CreateNamedBuildCopy(ApiSchemaBuilderContext context)
+    {
+        var copy = this.CreateExtensionBuildCopy();
+        var namedCopy = (ApiNamedTypeBuilder<TBuilder>)copy;
+        namedCopy._state = _state.CreateBuildCopy();
+        namedCopy.Context = context;
+        return copy;
     }
     #endregion
 }

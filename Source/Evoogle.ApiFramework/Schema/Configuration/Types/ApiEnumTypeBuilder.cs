@@ -19,7 +19,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiEnumTypeBuilder>(clrType, context)
 {
     #region Fields
-    private readonly ApiEnumTypeState _state = new();
+    private ApiEnumTypeState _state = new();
     #endregion
 
     #region AddExtension Methods
@@ -29,7 +29,8 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder AddEnumTypeExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiEnumTypeBuilder AddEnumTypeExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddValue Methods
@@ -62,7 +63,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     internal ApiEnumType Build()
     {
         var apiName = this.ApiName;
-        var apiEnumValues = _state.Values.Select(b => b.Build());
+        var apiEnumValues = _state.Values.Select(static b => b.Build());
         var clrEnumType = this.ClrType;
 
         var apiEnumType = new ApiEnumType
@@ -82,12 +83,14 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     }
     #endregion
 
-    #region Internal Convention Methods
+    #region Properties
     /// <summary>
     ///     Gets all <see cref="ApiEnumValueBuilder"/> instances currently on this enum type builder.
     /// </summary>
     internal IEnumerable<ApiEnumValueBuilder> ApiEnumValueBuilders => _state.Values;
+    #endregion
 
+    #region Internal Convention Methods
     /// <summary>
     ///     Adds an enumeration value if its CLR name is not already present and its ordinal has
     ///     not been claimed by an explicitly configured entry.
@@ -158,6 +161,15 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         _state.Values.Add(builder);
         return builder;
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiEnumTypeBuilder CreateBuildCopy(ApiSchemaBuilderContext context)
+    {
+        var copy = this.CreateNamedBuildCopy(context);
+        copy._state = _state.CreateBuildCopy();
+        return copy;
     }
     #endregion
 }

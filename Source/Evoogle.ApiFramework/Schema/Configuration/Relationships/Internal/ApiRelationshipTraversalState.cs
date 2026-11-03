@@ -26,6 +26,7 @@ internal sealed class ApiRelationshipTraversalState(string apiName, ClrMemberRef
     #endregion
 
     #region Build Methods
-    internal ApiRelationshipTraversal Build() => new(this.ApiName, this.ClrNavigationMember);
+    internal ApiRelationshipTraversal Build()
+        => new(this.ApiName, this.ClrNavigationMember);
     #endregion
 }

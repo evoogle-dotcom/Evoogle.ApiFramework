@@ -24,7 +24,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
     #region Fields
-    private readonly ApiObjectTypeState _state = new();
+    private ApiObjectTypeState _state = new();
     #endregion
 
     #region AddExtension Methods
@@ -34,7 +34,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddObjectTypeExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiObjectTypeBuilder AddObjectTypeExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region AddKey Methods
@@ -202,7 +203,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             .Select(b => b.Build(clrObjectType));
 
         var apiKeys = _state.KeyBuilders.Count > 0
-            ? _state.KeyBuilders.Select(b => b.BuildNamed())
+            ? _state.KeyBuilders.Select(static b => b.BuildNamed())
             : null;
 
         var apiCanonicalKeyName = _state.CanonicalKeyName;
@@ -420,12 +421,16 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             }
         }
     }
+    #endregion
 
+    #region Properties
     /// <summary>Gets all <see cref="ApiPropertyBuilder"/> instances currently on this object type builder.</summary>
     internal IEnumerable<ApiPropertyBuilder> ApiPropertyBuilders => _state.PropertyBuilders;
 
     internal string ConfiguredApiName => this.ApiName;
+    #endregion
 
+    #region Implementation Methods
     internal void RemoveConventionPropertyByClrName(string clrMemberName)
     {
         _state.PropertyBuilders.RemoveAll(builder =>
@@ -544,12 +549,9 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     )
     {
         var source = this.Context.CurrentConfigurationSource;
-        var builder = this.Context.GetOrAddOneToOneRelationshipBuilder(apiName, source);
+        var builder = this.Context.DeclareOneToOneRelationshipBuilder(apiName, source);
 
-        if (builder != null)
-        {
-            builder.ApplyConfiguration(source, () => configure(builder));
-        }
+        builder.ApplyConfiguration(source, () => configure(builder));
     }
 
     /// <summary>Configures a schema-level one-to-many relationship at the active source.</summary>
@@ -560,12 +562,9 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     )
     {
         var source = this.Context.CurrentConfigurationSource;
-        var builder = this.Context.GetOrAddOneToManyRelationshipBuilder(apiName, source);
+        var builder = this.Context.DeclareOneToManyRelationshipBuilder(apiName, source);
 
-        if (builder != null)
-        {
-            builder.ApplyConfiguration(source, () => configure(builder));
-        }
+        builder.ApplyConfiguration(source, () => configure(builder));
     }
 
     /// <summary>Configures a schema-level many-to-many relationship at the active source.</summary>
@@ -576,12 +575,18 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     )
     {
         var source = this.Context.CurrentConfigurationSource;
-        var builder = this.Context.GetOrAddManyToManyRelationshipBuilder(apiName, source);
+        var builder = this.Context.DeclareManyToManyRelationshipBuilder(apiName, source);
 
-        if (builder != null)
-        {
-            builder.ApplyConfiguration(source, () => configure(builder));
-        }
+        builder.ApplyConfiguration(source, () => configure(builder));
+    }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiObjectTypeBuilder CreateBuildCopy(ApiSchemaBuilderContext context)
+    {
+        var copy = this.CreateNamedBuildCopy(context);
+        copy._state = _state.CreateBuildCopy();
+        return copy;
     }
     #endregion
 }

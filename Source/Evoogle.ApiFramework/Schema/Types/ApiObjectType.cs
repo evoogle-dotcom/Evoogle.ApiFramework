@@ -77,14 +77,14 @@ public sealed partial class ApiObjectType
 
     /// <summary>Gets the immutable snapshot of named key definitions for the object type.</summary>
     public ImmutableArray<ApiNamedKeyDefinition> ApiKeys { get; } =
-        [.. apiKeys.EmptyIfNull().Where(x => x is not null)];
+        [.. apiKeys.EmptyIfNull().Where(static x => x is not null)];
 
     /// <summary>Gets the configuration options for the object type.</summary>
     public ApiObjectTypeOptions? ApiOptions { get; } = apiOptions;
 
     /// <summary>Gets the immutable snapshot of properties defined on this object type.</summary>
     public ImmutableArray<ApiProperty> ApiProperties { get; } =
-        [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
+        [.. apiProperties.EmptyIfNull().Where(static x => x is not null)];
 
     /// <summary>Gets the optional version metadata defined for this object type.</summary>
     public ApiVersionDefinition? ApiVersion { get; } = apiVersion;
@@ -315,8 +315,8 @@ public sealed partial class ApiObjectType
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: _apiRelationshipTraversals,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiRelationshipTraversal.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiRelationshipTraversalDuplicateApiName,
@@ -360,13 +360,13 @@ public sealed partial class ApiObjectType
     {
         // Compile lookup dictionaries for lookup of:
         // - Property by API name and CLR name
-        _apiKeyApiNames = [.. this.ApiKeys.Select(key => key.ApiName)];
+        _apiKeyApiNames = [.. this.ApiKeys.Select(static key => key.ApiName)];
 
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiKeys,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedKeyDefinition.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyApiName,
@@ -378,8 +378,8 @@ public sealed partial class ApiObjectType
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiProperties,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyApiName,
@@ -391,8 +391,8 @@ public sealed partial class ApiObjectType
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiProperties,
-            partKeySelector: x => x.ClrName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ClrName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: $"{nameof(ApiProperty.ClrValueMember)}.{nameof(ClrMemberReference.ClrName)}",
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyClrName,

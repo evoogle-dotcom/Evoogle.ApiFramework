@@ -13,10 +13,10 @@ namespace Evoogle.ApiFramework.Schema.TestData;
 public static partial class ApiSchemaFactory
 {
     #region Built-In Schema Cache
-    private static readonly Lazy<ApiSchema> _commerceApiSchema = new(() => BuildCommerceApiSchema(nameof(ApiSchemaKind.Commerce)));
-    private static readonly Lazy<ApiSchema> _keyApiSchema = new(() => BuildKeyApiSchema(nameof(ApiSchemaKind.Key)));
-    private static readonly Lazy<ApiSchema> _relationshipApiSchema = new(() => BuildRelationshipApiSchema(nameof(ApiSchemaKind.Relationship)));
-    private static readonly Lazy<ApiSchema> _simpleApiSchema = new(() => BuildSimpleApiSchema(nameof(ApiSchemaKind.Simple)));
+    private static readonly Lazy<ApiSchema> _commerceApiSchema = new(static () => BuildCommerceApiSchema(nameof(ApiSchemaKind.Commerce)));
+    private static readonly Lazy<ApiSchema> _keyApiSchema = new(static () => BuildKeyApiSchema(nameof(ApiSchemaKind.Key)));
+    private static readonly Lazy<ApiSchema> _relationshipApiSchema = new(static () => BuildRelationshipApiSchema(nameof(ApiSchemaKind.Relationship)));
+    private static readonly Lazy<ApiSchema> _simpleApiSchema = new(static () => BuildSimpleApiSchema(nameof(ApiSchemaKind.Simple)));
     #endregion
 
     #region Built-In Schema Accessors
@@ -57,7 +57,7 @@ public static partial class ApiSchemaFactory
         => WithExtensions(new ApiKeyPath(new ApiTypeReference(rootType), segments), extensions);
 
     private static ApiKeyPathSegment KPS(string propertyName, OrderedDictionary<Type, object>? extensions = null)
-         => WithExtensions
+        => WithExtensions
             (new ApiKeyPathSegment(ApiPropertyReference.ClrRef(propertyName)), extensions);
 
     private static ApiKeyDefinition KD(IEnumerable<ApiKeyPath> paths, OrderedDictionary<Type, object>? extensions = null)
@@ -68,7 +68,8 @@ public static partial class ApiSchemaFactory
         string name,
         IEnumerable<ApiKeyPath> paths,
         OrderedDictionary<Type, object>? extensions = null
-    ) => WithExtensions(new ApiNamedKeyDefinition(name, paths), extensions);
+    )
+        => WithExtensions(new ApiNamedKeyDefinition(name, paths), extensions);
 
     private static ApiObjectType O
     (
@@ -117,11 +118,14 @@ public static partial class ApiSchemaFactory
 
     private static class TE
     {
-        public static ApiTypeExpression ClrRef<TClr>() => new(ApiTypeReference.ClrRef<TClr>());
+        public static ApiTypeExpression ClrRef<TClr>()
+            => new(ApiTypeReference.ClrRef<TClr>());
 
-        public static ApiTypeExpression HashSetOf<TClr>(bool required) => ApiTypeExpression.HashSetOf<TClr>(required ? ApiNullability.NonNullable : ApiNullability.Nullable);
+        public static ApiTypeExpression HashSetOf<TClr>(bool required)
+            => ApiTypeExpression.HashSetOf<TClr>(required ? ApiNullability.NonNullable : ApiNullability.Nullable);
 
-        public static ApiTypeExpression ListOf<TClr>(bool required) => ApiTypeExpression.ListOf<TClr>(required ? ApiNullability.NonNullable : ApiNullability.Nullable);
+        public static ApiTypeExpression ListOf<TClr>(bool required)
+            => ApiTypeExpression.ListOf<TClr>(required ? ApiNullability.NonNullable : ApiNullability.Nullable);
     }
 
     // Query Source Presets
@@ -133,7 +137,8 @@ public static partial class ApiSchemaFactory
         ApiNullability outputNullability = ApiNullability.Nullable,
         ApiQueryComposition outputComposition = ApiQueryComposition.None,
         OrderedDictionary<Type, object>? extensions = null
-    ) => WithExtensions
+    )
+        => WithExtensions
     (
         new ApiQuerySource
         (
@@ -153,7 +158,8 @@ public static partial class ApiSchemaFactory
         ApiNullability nullability = ApiNullability.NonNullable,
         ApiPresence apiPresence = ApiPresence.Required,
         OrderedDictionary<Type, object>? extensions = null
-    ) => WithExtensions
+    )
+        => WithExtensions
     (
         new ApiQuerySourceParameter
         (

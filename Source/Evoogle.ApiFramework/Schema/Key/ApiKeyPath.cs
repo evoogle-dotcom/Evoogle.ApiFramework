@@ -178,8 +178,8 @@ public sealed class ApiKeyPath
     }
 
     /// <inheritdoc/>
-    protected override string BuildPath(string? apiPreviousPath) =>
-        ApiSchemaPathFormatting.BuildPath(apiPreviousPath, this.ApiElementName, this.ApiPathLabel);
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaPathFormatting.BuildPath(apiPreviousPath, this.ApiElementName, this.ApiPathLabel);
 
     /// <inheritdoc/>
     internal override void CompileCore(ApiSchemaCompilationContext context)
@@ -272,7 +272,8 @@ public sealed class ApiKeyPath
         return null;
     }
 
-    private string? GetInferredRootLabel() => this.FindRootProvider()?.RootLabel;
+    private string? GetInferredRootLabel()
+        => this.FindRootProvider()?.RootLabel;
 
     private void ValidateSegmentsNonEmpty(ApiSchemaCompilationContext context)
     {

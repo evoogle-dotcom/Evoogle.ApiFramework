@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted on 2026-11-01. Implementation is pending.
+Accepted and implemented on 2026-11-01.
 
 ## Context and Problem Statement
 
@@ -113,6 +113,9 @@ schemaBuilder.AddQuerySource<CustomerById>
 [ApiQuerySource]
 public delegate Customer CustomerById(Guid id);
 ```
+
+Configured annotation readers also apply to explicitly registered delegates without requiring an
+assembly discovery scan. The attribute remains optional for explicit generic registration.
 
 Annotation discovery and generic fluent configuration resolve through `typeof(CustomerById)` and
 therefore contribute to the same symbol. Structurally similar delegates remain distinct because
@@ -250,6 +253,10 @@ merging.
 - Service execution delegates and binding remain outside this decision under ADR 0002.
 
 ## Confirmation
+
+Implemented and covered by the [query-source declaration regression suite](../../Tests/Evoogle.ApiFramework.Tests/Schema/Configuration/Query/ApiQuerySourceDeclarationTests.cs).
+Final validation passed 1,664 runtime tests and 117 annotation tests with no skips. Production and test
+builds completed with zero warnings and errors; diff, UTF-8 BOM, CRLF, and final-newline checks passed.
 
 The decision is confirmed when tests demonstrate:
 

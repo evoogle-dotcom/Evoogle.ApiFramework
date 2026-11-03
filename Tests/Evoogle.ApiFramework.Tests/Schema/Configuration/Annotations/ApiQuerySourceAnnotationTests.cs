@@ -16,6 +16,7 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
     #region Test Types
     private sealed class BuildAnnotatedQuerySourceTest : XUnitTest
     {
+        #region User Supplied Properties
         [JsonConverter(typeof(ExpressionFuncJsonConverter<ApiSchemaCompilationResult>))]
         public required Expression<Func<ApiSchemaCompilationResult>> BuildExpression { get; init; }
 
@@ -25,10 +26,14 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
         public string? ExpectedApiPath { get; init; }
         public string ExpectedApiName { get; init; } = "customerSearch";
         public string ExpectedFirstParameterApiName { get; init; } = "customerName";
+        #endregion
 
+        #region Calculated Properties
         private Expression<Func<ApiSchemaCompilationResult>> RestoredBuildExpression { get; set; } = null!;
         private ApiSchemaCompilationResult ActualResult { get; set; } = null!;
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
             this.WriteLine($"Scenario:         {this.Name}");
@@ -101,18 +106,24 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             nestedIdsType.ApiItemType.ClrType.Should().Be<int>();
             nestedIdsType.ApiItemNullability.Should().Be(ApiNullability.Nullable);
         }
+        #endregion
     }
 
     private sealed class BuildQuerySourcePrecedenceTest : XUnitTest
     {
+        #region User Supplied Properties
         [JsonConverter(typeof(ExpressionFuncJsonConverter<ApiSchema>))]
         public required Expression<Func<ApiSchema>> BuildExpression { get; init; }
 
         public required string Scenario { get; init; }
+        #endregion
 
+        #region Calculated Properties
         private Expression<Func<ApiSchema>> RestoredBuildExpression { get; set; } = null!;
         private ApiSchema ActualSchema { get; set; } = null!;
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
             this.WriteLine($"Scenario:         {this.Scenario}");
@@ -140,7 +151,7 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             var source = this.ActualSchema.ApiQuerySources.Should().ContainSingle().Subject;
             if (this.Scenario == "Explicit")
             {
-                source.ApiOutputType.ClrType.Should().Be<string>();
+                source.ApiOutputType.ClrType.Should().Be<IReadOnlyList<QueryAnnotationCustomer>>();
                 source.ApiOutputNullability.Should().Be(ApiNullability.Nullable);
                 source.ApiOutputComposition.Should().Be(ApiQueryComposition.None);
                 source.ApiInputParameters[0].ApiPresence.Should().Be(ApiPresence.Required);
@@ -159,9 +170,9 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
             if (this.Scenario == "AnnotatedConvention")
             {
                 source.ApiOutputComposition.Should().Be(ApiQueryComposition.Filtering);
-                source.ApiInputParameters.Should().HaveCount(2);
+                source.ApiInputParameters.Should().HaveCount(1);
                 source.ApiInputParameters.Should().OnlyContain
-                    (parameter => parameter.ApiPresence == ApiPresence.Optional);
+                    (static parameter => parameter.ApiPresence == ApiPresence.Optional);
                 return;
             }
 
@@ -169,18 +180,24 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
                 (ApiQueryComposition.Projection | ApiQueryComposition.Filtering);
             source.ApiInputParameters.Should().HaveCount(2);
         }
+        #endregion
     }
 
     private sealed class BuildQuerySourceIsolationTest : XUnitTest
     {
+        #region User Supplied Properties
         [JsonConverter(typeof(ExpressionFuncJsonConverter<string>))]
         public required Expression<Func<string>> BuildExpression { get; init; }
 
         public required string ExpectedQuerySourceNames { get; init; }
+        #endregion
 
+        #region Calculated Properties
         private Expression<Func<string>> RestoredBuildExpression { get; set; } = null!;
         private string ActualQuerySourceNames { get; set; } = null!;
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
             this.WriteLine($"Scenario:         {this.Name}");
@@ -208,6 +225,7 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
         {
             this.ActualQuerySourceNames.Should().Be(this.ExpectedQuerySourceNames);
         }
+        #endregion
     }
     #endregion
 
@@ -353,12 +371,12 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
         },
         new BuildAnnotatedQuerySourceTest
         {
-            Name = "Duplicate resolved API names report an annotation discovery conflict",
+            Name = "Duplicate resolved API names report a schema compilation conflict",
             BuildExpression = static () => ApiQuerySourceAnnotationTestsFactory.BuildDuplicateDeclarations(),
             ExpectedSuccess = false,
-            ExpectedCode = ApiSchemaCompilationCode.ApiAnnotationQuerySourceDiscoveryConflict,
+            ExpectedCode = ApiSchemaCompilationCode.ApiSchemaDuplicateQuerySourceApiName,
             ExpectedApiPath =
-                "ApiSchema[\"DuplicateQuerySourceAnnotations\"].ApiQuerySource[\"Duplicate\"]"
+                "ApiSchema[\"DuplicateQuerySourceAnnotations\"]"
         },
         new BuildAnnotatedQuerySourceTest
         {
@@ -391,7 +409,7 @@ public sealed class ApiQuerySourceAnnotationTests(ITestOutputHelper output) : XU
         },
         new BuildQuerySourcePrecedenceTest
         {
-            Name = "Custom query conventions receive annotation CLR contexts and added parameters",
+            Name = "Custom query conventions receive CLR contexts and preserve delegate parameters",
             Scenario = "AnnotatedConvention",
             BuildExpression = static () => ApiQuerySourceAnnotationTestsFactory.BuildAnnotatedCustomConventions()
         },

@@ -98,7 +98,7 @@ public class ApiKeyDefinitionJsonConverter(ILogger<ApiKeyDefinitionJsonConverter
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>

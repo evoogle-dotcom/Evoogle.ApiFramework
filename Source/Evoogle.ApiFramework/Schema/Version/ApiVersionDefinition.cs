@@ -251,7 +251,8 @@ public sealed class ApiVersionDefinition : ApiSchemaElement
     #endregion
 
     #region Implementation Methods
-    private ApiObjectType GetApiObjectType() => this.Parent as ApiObjectType ?? throw new ApiSchemaException($"An {nameof(ApiVersionDefinition)} must be owned by an {nameof(ApiObjectType)}.");
+    private ApiObjectType GetApiObjectType()
+        => this.Parent as ApiObjectType ?? throw new ApiSchemaException($"An {nameof(ApiVersionDefinition)} must be owned by an {nameof(ApiObjectType)}.");
 
     private void ResolveApiProperty(ApiSchemaCompilationContext context)
     {

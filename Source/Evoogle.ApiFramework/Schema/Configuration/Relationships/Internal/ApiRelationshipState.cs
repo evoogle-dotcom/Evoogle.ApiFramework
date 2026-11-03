@@ -21,4 +21,9 @@ internal sealed class ApiRelationshipState(ApiRelationshipDeleteBehavior default
 
     internal ApiConfigurationSource RegistrationSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
+
+    #region Build Copy Methods
+    internal ApiRelationshipState CreateBuildCopy()
+        => (ApiRelationshipState)this.MemberwiseClone();
+    #endregion
 }

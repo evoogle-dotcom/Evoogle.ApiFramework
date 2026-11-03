@@ -56,4 +56,9 @@ public sealed class ApiVersionDefinitionBuilder : ExtensionBuilder<ApiVersionDef
         return apiVersionDefinition;
     }
     #endregion
+
+    #region Build Copy Methods
+    internal ApiVersionDefinitionBuilder CreateBuildCopy()
+        => this.CreateExtensionBuildCopy();
+    #endregion
 }

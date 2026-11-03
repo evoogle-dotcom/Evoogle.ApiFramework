@@ -50,9 +50,13 @@ internal readonly struct ApiKeyValueUnion
     #endregion
 
     #region Factory Methods
-    public static ApiKeyValueUnion FromInt32(int int32) => new(int32);
-    public static ApiKeyValueUnion FromInt64(long int64) => new(int64);
-    public static ApiKeyValueUnion FromGuid(Guid guid) => new(guid);
-    public static ApiKeyValueUnion FromUlid(Ulid ulid) => new(ulid);
+    public static ApiKeyValueUnion FromInt32(int int32)
+        => new(int32);
+    public static ApiKeyValueUnion FromInt64(long int64)
+        => new(int64);
+    public static ApiKeyValueUnion FromGuid(Guid guid)
+        => new(guid);
+    public static ApiKeyValueUnion FromUlid(Ulid ulid)
+        => new(ulid);
     #endregion
 }

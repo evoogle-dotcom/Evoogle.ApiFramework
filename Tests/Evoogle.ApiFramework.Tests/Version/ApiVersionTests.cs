@@ -92,7 +92,8 @@ public class ApiVersionTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange() => this.Source = new CustomVersion("v1");
+        protected override void Arrange()
+            => this.Source = new CustomVersion("v1");
 
         protected override void Act()
         {
@@ -204,10 +205,12 @@ public class ApiVersionTests(ITestOutputHelper output) : XUnitTests(output)
     #region Test Methods
     [Theory]
     [MemberData(nameof(EqualityTheoryData))]
-    public void Equality(IXUnitTest test) => test.Execute(this);
+    public void Equality(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(StorageTheoryData))]
-    public void Storage(IXUnitTest test) => test.Execute(this);
+    public void Storage(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

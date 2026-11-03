@@ -60,21 +60,24 @@ public class ApiPropertyReferenceTests(ITestOutputHelper output) : XUnitTests(ou
     private class JsonDeserializeTest : JsonDeserializeTest<ApiPropertyReference, ApiPropertyReferenceDef>
     {
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ApiPropertyReference? CreateExpected(ApiPropertyReferenceDef? descriptor) => BuildApiPropertyReference(descriptor);
+        protected override ApiPropertyReference? CreateExpected(ApiPropertyReferenceDef? descriptor)
+            => BuildApiPropertyReference(descriptor);
         #endregion
     }
 
     private class JsonRoundtripTest : JsonRoundtripTest<ApiPropertyReference, ApiPropertyReferenceDef>
     {
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ApiPropertyReference? CreateExpected(ApiPropertyReferenceDef? descriptor) => BuildApiPropertyReference(descriptor);
+        protected override ApiPropertyReference? CreateExpected(ApiPropertyReferenceDef? descriptor)
+            => BuildApiPropertyReference(descriptor);
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ApiPropertyReference, ApiPropertyReferenceDef>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ApiPropertyReference? CreateSource(ApiPropertyReferenceDef? descriptor) => BuildApiPropertyReference(descriptor);
+        protected override ApiPropertyReference? CreateSource(ApiPropertyReferenceDef? descriptor)
+            => BuildApiPropertyReference(descriptor);
         #endregion
     }
     #endregion
@@ -333,18 +336,22 @@ public class ApiPropertyReferenceTests(ITestOutputHelper output) : XUnitTests(ou
     #region Test Methods
     [Theory]
     [MemberData(nameof(EqualityTheoryData))]
-    public void Equality(IXUnitTest test) => test.Execute(this);
+    public void Equality(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonDeserializeTheoryData))]
-    public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
+    public void JsonDeserialize(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripTheoryData))]
-    public void JsonRoundtrip(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtrip(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonSerializeTheoryData))]
-    public void JsonSerialize(IXUnitTest test) => test.Execute(this);
+    public void JsonSerialize(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

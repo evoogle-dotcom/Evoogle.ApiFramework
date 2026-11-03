@@ -193,11 +193,14 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
         return this.Compile(context.Session, location);
     }
 
-    internal string BuildDefaultPath(string? apiPreviousPath) => this.BuildPath(apiPreviousPath);
+    internal string BuildDefaultPath(string? apiPreviousPath)
+        => this.BuildPath(apiPreviousPath);
 
-    internal virtual IEnumerable<ApiSchemaElement> GetOwnedElements() => [];
+    internal virtual IEnumerable<ApiSchemaElement> GetOwnedElements()
+        => [];
 
-    internal virtual void CompileCore(ApiSchemaCompilationContext context) => ArgumentNullException.ThrowIfNull(context);
+    internal virtual void CompileCore(ApiSchemaCompilationContext context)
+        => ArgumentNullException.ThrowIfNull(context);
 
     internal JsonEnumFinding? GetJsonEnumFinding(string memberName)
         => _jsonEnumFindings?.Find(finding => finding.MemberName == memberName);

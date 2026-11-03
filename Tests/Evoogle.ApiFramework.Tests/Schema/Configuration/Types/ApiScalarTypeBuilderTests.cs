@@ -189,10 +189,12 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
-    public void Build(IXUnitTest test) => test.Execute(this);
+    public void Build(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(BuildWithDefaultNameTheoryData))]
-    public void BuildWithDefaultName(IXUnitTest test) => test.Execute(this);
+    public void BuildWithDefaultName(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

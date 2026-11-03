@@ -12,8 +12,10 @@ namespace Evoogle.ApiFramework.Schema.Compilation.Internal;
 internal static class ApiSchemaNameValidation
 {
     #region Utility Methods
-    public static bool IsNameInvalid(string? name) => string.IsNullOrWhiteSpace(name);
+    public static bool IsNameInvalid(string? name)
+        => string.IsNullOrWhiteSpace(name);
 
-    public static bool IsNameValid(string? name) => !IsNameInvalid(name);
+    public static bool IsNameValid(string? name)
+        => !IsNameInvalid(name);
     #endregion
 }

@@ -45,7 +45,8 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
         #endregion
 
         #region Factory Methods
-        public static PropertyNames Create(JsonNamingPolicy policy) => new()
+        public static PropertyNames Create(JsonNamingPolicy policy)
+            => new()
         {
             ApiQuerySourceParameter = new ApiQuerySourceParameterPropertyNames
             {
@@ -159,7 +160,7 @@ public class ApiQuerySourceParameterJsonConverter(ILogger<ApiQuerySourceParamete
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>

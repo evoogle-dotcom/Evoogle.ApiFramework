@@ -59,15 +59,18 @@ public sealed class ClrMemberReference : IEquatable<ClrMemberReference>
 
     #region Equality Methods
     /// <inheritdoc/>
-    public bool Equals(ClrMemberReference? other) => other is not null
+    public bool Equals(ClrMemberReference? other)
+        => other is not null
         && _clrKind == other._clrKind
         && ClrNameComparer.Instance.Equals(this.ClrName, other.ClrName);
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => this.Equals(obj as ClrMemberReference);
+    public override bool Equals(object? obj)
+        => this.Equals(obj as ClrMemberReference);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine
+    public override int GetHashCode()
+        => HashCode.Combine
     (
         _clrKind,
         this.ClrName is null ? 0 : ClrNameComparer.Instance.GetHashCode(this.ClrName)

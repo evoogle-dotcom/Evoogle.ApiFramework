@@ -247,7 +247,7 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
             this.ActualResult.Should().NotBeNull();
             var result = this.ActualResult;
 
-            result.Issues.Select(issue => new ExpectedDiagnostic(issue.Code, issue.Severity, issue.ApiPath)).Should().BeEquivalentTo(this.ExpectedDiagnostics);
+            result.Issues.Select(static issue => new ExpectedDiagnostic(issue.Code, issue.Severity, issue.ApiPath)).Should().BeEquivalentTo(this.ExpectedDiagnostics);
             result.Errors.Should().HaveCount(this.ExpectedDiagnostics.Length);
             result.Warnings.Should().BeEmpty();
             result.IsValid.Should().Be(this.ExpectedDiagnostics.Length == 0);
@@ -357,15 +357,18 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
     #region Test Methods
     [Theory]
     [MemberData(nameof(TopologyTheoryData))]
-    public void CompileBindsTraversalSourceAndTargetEnds(IXUnitTest test) => test.Execute(this);
+    public void CompileBindsTraversalSourceAndTargetEnds(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NavigationCompatibilityTheoryData))]
-    public void CompileValidatesNavigationTargetAndCardinality(IXUnitTest test) => test.Execute(this);
+    public void CompileValidatesNavigationTargetAndCardinality(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(ConflictTheoryData))]
-    public void CompileReportsTraversalNameAndNavigationMemberConflictsIndependently(IXUnitTest test) => test.Execute(this);
+    public void CompileReportsTraversalNameAndNavigationMemberConflictsIndependently(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Factory Methods
@@ -503,7 +506,8 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
         );
     }
 
-    private static ApiObjectType CreateObjectType(string apiName, Type clrType) => new
+    private static ApiObjectType CreateObjectType(string apiName, Type clrType)
+        => new
     (
         apiName: apiName,
         apiOptions: null,
@@ -514,7 +518,8 @@ public class ApiRelationshipTraversalTests(ITestOutputHelper output) : XUnitTest
         clrObjectType: clrType
     );
 
-    private static ApiProperty CreateIdProperty() => new
+    private static ApiProperty CreateIdProperty()
+        => new
     (
         apiName: "Id",
         apiTypeExpression: new ApiTypeExpression(apiTypeReference: new ApiTypeReference(typeof(long))),

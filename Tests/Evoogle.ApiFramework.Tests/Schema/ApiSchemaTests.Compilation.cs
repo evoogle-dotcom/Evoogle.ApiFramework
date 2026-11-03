@@ -4365,10 +4365,12 @@ public partial class ApiSchemaTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(CompileThrowsTheoryData))]
-    public void CompileThrows(IXUnitTest test) => test.Execute(this);
+    public void CompileThrows(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(CompileWarnsTheoryData))]
-    public void CompileWarns(IXUnitTest test) => test.Execute(this);
+    public void CompileWarns(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

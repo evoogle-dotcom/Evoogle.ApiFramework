@@ -144,194 +144,194 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             .AddScalar<Uri>()
 
             // Enums
-            .AddEnum<CountryCode>(e => e
+            .AddEnum<CountryCode>(static e => e
                 .AddValue(CountryCode.US)
                 .AddValue(CountryCode.CA)
                 .AddValue(CountryCode.GB))
 
-            .AddEnum<OrderStatus>(e => e
+            .AddEnum<OrderStatus>(static e => e
                 .AddValue(OrderStatus.Pending)
                 .AddValue(OrderStatus.Paid)
                 .AddValue(OrderStatus.Shipped)
                 .AddValue(OrderStatus.Cancelled)
                 .AddValue(OrderStatus.Returned))
 
-            .AddEnum<PaymentMethod>(e => e
+            .AddEnum<PaymentMethod>(static e => e
                 .AddValue(PaymentMethod.Card)
                 .AddValue(PaymentMethod.Cash)
                 .AddValue(PaymentMethod.Wire)
                 .AddValue(PaymentMethod.Crypto))
 
-            .AddEnum<UserRole>(e => e
+            .AddEnum<UserRole>(static e => e
                 .AddValue(UserRole.None)
                 .AddValue(UserRole.Reader)
                 .AddValue(UserRole.Editor)
                 .AddValue(UserRole.Admin))
 
             // Value Objects
-            .AddObject<Address>(o => o
-                .AddProperty(p => p.Line1)
-                .AddProperty(p => p.Line2)
-                .AddProperty(p => p.City)
-                .AddProperty(p => p.State)
-                .AddProperty(p => p.Postal)
-                .AddProperty(p => p.Country))
+            .AddObject<Address>(static o => o
+                .AddProperty(static p => p.Line1)
+                .AddProperty(static p => p.Line2)
+                .AddProperty(static p => p.City)
+                .AddProperty(static p => p.State)
+                .AddProperty(static p => p.Postal)
+                .AddProperty(static p => p.Country))
 
-            .AddObject<EmailAddress>(o => o
-                .AddProperty(p => p.Value))
+            .AddObject<EmailAddress>(static o => o
+                .AddProperty(static p => p.Value))
 
-            .AddObject<Money>(o => o
-                .AddProperty(p => p.Amount)
-                .AddProperty(p => p.Currency))
+            .AddObject<Money>(static o => o
+                .AddProperty(static p => p.Amount)
+                .AddProperty(static p => p.Currency))
 
-            .AddObject<Quantity>(o => o
-                .AddProperty(p => p.Value)
-                .AddProperty(p => p.Unit))
+            .AddObject<Quantity>(static o => o
+                .AddProperty(static p => p.Value)
+                .AddProperty(static p => p.Unit))
 
             // Customer Objects
-            .AddObject<Customer>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Email)
-                .AddProperty(p => p.PrimaryAddress)
-                .AddProperty(p => p.Addresses)
-                .AddProperty(p => p.Orders)
-                .AddKey("PK_Customer", p => p.Id)
-                .AddKey("AK_Customer_Email", p => p.Email.Value))
+            .AddObject<Customer>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Email)
+                .AddProperty(static p => p.PrimaryAddress)
+                .AddProperty(static p => p.Addresses)
+                .AddProperty(static p => p.Orders)
+                .AddKey("PK_Customer", static p => p.Id)
+                .AddKey("AK_Customer_Email", static p => p.Email.Value))
 
-            .AddObject<CustomerProfile>(o => o
-                .AddProperty(p => p.Biography))
+            .AddObject<CustomerProfile>(static o => o
+                .AddProperty(static p => p.Biography))
 
             // Product Objects
-            .AddObject<Category>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.ParentId)
-                .AddProperty(p => p.Parent)
-                .AddProperty(p => p.Children)
-                .AddKey("PK_Category", p => p.Id)
-                .AddKey("AK_Category_Name", p => p.Name))
+            .AddObject<Category>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.ParentId)
+                .AddProperty(static p => p.Parent)
+                .AddProperty(static p => p.Children)
+                .AddKey("PK_Category", static p => p.Id)
+                .AddKey("AK_Category_Name", static p => p.Name))
 
-            .AddObject<DigitalProduct>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Sku)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Price)
-                .AddProperty(p => p.Tags)
-                .AddProperty(p => p.Category)
-                .AddProperty(p => p.CategoryId)
-                .AddProperty(p => p.DownloadUrl)
-                .AddProperty(p => p.Bytes)
-                .AddKey("PK_DigitalProduct", p => p.Id)
-                .AddKey("AK_DigitalProduct_Sku", p => p.Sku))
+            .AddObject<DigitalProduct>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Sku)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Price)
+                .AddProperty(static p => p.Tags)
+                .AddProperty(static p => p.Category)
+                .AddProperty(static p => p.CategoryId)
+                .AddProperty(static p => p.DownloadUrl)
+                .AddProperty(static p => p.Bytes)
+                .AddKey("PK_DigitalProduct", static p => p.Id)
+                .AddKey("AK_DigitalProduct_Sku", static p => p.Sku))
 
-            .AddObject<PhysicalProduct>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Sku)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Price)
-                .AddProperty(p => p.Tags)
-                .AddProperty(p => p.Category)
-                .AddProperty(p => p.CategoryId)
-                .AddProperty(p => p.Weight)
-                .AddProperty(p => p.Size)
-                .AddKey("PK_PhysicalProduct", p => p.Id)
-                .AddKey("AK_PhysicalProduct_Sku", p => p.Sku))
+            .AddObject<PhysicalProduct>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Sku)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Price)
+                .AddProperty(static p => p.Tags)
+                .AddProperty(static p => p.Category)
+                .AddProperty(static p => p.CategoryId)
+                .AddProperty(static p => p.Weight)
+                .AddProperty(static p => p.Size)
+                .AddKey("PK_PhysicalProduct", static p => p.Id)
+                .AddKey("AK_PhysicalProduct_Sku", static p => p.Sku))
 
-            .AddObject<Tag>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddKey("PK_Tag", p => p.Id)
-                .AddKey("AK_Tag_Name", p => p.Name))
+            .AddObject<Tag>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddKey("PK_Tag", static p => p.Id)
+                .AddKey("AK_Tag_Name", static p => p.Name))
 
-            .AddObject<DigitalProductTag>(o => o
-                .AddProperty(p => p.DigitalProductId)
-                .AddProperty(p => p.TagId)
-                .AddKey("PK_DigitalProductTag", p => p.DigitalProductId, p => p.TagId))
+            .AddObject<DigitalProductTag>(static o => o
+                .AddProperty(static p => p.DigitalProductId)
+                .AddProperty(static p => p.TagId)
+                .AddKey("PK_DigitalProductTag", static p => p.DigitalProductId, static p => p.TagId))
 
-            .AddObject<PhysicalProductTag>(o => o
-                .AddProperty(p => p.PhysicalProductId)
-                .AddProperty(p => p.TagId)
-                .AddKey("PK_PhysicalProductTag", p => p.PhysicalProductId, p => p.TagId))
+            .AddObject<PhysicalProductTag>(static o => o
+                .AddProperty(static p => p.PhysicalProductId)
+                .AddProperty(static p => p.TagId)
+                .AddKey("PK_PhysicalProductTag", static p => p.PhysicalProductId, static p => p.TagId))
 
             // Order Objects
-            .AddObject<Order>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Customer)
-                .AddProperty(p => p.PlacedAt)
-                .AddProperty(p => p.Status)
-                .AddProperty(p => p.Lines)
-                .AddProperty(p => p.Payment)
-                .AddProperty(p => p.Total)
-                .AddKey("PK_Order", p => p.Id)
+            .AddObject<Order>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Customer)
+                .AddProperty(static p => p.PlacedAt)
+                .AddProperty(static p => p.Status)
+                .AddProperty(static p => p.Lines)
+                .AddProperty(static p => p.Payment)
+                .AddProperty(static p => p.Total)
+                .AddKey("PK_Order", static p => p.Id)
                 .WithRepositoryVersion<long>())
 
-            .AddObject<OrderLine>(o => o
-                .AddProperty(p => p.OrderId)
-                .AddProperty(p => p.LineNumber)
-                .AddProperty(p => p.Qty)
-                .AddProperty(p => p.UnitPrice)
-                .AddProperty(p => p.LineTotal)
-                .AddKey("PK_OrderLine", k => k
-                    .AddPathFrom<Order>(p => p.Id)
-                    .AddPath(p => p.LineNumber)))
+            .AddObject<OrderLine>(static o => o
+                .AddProperty(static p => p.OrderId)
+                .AddProperty(static p => p.LineNumber)
+                .AddProperty(static p => p.Qty)
+                .AddProperty(static p => p.UnitPrice)
+                .AddProperty(static p => p.LineTotal)
+                .AddKey("PK_OrderLine", static k => k
+                    .AddPathFrom<Order>(static p => p.Id)
+                    .AddPath(static p => p.LineNumber)))
 
             // Payment Objects
-            .AddObject<Payment>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Method)
-                .AddProperty(p => p.Amount)
-                .AddProperty(p => p.CapturedAt)
-                .AddKey("PK_Payment", p => p.Id))
+            .AddObject<Payment>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Method)
+                .AddProperty(static p => p.Amount)
+                .AddProperty(static p => p.CapturedAt)
+                .AddKey("PK_Payment", static p => p.Id))
 
             // Relationships
-            .AddOneToManyRelationship("REL_Customer_Order_1toN", r => r
+            .AddOneToManyRelationship("REL_Customer_Order_1toN", static r => r
                 .From<Customer>()
-                .To<Order>(de => de.WithForeignKey(p => p.Customer.Id)))
+                .To<Order>(static de => de.WithForeignKey(static p => p.Customer.Id)))
 
-            .AddOneToOneRelationship("REL_Customer_Profile_1to1", r => r
+            .AddOneToOneRelationship("REL_Customer_Profile_1to1", static r => r
                 .From<Customer>()
                 .To<CustomerProfile>())
 
-            .AddOneToManyRelationship("REL_Order_OrderLine_1toN", r => r
+            .AddOneToManyRelationship("REL_Order_OrderLine_1toN", static r => r
                 .From<Order>()
-                .To<OrderLine>(de => de.WithForeignKeyFrom<Order>(p => p.Id))
+                .To<OrderLine>(static de => de.WithForeignKeyFrom<Order>(static p => p.Id))
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
 
-            .AddOneToOneRelationship("REL_Payment_Order_1to1", r => r
+            .AddOneToOneRelationship("REL_Payment_Order_1to1", static r => r
                 .From<Payment>()
-                .To<Order>(de => de.WithForeignKey(p => p.Payment!.Id)))
+                .To<Order>(static de => de.WithForeignKey(static p => p.Payment!.Id)))
 
-            .AddOneToManyRelationship("REL_Category_Category_1toN", r => r
+            .AddOneToManyRelationship("REL_Category_Category_1toN", static r => r
                 .From<Category>()
-                .To<Category>(de => de.WithForeignKey(p => p.ParentId)))
+                .To<Category>(static de => de.WithForeignKey(static p => p.ParentId)))
 
-            .AddOneToManyRelationship("REL_Category_DigitalProduct_1toN", r => r
+            .AddOneToManyRelationship("REL_Category_DigitalProduct_1toN", static r => r
                 .From<Category>()
-                .To<DigitalProduct>(de => de.WithForeignKey(p => p.CategoryId)))
+                .To<DigitalProduct>(static de => de.WithForeignKey(static p => p.CategoryId)))
 
-            .AddOneToManyRelationship("REL_Category_PhysicalProduct_1toN", r => r
+            .AddOneToManyRelationship("REL_Category_PhysicalProduct_1toN", static r => r
                 .From<Category>("PK_Category")
-                .To<PhysicalProduct>(de => de.WithForeignKey(p => p.CategoryId)))
+                .To<PhysicalProduct>(static de => de.WithForeignKey(static p => p.CategoryId)))
 
-            .AddManyToManyRelationship("REL_DigitalProduct_Tag_NtoN", r => r
+            .AddManyToManyRelationship("REL_DigitalProduct_Tag_NtoN", static r => r
                 .Between<DigitalProduct>()
                 .And<Tag>()
-                .WithAssociation<DigitalProductTag>(a => a
-                    .WithForeignKeyA(p => p.DigitalProductId)
-                    .WithForeignKeyB(p => p.TagId)))
+                .WithAssociation<DigitalProductTag>(static a => a
+                    .WithForeignKeyA(static p => p.DigitalProductId)
+                    .WithForeignKeyB(static p => p.TagId)))
 
-            .AddManyToManyRelationship("REL_PhysicalProduct_Tag_NtoN", r => r
+            .AddManyToManyRelationship("REL_PhysicalProduct_Tag_NtoN", static r => r
                 .Between<PhysicalProduct>("PK_PhysicalProduct")
                 .And<Tag>("PK_Tag")
-                .WithAssociation<PhysicalProductTag>(a => a
-                    .WithForeignKeyA(p => p.PhysicalProductId)
-                    .WithForeignKeyB(p => p.TagId)))
+                .WithAssociation<PhysicalProductTag>(static a => a
+                    .WithForeignKeyA(static p => p.PhysicalProductId)
+                    .WithForeignKeyB(static p => p.TagId)))
 
             // Query Sources
-            .AddQuerySource("SearchCustomers", s => s
+            .AddQuerySource("SearchCustomers", static s => s
                 .AddInputParameter<string>("name")
-                .AddInputParameter<OrderStatus>("status", p => p
+                .AddInputParameter<OrderStatus>("status", static p => p
                     .AsRequired()
                     .AsNonNullable())
                 .WithCollectionOutput<Customer>(
@@ -342,31 +342,31 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                     | ApiQueryComposition.Ordering
                     | ApiQueryComposition.OffsetPagination))
 
-            .AddQuerySource("GetCustomerById", s => s
-                .AddInputParameter<Ulid>("id", p => p
+            .AddQuerySource("GetCustomerById", static s => s
+                .AddInputParameter<Ulid>("id", static p => p
                     .AsRequired()
                     .AsNonNullable())
                 .WithOutput<Customer>()
                 .WithOutputComposition(ApiQueryComposition.Projection))
 
-            .AddQuerySource("CountOrders", s => s
+            .AddQuerySource("CountOrders", static s => s
                 .WithOutput<int>(ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.None))
 
-            .AddQuerySource("GetOrderTotal", s => s
-                .AddInputParameter<Ulid>("orderId", p => p
+            .AddQuerySource("GetOrderTotal", static s => s
+                .AddInputParameter<Ulid>("orderId", static p => p
                     .AsRequired()
                     .AsNonNullable())
                 .WithOutput<Money>(ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.None))
 
-            .AddQuerySource("ListCategories", s => s
+            .AddQuerySource("ListCategories", static s => s
                 .WithCollectionOutput<Category>(
                     apiCollectionNullability: ApiNullability.NonNullable,
                     apiItemNullability: ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.Filtering | ApiQueryComposition.Ordering))
 
-            .AddQuerySource("SearchOrders", s => s
+            .AddQuerySource("SearchOrders", static s => s
                 .AddInputParameter<OrderStatus>("status")
                 .AddInputParameter<decimal>("minimumTotal")
                 .WithCollectionOutput<Order>(
@@ -393,54 +393,54 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             // Enums
 
             // Objects
-            .AddObject<KeyOneScalarPart>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddKey("PK_KeyOneScalarPart", p => p.Id)
-                .AddKey("AK_KeyOneScalarPart", p => p.Name)
+            .AddObject<KeyOneScalarPart>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddKey("PK_KeyOneScalarPart", static p => p.Id)
+                .AddKey("AK_KeyOneScalarPart", static p => p.Name)
                 .WithCanonicalKey("AK_KeyOneScalarPart"))
 
-            .AddObject<KeyTwoScalarPartComposite>(o => o
-                .AddProperty(p => p.Id1)
-                .AddProperty(p => p.Id2)
-                .AddProperty(p => p.Description)
-                .AddKey("PK_KeyTwoScalarPartComposite", p => p.Id1, p => p.Id2))
+            .AddObject<KeyTwoScalarPartComposite>(static o => o
+                .AddProperty(static p => p.Id1)
+                .AddProperty(static p => p.Id2)
+                .AddProperty(static p => p.Description)
+                .AddKey("PK_KeyTwoScalarPartComposite", static p => p.Id1, static p => p.Id2))
 
-            .AddObject<KeyThreeScalarPartComposite>(o => o
-                .AddProperty(p => p.Id1)
-                .AddProperty(p => p.Id2)
-                .AddProperty(p => p.Id3)
-                .AddProperty(p => p.Description)
-                .AddKey("PK_KeyThreeScalarPartComposite", p => p.Id1, p => p.Id2, p => p.Id3))
+            .AddObject<KeyThreeScalarPartComposite>(static o => o
+                .AddProperty(static p => p.Id1)
+                .AddProperty(static p => p.Id2)
+                .AddProperty(static p => p.Id3)
+                .AddProperty(static p => p.Description)
+                .AddKey("PK_KeyThreeScalarPartComposite", static p => p.Id1, static p => p.Id2, static p => p.Id3))
 
-            .AddObject<KeyNested>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Description)
-                .AddKey("PK_KeyNestedPart", p => p.Id)
+            .AddObject<KeyNested>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Description)
+                .AddKey("PK_KeyNestedPart", static p => p.Id)
                 .WithRepositoryVersion<Guid>())
 
-            .AddObject<KeyNestedComposite>(o => o
-                .AddProperty(p => p.NestedPart)
-                .AddProperty(p => p.Name)
-                .AddKey("PK_KeyNestedComposite", p => p.NestedPart.Id, p => p.Name))
+            .AddObject<KeyNestedComposite>(static o => o
+                .AddProperty(static p => p.NestedPart)
+                .AddProperty(static p => p.Name)
+                .AddKey("PK_KeyNestedComposite", static p => p.NestedPart.Id, static p => p.Name))
 
-            .AddObject<KeyOwner>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Description)
-                .AddProperty(p => p.Dependents)
-                .AddProperty(p => p.Dependent)
-                .AddKey("PK_KeyOwner", p => p.Id))
+            .AddObject<KeyOwner>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Description)
+                .AddProperty(static p => p.Dependents)
+                .AddProperty(static p => p.Dependent)
+                .AddKey("PK_KeyOwner", static p => p.Id))
 
-            .AddObject<KeyOwnedComposite>(o => o
-                .AddProperty(p => p.LineNumber)
-                .AddProperty(p => p.Description)
-                .AddKey("PK_KeyOwnedComposite", k => k
-                    .AddPathFrom<KeyOwner>(p => p.Id)
-                    .AddPath(p => p.LineNumber)))
+            .AddObject<KeyOwnedComposite>(static o => o
+                .AddProperty(static p => p.LineNumber)
+                .AddProperty(static p => p.Description)
+                .AddKey("PK_KeyOwnedComposite", static k => k
+                    .AddPathFrom<KeyOwner>(static p => p.Id)
+                    .AddPath(static p => p.LineNumber)))
 
-            .AddObject<KeyOwnedDependent>(o => o
-                .AddProperty(p => p.Description)
-                .AddKeyFrom<KeyOwner>("PK_KeyOwnedDependent", p => p.Id));
+            .AddObject<KeyOwnedDependent>(static o => o
+                .AddProperty(static p => p.Description)
+                .AddKeyFrom<KeyOwner>("PK_KeyOwnedDependent", static p => p.Id));
 
         return builder;
     }
@@ -458,57 +458,57 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             .AddScalar<Ulid>()
 
             // Enums
-            .AddEnum<Gender>(e => e
+            .AddEnum<Gender>(static e => e
                 .AddValue(Gender.Unspecified)
                 .AddValue(Gender.Male)
                 .AddValue(Gender.Female))
 
-            .AddEnum<StopLight>(e => e
+            .AddEnum<StopLight>(static e => e
                 .AddValue(StopLight.None)
                 .AddValue(StopLight.Green)
                 .AddValue(StopLight.Yellow)
                 .AddValue(StopLight.Red))
 
             // Objects
-            .AddObject<Empty>(o => o
-                .WithOptions(opt => opt.ThrowOnNullKeyPart()))
+            .AddObject<Empty>(static o => o
+                .WithOptions(static opt => opt.ThrowOnNullKeyPart()))
 
-            .AddObject<Point>(o => o
-                .WithOptions(opt => opt.ThrowOnNullKeyPart())
-                .AddProperty(p => p.X)
-                .AddProperty(p => p.Y)
-                .AddProperty(p => p.Note)
+            .AddObject<Point>(static o => o
+                .WithOptions(static opt => opt.ThrowOnNullKeyPart())
+                .AddProperty(static p => p.X)
+                .AddProperty(static p => p.Y)
+                .AddProperty(static p => p.Note)
                 .WithVersion(nameof(Point.X)))
 
-            .AddObject<ScalarsOnly>(o => o
-                .WithOptions(opt => opt.ThrowOnNullKeyPart())
-                .AddProperty(p => p.RequiredName)
-                .AddProperty(p => p.RequiredNumber)
-                .AddProperty(p => p.RequiredPredicate)
-                .AddProperty(p => p.OptionalName)
-                .AddProperty(p => p.OptionalNumber)
-                .AddProperty(p => p.OptionalPredicate))
+            .AddObject<ScalarsOnly>(static o => o
+                .WithOptions(static opt => opt.ThrowOnNullKeyPart())
+                .AddProperty(static p => p.RequiredName)
+                .AddProperty(static p => p.RequiredNumber)
+                .AddProperty(static p => p.RequiredPredicate)
+                .AddProperty(static p => p.OptionalName)
+                .AddProperty(static p => p.OptionalNumber)
+                .AddProperty(static p => p.OptionalPredicate))
 
-            .AddObject<Person>(o => o
-                .WithOptions(opt => opt.ThrowOnNullKeyPart())
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Age)
-                .AddProperty(p => p.Gender)
-                .AddProperty(p => p.Hobbies)
-                .AddProperty(p => p.CompanyId)
-                .AddKey("PK_Person_Id", p => p.Id)
-                .AddKey("AK_Person_Name", p => p.Name)
+            .AddObject<Person>(static o => o
+                .WithOptions(static opt => opt.ThrowOnNullKeyPart())
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Age)
+                .AddProperty(static p => p.Gender)
+                .AddProperty(static p => p.Hobbies)
+                .AddProperty(static p => p.CompanyId)
+                .AddKey("PK_Person_Id", static p => p.Id)
+                .AddKey("AK_Person_Name", static p => p.Name)
                 .WithCanonicalKey("PK_Person_Id"))
 
-            .AddObject<Company>(o => o
-                .WithOptions(opt => opt.ThrowOnNullKeyPart())
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Owner)
-                .AddProperty(p => p.Employees)
-                .AddKey("PK_Company_Id", p => p.Id)
-                .AddKey("AK_Company_Name", p => p.Name)
+            .AddObject<Company>(static o => o
+                .WithOptions(static opt => opt.ThrowOnNullKeyPart())
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Owner)
+                .AddProperty(static p => p.Employees)
+                .AddKey("PK_Company_Id", static p => p.Id)
+                .AddKey("AK_Company_Name", static p => p.Name)
                 .WithCanonicalKey("AK_Company_Name"));
 
         return builder;
@@ -527,151 +527,151 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             // Enums
 
             // Value Objects
-            .AddObject<RelationshipUserRef>(o => o
-                .AddProperty(p => p.UserId))
+            .AddObject<RelationshipUserRef>(static o => o
+                .AddProperty(static p => p.UserId))
 
-            .AddObject<RelationshipPostRef>(o => o
-                .AddProperty(p => p.PostId))
+            .AddObject<RelationshipPostRef>(static o => o
+                .AddProperty(static p => p.PostId))
 
-            .AddObject<RelationshipCatalogKey>(o => o
-                .AddProperty(p => p.Sku)
-                .AddProperty(p => p.Revision))
+            .AddObject<RelationshipCatalogKey>(static o => o
+                .AddProperty(static p => p.Sku)
+                .AddProperty(static p => p.Revision))
 
             // RelationshipUser
-            .AddObject<RelationshipUser>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.UserName)
-                .AddProperty(p => p.Profile)
-                .AddProperty(p => p.Posts)
-                .AddKey("PK_RelationshipUser", p => p.Id))
+            .AddObject<RelationshipUser>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.UserName)
+                .AddProperty(static p => p.Profile)
+                .AddProperty(static p => p.Posts)
+                .AddKey("PK_RelationshipUser", static p => p.Id))
 
             // RelationshipUserProfile
-            .AddObject<RelationshipUserProfile>(o => o
-                .AddProperty(p => p.UserId)
-                .AddProperty(p => p.UserRef)
-                .AddProperty(p => p.DisplayName)
-                .AddProperty(p => p.User)
-                .AddKey("PK_RelationshipUserProfile", p => p.UserId))
+            .AddObject<RelationshipUserProfile>(static o => o
+                .AddProperty(static p => p.UserId)
+                .AddProperty(static p => p.UserRef)
+                .AddProperty(static p => p.DisplayName)
+                .AddProperty(static p => p.User)
+                .AddKey("PK_RelationshipUserProfile", static p => p.UserId))
 
             // RelationshipPost
-            .AddObject<RelationshipPost>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.AuthorUserId)
-                .AddProperty(p => p.AuthorUserRef)
-                .AddProperty(p => p.Title)
-                .AddProperty(p => p.Comments)
-                .AddProperty(p => p.Tags)
-                .AddProperty(p => p.User)
-                .AddKey("PK_RelationshipPost", p => p.Id))
+            .AddObject<RelationshipPost>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.AuthorUserId)
+                .AddProperty(static p => p.AuthorUserRef)
+                .AddProperty(static p => p.Title)
+                .AddProperty(static p => p.Comments)
+                .AddProperty(static p => p.Tags)
+                .AddProperty(static p => p.User)
+                .AddKey("PK_RelationshipPost", static p => p.Id))
 
             // RelationshipComment
-            .AddObject<RelationshipComment>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.PostId)
-                .AddProperty(p => p.PostRef)
-                .AddProperty(p => p.Body)
-                .AddProperty(p => p.Post)
-                .AddKey("PK_RelationshipComment", p => p.Id))
+            .AddObject<RelationshipComment>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.PostId)
+                .AddProperty(static p => p.PostRef)
+                .AddProperty(static p => p.Body)
+                .AddProperty(static p => p.Post)
+                .AddKey("PK_RelationshipComment", static p => p.Id))
 
             // RelationshipTag
-            .AddObject<RelationshipTag>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Posts)
-                .AddKey("PK_RelationshipTag", p => p.Id))
+            .AddObject<RelationshipTag>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Posts)
+                .AddKey("PK_RelationshipTag", static p => p.Id))
 
             // RelationshipPostTag
-            .AddObject<RelationshipPostTag>(o => o
-                .AddProperty(p => p.PostId)
-                .AddProperty(p => p.TagId)
-                .AddKey("PK_RelationshipPostTag", p => p.PostId, p => p.TagId))
+            .AddObject<RelationshipPostTag>(static o => o
+                .AddProperty(static p => p.PostId)
+                .AddProperty(static p => p.TagId)
+                .AddKey("PK_RelationshipPostTag", static p => p.PostId, static p => p.TagId))
 
             // RelationshipCatalogItem
-            .AddObject<RelationshipCatalogItem>(o => o
-                .AddProperty(p => p.Sku)
-                .AddProperty(p => p.Revision)
-                .AddProperty(p => p.Name)
-                .AddKey("PK_RelationshipCatalogItem", p => p.Sku, p => p.Revision)
+            .AddObject<RelationshipCatalogItem>(static o => o
+                .AddProperty(static p => p.Sku)
+                .AddProperty(static p => p.Revision)
+                .AddProperty(static p => p.Name)
+                .AddKey("PK_RelationshipCatalogItem", static p => p.Sku, static p => p.Revision)
                 .WithVersion(nameof(RelationshipCatalogItem.Revision)))
 
             // RelationshipOrder
-            .AddObject<RelationshipOrder>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Lines)
-                .AddKey("PK_RelationshipOrder", p => p.Id))
+            .AddObject<RelationshipOrder>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Lines)
+                .AddKey("PK_RelationshipOrder", static p => p.Id))
 
             // RelationshipOrderLine
-            .AddObject<RelationshipOrderLine>(o => o
-                .AddProperty(p => p.OrderId)
-                .AddProperty(p => p.LineNumber)
-                .AddProperty(p => p.ProductSku)
-                .AddProperty(p => p.ProductRevision)
-                .AddProperty(p => p.ProductKey)
-                .AddKey("PK_RelationshipOrderLine", p => p.OrderId, p => p.LineNumber))
+            .AddObject<RelationshipOrderLine>(static o => o
+                .AddProperty(static p => p.OrderId)
+                .AddProperty(static p => p.LineNumber)
+                .AddProperty(static p => p.ProductSku)
+                .AddProperty(static p => p.ProductRevision)
+                .AddProperty(static p => p.ProductKey)
+                .AddKey("PK_RelationshipOrderLine", static p => p.OrderId, static p => p.LineNumber))
 
             // RelationshipOwnedLine
-            .AddObject<RelationshipOwnedLine>(o => o
-                .AddProperty(p => p.LineNumber)
-                .AddProperty(p => p.Notes)
-                .AddKey("PK_RelationshipOwnedLine", k => k
-                    .AddPathFrom<RelationshipOrder>(p => p.Id)
-                    .AddPath(p => p.LineNumber)))
+            .AddObject<RelationshipOwnedLine>(static o => o
+                .AddProperty(static p => p.LineNumber)
+                .AddProperty(static p => p.Notes)
+                .AddKey("PK_RelationshipOwnedLine", static k => k
+                    .AddPathFrom<RelationshipOrder>(static p => p.Id)
+                    .AddPath(static p => p.LineNumber)))
 
             // RelationshipOrgUnit
-            .AddObject<RelationshipOrgUnit>(o => o
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.ParentId)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Children)
-                .AddKey("PK_RelationshipOrgUnit", p => p.Id))
+            .AddObject<RelationshipOrgUnit>(static o => o
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.ParentId)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Children)
+                .AddKey("PK_RelationshipOrgUnit", static p => p.Id))
 
             // Relationships
-            .AddOneToOneRelationship("REL_User_UserProfile_1to1ViaScalar", r => r
+            .AddOneToOneRelationship("REL_User_UserProfile_1to1ViaScalar", static r => r
                 .From<RelationshipUser>()
-                .To<RelationshipUserProfile>(de => de.WithForeignKey(p => p.UserId)))
+                .To<RelationshipUserProfile>(static de => de.WithForeignKey(static p => p.UserId)))
 
-            .AddOneToOneRelationship("REL_User_UserProfile_1to1ViaNested", r => r
+            .AddOneToOneRelationship("REL_User_UserProfile_1to1ViaNested", static r => r
                 .From<RelationshipUser>()
-                .To<RelationshipUserProfile>(de => de.WithForeignKey(p => p.UserRef.UserId)))
+                .To<RelationshipUserProfile>(static de => de.WithForeignKey(static p => p.UserRef.UserId)))
 
-            .AddOneToManyRelationship("REL_User_Post_1toN_ViaScalar", r => r
+            .AddOneToManyRelationship("REL_User_Post_1toN_ViaScalar", static r => r
                 .From<RelationshipUser>()
-                .To<RelationshipPost>(de => de.WithForeignKey(p => p.AuthorUserId)))
+                .To<RelationshipPost>(static de => de.WithForeignKey(static p => p.AuthorUserId)))
 
-            .AddOneToManyRelationship("REL_User_Post_1toN_ViaNested", r => r
+            .AddOneToManyRelationship("REL_User_Post_1toN_ViaNested", static r => r
                 .From<RelationshipUser>()
-                .To<RelationshipPost>(de => de.WithForeignKey(p => p.AuthorUserRef.UserId)))
+                .To<RelationshipPost>(static de => de.WithForeignKey(static p => p.AuthorUserRef.UserId)))
 
-            .AddOneToManyRelationship("REL_Post_Comment_1toN_ViaScalar", r => r
+            .AddOneToManyRelationship("REL_Post_Comment_1toN_ViaScalar", static r => r
                 .From<RelationshipPost>()
-                .To<RelationshipComment>(de => de.WithForeignKey(p => p.PostId)))
+                .To<RelationshipComment>(static de => de.WithForeignKey(static p => p.PostId)))
 
-            .AddOneToManyRelationship("REL_Post_Comment_1toN_ViaNested", r => r
+            .AddOneToManyRelationship("REL_Post_Comment_1toN_ViaNested", static r => r
                 .From<RelationshipPost>()
-                .To<RelationshipComment>(de => de.WithForeignKey(p => p.PostRef.PostId)))
+                .To<RelationshipComment>(static de => de.WithForeignKey(static p => p.PostRef.PostId)))
 
-            .AddManyToManyRelationship("REL_Post_Tag_NtoN_ViaPostTag", r => r
+            .AddManyToManyRelationship("REL_Post_Tag_NtoN_ViaPostTag", static r => r
                 .Between<RelationshipPost>()
                 .And<RelationshipTag>()
-                .WithAssociation<RelationshipPostTag>(a => a
-                    .WithForeignKeyA(p => p.PostId)
-                    .WithForeignKeyB(p => p.TagId)))
+                .WithAssociation<RelationshipPostTag>(static a => a
+                    .WithForeignKeyA(static p => p.PostId)
+                    .WithForeignKeyB(static p => p.TagId)))
 
-            .AddOneToManyRelationship("REL_CatalogItem_OrderLine_1toN_ViaScalarComposite", r => r
+            .AddOneToManyRelationship("REL_CatalogItem_OrderLine_1toN_ViaScalarComposite", static r => r
                 .From<RelationshipCatalogItem>()
-                .To<RelationshipOrderLine>(de => de.WithForeignKey(p => p.ProductSku, p => p.ProductRevision)))
+                .To<RelationshipOrderLine>(static de => de.WithForeignKey(static p => p.ProductSku, static p => p.ProductRevision)))
 
-            .AddOneToManyRelationship("REL_CatalogItem_OrderLine_1toN_ViaNestedComposite", r => r
+            .AddOneToManyRelationship("REL_CatalogItem_OrderLine_1toN_ViaNestedComposite", static r => r
                 .From<RelationshipCatalogItem>()
-                .To<RelationshipOrderLine>(de => de.WithForeignKey(p => p.ProductKey.Sku, p => p.ProductKey.Revision)))
+                .To<RelationshipOrderLine>(static de => de.WithForeignKey(static p => p.ProductKey.Sku, static p => p.ProductKey.Revision)))
 
-            .AddOneToManyRelationship("REL_Order_OwnedLine_1toN_ViaOwnerKeyPath", r => r
+            .AddOneToManyRelationship("REL_Order_OwnedLine_1toN_ViaOwnerKeyPath", static r => r
                 .From<RelationshipOrder>()
-                .To<RelationshipOwnedLine>(de => de.WithForeignKeyFrom<RelationshipOrder>(p => p.Id)))
+                .To<RelationshipOwnedLine>(static de => de.WithForeignKeyFrom<RelationshipOrder>(static p => p.Id)))
 
-            .AddOneToManyRelationship("REL_OrgUnit_OrgUnit_1toN", r => r
+            .AddOneToManyRelationship("REL_OrgUnit_OrgUnit_1toN", static r => r
                 .From<RelationshipOrgUnit>()
-                .To<RelationshipOrgUnit>(de => de.WithForeignKey(p => p.ParentId)));
+                .To<RelationshipOrgUnit>(static de => de.WithForeignKey(static p => p.ParentId)));
 
         return builder;
     }

@@ -67,28 +67,32 @@ public sealed class ApiTypeExpression
     #endregion
 
     #region Resolution Methods
-    internal void ResolveForCollection(ApiSchemaCompilationContext context) => this.Resolve
+    internal void ResolveForCollection(ApiSchemaCompilationContext context)
+        => this.Resolve
     (
         context,
         ApiSchemaCompilationCode.ApiCollectionTypeUnresolvedItemType,
         nameof(ApiCollectionType.ApiItemType)
     );
 
-    internal void ResolveForQuerySource(ApiSchemaCompilationContext context) => this.Resolve
+    internal void ResolveForQuerySource(ApiSchemaCompilationContext context)
+        => this.Resolve
     (
         context,
         ApiSchemaCompilationCode.ApiQuerySourceUnresolvedOutputType,
         nameof(ApiQuerySource.ApiOutputType)
     );
 
-    internal void ResolveForQuerySourceParameter(ApiSchemaCompilationContext context) => this.Resolve
+    internal void ResolveForQuerySourceParameter(ApiSchemaCompilationContext context)
+        => this.Resolve
     (
         context,
         ApiSchemaCompilationCode.ApiQuerySourceParameterUnresolvedType,
         nameof(ApiQuerySourceParameter.ApiType)
     );
 
-    internal void ResolveForProperty(ApiSchemaCompilationContext context) => this.Resolve
+    internal void ResolveForProperty(ApiSchemaCompilationContext context)
+        => this.Resolve
     (
         context,
         ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
@@ -136,7 +140,8 @@ public sealed class ApiTypeExpression
     /// <typeparam name="TClr">The CLR item type.</typeparam>
     /// <param name="apiItemNullability">Nullability of each item.</param>
     /// <returns>A new inline collection expression.</returns>
-    public static ApiTypeExpression HashSetOf<TClr>(ApiNullability apiItemNullability) => new
+    public static ApiTypeExpression HashSetOf<TClr>(ApiNullability apiItemNullability)
+        => new
     (
         new ApiCollectionType
         (
@@ -150,7 +155,8 @@ public sealed class ApiTypeExpression
     /// <typeparam name="TClr">The CLR item type.</typeparam>
     /// <param name="apiItemNullability">Nullability of each item.</param>
     /// <returns>A new inline collection expression.</returns>
-    public static ApiTypeExpression ListOf<TClr>(ApiNullability apiItemNullability) => new
+    public static ApiTypeExpression ListOf<TClr>(ApiNullability apiItemNullability)
+        => new
     (
         new ApiCollectionType
         (

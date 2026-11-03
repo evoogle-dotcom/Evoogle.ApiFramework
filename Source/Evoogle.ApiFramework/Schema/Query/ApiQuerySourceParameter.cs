@@ -91,7 +91,8 @@ public sealed class ApiQuerySourceParameter
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    protected override string BuildPath(string? apiPreviousPath) => ApiSchemaPathFormatting.BuildPath
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaPathFormatting.BuildPath
         (apiPreviousPath, this.ApiElementName, this.ApiName);
 
     /// <inheritdoc/>

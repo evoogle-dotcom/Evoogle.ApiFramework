@@ -39,9 +39,9 @@ internal static class ApiSchemaCompilationLookup
             .Where(x => x.Key is not null && partKeyFilter(x.Key));
 
         lookupDictionary = keyedParts
-            .GroupBy(x => x.Key!, keyComparer)
-            .Where(g => g.Count() == 1)
-            .ToFrozenDictionary(g => g.Key, g => g.Single().Part, keyComparer);
+            .GroupBy(static x => x.Key!, keyComparer)
+            .Where(static g => g.Count() == 1)
+            .ToFrozenDictionary(static g => g.Key, static g => g.Single().Part, keyComparer);
 
         ValidateUnique
         (
@@ -76,9 +76,9 @@ internal static class ApiSchemaCompilationLookup
             .OfType<TPart>()
             .Select(part => (Part: part, Key: partKeySelector(part)))
             .Where(x => x.Key is not null && partKeyFilter(x.Key))
-            .GroupBy(x => x.Key!, keyComparer)
-            .Where(g => g.Count() > 1)
-            .Select(g => g.Key)
+            .GroupBy(static x => x.Key!, keyComparer)
+            .Where(static g => g.Count() > 1)
+            .Select(static g => g.Key)
             .ToList();
 
         if (duplicates.Count == 0)

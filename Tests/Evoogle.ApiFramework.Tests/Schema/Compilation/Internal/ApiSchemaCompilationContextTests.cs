@@ -55,7 +55,8 @@ public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitT
             };
         }
 
-        protected override void Assert() => this.ActualPaths.Should().Equal(this.ExpectedPaths);
+        protected override void Assert()
+            => this.ActualPaths.Should().Equal(this.ExpectedPaths);
         #endregion
     }
 
@@ -190,9 +191,11 @@ public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitT
 
         #region ILogger Methods
         public IDisposable? BeginScope<TState>(TState state)
-            where TState : notnull => null;
+            where TState : notnull
+            => null;
 
-        public bool IsEnabled(LogLevel logLevel) => true;
+        public bool IsEnabled(LogLevel logLevel)
+            => true;
 
         public void Log<TState>
         (
@@ -340,15 +343,18 @@ public class ApiSchemaCompilationContextTests(ITestOutputHelper output) : XUnitT
     #region Test Methods
     [Theory]
     [MemberData(nameof(SessionIsolationTheoryData))]
-    public void SessionIsolation(IXUnitTest test) => test.Execute(this);
+    public void SessionIsolation(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(DiagnosticPathTheoryData))]
-    public void DiagnosticPath(IXUnitTest test) => test.Execute(this);
+    public void DiagnosticPath(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(IssueLoggingTheoryData))]
-    public void IssueLogging(IXUnitTest test) => test.Execute(this);
+    public void IssueLogging(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Implementation Methods

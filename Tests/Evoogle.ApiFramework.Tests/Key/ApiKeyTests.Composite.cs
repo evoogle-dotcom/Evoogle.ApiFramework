@@ -108,6 +108,7 @@ public partial class ApiKeyTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(CompositeTheoryData))]
-    public void Composite(IXUnitTest test) => test.Execute(this);
+    public void Composite(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

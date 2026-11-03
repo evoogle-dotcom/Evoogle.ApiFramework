@@ -50,7 +50,7 @@ public sealed class ApiEnumType
     #region ApiEnumType Properties
     /// <summary>Gets the immutable snapshot of values defined for this API enum type.</summary>
     public ImmutableArray<ApiEnumValue> ApiEnumValues { get; } =
-        [.. apiEnumValues.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ClrOrdinal)];
+        [.. apiEnumValues.EmptyIfNull().Where(static x => x is not null).OrderBy(static x => x.ClrOrdinal)];
 
     private FrozenDictionary<string, ApiEnumValue> ApiNameLookup => this.RequireValue(_apiNameLookup);
     private FrozenDictionary<string, ApiEnumValue> ClrNameLookup => this.RequireValue(_clrNameLookup);
@@ -100,7 +100,8 @@ public sealed class ApiEnumType
     /// <param name="apiName">The API name of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetValueByApiName(string apiName, [NotNullWhen(true)] out ApiEnumValue? value) => this.ApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetValueByApiName(string apiName, [NotNullWhen(true)] out ApiEnumValue? value)
+        => this.ApiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API enum value by its CLR name.
@@ -108,7 +109,8 @@ public sealed class ApiEnumType
     /// <param name="clrName">The CLR name of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetValueByClrName(string clrName, [NotNullWhen(true)] out ApiEnumValue? value) => this.ClrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetValueByClrName(string clrName, [NotNullWhen(true)] out ApiEnumValue? value)
+        => this.ClrNameLookup.TryGetValue(clrName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API enum value by its CLR ordinal value.
@@ -116,7 +118,8 @@ public sealed class ApiEnumType
     /// <param name="clrOrdinal">The CLR ordinal of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetValueByClrOrdinal(int clrOrdinal, [NotNullWhen(true)] out ApiEnumValue? value) => this.ClrOrdinalLookup.TryGetValue(clrOrdinal, out value);
+    public bool TryGetValueByClrOrdinal(int clrOrdinal, [NotNullWhen(true)] out ApiEnumValue? value)
+        => this.ClrOrdinalLookup.TryGetValue(clrOrdinal, out value);
     #endregion
 
     #region Implementation Methods
@@ -167,8 +170,8 @@ public sealed class ApiEnumType
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumValues,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueApiName,
@@ -180,8 +183,8 @@ public sealed class ApiEnumType
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumValues,
-            partKeySelector: x => x.ClrName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ClrName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ClrName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueClrName,
@@ -193,7 +196,7 @@ public sealed class ApiEnumType
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumValues,
-            partKeySelector: x => x.ClrOrdinal,
+            partKeySelector: static x => x.ClrOrdinal,
             partKeyFilter: null,
             partKeyPropertyName: nameof(ApiEnumValue.ClrOrdinal),
             apiPath: this.ApiPath,

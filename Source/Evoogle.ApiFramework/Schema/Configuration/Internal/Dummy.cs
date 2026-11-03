@@ -249,7 +249,8 @@ internal static class Dummy
     /// </remarks>
     internal class EmailAddressConfigurationGeneric : IApiScalarTypeConfiguration<EmailAddress>
     {
-        public void Configure(ApiScalarTypeBuilder<EmailAddress> builder) => builder.WithName("EmailAddress");
+        public void Configure(ApiScalarTypeBuilder<EmailAddress> builder)
+            => builder.WithName("EmailAddress");
     }
 
     /// <summary>
@@ -342,7 +343,7 @@ internal static class Dummy
                 .From<Customer>()
                 .To<Order>
                 (
-                    d => d.WithForeignKey(b => b.AddPath(typeof(Order), "CustomerId"))
+                    static d => d.WithForeignKey(static b => b.AddPath(typeof(Order), "CustomerId"))
                 );
         }
     }
@@ -383,7 +384,8 @@ internal static class Dummy
         public bool IsVisible { get; set; }
 
         /// <inheritdoc />
-        public IApiSchemaExtension CreateFrozenSnapshot() => new VisibleMetadata
+        public IApiSchemaExtension CreateFrozenSnapshot()
+            => new VisibleMetadata
         {
             IsVisible = this.IsVisible
         };
@@ -410,13 +412,13 @@ internal static class Dummy
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .From<Customer>
                 (
-                    p => p
+                    static p => p
                         .AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
                 )
                 .To<CustomerProfile>
                 (
                     // The key value is not a direct scalar; it lives inside the nested CustomerRef property.
-                    d => d.WithForeignKey(b => b.AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
+                    static d => d.WithForeignKey(static b => b.AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
                 );
         }
     }
@@ -442,17 +444,17 @@ internal static class Dummy
             builder
                 .Between<Product>
                 (
-                    p => p.AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
+                    static p => p.AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
                 )
                 .And<Tag>
                 (
-                    p => p.WithPrincipalKey("PrimaryKey")
+                    static p => p.WithPrincipalKey("PrimaryKey")
                 )
                 .WithAssociation<ProductTag>
                 (
-                    a => a
-                        .WithForeignKeyA(b => b.AddPath(typeof(ProductTag), "ProductId"))
-                        .WithForeignKeyB(b => b.AddPath(typeof(ProductTag), "TagId"))
+                    static a => a
+                        .WithForeignKeyA(static b => b.AddPath(typeof(ProductTag), "ProductId"))
+                        .WithForeignKeyB(static b => b.AddPath(typeof(ProductTag), "TagId"))
                 );
         }
     }
@@ -467,13 +469,13 @@ internal static class Dummy
         {
             builder
                 .WithName("Customer")
-                .WithOptions(o => o.ThrowOnNullKeyPart())
-                .AddProperty(c => c.Id, property => property.AsNonNullable())
-                .AddProperty(c => c.Name, property => property.AsNonNullable())
-                .AddProperty(c => c.Email, property => property.AsNullable())
-                .AddProperty(c => c.Orders, property => property.AsNonNullable())
-                .AddKey("PrimaryKey", c => c.Id)                       // shorthand: single expression
-                .AddKey("AlternateKey", c => c.Country.Code);          // shorthand: navigated expression
+                .WithOptions(static o => o.ThrowOnNullKeyPart())
+                .AddProperty(static c => c.Id, static property => property.AsNonNullable())
+                .AddProperty(static c => c.Name, static property => property.AsNonNullable())
+                .AddProperty(static c => c.Email, static property => property.AsNullable())
+                .AddProperty(static c => c.Orders, static property => property.AsNonNullable())
+                .AddKey("PrimaryKey", static c => c.Id)                       // shorthand: single expression
+                .AddKey("AlternateKey", static c => c.Country.Code);          // shorthand: navigated expression
         }
     }
 
@@ -490,7 +492,7 @@ internal static class Dummy
             builder
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .From<Customer>()
-                .To<Order>(d => d.WithForeignKey(o => o.CustomerId));   // shorthand: single expression
+                .To<Order>(static d => d.WithForeignKey(static o => o.CustomerId));   // shorthand: single expression
         }
     }
 
@@ -507,8 +509,8 @@ internal static class Dummy
             builder
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .From<Customer>()
-                .To<CustomerProfile>(d => d
-                    .WithForeignKey(cp => cp.CustomerRef.CustomerId));   // shorthand: navigated expression
+                .To<CustomerProfile>(static d => d
+                    .WithForeignKey(static cp => cp.CustomerRef.CustomerId));   // shorthand: navigated expression
         }
     }
 
@@ -523,13 +525,13 @@ internal static class Dummy
         public void Configure(ApiRelationshipManyToManyBuilder builder)
         {
             builder
-                .Between<Product>(p => p.WithPrincipalKey("PrimaryKey"))
-                .And<Tag>(p => p.WithPrincipalKey("PrimaryKey"))
+                .Between<Product>(static p => p.WithPrincipalKey("PrimaryKey"))
+                .And<Tag>(static p => p.WithPrincipalKey("PrimaryKey"))
                 .WithAssociation<ProductTag>
                 (
-                    a => a
-                        .WithForeignKeyA(p => p.ProductId)              // shorthand: single expression
-                        .WithForeignKeyB(p => p.TagId)                  // shorthand: single expression
+                    static a => a
+                        .WithForeignKeyA(static p => p.ProductId)              // shorthand: single expression
+                        .WithForeignKeyB(static p => p.TagId)                  // shorthand: single expression
                 );
         }
     }
@@ -543,51 +545,51 @@ internal static class Dummy
             .WithName("CustomerOrdersAPI")
             .WithVersion("v1")
             .WithDefaultOptions()
-            .WithOptions(o => o
+            .WithOptions(static o => o
                 .UseEmptyKeyOnNullKeyPart()
                 .ThrowOnNullKeyPart())
-            .AddScalar<EmailAddress>(x => x
+            .AddScalar<EmailAddress>(static x => x
                 .WithName("EmailAddress"))
                 .AddSchemaExtension(new VisibleMetadata { IsVisible = true })
-            .AddObject<Country>(x => x
+            .AddObject<Country>(static x => x
                 .WithName("Country")
-                .AddKey("PrimaryKey", b => b
+                .AddKey("PrimaryKey", static b => b
                     .AddPath(typeof(Country), "Code")))
-            .AddObject<Customer>(x => x
+            .AddObject<Customer>(static x => x
                 .WithName("Customer")
-                .WithOptions(o => o
+                .WithOptions(static o => o
                     .ThrowOnNullKeyPart())
-                .AddProperty("Id", "Id", p => p.AsNonNullable())
-                .AddProperty("Name", "Name", p => p.AsNonNullable().AddPropertyExtension(new VisibleMetadata { IsVisible = true }))
-                .AddProperty("Email", "Email", p => p.AsNullable())
-                .AddProperty("Orders", "Orders", p => p.AsNonNullable())
-                .AddKey("PrimaryKey", b => b
+                .AddProperty("Id", "Id", static p => p.AsNonNullable())
+                .AddProperty("Name", "Name", static p => p.AsNonNullable().AddPropertyExtension(new VisibleMetadata { IsVisible = true }))
+                .AddProperty("Email", "Email", static p => p.AsNullable())
+                .AddProperty("Orders", "Orders", static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static b => b
                     .AddPath(typeof(Customer), "Id"))
-                .AddKey("AlternateKey", b => b
+                .AddKey("AlternateKey", static b => b
                     .AddPath(typeof(Customer), "Country", "Code")))
-            .AddObject<Order>(x => x
+            .AddObject<Order>(static x => x
                 .WithName("Order")
                 .WithDefaultOptions()
-                .AddProperty("Id", "Id", p => p.AsNonNullable())
-                .AddProperty("Status", "Status", p => p.AsNonNullable())
-                .AddProperty("Total", "Total", p => p.AsNonNullable())
-                .AddProperty("CustomerId", "CustomerId", p => p.AsNullable())
-                .AddProperty("Customer", "Customer", p => p.AsNullable()))
-            .AddObject<OrderItem>(x => x
+                .AddProperty("Id", "Id", static p => p.AsNonNullable())
+                .AddProperty("Status", "Status", static p => p.AsNonNullable())
+                .AddProperty("Total", "Total", static p => p.AsNonNullable())
+                .AddProperty("CustomerId", "CustomerId", static p => p.AsNullable())
+                .AddProperty("Customer", "Customer", static p => p.AsNullable()))
+            .AddObject<OrderItem>(static x => x
                 .WithName("OrderItem")
                 .WithDefaultOptions()
-                .AddProperty("OrderId", "OrderId", p => p.AsNonNullable())
-                .AddProperty("LineItemNumber", "LineItemNumber", p => p.AsNonNullable())
-                .AddProperty("ProductName", "ProductName", p => p.AsNonNullable())
-                .AddProperty("Quantity", "Quantity", p => p.AsNonNullable())
-                .AddProperty("UnitPrice", "UnitPrice", p => p.AsNonNullable())
-                .AddKey("PrimaryKey", b => b
-                    .AddPath(typeof(OrderItem), ["OrderId"], p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
+                .AddProperty("OrderId", "OrderId", static p => p.AsNonNullable())
+                .AddProperty("LineItemNumber", "LineItemNumber", static p => p.AsNonNullable())
+                .AddProperty("ProductName", "ProductName", static p => p.AsNonNullable())
+                .AddProperty("Quantity", "Quantity", static p => p.AsNonNullable())
+                .AddProperty("UnitPrice", "UnitPrice", static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static b => b
+                    .AddPath(typeof(OrderItem), ["OrderId"], static p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
                     .AddPath(typeof(OrderItem), "LineItemNumber"))
-                .AddKey("AlternateKey", b => b
-                    .AddPath(typeof(Order), ["Id"], p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
+                .AddKey("AlternateKey", static b => b
+                    .AddPath(typeof(Order), ["Id"], static p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
                     .AddPath(typeof(OrderItem), "LineItemNumber")))
-            .AddEnum<OrderStatus>(x => x
+            .AddEnum<OrderStatus>(static x => x
                 .AddEnumTypeExtension(new VisibleMetadata { IsVisible = true })
                 .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
@@ -597,28 +599,28 @@ internal static class Dummy
             .AddScalar(new EmailAddressConfiguration())
             .AddEnum(new OrderStatusConfiguration())
             .AddObject(new OrderConfiguration())
-            .AddObject<CustomerProfile>(x => x
+            .AddObject<CustomerProfile>(static x => x
                 .WithName("CustomerProfile")
-                .AddProperty("Biography", "Biography", p => p.AsNonNullable())
-                .AddKey("PrimaryKey", b => b
+                .AddProperty("Biography", "Biography", static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static b => b
                     .AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId")))
-            .AddObject<Product>(x => x
+            .AddObject<Product>(static x => x
                 .WithName("Product")
-                .AddProperty("Id", "Id", p => p.AsNonNullable())
-                .AddProperty("Name", "Name", p => p.AsNonNullable())
-                .AddKey("PrimaryKey", b => b
+                .AddProperty("Id", "Id", static p => p.AsNonNullable())
+                .AddProperty("Name", "Name", static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static b => b
                     .AddPath(typeof(Product), "Id")))
-            .AddObject<Tag>(x => x
+            .AddObject<Tag>(static x => x
                 .WithName("Tag")
-                .AddProperty("Id", "Id", p => p.AsNonNullable())
-                .AddProperty("Name", "Name", p => p.AsNonNullable())
-                .AddKey("PrimaryKey", b => b
+                .AddProperty("Id", "Id", static p => p.AsNonNullable())
+                .AddProperty("Name", "Name", static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static b => b
                     .AddPath(typeof(Tag), "Id")))
-            .AddObject<ProductTag>(x => x
+            .AddObject<ProductTag>(static x => x
                 .WithName("ProductTag")
-                .AddProperty("ProductId", "ProductId", p => p.AsNonNullable())
-                .AddProperty("TagId", "TagId", p => p.AsNonNullable())
-                .AddKey("PrimaryKey", b => b
+                .AddProperty("ProductId", "ProductId", static p => p.AsNonNullable())
+                .AddProperty("TagId", "TagId", static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static b => b
                     .AddPath(typeof(ProductTag), "ProductId")
                     .AddPath(typeof(ProductTag), "TagId")))
             .AddOneToManyRelationship(new CustomerHasOrdersRelationshipConfiguration())
@@ -626,24 +628,24 @@ internal static class Dummy
             .AddOneToManyRelationship
             (
                 "CustomerOrders",
-                r => r
+                static r => r
                     .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                     .From<Customer>()
                     .To<Order>
                     (
-                        d => d.WithForeignKey(b => b.AddPath(typeof(Order), "CustomerId"))
+                        static d => d.WithForeignKey(static b => b.AddPath(typeof(Order), "CustomerId"))
                     )
             )
             // 1:M — inline lambda; demonstrates WithForeignKey for a composite key role.
             .AddOneToManyRelationship
             (
                 "OrderOrderItemsViaOwner",
-                r => r
+                static r => r
                     .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                     .From<Order>()
                     .To<OrderItem>
                     (
-                        d => d.WithForeignKey(b => b
+                        static d => d.WithForeignKey(static b => b
                             .AddPath(typeof(OrderItem), "OrderId")
                             .AddPath(typeof(OrderItem), "LineItemNumber"))
                     )
@@ -654,16 +656,16 @@ internal static class Dummy
             .AddOneToOneRelationship
             (
                 "CustomerHasProfileInline",
-                r => r
+                static r => r
                     .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                     .From<Customer>
                     (
-                        p => p
+                        static p => p
                             .WithPrincipalKey("PrimaryKey")
                     )
                     .To<CustomerProfile>
                     (
-                        d => d.WithForeignKey(b => b.AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
+                        static d => d.WithForeignKey(static b => b.AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
                     )
             )
             // M:N — configuration class style; demonstrates named principal keys and end extensions.
@@ -672,30 +674,30 @@ internal static class Dummy
             .AddManyToManyRelationship
             (
                 "ProductHasTagsInline",
-                r => r
+                static r => r
                     .Between<Product>
                     (
-                        p => p
+                        static p => p
                             .WithPrincipalKey("PrimaryKey")
                             .AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
                     )
                     .And<Tag>
                     (
-                        p => p
+                        static p => p
                             .WithPrincipalKey("PrimaryKey")
                     )
                     .WithAssociation<ProductTag>
                     (
-                        a => a
-                            .WithForeignKeyA(b => b.AddPath(typeof(ProductTag), "ProductId"))
-                            .WithForeignKeyB(b => b.AddPath(typeof(ProductTag), "TagId"))
+                        static a => a
+                            .WithForeignKeyA(static b => b.AddPath(typeof(ProductTag), "ProductId"))
+                            .WithForeignKeyB(static b => b.AddPath(typeof(ProductTag), "TagId"))
                             .AddRelationshipAssociationExtension(new VisibleMetadata { IsVisible = true })
                     )
                     .AddRelationshipExtension(new VisibleMetadata { IsVisible = true })
             )
             // Query source — single output by type reference; parameter added by type reference.
-            .AddQuerySource("CustomerById", s => s
-                .AddInputParameter("id", new ApiTypeReference(typeof(int)), p => p
+            .AddQuerySource("CustomerById", static s => s
+                .AddInputParameter("id", new ApiTypeReference(typeof(int)), static p => p
                     .AsNonNullable()
                     .AsRequired()
                     .AddQuerySourceParameterExtension(typeof(VisibleMetadata), new VisibleMetadata { IsVisible = true }))
@@ -703,16 +705,16 @@ internal static class Dummy
                 .WithOutputComposition(ApiQueryComposition.Projection)
                 .AddQuerySourceExtension(typeof(VisibleMetadata), new VisibleMetadata { IsVisible = true }))
             // Query source — CLR type output with multiple parameters configured by CLR type.
-            .AddQuerySource("OrderByStatus", s => s
-                .AddInputParameter<OrderStatus>("status", p => p
+            .AddQuerySource("OrderByStatus", static s => s
+                .AddInputParameter<OrderStatus>("status", static p => p
                     .AsNullable()
                     .AsOptional())
                 .AddInputParameter<int>("customerId")
                 .WithOutput<Order>(ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.None))
             // Query source — collection output by CLR item type with combined composition flags.
-            .AddQuerySource("Orders", s => s
-                .AddInputParameter<OrderStatus>("status", p => p
+            .AddQuerySource("Orders", static s => s
+                .AddInputParameter<OrderStatus>("status", static p => p
                     .AsOptional()
                     .AsNonNullable())
                 .WithCollectionOutput<Order>(apiCollectionNullability: ApiNullability.NonNullable, apiItemNullability: ApiNullability.NonNullable)
@@ -737,95 +739,95 @@ internal static class Dummy
             .AddScalar<EmailAddress>(new EmailAddressConfigurationGeneric())
             .AddScalar<EmailAddress>()
             .AddEnum<OrderStatus>(new OrderStatusConfigurationGeneric())
-            .AddObject<Country>(x => x
+            .AddObject<Country>(static x => x
                 .WithName("Country")
-                .AddProperty(c => c.Code)
-                .AddKey("PrimaryKey", c => c.Code))                        // shorthand: single expression
+                .AddProperty(static c => c.Code)
+                .AddKey("PrimaryKey", static c => c.Code))                        // shorthand: single expression
             .AddObject<Customer>(new CustomerConfigurationGeneric())
-            .AddObject<Order>(x => x
+            .AddObject<Order>(static x => x
                 .WithName("Order")
-                .AddProperty(o => o.Id, p => p.AsNonNullable())
-                .AddProperty(o => o.Status, p => p.AsNonNullable())
-                .AddProperty(o => o.Total, p => p.AsNonNullable())
-                .AddProperty(o => o.CustomerId, p => p.AsNullable())
-                .AddProperty(o => o.Customer, p => p.AsNullable())
-                .AddKey("PrimaryKey", o => o.Id))                          // shorthand: single expression
-            .AddObject<OrderItem>(x => x
+                .AddProperty(static o => o.Id, static p => p.AsNonNullable())
+                .AddProperty(static o => o.Status, static p => p.AsNonNullable())
+                .AddProperty(static o => o.Total, static p => p.AsNonNullable())
+                .AddProperty(static o => o.CustomerId, static p => p.AsNullable())
+                .AddProperty(static o => o.Customer, static p => p.AsNullable())
+                .AddKey("PrimaryKey", static o => o.Id))                          // shorthand: single expression
+            .AddObject<OrderItem>(static x => x
                 .WithName("OrderItem")
-                .AddProperty(oi => oi.OrderId, p => p.AsNonNullable())
-                .AddProperty(oi => oi.LineItemNumber, p => p.AsNonNullable())
-                .AddProperty(oi => oi.ProductName, p => p.AsNonNullable())
-                .AddProperty(oi => oi.Quantity, p => p.AsNonNullable())
-                .AddProperty(oi => oi.UnitPrice, p => p.AsNonNullable())
-                .AddKey("PrimaryKey", b => b                               // composite: builder required
-                    .AddPath(oi => oi.OrderId)
-                    .AddPath(oi => oi.LineItemNumber))
-                .AddKey("AlternateKey", b => b                             // cross-entity: builder required
-                    .AddPathFrom<Order>(o => o.Id)
-                    .AddPath(oi => oi.LineItemNumber)))
-            .AddObject<CustomerProfile>(x => x
+                .AddProperty(static oi => oi.OrderId, static p => p.AsNonNullable())
+                .AddProperty(static oi => oi.LineItemNumber, static p => p.AsNonNullable())
+                .AddProperty(static oi => oi.ProductName, static p => p.AsNonNullable())
+                .AddProperty(static oi => oi.Quantity, static p => p.AsNonNullable())
+                .AddProperty(static oi => oi.UnitPrice, static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static b => b                               // composite: builder required
+                    .AddPath(static oi => oi.OrderId)
+                    .AddPath(static oi => oi.LineItemNumber))
+                .AddKey("AlternateKey", static b => b                             // cross-entity: builder required
+                    .AddPathFrom<Order>(static o => o.Id)
+                    .AddPath(static oi => oi.LineItemNumber)))
+            .AddObject<CustomerProfile>(static x => x
                 .WithName("CustomerProfile")
-                .AddProperty(cp => cp.CustomerRef, p => p.AsNonNullable())
-                .AddProperty(cp => cp.Biography, p => p.AsNonNullable())
-                .AddKey("PrimaryKey", cp => cp.CustomerRef.CustomerId))    // shorthand: navigated expression
-            .AddObject<Product>(x => x
+                .AddProperty(static cp => cp.CustomerRef, static p => p.AsNonNullable())
+                .AddProperty(static cp => cp.Biography, static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static cp => cp.CustomerRef.CustomerId))    // shorthand: navigated expression
+            .AddObject<Product>(static x => x
                 .WithName("Product")
-                .AddProperty(p => p.Id, cfg => cfg.AsNonNullable())
-                .AddProperty(p => p.Name, cfg => cfg.AsNonNullable())
-                .AddKey("PrimaryKey", p => p.Id))                          // shorthand: single expression
-            .AddObject<Tag>(x => x
+                .AddProperty(static p => p.Id, static cfg => cfg.AsNonNullable())
+                .AddProperty(static p => p.Name, static cfg => cfg.AsNonNullable())
+                .AddKey("PrimaryKey", static p => p.Id))                          // shorthand: single expression
+            .AddObject<Tag>(static x => x
                 .WithName("Tag")
-                .AddProperty(t => t.Id, p => p.AsNonNullable())
-                .AddProperty(t => t.Name, p => p.AsNonNullable())
-                .AddKey("PrimaryKey", t => t.Id))                          // shorthand: single expression
-            .AddObject<ProductTag>(x => x
+                .AddProperty(static t => t.Id, static p => p.AsNonNullable())
+                .AddProperty(static t => t.Name, static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static t => t.Id))                          // shorthand: single expression
+            .AddObject<ProductTag>(static x => x
                 .WithName("ProductTag")
-                .AddProperty(pt => pt.ProductId, p => p.AsNonNullable())
-                .AddProperty(pt => pt.TagId, p => p.AsNonNullable())
-                .AddKey("PrimaryKey", b => b                               // composite: builder required
-                    .AddPath(pt => pt.ProductId)
-                    .AddPath(pt => pt.TagId)))
+                .AddProperty(static pt => pt.ProductId, static p => p.AsNonNullable())
+                .AddProperty(static pt => pt.TagId, static p => p.AsNonNullable())
+                .AddKey("PrimaryKey", static b => b                               // composite: builder required
+                    .AddPath(static pt => pt.ProductId)
+                    .AddPath(static pt => pt.TagId)))
             .AddOneToManyRelationship(new CustomerHasOrdersConfigurationGeneric())
-            .AddOneToManyRelationship("OrderHasOrderItems", r => r
+            .AddOneToManyRelationship("OrderHasOrderItems", static r => r
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .From<Order>()
-                .To<OrderItem>(d => d
-                    .WithForeignKey(b => b                                  // composite: builder required
-                        .AddPath(oi => oi.OrderId)
-                        .AddPath(oi => oi.LineItemNumber))))
+                .To<OrderItem>(static d => d
+                    .WithForeignKey(static b => b                                  // composite: builder required
+                        .AddPath(static oi => oi.OrderId)
+                        .AddPath(static oi => oi.LineItemNumber))))
             .AddOneToOneRelationship(new CustomerHasProfileConfigurationGeneric())
-            .AddOneToOneRelationship("CustomerHasProfileInline", r => r
+            .AddOneToOneRelationship("CustomerHasProfileInline", static r => r
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
-                .From<Customer>(p => p
+                .From<Customer>(static p => p
                     .WithPrincipalKey("PrimaryKey"))
-                .To<CustomerProfile>(d => d
-                    .WithForeignKey(cp => cp.CustomerRef.CustomerId)))      // shorthand: navigated expression
+                .To<CustomerProfile>(static d => d
+                    .WithForeignKey(static cp => cp.CustomerRef.CustomerId)))      // shorthand: navigated expression
             .AddManyToManyRelationship(new ProductTagConfigurationGeneric())
-            .AddManyToManyRelationship("ProductHasTagsInline", r => r
-                .Between<Product>(p => p
+            .AddManyToManyRelationship("ProductHasTagsInline", static r => r
+                .Between<Product>(static p => p
                     .WithPrincipalKey("PrimaryKey"))
-                .And<Tag>(p => p
+                .And<Tag>(static p => p
                     .WithPrincipalKey("PrimaryKey"))
-                .WithAssociation<ProductTag>(a => a
-                    .WithForeignKeyA(p => p.ProductId)                      // shorthand: single expression
-                    .WithForeignKeyB(p => p.TagId)))                        // shorthand: single expression
-            .AddQuerySource("CustomerById", s => s
-                .AddInputParameter<int>("id", p => p
+                .WithAssociation<ProductTag>(static a => a
+                    .WithForeignKeyA(static p => p.ProductId)                      // shorthand: single expression
+                    .WithForeignKeyB(static p => p.TagId)))                        // shorthand: single expression
+            .AddQuerySource("CustomerById", static s => s
+                .AddInputParameter<int>("id", static p => p
                     .AsNonNullable()
                     .AsRequired()
                     .AddParameterExtension(new VisibleMetadata { IsVisible = true }))
                 .WithOutput<Customer>()
                 .WithOutputComposition(ApiQueryComposition.Projection)
                 .AddQuerySourceExtension(new VisibleMetadata { IsVisible = true }))
-            .AddQuerySource("OrderByStatus", s => s
-                .AddInputParameter<OrderStatus>("status", p => p
+            .AddQuerySource("OrderByStatus", static s => s
+                .AddInputParameter<OrderStatus>("status", static p => p
                     .AsNullable()
                     .AsOptional())
                 .AddInputParameter<int>("customerId")
                 .WithOutput<Order>(ApiNullability.NonNullable)
                 .WithOutputComposition(ApiQueryComposition.None))
-            .AddQuerySource("Orders", s => s
-                .AddInputParameter<OrderStatus>("status", p => p
+            .AddQuerySource("Orders", static s => s
+                .AddInputParameter<OrderStatus>("status", static p => p
                     .AsOptional()
                     .AsNonNullable())
                 .WithCollectionOutput<Order>(
@@ -918,13 +920,13 @@ internal static class Dummy
             .WithVersion("v1")
             // Conventions discover properties and infer keys automatically, but the scalar
             // types that those properties resolve to must still be registered explicitly.
-            .AddScalar<Guid>(x => x.WithName("Guid"))
-            .AddScalar<string>(x => x.WithName("String"))
+            .AddScalar<Guid>(static x => x.WithName("Guid"))
+            .AddScalar<string>(static x => x.WithName("String"))
             // Apply the full default convention set: enum-value discovery, property discovery,
             // camelCase naming, nullability, and PrimaryKey inference.
             .UseDefaultConventions()
             // Augment the default set with a custom application-specific convention.
-            .UseConventions(c => c
+            .UseConventions(static c => c
                 .AddConvention(new ApiObjectTypeConventionExample()))
             // Register the CLR types; conventions configure them automatically.
             .AddTypes(typeof(Product), typeof(Tag), typeof(ProductTag))
@@ -932,12 +934,12 @@ internal static class Dummy
             // has no built-in implementations). Register the M:N link explicitly.
             .AddManyToManyRelationship(
                 "ProductHasTags",
-                r => r
+                static r => r
                     .Between<Product>()
                     .And<Tag>()
-                    .WithAssociation<ProductTag>(a => a
-                        .WithForeignKeyA(b => b.AddPath(typeof(ProductTag), "ProductId"))
-                        .WithForeignKeyB(b => b.AddPath(typeof(ProductTag), "TagId"))))
+                    .WithAssociation<ProductTag>(static a => a
+                        .WithForeignKeyA(static b => b.AddPath(typeof(ProductTag), "ProductId"))
+                        .WithForeignKeyB(static b => b.AddPath(typeof(ProductTag), "TagId"))))
             .Build();
     }
 
@@ -950,9 +952,9 @@ internal static class Dummy
         var schema = new ApiSchemaBuilder()
             .WithName("CustomerOrdersAPI")
             .WithVersion("v1")
-            .AddScalar<Guid>(x => x.WithName("Guid"))
-            .AddScalar<string>(x => x.WithName("String"))
-            .AddScalar<decimal>(x => x.WithName("Decimal"))
+            .AddScalar<Guid>(static x => x.WithName("Guid"))
+            .AddScalar<string>(static x => x.WithName("String"))
+            .AddScalar<decimal>(static x => x.WithName("Decimal"))
             // Use default conventions for enum-value discovery, property discovery, and
             // nullability inference.
             .UseDefaultConventions()

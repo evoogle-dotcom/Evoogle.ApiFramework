@@ -69,7 +69,8 @@ public partial class ApiConventionTests
             );
         }
 
-        protected override void Assert() => this.ApiNameActual.Should().Be(this.ExpectedApiName);
+        protected override void Assert()
+            => this.ApiNameActual.Should().Be(this.ExpectedApiName);
         #endregion
     }
 
@@ -98,15 +99,15 @@ public partial class ApiConventionTests
                 .AddScalar<Guid>()
                 .AddScalar<string>()
                 .AddScalar<CustomScalar>()
-                .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.InProgress))
-                .AddObject<People>(x => x.AddProperty(p => p.Id))
-                .AddObject<PersonWithId>(x => x
-                    .AddProperty(p => p.Id)
-                    .AddProperty(p => p.Name)
-                    .AddProperty(p => p.Email, "ExplicitProperty"))
-                .AddObject<OrderWithPersonId>(x => x
+                .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.InProgress))
+                .AddObject<People>(static x => x.AddProperty(static p => p.Id))
+                .AddObject<PersonWithId>(static x => x
+                    .AddProperty(static p => p.Id)
+                    .AddProperty(static p => p.Name)
+                    .AddProperty(static p => p.Email, "ExplicitProperty"))
+                .AddObject<OrderWithPersonId>(static x => x
                     .WithName("ExplicitObject")
-                    .AddProperty(p => p.OrderId));
+                    .AddProperty(static p => p.OrderId));
         }
 
         protected override void Act()
@@ -119,11 +120,11 @@ public partial class ApiConventionTests
                     this.ApiSchemaBuilder!.UseSingularizeNaming().Build(),
                 (NamingInflectionRegistration.DirectConvention, NamingInflectionStyle.Pluralize) =>
                     this.ApiSchemaBuilder!
-                        .UseConventions(c => c.AddConvention(new ApiNamingPluralizeConvention()))
+                        .UseConventions(static c => c.AddConvention(new ApiNamingPluralizeConvention()))
                         .Build(),
                 (NamingInflectionRegistration.DirectConvention, NamingInflectionStyle.Singularize) =>
                     this.ApiSchemaBuilder!
-                        .UseConventions(c => c.AddConvention(new ApiNamingSingularizeConvention()))
+                        .UseConventions(static c => c.AddConvention(new ApiNamingSingularizeConvention()))
                         .Build(),
                 _ => throw new InvalidOperationException
                 (
@@ -137,11 +138,11 @@ public partial class ApiConventionTests
             this.ApiSchemaActual.Should().NotBeNull();
 
             var apiSchema = this.ApiSchemaActual;
-            var people = apiSchema.ApiObjectTypes.Single(x => x.ClrType == typeof(People));
+            var people = apiSchema.ApiObjectTypes.Single(static x => x.ClrType == typeof(People));
             var personWithId = apiSchema.ApiObjectTypes
-                .Single(x => x.ClrType == typeof(PersonWithId));
+                .Single(static x => x.ClrType == typeof(PersonWithId));
             var explicitObject = apiSchema.ApiObjectTypes
-                .Single(x => x.ClrType == typeof(OrderWithPersonId));
+                .Single(static x => x.ClrType == typeof(OrderWithPersonId));
 
             people.ApiName.Should().Be
             (
@@ -149,7 +150,7 @@ public partial class ApiConventionTests
                     ? "Person"
                     : "People"
             );
-            people.ApiProperties.Single(x => x.ClrName == nameof(People.Id)).ApiName
+            people.ApiProperties.Single(static x => x.ClrName == nameof(People.Id)).ApiName
                 .Should().Be("Id");
 
             personWithId.ApiName.Should().Be
@@ -158,11 +159,11 @@ public partial class ApiConventionTests
                     ? "PersonWithIds"
                     : "PersonWithId"
             );
-            personWithId.ApiProperties.Single(x => x.ClrName == nameof(PersonWithId.Id)).ApiName
+            personWithId.ApiProperties.Single(static x => x.ClrName == nameof(PersonWithId.Id)).ApiName
                 .Should().Be("Id");
-            personWithId.ApiProperties.Single(x => x.ClrName == nameof(PersonWithId.Name)).ApiName
+            personWithId.ApiProperties.Single(static x => x.ClrName == nameof(PersonWithId.Name)).ApiName
                 .Should().Be("Name");
-            personWithId.ApiProperties.Single(x => x.ClrName == nameof(PersonWithId.Email)).ApiName
+            personWithId.ApiProperties.Single(static x => x.ClrName == nameof(PersonWithId.Email)).ApiName
                 .Should().Be("ExplicitProperty");
 
             explicitObject.ApiName.Should().Be("ExplicitObject");
@@ -194,8 +195,8 @@ public partial class ApiConventionTests
                 .WithName("Test")
                 .AddScalar<Guid>()
                 .AddScalar<string>()
-                .AddObject<People>(x => x.AddProperty(p => p.Names))
-                .AddObject<PersonWithId>(x => x.AddProperty(p => p.Name));
+                .AddObject<People>(static x => x.AddProperty(static p => p.Names))
+                .AddObject<PersonWithId>(static x => x.AddProperty(static p => p.Name));
         }
 
         protected override void Act()
@@ -217,9 +218,9 @@ public partial class ApiConventionTests
             this.ApiSchemaActual.Should().NotBeNull();
 
             var apiSchema = this.ApiSchemaActual;
-            var people = apiSchema.ApiObjectTypes.Single(x => x.ClrType == typeof(People));
+            var people = apiSchema.ApiObjectTypes.Single(static x => x.ClrType == typeof(People));
             var personWithId = apiSchema.ApiObjectTypes
-                .Single(x => x.ClrType == typeof(PersonWithId));
+                .Single(static x => x.ClrType == typeof(PersonWithId));
 
             var isObjectTypeTargeted =
                 (this.Targets & ApiNamingConventionTargets.ObjectType) !=
@@ -234,7 +235,7 @@ public partial class ApiConventionTests
                     ? "Person"
                     : "People"
             );
-            people.ApiProperties.Single(x => x.ClrName == nameof(People.Names)).ApiName
+            people.ApiProperties.Single(static x => x.ClrName == nameof(People.Names)).ApiName
                 .Should().Be
                 (
                     this.Style == NamingInflectionStyle.Singularize && isPropertyTargeted
@@ -248,7 +249,7 @@ public partial class ApiConventionTests
                     ? "PersonWithIds"
                     : "PersonWithId"
             );
-            personWithId.ApiProperties.Single(x => x.ClrName == nameof(PersonWithId.Name)).ApiName
+            personWithId.ApiProperties.Single(static x => x.ClrName == nameof(PersonWithId.Name)).ApiName
                 .Should().Be
                 (
                     this.Style == NamingInflectionStyle.Pluralize && isPropertyTargeted
@@ -308,7 +309,8 @@ public partial class ApiConventionTests
             }
         }
 
-        protected override void Assert() => this.ExceptionActual.Should().BeOfType(this.ExpectedExceptionType);
+        protected override void Assert()
+            => this.ExceptionActual.Should().BeOfType(this.ExpectedExceptionType);
         #endregion
     }
 
@@ -359,7 +361,8 @@ public partial class ApiConventionTests
             }
         }
 
-        protected override void Assert() => this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
+        protected override void Assert()
+            => this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
         #endregion
     }
     #endregion
@@ -503,22 +506,27 @@ public partial class ApiConventionTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(NamingInflectionConversionTheoryData))]
-    public void NamingInflectionConversion(IXUnitTest test) => test.Execute(this);
+    public void NamingInflectionConversion(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NamingInflectionDefaultTargetTheoryData))]
-    public void NamingInflectionDefaultTarget(IXUnitTest test) => test.Execute(this);
+    public void NamingInflectionDefaultTarget(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NamingInflectionTargetSelectionTheoryData))]
-    public void NamingInflectionTargetSelection(IXUnitTest test) => test.Execute(this);
+    public void NamingInflectionTargetSelection(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NamingInflectionValidationTheoryData))]
-    public void NamingInflectionValidation(IXUnitTest test) => test.Execute(this);
+    public void NamingInflectionValidation(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NamingInflectionTargetValidationTheoryData))]
-    public void NamingInflectionTargetValidation(IXUnitTest test) => test.Execute(this);
+    public void NamingInflectionTargetValidation(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

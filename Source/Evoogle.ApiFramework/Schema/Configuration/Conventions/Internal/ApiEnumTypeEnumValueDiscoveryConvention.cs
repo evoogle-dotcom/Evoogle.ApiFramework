@@ -30,7 +30,7 @@ internal sealed class ApiEnumTypeEnumValueDiscoveryConvention : IApiEnumTypeConv
         var clrType = builder.ClrType;
         var members = Enum.GetNames(clrType)
             .Select(name => (Name: name, Ordinal: Convert.ToInt32(Enum.Parse(clrType, name))))
-            .OrderBy(m => m.Ordinal);
+            .OrderBy(static m => m.Ordinal);
 
         foreach (var (clrName, clrOrdinal) in members)
         {

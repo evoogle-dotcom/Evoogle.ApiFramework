@@ -79,7 +79,7 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
             this.ExceptionActual.Should().NotBeNull();
             this.ExceptionActual.Errors.Should().Contain
             (
-                issue => issue.Code == ApiSchemaCompilationCode.ApiAssemblyDiscoveryFailed &&
+                static issue => issue.Code == ApiSchemaCompilationCode.ApiAssemblyDiscoveryFailed &&
                     issue.Severity == ApiSchemaCompilationSeverity.Error &&
                     issue.ApiPath == typeof(AssemblyFilterFailureCandidate).FullName &&
                     issue.Exception is InvalidOperationException
@@ -171,11 +171,13 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
     #region Test Methods
     [Theory]
     [MemberData(nameof(PipelineFilterFailureTheoryData))]
-    public void PipelineFilterFailure(IXUnitTest test) => test.Execute(this);
+    public void PipelineFilterFailure(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(ReflectionTypeLoadFailureTheoryData))]
-    public void ReflectionTypeLoadFailure(IXUnitTest test) => test.Execute(this);
+    public void ReflectionTypeLoadFailure(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }
 

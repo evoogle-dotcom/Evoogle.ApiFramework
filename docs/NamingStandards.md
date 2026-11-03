@@ -44,6 +44,10 @@ Delegate declarations use the delegate type name as the query-source naming cand
 parameter names as parameter naming candidates. `ApiQuerySourceAttribute.ApiName` and
 `ApiQuerySourceParameterAttribute.ApiName` are explicit data-annotation overrides. Query-source and
 parameter naming conventions apply only to inferred candidates; they do not transform explicit names.
+Use `Registration` for opaque builder-scoped declaration handles: `ApiQuerySourceRegistration` and
+`ApiRelationshipOneToManyRegistration`, with corresponding relationship kinds. A locator identifies a
+CLR declaration; API names remain configurable facets. `ConfigureInputParameter` targets a delegate's
+original CLR parameter name. `InverseNavigation` names the opposite CLR navigation member in annotations.
 Use **binding** for connecting an operation to a query source and its parameter declarations.
 Reserve **materialization** for producing actual values or objects, such as an `ApiKey` from a POCO.
 

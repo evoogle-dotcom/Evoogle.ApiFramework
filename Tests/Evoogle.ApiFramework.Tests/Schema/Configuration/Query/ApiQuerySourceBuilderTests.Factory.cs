@@ -12,46 +12,46 @@ public static class ApiQuerySourceBuilderTestsFactory
 {
     #region Input Parameter Factory Methods
     public static ApiSchema BuildWithLaterOptionalPresence()
-        => BuildSchema(parameter => parameter.WithPresence(ApiPresence.Required).WithPresence(ApiPresence.Optional));
+        => BuildSchema(static parameter => parameter.WithPresence(ApiPresence.Required).WithPresence(ApiPresence.Optional));
 
     public static ApiSchema BuildWithAnnotationPresence()
-        => BuildSchema(parameter =>
+        => BuildSchema(static parameter =>
         {
             parameter.ApplyConfiguration(ApiConfigurationSource.DataAnnotation, () => parameter.AsOptional());
             parameter.ApplyConfiguration(ApiConfigurationSource.Convention, () => parameter.AsRequired());
         });
 
     public static ApiSchema BuildWithExplicitPresenceOverAnnotation()
-        => BuildSchema(parameter =>
+        => BuildSchema(static parameter =>
         {
             parameter.WithPresence(ApiPresence.Optional);
             parameter.ApplyConfiguration(ApiConfigurationSource.DataAnnotation, () => parameter.AsRequired());
         });
 
     public static ApiSchema BuildRequiredArgumentWithNonNullableValue()
-        => BuildSchema(parameter => parameter.AsRequired().AsNonNullable());
+        => BuildSchema(static parameter => parameter.AsRequired().AsNonNullable());
 
     public static ApiSchema BuildWithDefaultArgumentSettings()
         => BuildSchema(static _ => { });
 
     public static ApiSchema BuildRequiredArgumentWithNullableValue()
-        => BuildSchema(parameter => parameter.AsRequired().AsNullable());
+        => BuildSchema(static parameter => parameter.AsRequired().AsNullable());
 
     public static ApiSchema BuildOptionalArgumentWithNonNullableValue()
-        => BuildSchema(parameter => parameter.AsOptional().AsNonNullable());
+        => BuildSchema(static parameter => parameter.AsOptional().AsNonNullable());
 
     public static ApiSchema BuildOptionalArgumentWithNullableValue()
-        => BuildSchema(parameter => parameter.AsNullable().AsOptional());
+        => BuildSchema(static parameter => parameter.AsNullable().AsOptional());
 
     public static ApiSchema BuildWithLaterRequiredNonNullableConfiguration()
-        => BuildSchema(parameter => parameter.AsOptional().AsNullable()
+        => BuildSchema(static parameter => parameter.AsOptional().AsNullable()
             .AsRequired().AsNonNullable());
 
     public static ApiSchema BuildWithLaterNullableConfiguration()
-        => BuildSchema(parameter => parameter.WithNullability(ApiNullability.NonNullable).AsNullable());
+        => BuildSchema(static parameter => parameter.WithNullability(ApiNullability.NonNullable).AsNullable());
 
     public static ApiSchema BuildWithExplicitOptionalNullableConfiguration()
-        => BuildSchema(parameter =>
+        => BuildSchema(static parameter =>
         {
             parameter.AsOptional().AsNullable();
             parameter.ApplyConfiguration(ApiConfigurationSource.Convention, () =>
@@ -59,7 +59,7 @@ public static class ApiQuerySourceBuilderTestsFactory
         });
 
     public static ApiSchema BuildWithExplicitRequiredNonNullableConfiguration()
-        => BuildSchema(parameter =>
+        => BuildSchema(static parameter =>
         {
             parameter.AsRequired().AsNonNullable();
             parameter.ApplyConfiguration(ApiConfigurationSource.Convention, () =>

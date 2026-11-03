@@ -16,18 +16,29 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 internal sealed class ApiObjectTypeState
 {
     #region Properties
-    internal List<ApiKeyDefinitionBuilder> KeyBuilders { get; } = [];
+    internal List<ApiKeyDefinitionBuilder> KeyBuilders { get; private set; } = [];
 
     internal string? CanonicalKeyName { get; set; }
 
     internal ApiConfigurationSource CanonicalKeyConfigurationSource { get; set; } = ApiConfigurationSource.Convention;
 
-    internal List<ApiPropertyBuilder> PropertyBuilders { get; } = [];
+    internal List<ApiPropertyBuilder> PropertyBuilders { get; private set; } = [];
 
     internal Action<ApiObjectTypeOptionsBuilder>? OptionsConfiguration { get; set; }
 
     internal ApiVersionDefinitionBuilder? VersionBuilder { get; set; }
 
     internal ApiConfigurationSource VersionConfigurationSource { get; set; } = ApiConfigurationSource.Convention;
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiObjectTypeState CreateBuildCopy()
+    {
+        var copy = (ApiObjectTypeState)this.MemberwiseClone();
+        copy.KeyBuilders = [.. this.KeyBuilders.Select(static builder => builder.CreateBuildCopy())];
+        copy.PropertyBuilders = [.. this.PropertyBuilders.Select(static builder => builder.CreateBuildCopy())];
+        copy.VersionBuilder = this.VersionBuilder?.CreateBuildCopy();
+        return copy;
+    }
     #endregion
 }

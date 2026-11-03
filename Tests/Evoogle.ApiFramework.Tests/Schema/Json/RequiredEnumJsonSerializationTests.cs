@@ -269,7 +269,7 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
             }
 
             var sourceProperties = sourceSchema.SelfAndDescendants(TraversalStrategy.DepthFirst).OfType<ApiProperty>().ToArray();
-            sourceProperties.Should().Contain(property => property.ClrKind == ClrMemberKind.Property);
+            sourceProperties.Should().Contain(static property => property.ClrKind == ClrMemberKind.Property);
             foreach (var sourceObjectType in sourceSchema.ApiObjectTypes)
             {
                 this.WriteLine($"Object Lookup API Name: {sourceObjectType.ApiName}; CLR Type: {sourceObjectType.ClrType.SafeToString()}");
@@ -331,11 +331,13 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
     #region Test Methods
     [Theory]
     [MemberData(nameof(SerializeTheoryData))]
-    public void SerializePreservesRequiredEnumIdentitiesWhenIgnoringDefaults(IXUnitTest test) => test.Execute(this);
+    public void SerializePreservesRequiredEnumIdentitiesWhenIgnoringDefaults(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripTheoryData))]
-    public void JsonRoundtripPreservesRequiredEnumIdentitiesWhenIgnoringDefaults(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtripPreservesRequiredEnumIdentitiesWhenIgnoringDefaults(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(SchemaJsonRoundtripTheoryData))]
@@ -344,8 +346,8 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
     #endregion
 
     #region Implementation Methods
-    private static TheoryDataRow<IXUnitTest>[] CreateRequiredEnumTheoryData(bool shouldRoundtrip) =>
-    [
+    private static TheoryDataRow<IXUnitTest>[] CreateRequiredEnumTheoryData(bool shouldRoundtrip)
+        => [
         .. from identity in Enum.GetValues<RequiredEnumIdentity>()
            from ignoreCondition in new[]
            {
@@ -364,7 +366,8 @@ public class RequiredEnumJsonSerializationTests(ITestOutputHelper output) : XUni
            }
     ];
 
-    private static JsonSerializerOptions CreateOptions(bool usesCamelCase, JsonIgnoreCondition ignoreCondition) => new()
+    private static JsonSerializerOptions CreateOptions(bool usesCamelCase, JsonIgnoreCondition ignoreCondition)
+        => new()
     {
         PropertyNamingPolicy = usesCamelCase ? JsonNamingPolicy.CamelCase : null,
         DefaultIgnoreCondition = ignoreCondition

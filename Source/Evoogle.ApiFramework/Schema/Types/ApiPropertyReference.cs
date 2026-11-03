@@ -71,15 +71,18 @@ public sealed class ApiPropertyReference : IEquatable<ApiPropertyReference>
 
     #region Equality Methods
     /// <inheritdoc/>
-    public bool Equals(ApiPropertyReference? other) => other is not null
+    public bool Equals(ApiPropertyReference? other)
+        => other is not null
         && ApiNameComparer.Instance.Equals(this.ApiName, other.ApiName)
         && ClrNameComparer.Instance.Equals(this.ClrName, other.ClrName);
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => this.Equals(obj as ApiPropertyReference);
+    public override bool Equals(object? obj)
+        => this.Equals(obj as ApiPropertyReference);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine
+    public override int GetHashCode()
+        => HashCode.Combine
     (
         this.ApiName is null ? 0 : ApiNameComparer.Instance.GetHashCode(this.ApiName),
         this.ClrName is null ? 0 : ClrNameComparer.Instance.GetHashCode(this.ClrName)

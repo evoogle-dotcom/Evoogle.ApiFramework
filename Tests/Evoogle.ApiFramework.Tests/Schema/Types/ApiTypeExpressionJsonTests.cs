@@ -141,5 +141,6 @@ public class ApiTypeExpressionJsonTests(ITestOutputHelper output) : XUnitTests(o
 
     [Theory]
     [MemberData(nameof(ShapeReadTheoryData))]
-    public void ReadShape(IXUnitTest test) => test.Execute(this);
+    public void ReadShape(IXUnitTest test)
+        => test.Execute(this);
 }

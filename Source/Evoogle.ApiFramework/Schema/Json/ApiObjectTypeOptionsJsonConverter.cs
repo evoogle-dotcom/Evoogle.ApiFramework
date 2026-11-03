@@ -118,7 +118,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>

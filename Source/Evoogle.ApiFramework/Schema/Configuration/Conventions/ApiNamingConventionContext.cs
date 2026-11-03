@@ -81,7 +81,7 @@ public sealed class ApiNamingConventionContext
     public ApiNamingConventionContext
     (
         ApiNamingConventionTarget target,
-        Type clrType,
+        Type? clrType,
         string? clrName,
         ApiQuerySourceConventionContext apiQuerySourceConventionContext,
         ApiQuerySourceParameterConventionContext? apiQuerySourceParameterConventionContext
@@ -90,19 +90,35 @@ public sealed class ApiNamingConventionContext
         ArgumentNullException.ThrowIfNull(apiQuerySourceConventionContext);
 
         this.Target = target;
-        this.ClrType = clrType ?? throw new ArgumentNullException(nameof(clrType));
+        this.ClrType = clrType;
         this.ClrName = clrName;
         this.ApiQuerySourceConventionContext = apiQuerySourceConventionContext;
         this.ApiQuerySourceParameterConventionContext = apiQuerySourceParameterConventionContext;
     }
+    /// <summary>Creates a naming context for a relationship traversal.</summary>
+    /// <param name="apiRelationshipTraversalConventionContext">The traversal convention context.</param>
+    public ApiNamingConventionContext
+    (
+        ApiRelationshipTraversalConventionContext apiRelationshipTraversalConventionContext
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiRelationshipTraversalConventionContext);
+        this.Target = ApiNamingConventionTarget.RelationshipTraversal;
+        this.ClrType = apiRelationshipTraversalConventionContext.ClrDeclaringType;
+        this.ClrName = apiRelationshipTraversalConventionContext.ClrMemberInfo?.Name;
+        this.ApiRelationshipTraversalConventionContext = apiRelationshipTraversalConventionContext;
+    }
     #endregion
 
     #region Properties
+    /// <summary>Gets the traversal convention context, or null for other targets.</summary>
+    public ApiRelationshipTraversalConventionContext? ApiRelationshipTraversalConventionContext { get; }
+
     /// <summary>Gets the schema element kind whose API name is being produced.</summary>
     public ApiNamingConventionTarget Target { get; }
 
-    /// <summary>Gets the CLR type associated with the naming target.</summary>
-    public Type ClrType { get; }
+    /// <summary>Gets the CLR type associated with the target, or null for an unanchored fluent declaration.</summary>
+    public Type? ClrType { get; }
 
     /// <summary>
     ///     Gets the CLR member name associated with the naming target. Naming conventions can use

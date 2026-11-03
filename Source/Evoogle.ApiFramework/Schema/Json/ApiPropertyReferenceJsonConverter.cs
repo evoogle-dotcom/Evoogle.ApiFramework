@@ -123,7 +123,7 @@ public class ApiPropertyReferenceJsonConverter(ILogger<ApiPropertyReferenceJsonC
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>

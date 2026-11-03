@@ -188,6 +188,20 @@ responsibility.
 
 Fluent builder methods are stricter because they are explicit authoring APIs. A builder method may fail fast with standard argument exceptions when the method call itself violates its parameter contract, such as passing a `null` callback, `null` configuration object, `null` `Type`, blank name, invalid expression, or invalid extension metadata. Those precondition failures are treated as programmer errors and are separate from schema compilation diagnostics.
 
+## Schema Authoring and Build Sessions
+
+`ApiSchemaBuilder` retains fluent authoring state. Direct configuration callbacks execute immediately
+and are not replayed by later builds. Each `BuildResult()` copies the complete builder graph into an
+isolated session, recomputes discovery, annotations, conventions, and inference, then constructs and
+compiles one fresh schema graph. Successful and failed sessions are discarded. Changes to conventions,
+annotation results, discovery filters, or retained fluent builders affect subsequent builds.
+
+Schema and object options callbacks retain their deferred timing. Assembly configurations are activated
+once per configuration CLR type in each build, and each supported configuration role runs once even
+when scans overlap. Directly supplied non-generic configuration instances remain independent declarations.
+The builder does not support concurrent authoring; overlapping and reentrant builds fail immediately.
+Compiled schemas retain their existing immutability and concurrent-read contracts.
+
 ## Builder Configuration Sources
 
 All stored builder configuration sources are non-nullable `ApiConfigurationSource` values.
@@ -278,38 +292,59 @@ builder.AddQuerySource("Orders", source => source
     .WithOutputComposition(ApiQueryComposition.Projection | ApiQueryComposition.Filtering));
 ```
 
-Repeated `AddQuerySource` calls with the same API name configure one source builder. Repeated
-`AddInputParameter` calls with the same parameter API name and equal type reference configure
-one parameter builder. A type-reference change at equal or higher precedence replaces that
+Each name-only `AddQuerySource` call declares an independent source. Two declarations with the same
+final API name produce a schema compilation error. Retain a `DeclareQuerySource` handle to configure
+one fluent declaration repeatedly, or use a delegate type as its stable locator.
+
+Within a pure fluent source, repeated `AddInputParameter` calls with the same original declaration name
+and equal type reference configure one parameter builder, including after `WithName` renames its API
+facet. A type-reference change at equal or higher precedence replaces that
 parameter's settings and extensions in its original position; a lower-precedence type change
 is ignored. Type-reference equality compares the declaration, so CLR-backed and API-named
 references are distinct even when they resolve to the same schema type.
 
 Configuration precedence is convention, then data annotation, then explicit configuration;
-later settings at the same precedence win. Output type, collection item configuration, and
-output nullability form one declaration, while output composition is configured separately.
-Parameter nullability and argument presence are also configured separately. The builders
-provide precedence support for future query-source conventions and annotation readers.
+later settings at the same precedence win. `WithOutputNullability` and `WithOutputItemNullability`
+configure output facets independently of its type. Parameter `WithNullability`, `WithItemNullability`,
+and `WithPresence` configure separate facets. Collection-item setters require collection declarations.
+The initial fluent source name is a convention candidate; `WithName` pins an explicit API name.
 Extensions follow the existing builder behavior: the last registration for an extension type wins.
 
-Reusable source configurations implement `IApiQuerySourceConfiguration` from
+Reusable delegate source configurations implement `IApiQuerySourceConfiguration<TDelegate>` from
 `Evoogle.ApiFramework.Schema.Configuration.Query`:
 
 ```csharp
-public sealed class CustomerByIdConfiguration : IApiQuerySourceConfiguration
-{
-    public string ApiName => "CustomerById";
+public delegate Customer CustomerById(int id);
 
+public sealed class CustomerByIdConfiguration : IApiQuerySourceConfiguration<CustomerById>
+{
     public void Configure(ApiQuerySourceBuilder builder) => builder
-        .AddInputParameter<int>("id")
-        .WithOutput<Customer>();
+        .WithName("customer")
+        .ConfigureInputParameter("id", parameter => parameter.AsRequired());
 }
 ```
 
 Register an instance with `builder.AddQuerySource(new CustomerByIdConfiguration())`, or use
 `builder.UseConfigurationsFromAssembly(typeof(CustomerByIdConfiguration).Assembly)` to discover
 public implementations with public parameterless constructors. Discovered configurations run
-at explicit precedence. Referenced schema types must still be registered.
+at explicit precedence and are deduplicated by configuration type and closed role. The non-generic
+`IApiQuerySourceConfiguration` remains available for independent fluent declarations. Referenced schema
+types must still be registered.
+
+```csharp
+var registration = builder.DeclareQuerySource("customerSearch", source => source
+    .AddInputParameter<string>("text")
+    .WithCollectionOutput<Customer>());
+
+builder.ConfigureQuerySource(registration, source => source.WithName("customers"));
+builder.AddQuerySource<CustomerById>(source => source.WithName("customer"));
+```
+
+Registrations are immutable, owned by their creating builder, valid across sequential builds, and
+unsupported for serialization. Passing a registration to another builder fails immediately. `Declare`
+methods issue durable handles before a build; build-time discovery and conventions use `Add` methods
+for declarations local to their session. Configuring an existing durable handle during a build targets
+its copied declaration.
 
 The builders have public constructors; `ApiQuerySourceParameterBuilder` accepts either an
 `ApiTypeReference` or a CLR `Type` alongside its API name. `AddInputParameter`, `WithOutput`,
@@ -351,9 +386,14 @@ declarations. Every delegate parameter becomes an input declaration; its attribu
 for name, nullability, or presence overrides. CLR names and nullable metadata supply convention
 candidates, while attribute values apply at data-annotation precedence and explicit fluent settings
 remain authoritative. Naming conventions can independently target `QuerySource` and
-`QuerySourceParameter`. Repeated discovery of the same delegate is idempotent. Different annotated
-delegates resolving to the same API name produce a discovery conflict, while an existing fluent
-source with that name is merged according to normal configuration precedence.
+`QuerySourceParameter`. Repeated discovery and generic registration of the same delegate target one
+declaration. Explicitly registered delegates also read configured annotations without requiring an
+assembly discovery scan. Different delegates and independent fluent registrations remain distinct, even with
+equivalent signatures or names; duplicate final names produce schema compilation diagnostics.
+
+The delegate signature fixes parameter count, order, CLR types, and output CLR type. Configure
+API-facing names, nullability, argument presence, composition, and extensions through that declaration.
+Use `ConfigureInputParameter` with the original CLR parameter name after any API renaming.
 
 Annotated delegates must be public, closed, return a value, and avoid pointer or by-reference
 signatures. `Task`, task-derived, `ValueTask`, and `IAsyncEnumerable`-implementing outputs are rejected
@@ -366,11 +406,67 @@ annotation-derived query sources.
 so annotations-only POCO projects can use the exact schema contract enums. Their namespaces and
 values are unchanged, but consumers compiled against an earlier assembly location must rebuild.
 
+## Relationship Declaration Identity
+
+Name-only relationship calls declare independent relationships. Keep a kind-safe registration handle
+when a relationship has no navigation locator and needs later configuration:
+
+```csharp
+var registration = builder.DeclareOneToManyRelationship("CustomerOrders", relationship => relationship
+    .From<Customer>()
+    .To<Order>());
+
+builder.ConfigureRelationship(registration, relationship => relationship.WithName("Purchases"));
+```
+
+Member-based declarations identify relationships through explicit CLR navigation members:
+
+```csharp
+builder.AddOneToManyRelationship<Customer, Order>(
+    "CustomerOrders",
+    customer => customer.Orders,
+    order => order.Customer);
+
+builder.ConfigureOneToManyRelationship<Order>(
+    order => order.Customer,
+    relationship => relationship.WithDeleteBehavior(ApiRelationshipDeleteBehavior.None));
+```
+
+The same member-based overloads and kind-safe handles are available for one-to-one and many-to-many
+relationships. Supply `null` for an absent selector; at least one selector is required. A selector
+identifies one direct public instance property or field. Use `AssociateInverseNavigation` to attach
+an unclaimed opposite member to an existing member-located relationship. Member-targeted configuration
+requires an existing declaration.
+
+Member attributes also support explicit inverse association:
+
+```csharp
+[ApiRelationship(
+    ApiName = "CustomerOrders",
+    Kind = ApiRelationshipKind.OneToMany,
+    InverseNavigation = nameof(Order.Customer))]
+public List<Order> Orders { get; set; } = [];
+```
+
+`ApiManyToManyRelationshipAttribute.InverseNavigation` provides the same capability. The inverse value
+names one member on the opposite CLR endpoint. Existing principal-end annotation placement rules remain
+in force for one-to-one and one-to-many relationships.
+
+Navigation locators establish authoritative CLR binding, target type, and cardinality. Traversal names
+remain configurable, including through the `RelationshipTraversal` naming target. Endpoints, foreign
+keys, association types, and traversal bindings added later through builders do not establish identity.
+Explicit locators already owned by different relationships produce a declaration conflict and are never
+merged. Independent declarations with equal final names produce the existing schema compilation error.
+
+Migration from repeated same-name configuration requires a delegate locator, navigation locator, or
+registration handle. Public builder/configuration consumers must rebuild. Schema JSON names, defaults,
+metadata types, and runtime name lookups retain their contracts; registration identity is never serialized.
+
 ## Naming Conventions
 
-Built-in API naming conventions are opt-in through `ApiSchemaBuilder` extension methods. They
-apply to convention-configurable schema type, enum-value, and property API names. Explicit API
-names remain unchanged.
+Built-in API naming conventions are opt-in through `ApiSchemaBuilder` extension methods. They apply to
+convention-configurable API names for types, enum values, properties, query sources, parameters, and relationship
+traversals. Explicit API names remain unchanged.
 
 | Method | Format | Example for `PersonWithId` |
 | --- | --- | --- |
@@ -396,7 +492,17 @@ builder.UseKebabCaseNaming
 );
 ```
 
-The available targets are object types, scalar types, enum types, enum values, and properties.
+The available targets are object types, scalar types, enum types, enum values, properties, query sources,
+query-source parameters, and relationship traversals. Naming contexts have a nullable `ClrType` because
+unanchored fluent declarations have no CLR locator.
+
+Relationship traversal conventions implement `IApiRelationshipTraversalConvention` and receive an
+`ApiRelationshipTraversalBuilder` plus `ApiRelationshipTraversalConventionContext`. Register them with
+`UseConventions(conventions => conventions.AddConvention(...))`. They use the `Configuration` phase and
+run in registration order after relationship annotations, inference, and navigation binding. Naming conventions
+participate through the same traversal convention collection; query-source registration is independent.
+Explicit and annotation-configured traversal names retain precedence over convention-derived names.
+
 Lower-case and upper-case naming change the casing of the whole name without inserting separators.
 
 ### Prefix Standard: `Api`, `Clr`, and No Prefix

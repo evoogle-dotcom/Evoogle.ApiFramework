@@ -129,7 +129,7 @@ public class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJsonConve
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>
@@ -192,7 +192,8 @@ public class ClrMemberReferenceJsonConverter(ILogger<ClrMemberReferenceJsonConve
         Utf8JsonWriter writer,
         ClrMemberReference clrMemberReference,
         DefaultWriteContext<PropertyNames> writeContext
-    ) => writer.WritePropertyWithConverter
+    )
+        => writer.WritePropertyWithConverter
     (
         propertyName: writeContext.PropertyNames.ClrMemberReference.ClrKind,
         value: clrMemberReference.ClrKind,

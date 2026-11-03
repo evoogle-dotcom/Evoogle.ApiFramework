@@ -63,8 +63,10 @@ internal readonly record struct ApiKeyMaterializationValue
     #endregion
 
     #region Factory Methods
-    public static ApiKeyMaterializationValue FromKey(ApiKey apiKey) => new(ApiKeyMaterializationValueKind.Key, apiKey, text: null);
-    public static ApiKeyMaterializationValue FromText(string? text) => new(ApiKeyMaterializationValueKind.Text, ApiKey.Empty, text);
+    public static ApiKeyMaterializationValue FromKey(ApiKey apiKey)
+        => new(ApiKeyMaterializationValueKind.Key, apiKey, text: null);
+    public static ApiKeyMaterializationValue FromText(string? text)
+        => new(ApiKeyMaterializationValueKind.Text, ApiKey.Empty, text);
     #endregion
 }
 

@@ -373,20 +373,23 @@ public partial class ApiPropertyTests
     #region Member Access Lifecycle Test Methods
     [Theory]
     [MemberData(nameof(UncompiledTryMemberAccessTheoryData))]
-    public void TryMemberAccessReturnsFalseBeforeSchemaCompilation(IXUnitTest test) => test.Execute(this);
+    public void TryMemberAccessReturnsFalseBeforeSchemaCompilation(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(UncompiledMemberAccessTheoryData))]
-    public void MemberAccessReportsUncompiledSchema(IXUnitTest test) => test.Execute(this);
+    public void MemberAccessReportsUncompiledSchema(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(CompiledStructWriteTheoryData))]
-    public void CompileWiresByRefMemberWrites(IXUnitTest test) => test.Execute(this);
+    public void CompileWiresByRefMemberWrites(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Member Access Lifecycle Factory Methods
-    private static TheoryDataRow<IXUnitTest>[] CreateUncompiledTheoryData(bool usesTry) =>
-    [
+    private static TheoryDataRow<IXUnitTest>[] CreateUncompiledTheoryData(bool usesTry)
+        => [
         .. from surface in Enum.GetValues<MemberAccessSurface>()
            from clrKind in Enum.GetValues<ClrMemberKind>()
            from overload in new[] { (MemberAccessOverload.Object, false), (MemberAccessOverload.Generic, false),
@@ -403,7 +406,8 @@ public partial class ApiPropertyTests
            }
     ];
 
-    private static ApiProperty CreateLifecycleProperty(string apiName, string clrName, ClrMemberKind clrKind) => new
+    private static ApiProperty CreateLifecycleProperty(string apiName, string clrName, ClrMemberKind clrKind)
+        => new
         (
             apiName: apiName,
             apiTypeExpression: new ApiTypeExpression(apiTypeReference: new ApiTypeReference(clrType: typeof(long))),

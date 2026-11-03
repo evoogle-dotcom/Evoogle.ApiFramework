@@ -12,7 +12,7 @@ public partial class ApiSchemaTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeKeyTheoryData =>
     [
-        .. KeyJsonTestCases.Select(c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
+        .. KeyJsonTestCases.Select(static c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
         {
             Name = c.Name,
             SourceJson = c.Json,
@@ -22,7 +22,7 @@ public partial class ApiSchemaTests
 
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripKeyTheoryData =>
     [
-        .. KeyJsonTestCases.Select(c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
+        .. KeyJsonTestCases.Select(static c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
         {
             Name = c.Name,
             ExpectedFactoryArgument = c.FactoryArgument
@@ -31,7 +31,7 @@ public partial class ApiSchemaTests
 
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeKeyTheoryData =>
     [
-        .. KeyJsonTestCases.Select(c => (TheoryDataRow<IXUnitTest>)new JsonSerializeTest
+        .. KeyJsonTestCases.Select(static c => (TheoryDataRow<IXUnitTest>)new JsonSerializeTest
         {
             Name = c.Name,
             SourceFactoryArgument = c.FactoryArgument,
@@ -43,14 +43,17 @@ public partial class ApiSchemaTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(JsonDeserializeKeyTheoryData))]
-    public void JsonDeserialize_Key(IXUnitTest test) => test.Execute(this);
+    public void JsonDeserialize_Key(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripKeyTheoryData))]
-    public void JsonRoundtrip_Key(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtrip_Key(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonSerializeKeyTheoryData))]
-    public void JsonSerialize_Key(IXUnitTest test) => test.Execute(this);
+    public void JsonSerialize_Key(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

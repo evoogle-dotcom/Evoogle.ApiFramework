@@ -45,7 +45,8 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
 
         #region Factory Methods
-        public static PropertyNames Create(JsonNamingPolicy policy) => new()
+        public static PropertyNames Create(JsonNamingPolicy policy)
+            => new()
         {
             ApiProperty = new ApiPropertyPropertyNames
             {
@@ -162,7 +163,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>
@@ -261,7 +262,8 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         Utf8JsonWriter writer,
         ApiProperty apiProperty,
         DefaultWriteContext<PropertyNames> writeContext
-    ) => writer.TryWritePropertyWithSerializer
+    )
+        => writer.TryWritePropertyWithSerializer
     (
         propertyName: writeContext.PropertyNames.ApiProperty.ClrValueMember,
         obj: apiProperty.ClrValueMember,

@@ -146,7 +146,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
             this.ConfigureCount++;
             builder
                 .From<RelationshipPrincipal>()
-                .To<RelationshipDependent>(d => d.WithForeignKey(x => x.PrincipalId));
+                .To<RelationshipDependent>(static d => d.WithForeignKey(static x => x.PrincipalId));
         }
     }
 
@@ -161,7 +161,7 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
             this.ConfigureCount++;
             builder
                 .From<RelationshipPrincipal>()
-                .To<RelationshipDependent>(d => d.WithForeignKey(x => x.PrincipalId));
+                .To<RelationshipDependent>(static d => d.WithForeignKey(static x => x.PrincipalId));
         }
     }
 
@@ -179,9 +179,9 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
                 .And<RelationshipDependent>()
                 .WithAssociation<RelationshipAssociation>
                 (
-                    a => a
-                        .WithForeignKeyA(x => x.PrincipalId)
-                        .WithForeignKeyB(x => x.DependentId)
+                    static a => a
+                        .WithForeignKeyA(static x => x.PrincipalId)
+                        .WithForeignKeyB(static x => x.DependentId)
                 );
         }
     }
@@ -231,7 +231,8 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         private Type? ClrTypeActual { get; set; }
         private string? ApiNameActual { get; set; }
 
-        protected override void Arrange() => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
+        protected override void Arrange()
+            => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
 
         protected override void Act()
         {
@@ -291,7 +292,8 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         private Type? BuilderClrTypeActual { get; set; }
         private int ConfigureCountActual { get; set; }
 
-        protected override void Arrange() => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
+        protected override void Arrange()
+            => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
 
         protected override void Act()
         {
@@ -342,7 +344,8 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         private string? ApiNameActual { get; set; }
         private int ConfigureCountActual { get; set; }
 
-        protected override void Arrange() => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
+        protected override void Arrange()
+            => this.WriteLine($"ConfigurationKind: {this.ConfigurationKind}");
 
         protected override void Act()
         {
@@ -454,13 +457,15 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         (
             ApiSchemaBuilder schemaBuilder,
             OneToOneConfiguration configuration
-        ) => this.AddRelationshipPrincipal(schemaBuilder, configuration);
+        )
+            => this.AddRelationshipPrincipal(schemaBuilder, configuration);
 
         private void AddOneToManyConfiguration
         (
             ApiSchemaBuilder schemaBuilder,
             OneToManyConfiguration configuration
-        ) => this.AddRelationshipPrincipal(schemaBuilder, configuration);
+        )
+            => this.AddRelationshipPrincipal(schemaBuilder, configuration);
 
         private void AddManyToManyConfiguration
         (
@@ -552,31 +557,31 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
         private static void ConfigurePrincipal(ApiObjectTypeBuilder<RelationshipPrincipal> builder)
         {
             builder
-                .AddProperty(p => p.Id)
-                .AddKey("PrimaryKey", p => p.Id);
+                .AddProperty(static p => p.Id)
+                .AddKey("PrimaryKey", static p => p.Id);
         }
 
         private static void ConfigurePrincipal(ApiObjectTypeBuilder builder)
         {
             builder
                 .AddProperty("Id", "Id")
-                .AddKey("PrimaryKey", p => p.AddPath(typeof(RelationshipPrincipal), "Id"));
+                .AddKey("PrimaryKey", static p => p.AddPath(typeof(RelationshipPrincipal), "Id"));
         }
 
         private static void AddRelationshipTypes(ApiSchemaBuilder schemaBuilder, bool includeAssociation)
         {
             schemaBuilder
-                .AddObject<RelationshipDependent>(builder => builder
-                    .AddProperty(p => p.Id)
-                    .AddProperty(p => p.PrincipalId)
-                    .AddKey("PrimaryKey", p => p.Id));
+                .AddObject<RelationshipDependent>(static builder => builder
+                    .AddProperty(static p => p.Id)
+                    .AddProperty(static p => p.PrincipalId)
+                    .AddKey("PrimaryKey", static p => p.Id));
 
             if (includeAssociation)
             {
-                schemaBuilder.AddObject<RelationshipAssociation>(builder => builder
-                    .AddProperty(p => p.PrincipalId)
-                    .AddProperty(p => p.DependentId)
-                    .AddKey("PrimaryKey", p => p.PrincipalId, p => p.DependentId));
+                schemaBuilder.AddObject<RelationshipAssociation>(static builder => builder
+                    .AddProperty(static p => p.PrincipalId)
+                    .AddProperty(static p => p.DependentId)
+                    .AddKey("PrimaryKey", static p => p.PrincipalId, static p => p.DependentId));
             }
         }
     }
@@ -664,7 +669,8 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
 
         private Exception? ExceptionActual { get; set; }
 
-        protected override void Arrange() => this.WriteLine($"IsObjectBuilderExtension: {this.IsObjectBuilderExtension}");
+        protected override void Arrange()
+            => this.WriteLine($"IsObjectBuilderExtension: {this.IsObjectBuilderExtension}");
 
         protected override void Act()
         {
@@ -826,30 +832,37 @@ public class ApiConfigurationTests(ITestOutputHelper output) : XUnitTests(output
     #region Test Methods
     [Theory]
     [MemberData(nameof(ConfigurationHierarchyTheoryData))]
-    public void ConfigurationHierarchy(IXUnitTest test) => test.Execute(this);
+    public void ConfigurationHierarchy(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NonGenericIdentityTheoryData))]
-    public void NonGenericIdentity(IXUnitTest test) => test.Execute(this);
+    public void NonGenericIdentity(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(SchemaBuilderConfigurationTheoryData))]
-    public void SchemaBuilderConfiguration(IXUnitTest test) => test.Execute(this);
+    public void SchemaBuilderConfiguration(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(GenericConfigurationBridgeTheoryData))]
-    public void GenericConfigurationBridge(IXUnitTest test) => test.Execute(this);
+    public void GenericConfigurationBridge(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(RelationshipConfigurationTheoryData))]
-    public void RelationshipConfiguration(IXUnitTest test) => test.Execute(this);
+    public void RelationshipConfiguration(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(NullConfigurationTheoryData))]
-    public void NullConfiguration(IXUnitTest test) => test.Execute(this);
+    public void NullConfiguration(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(InvalidRelationshipNameTheoryData))]
-    public void InvalidRelationshipName(IXUnitTest test) => test.Execute(this);
+    public void InvalidRelationshipName(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

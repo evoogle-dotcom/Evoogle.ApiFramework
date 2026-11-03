@@ -85,21 +85,24 @@ public class ClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(outp
     private class JsonDeserializeTest : JsonDeserializeTest<ClrMemberReference, ClrMemberReferenceDef>
     {
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ClrMemberReference? CreateExpected(ClrMemberReferenceDef? descriptor) => BuildClrMemberReference(descriptor);
+        protected override ClrMemberReference? CreateExpected(ClrMemberReferenceDef? descriptor)
+            => BuildClrMemberReference(descriptor);
         #endregion
     }
 
     private class JsonRoundtripTest : JsonRoundtripTest<ClrMemberReference, ClrMemberReferenceDef>
     {
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ClrMemberReference? CreateExpected(ClrMemberReferenceDef? descriptor) => BuildClrMemberReference(descriptor);
+        protected override ClrMemberReference? CreateExpected(ClrMemberReferenceDef? descriptor)
+            => BuildClrMemberReference(descriptor);
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ClrMemberReference, ClrMemberReferenceDef>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ClrMemberReference? CreateSource(ClrMemberReferenceDef? descriptor) => BuildClrMemberReference(descriptor);
+        protected override ClrMemberReference? CreateSource(ClrMemberReferenceDef? descriptor)
+            => BuildClrMemberReference(descriptor);
         #endregion
     }
     #endregion
@@ -173,7 +176,7 @@ public class ClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(outp
 
     public static TheoryDataRow<IXUnitTest>[] DistinctInstanceEqualityTheoryData =>
     [
-        .. Enum.GetValues<ClrMemberKind>().Select(clrKind => (TheoryDataRow<IXUnitTest>)new EqualityTest
+        .. Enum.GetValues<ClrMemberKind>().Select(static clrKind => (TheoryDataRow<IXUnitTest>)new EqualityTest
         {
             Name = $"Distinct {clrKind} references use value equality",
             Lhs = new ClrMemberReference(clrKind, "Value"),
@@ -336,22 +339,27 @@ public class ClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(outp
     #region Test Methods
     [Theory]
     [MemberData(nameof(DistinctInstanceEqualityTheoryData))]
-    public void EqualClrMemberReferencesUseValueEqualityAcrossDistinctInstances(IXUnitTest test) => test.Execute(this);
+    public void EqualClrMemberReferencesUseValueEqualityAcrossDistinctInstances(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(EqualityTheoryData))]
-    public void Equality(IXUnitTest test) => test.Execute(this);
+    public void Equality(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonDeserializeTheoryData))]
-    public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
+    public void JsonDeserialize(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripTheoryData))]
-    public void JsonRoundtrip(IXUnitTest test) => test.Execute(this);
+    public void JsonRoundtrip(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonSerializeTheoryData))]
-    public void JsonSerialize(IXUnitTest test) => test.Execute(this);
+    public void JsonSerialize(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

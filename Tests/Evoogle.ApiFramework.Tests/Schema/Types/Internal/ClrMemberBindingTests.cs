@@ -117,7 +117,7 @@ public class ClrMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
             this.ActualSuccess.Should().Be(this.Case.ExpectedIsBound);
             this.Binding!.IsBound.Should().Be(this.Case.ExpectedIsBound);
             this.Binding.HasReference.Should().BeTrue();
-            this.Context!.Issues.Select(issue => new ExpectedDiagnostic(issue.Code, issue.Severity, issue.ApiPath)).Should().BeEquivalentTo(this.ExpectedIssues);
+            this.Context!.Issues.Select(static issue => new ExpectedDiagnostic(issue.Code, issue.Severity, issue.ApiPath)).Should().BeEquivalentTo(this.ExpectedIssues);
             foreach (var fragment in this.Case.ExpectedDescriptionFragments)
             {
                 this.Context.Issues.Should().Contain(issue => issue.Description.Contains(fragment));
@@ -223,7 +223,7 @@ public class ClrMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
             this.Binding.IsBound.Should().Be(this.ExpectedIsBound);
             this.Binding.BoundClrMemberInfo.Should().BeSameAs(this.ExpectedMember);
             (this.Binding.BoundClrMemberAccessor is not null).Should().Be(this.ExpectedHasAccessor);
-            this.Context!.Issues.Select(issue => new ExpectedDiagnostic(issue.Code, issue.Severity, issue.ApiPath)).Should().BeEquivalentTo(this.ExpectedIssues);
+            this.Context!.Issues.Select(static issue => new ExpectedDiagnostic(issue.Code, issue.Severity, issue.ApiPath)).Should().BeEquivalentTo(this.ExpectedIssues);
             if (this.ExpectedIsBound)
             {
                 this.Binding.ClrMemberInfo.Should().BeSameAs(this.ExpectedMember);
@@ -346,31 +346,38 @@ public class ClrMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
     #region Test Methods
     [Theory]
     [MemberData(nameof(DirectBindingTheoryData))]
-    public void BindPublishesClrMemberMetadataAndAccessor(IXUnitTest test) => test.Execute(this);
+    public void BindPublishesClrMemberMetadataAndAccessor(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(ResolutionTheoryData))]
-    public void TryResolveReferencePublishesClrMemberMetadataAndAccessor(IXUnitTest test) => test.Execute(this);
+    public void TryResolveReferencePublishesClrMemberMetadataAndAccessor(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(RequiredAccessTheoryData))]
-    public void TryResolveReferenceHonorsRequiredReadAndWriteAccess(IXUnitTest test) => test.Execute(this);
+    public void TryResolveReferenceHonorsRequiredReadAndWriteAccess(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(UnsupportedShapeTheoryData))]
-    public void TryResolveReferenceRejectsUnsupportedMemberShapes(IXUnitTest test) => test.Execute(this);
+    public void TryResolveReferenceRejectsUnsupportedMemberShapes(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(InvalidAccessorTheoryData))]
-    public void TryResolveReferenceReportsGetterAndSetterCompilationFailures(IXUnitTest test) => test.Execute(this);
+    public void TryResolveReferenceReportsGetterAndSetterCompilationFailures(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(RepeatedBindingTheoryData))]
-    public void BindingCanOnlyBeAttemptedOnce(IXUnitTest test) => test.Execute(this);
+    public void BindingCanOnlyBeAttemptedOnce(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(InvalidationTheoryData))]
-    public void InvalidateAccessorPreservesResolvedMemberMetadata(IXUnitTest test) => test.Execute(this);
+    public void InvalidateAccessorPreservesResolvedMemberMetadata(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Factory Methods
@@ -381,8 +388,8 @@ public class ClrMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
         return new ApiSchemaCompilationContext(session, schema, default, _contextApiPath);
     }
 
-    private static TheoryDataRow<IXUnitTest>[] CreateResolutionTheoryData(ResolutionCase[] cases) =>
-    [
+    private static TheoryDataRow<IXUnitTest>[] CreateResolutionTheoryData(ResolutionCase[] cases)
+        => [
         .. from resolutionCase in cases
            from apiPathOverride in new[] { null, _memberApiPath }
            select (TheoryDataRow<IXUnitTest>)new ResolutionTest
@@ -394,8 +401,8 @@ public class ClrMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
     ];
 
     private static TheoryDataRow<IXUnitTest>[] CreateBindingStateTheoryData(bool usesReference,
-        bool shouldInvalidate, bool shouldRepeat, bool isFirstResolutionMissing = false) =>
-    [
+        bool shouldInvalidate, bool shouldRepeat, bool isFirstResolutionMissing = false)
+        => [
         .. Enum.GetValues<ClrMemberKind>().Select(clrKind => (TheoryDataRow<IXUnitTest>)new BindingStateTest
         {
             Name = $"{clrKind}; Reference={usesReference}; Missing={isFirstResolutionMissing}; Invalidate={shouldInvalidate}; Repeat={shouldRepeat}",

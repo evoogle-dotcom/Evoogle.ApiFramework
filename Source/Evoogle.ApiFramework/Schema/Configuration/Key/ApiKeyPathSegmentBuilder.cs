@@ -67,8 +67,8 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// <summary>Creates a builder for a segment with the specified property reference.</summary>
     /// <param name="apiPropertyReference">The property reference for this navigation step.</param>
     /// <returns>A new segment builder.</returns>
-    public static ApiKeyPathSegmentBuilder For(ApiPropertyReference apiPropertyReference) =>
-        new(apiPropertyReference);
+    public static ApiKeyPathSegmentBuilder For(ApiPropertyReference apiPropertyReference)
+        => new(apiPropertyReference);
     #endregion
 
     #region AddExtension Methods
@@ -78,7 +78,8 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension(Type extensionType, object extension) => this.AddExtension(extensionType, extension);
+    public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension(Type extensionType, object extension)
+        => this.AddExtension(extensionType, extension);
     #endregion
 
     #region Build Methods
@@ -97,5 +98,10 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
 
         return segment;
     }
+    #endregion
+
+    #region Build Copy Methods
+    internal ApiKeyPathSegmentBuilder CreateBuildCopy()
+        => this.CreateExtensionBuildCopy();
     #endregion
 }

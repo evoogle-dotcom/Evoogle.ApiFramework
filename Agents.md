@@ -66,6 +66,14 @@ Public production APIs require XML documentation because CS1591 is treated as an
 
 Do not reformat or reorganize unrelated code as part of a focused change.
 
+# C# Coding Conventions
+
+## Performance & Memory Management
+- **Prefer Static Lambdas:** Always explicitly mark lambda functions and anonymous functions as `static` (`static (x) => ...`) by default to completely eliminate accidental closure allocations and heap-allocated display classes.
+- **Enforce No Captures:** Do not capture external variables, local state, or instance variables (`this`) within a lambda unless absolutely unavoidable.
+- **State Parameters:** If external context or state is required inside a lambda, explicitly pass that state as an argument instead of capturing it (e.g., using modern .NET APIs that accept a `TState` variable alongside the delegate).
+- **Fallback Rule:** Only omit the `static` modifier if you are targeting a legacy third-party API that completely lacks state-passing capabilities, or when writing Expression Trees (like Entity Framework LINQ queries) where the closure expression is functionally required.
+
 ### Schema Compilation Issues
 
 When adding a schema compilation issue, assign its five parts to local variables named

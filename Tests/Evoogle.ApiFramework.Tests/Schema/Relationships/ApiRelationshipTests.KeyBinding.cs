@@ -299,7 +299,8 @@ public partial class ApiRelationshipTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(KeyBindingTheoryData))]
-    public void KeyBinding(IXUnitTest test) => test.Execute(this);
+    public void KeyBinding(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Implementation Methods

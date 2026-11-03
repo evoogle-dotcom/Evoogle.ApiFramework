@@ -30,4 +30,16 @@ internal sealed class ApiRelationshipEndsState
 
     internal ApiConfigurationSource DependentEndSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
+
+    #region Build Copy Methods
+    internal ApiRelationshipEndsState CreateBuildCopy()
+    {
+        var copy = (ApiRelationshipEndsState)this.MemberwiseClone();
+        copy.PrincipalEndA = this.PrincipalEndA?.CreateBuildCopy();
+        copy.PrincipalEndB = this.PrincipalEndB?.CreateBuildCopy();
+        copy.DependentEnd = this.DependentEnd?.CreateBuildCopy();
+        copy.Association = this.Association?.CreateBuildCopy();
+        return copy;
+    }
+    #endregion
 }

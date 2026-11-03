@@ -134,20 +134,20 @@ public sealed class ApiSchema : ApiSchemaElement
         this.ApiOptions = apiOptions ?? ApiSchemaOptions.Default;
 
         // Compile the collections for API named types, scalar types, enum types, and object types.
-        this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
+        this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(static x => x is not null).OrderBy(static x => x.ApiName, ApiNameComparer.Instance)];
 
-        this.ApiEnumTypes = [.. apiEnumTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
+        this.ApiEnumTypes = [.. apiEnumTypes.EmptyIfNull().Where(static x => x is not null).OrderBy(static x => x.ApiName, ApiNameComparer.Instance)];
 
-        this.ApiObjectTypes = [.. apiObjectTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
+        this.ApiObjectTypes = [.. apiObjectTypes.EmptyIfNull().Where(static x => x is not null).OrderBy(static x => x.ApiName, ApiNameComparer.Instance)];
 
         // Compile the collection of all API named types.
-        this.ApiNamedTypes = [.. this.ApiScalarTypes.SafeCast<ApiNamedType>().Concat(this.ApiEnumTypes.SafeCast<ApiNamedType>()).Concat(this.ApiObjectTypes.SafeCast<ApiNamedType>()).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
+        this.ApiNamedTypes = [.. this.ApiScalarTypes.SafeCast<ApiNamedType>().Concat(this.ApiEnumTypes.SafeCast<ApiNamedType>()).Concat(this.ApiObjectTypes.SafeCast<ApiNamedType>()).OrderBy(static x => x.ApiName, ApiNameComparer.Instance)];
 
         // Compile the collection of API relationships.
-        this.ApiRelationships = [.. apiRelationships.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
+        this.ApiRelationships = [.. apiRelationships.EmptyIfNull().Where(static x => x is not null).OrderBy(static x => x.ApiName, ApiNameComparer.Instance)];
 
         // Compile the collection of API query sources.
-        this.ApiQuerySources = [.. apiQuerySources.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
+        this.ApiQuerySources = [.. apiQuerySources.EmptyIfNull().Where(static x => x is not null).OrderBy(static x => x.ApiName, ApiNameComparer.Instance)];
     }
 
     /// <summary>
@@ -212,61 +212,71 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <param name="apiName">The API name to look up.</param>
     /// <param name="apiNamedType">The matching named type, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if a named type with the given API name was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetTypeByApiName(string apiName, [NotNullWhen(true)] out ApiNamedType? apiNamedType) => this.ApiNamedTypeApiNameLookup.TryGetValue(apiName, out apiNamedType);
+    public bool TryGetTypeByApiName(string apiName, [NotNullWhen(true)] out ApiNamedType? apiNamedType)
+        => this.ApiNamedTypeApiNameLookup.TryGetValue(apiName, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API named type by its CLR type.</summary>
     /// <param name="clrType">The CLR type to look up.</param>
     /// <param name="apiNamedType">The matching named type, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if a named type matching the CLR type was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiNamedType? apiNamedType) => this.ApiNamedTypeClrTypeLookup.TryGetValue(clrType, out apiNamedType);
+    public bool TryGetTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiNamedType? apiNamedType)
+        => this.ApiNamedTypeClrTypeLookup.TryGetValue(clrType, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its API name.</summary>
     /// <param name="apiName">The API name to look up.</param>
     /// <param name="apiEnumType">The matching enum type, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if an enum type with the given API name was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetEnumTypeByApiName(string apiName, [NotNullWhen(true)] out ApiEnumType? apiEnumType) => this.ApiEnumTypeApiNameLookup.TryGetValue(apiName, out apiEnumType);
+    public bool TryGetEnumTypeByApiName(string apiName, [NotNullWhen(true)] out ApiEnumType? apiEnumType)
+        => this.ApiEnumTypeApiNameLookup.TryGetValue(apiName, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its CLR type.</summary>
     /// <param name="clrType">The CLR type to look up.</param>
     /// <param name="apiEnumType">The matching enum type, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if an enum type matching the CLR type was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetEnumTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiEnumType? apiEnumType) => this.ApiEnumTypeClrTypeLookup.TryGetValue(clrType, out apiEnumType);
+    public bool TryGetEnumTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiEnumType? apiEnumType)
+        => this.ApiEnumTypeClrTypeLookup.TryGetValue(clrType, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API object type by its API name.</summary>
     /// <param name="apiName">The API name to look up.</param>
     /// <param name="apiObjectType">The matching object type, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if an object type with the given API name was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetObjectTypeByApiName(string apiName, [NotNullWhen(true)] out ApiObjectType? apiObjectType) => this.ApiObjectTypeApiNameLookup.TryGetValue(apiName, out apiObjectType);
+    public bool TryGetObjectTypeByApiName(string apiName, [NotNullWhen(true)] out ApiObjectType? apiObjectType)
+        => this.ApiObjectTypeApiNameLookup.TryGetValue(apiName, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API object type by its CLR type.</summary>
     /// <param name="clrType">The CLR type to look up.</param>
     /// <param name="apiObjectType">The matching object type, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if an object type matching the CLR type was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetObjectTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiObjectType? apiObjectType) => this.ApiObjectTypeClrTypeLookup.TryGetValue(clrType, out apiObjectType);
+    public bool TryGetObjectTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiObjectType? apiObjectType)
+        => this.ApiObjectTypeClrTypeLookup.TryGetValue(clrType, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API scalar type by its API name.</summary>
     /// <param name="apiName">The API name to look up.</param>
     /// <param name="apiScalarType">The matching scalar type, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if a scalar type with the given API name was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetScalarTypeByApiName(string apiName, [NotNullWhen(true)] out ApiScalarType? apiScalarType) => this.ApiScalarTypeApiNameLookup.TryGetValue(apiName, out apiScalarType);
+    public bool TryGetScalarTypeByApiName(string apiName, [NotNullWhen(true)] out ApiScalarType? apiScalarType)
+        => this.ApiScalarTypeApiNameLookup.TryGetValue(apiName, out apiScalarType);
 
     /// <summary>Attempts to retrieve an API scalar type by its CLR type.</summary>
     /// <param name="clrType">The CLR type to look up.</param>
     /// <param name="apiScalarType">The matching scalar type, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if a scalar type matching the CLR type was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetScalarTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiScalarType? apiScalarType) => this.ApiScalarTypeClrTypeLookup.TryGetValue(clrType, out apiScalarType);
+    public bool TryGetScalarTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiScalarType? apiScalarType)
+        => this.ApiScalarTypeClrTypeLookup.TryGetValue(clrType, out apiScalarType);
 
     /// <summary>Attempts to retrieve an API relationship by its API name.</summary>
     /// <param name="apiName">The API name to look up.</param>
     /// <param name="apiRelationship">The matching relationship, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if a relationship with the given API name was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetRelationshipByApiName(string apiName, [NotNullWhen(true)] out ApiRelationship? apiRelationship) => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out apiRelationship);
+    public bool TryGetRelationshipByApiName(string apiName, [NotNullWhen(true)] out ApiRelationship? apiRelationship)
+        => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out apiRelationship);
 
     /// <summary>Attempts to retrieve a query source by its ordinal, case-sensitive API name.</summary>
     /// <param name="apiName">The query source API name.</param>
     /// <param name="apiQuerySource">The matching source, or <see langword="null"/> if not found.</param>
     /// <returns><see langword="true"/> if a query source with the given API name was found; otherwise <see langword="false"/>.</returns>
-    public bool TryGetQuerySourceByApiName(string apiName, [NotNullWhen(true)] out ApiQuerySource? apiQuerySource) => this.ApiQuerySourceApiNameLookup.TryGetValue(apiName, out apiQuerySource);
+    public bool TryGetQuerySourceByApiName(string apiName, [NotNullWhen(true)] out ApiQuerySource? apiQuerySource)
+        => this.ApiQuerySourceApiNameLookup.TryGetValue(apiName, out apiQuerySource);
     #endregion
 
     #region ApiSchemaElement Methods
@@ -350,7 +360,8 @@ public sealed class ApiSchema : ApiSchemaElement
         }
     }
 
-    internal void CompleteCompilation(bool isSuccessful) => Interlocked.Exchange(ref _compilationState, isSuccessful ? 2 : 3);
+    internal void CompleteCompilation(bool isSuccessful)
+        => Interlocked.Exchange(ref _compilationState, isSuccessful ? 2 : 3);
 
     private void ValidateApiName(ApiSchemaCompilationContext context)
     {
@@ -499,8 +510,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiNamedTypes,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeApiName,
@@ -512,8 +523,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiNamedTypes,
-            partKeySelector: x => x.ClrType,
-            partKeyFilter: x => x is not null,
+            partKeySelector: static x => x.ClrType,
+            partKeyFilter: static x => x is not null,
             partKeyPropertyName: nameof(ApiNamedType.ClrType),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeClrType,
@@ -525,8 +536,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumTypes,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateEnumTypeApiName,
@@ -538,8 +549,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumTypes,
-            partKeySelector: x => x.ClrType,
-            partKeyFilter: x => x is not null,
+            partKeySelector: static x => x.ClrType,
+            partKeyFilter: static x => x is not null,
             partKeyPropertyName: nameof(ApiEnumType.ClrType),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateEnumTypeClrType,
@@ -551,8 +562,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiObjectTypes,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiObjectType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateObjectTypeApiName,
@@ -564,8 +575,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiObjectTypes,
-            partKeySelector: x => x.ClrType,
-            partKeyFilter: x => x is not null,
+            partKeySelector: static x => x.ClrType,
+            partKeyFilter: static x => x is not null,
             partKeyPropertyName: nameof(ApiObjectType.ClrType),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateObjectTypeClrType,
@@ -577,8 +588,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiScalarTypes,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiScalarType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateScalarTypeApiName,
@@ -590,8 +601,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiScalarTypes,
-            partKeySelector: x => x.ClrType,
-            partKeyFilter: x => x is not null,
+            partKeySelector: static x => x.ClrType,
+            partKeyFilter: static x => x is not null,
             partKeyPropertyName: nameof(ApiScalarType.ClrType),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateScalarTypeClrType,
@@ -603,8 +614,8 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiRelationships,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeySelector: static x => x.ApiName,
+            partKeyFilter: static x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiRelationship.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateRelationshipApiName,
@@ -616,7 +627,7 @@ public sealed class ApiSchema : ApiSchemaElement
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiQuerySources,
-            partKeySelector: x => x.ApiName,
+            partKeySelector: static x => x.ApiName,
             partKeyFilter: ApiSchemaNameValidation.IsNameValid,
             partKeyPropertyName: nameof(ApiQuerySource.ApiName),
             apiPath: this.ApiPath,

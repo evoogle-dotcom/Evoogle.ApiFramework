@@ -30,7 +30,7 @@ public static class ApiConventionTestsFactory
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active, "Enabled"))
+            .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.Active, "Enabled"))
             .UseEnumValueDiscovery()
             .Build();
 
@@ -54,7 +54,7 @@ public static class ApiConventionTestsFactory
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddAllValues())
+            .AddEnum<PipelineStatus>(static x => x.AddAllValues())
             .UseCamelCaseNaming()
             .Build();
 
@@ -65,7 +65,7 @@ public static class ApiConventionTestsFactory
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x
+            .AddEnum<PipelineStatus>(static x => x
                 .AddValue(PipelineStatus.Active, "Enabled"))
             .UseCamelCaseNaming()
             .Build();
@@ -77,7 +77,7 @@ public static class ApiConventionTestsFactory
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x
+            .AddEnum<PipelineStatus>(static x => x
                 .AddValue("Enabled", nameof(PipelineStatus.Active), (int)PipelineStatus.Active)
                 .AddValue(nameof(PipelineStatus.InProgress), (int)PipelineStatus.InProgress))
             .UseCamelCaseNaming()
@@ -92,10 +92,10 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Email))
+            .AddObject<PersonWithId>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Email))
             .UseCamelCaseNaming()
             .Build();
 
@@ -108,10 +108,10 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Email, "EmailAddress"))
+            .AddObject<PersonWithId>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Email, "EmailAddress"))
             .UseCamelCaseNaming()
             .Build();
 
@@ -124,10 +124,10 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Email, p => p.WithName("EmailAddress")))
+            .AddObject<PersonWithId>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Email, static p => p.WithName("EmailAddress")))
             .UseCamelCaseNaming()
             .Build();
 
@@ -140,7 +140,7 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
+            .AddObject<PersonWithId>(static x => x
                 .WithName("Person")
                 .AddProperty("Id")
                 .AddProperty("Name")
@@ -155,9 +155,9 @@ public static class ApiConventionTestsFactory
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
+            .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.Active))
             .AddObject<PersonWithId>()
-            .UseConventions(c => c
+            .UseConventions(static c => c
                 .AddConvention(new AppendApiNameConvention("Api"))
                 .AddConvention(new AppendApiNameConvention("Model")))
             .Build();
@@ -169,8 +169,8 @@ public static class ApiConventionTestsFactory
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
-            .UseConventions(c => c
+            .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.Active))
+            .UseConventions(static c => c
                 .AddConvention(new ExplicitEnumValueNameConvention())
                 .AddConvention(new AppendApiNameConvention("Changed")))
             .Build();
@@ -186,10 +186,10 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Email))
+            .AddObject<PersonWithId>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Email))
             .UsePrimaryKeyInference()
             .Build();
 
@@ -202,11 +202,11 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Email)
-                .AddKey("PrimaryKey", b => b.AddPath(x => x.Name)))
+            .AddObject<PersonWithId>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Email)
+                .AddKey("PrimaryKey", static b => b.AddPath(static x => x.Name)))
             .UsePrimaryKeyInference()
             .Build();
 
@@ -219,9 +219,9 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<OrderItem>(x => x
-                .AddProperty(p => p.OrderItemId)
-                .AddProperty(p => p.Description))
+            .AddObject<OrderItem>(static x => x
+                .AddProperty(static p => p.OrderItemId)
+                .AddProperty(static p => p.Description))
             .UsePrimaryKeyInference()
             .Build();
 
@@ -236,10 +236,10 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty(p => p.Email))
+            .AddObject<PersonWithId>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty(static p => p.Email))
             .UsePropertyNullability()
             .Build();
 
@@ -252,10 +252,10 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddProperty(p => p.Id)
-                .AddProperty(p => p.Name)
-                .AddProperty("email", "Email", p => p.WithNullability(ApiNullability.NonNullable)))
+            .AddObject<PersonWithId>(static x => x
+                .AddProperty(static p => p.Id)
+                .AddProperty(static p => p.Name)
+                .AddProperty("email", "Email", static p => p.WithNullability(ApiNullability.NonNullable)))
             .UsePropertyNullability()
             .Build();
 
@@ -297,7 +297,7 @@ public static class ApiConventionTestsFactory
             .WithName("Test")
             .AddScalar<Guid>()
             .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
+            .AddObject<PersonWithId>(static x => x
                 .AddProperty("identifier", "Id")
                 .AddProperty("displayName", "Name"))
             .UsePropertyDiscovery()
@@ -336,8 +336,8 @@ public static class ApiConventionTestsFactory
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
-            .UseConventions(c => c
+            .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.Active))
+            .UseConventions(static c => c
                 .AddConvention(new EnumTypeAddsValueConvention())
                 .AddConvention(new RecordingEnumValueConvention()));
     }
@@ -346,8 +346,8 @@ public static class ApiConventionTestsFactory
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
-            .UseConventions(c => c
+            .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.Active))
+            .UseConventions(static c => c
                 .AddConvention(new EnumValueAddsValueConvention())
                 .AddConvention(new RecordingEnumValueConvention()));
     }
@@ -357,12 +357,12 @@ public static class ApiConventionTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddObject<PropertyConventionTarget>(x => x.AddProperty
+            .AddObject<PropertyConventionTarget>(static x => x.AddProperty
             (
                 nameof(PropertyConventionTarget.Initial),
                 nameof(PropertyConventionTarget.Initial)
             ))
-            .UseConventions(c => c
+            .UseConventions(static c => c
                 .AddConvention(new AddSiblingPropertyConvention())
                 .AddConvention(new RecordingPropertyConvention()));
     }
@@ -372,17 +372,17 @@ public static class ApiConventionTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddObject<PropertyConventionTarget>(x => x.AddProperty
+            .AddObject<PropertyConventionTarget>(static x => x.AddProperty
             (
                 nameof(PropertyConventionTarget.Initial),
                 nameof(PropertyConventionTarget.Initial)
             ))
-            .AddObject<PropertyConventionTrigger>(x => x.AddProperty
+            .AddObject<PropertyConventionTrigger>(static x => x.AddProperty
             (
                 nameof(PropertyConventionTrigger.Trigger),
                 nameof(PropertyConventionTrigger.Trigger)
             ))
-            .UseConventions(c => c
+            .UseConventions(static c => c
                 .AddConvention(new AddPropertyToVisitedObjectConvention())
                 .AddConvention(new RecordingPropertyConvention()));
     }
@@ -392,12 +392,12 @@ public static class ApiConventionTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddObject<PropertyConventionTrigger>(x => x.AddProperty
+            .AddObject<PropertyConventionTrigger>(static x => x.AddProperty
             (
                 nameof(PropertyConventionTrigger.Trigger),
                 nameof(PropertyConventionTrigger.Trigger)
             ))
-            .UseConventions(c => c.AddConvention(new PropertyRegisteredObjectOrderingConvention()));
+            .UseConventions(static c => c.AddConvention(new PropertyRegisteredObjectOrderingConvention()));
     }
 
     internal static ApiSchemaBuilder BuildWithPropertyAddedEnumValueTrace()
@@ -405,13 +405,13 @@ public static class ApiConventionTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
-            .AddObject<PropertyConventionTarget>(x => x.AddProperty
+            .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.Active))
+            .AddObject<PropertyConventionTarget>(static x => x.AddProperty
             (
                 nameof(PropertyConventionTarget.Initial),
                 nameof(PropertyConventionTarget.Initial)
             ))
-            .UseConventions(c => c
+            .UseConventions(static c => c
                 .AddConvention(new PropertyAddsEnumValueConvention())
                 .AddConvention(new RecordingEnumValueConvention()));
     }
@@ -421,7 +421,7 @@ public static class ApiConventionTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddObject<PersonWithId>()
-            .UseConventions(c => c
+            .UseConventions(static c => c
                 .AddConvention(new RecordingObjectPhaseConvention
                 (
                     ApiConventionPhase.Configuration
@@ -447,7 +447,7 @@ public static class ApiConventionTestsFactory
         var namingConvention = new CaptureEnumValueNamingConvention();
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
+            .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.Active))
             .UseConventions(c => c.AddConvention(namingConvention))
             .Build();
         var isEnumTypeRegistered = apiSchema.TryGetEnumTypeByClrType(typeof(PipelineStatus), out _);
@@ -470,7 +470,7 @@ public static class ApiConventionTestsFactory
         (
             isEnumTypeRegistered,
             namingContext.Target,
-            namingContext.ClrType,
+            namingContext.ClrType ?? throw new InvalidOperationException("The enum CLR type was not captured."),
             clrName,
             namingContext.ApiPropertyConventionContext is not null,
             enumValueContext.ClrEnumType,
@@ -508,7 +508,7 @@ public static class ApiConventionTestsFactory
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
-            .UseConventions(c => c.AddConvention(new InvalidPropertyPhaseConvention()))
+            .UseConventions(static c => c.AddConvention(new InvalidPropertyPhaseConvention()))
             .Build();
     }
 
@@ -516,7 +516,7 @@ public static class ApiConventionTestsFactory
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
-            .UseConventions(c => c.AddConvention(new RelationshipAddsObjectConvention()))
+            .UseConventions(static c => c.AddConvention(new RelationshipAddsObjectConvention()))
             .Build();
     }
 
@@ -527,7 +527,7 @@ public static class ApiConventionTestsFactory
             .AddScalar<int>()
             .AddObject<ConventionLoopRoot>()
             .UsePropertyDiscovery()
-            .UseConventions(c => c.AddConvention(new NonConvergingPropertyConvention()))
+            .UseConventions(static c => c.AddConvention(new NonConvergingPropertyConvention()))
             .Build();
     }
 
@@ -536,12 +536,12 @@ public static class ApiConventionTestsFactory
         return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
-            .AddObject<PropertyConventionTarget>(x => x.AddProperty
+            .AddObject<PropertyConventionTarget>(static x => x.AddProperty
             (
                 nameof(PropertyConventionTarget.Initial),
                 nameof(PropertyConventionTarget.Initial)
             ))
-            .UseConventions(c => c.AddConvention(new NonConvergingPropertyAdditionConvention()))
+            .UseConventions(static c => c.AddConvention(new NonConvergingPropertyAdditionConvention()))
             .Build();
     }
 
@@ -549,8 +549,8 @@ public static class ApiConventionTestsFactory
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
-            .UseConventions(c => c.AddConvention(new NonConvergingEnumValueConvention()))
+            .AddEnum<PipelineStatus>(static x => x.AddValue(PipelineStatus.Active))
+            .UseConventions(static c => c.AddConvention(new NonConvergingEnumValueConvention()))
             .Build();
     }
     #endregion

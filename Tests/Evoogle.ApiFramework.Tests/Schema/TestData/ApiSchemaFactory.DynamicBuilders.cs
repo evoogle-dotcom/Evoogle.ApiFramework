@@ -273,19 +273,19 @@ public static partial class ApiSchemaFactory
 
         var apiNamedTypes = (apiSchemaDef.ApiNamedTypes ?? [])
             .Select(BuildApiType)
-            .Where(t => t != null)
+            .Where(static t => t != null)
             .Cast<ApiNamedType>()
             .ToList();
 
         var apiRelationships = (apiSchemaDef.ApiRelationships ?? [])
             .Select(BuildApiRelationship)
-            .Where(r => r != null)
+            .Where(static r => r != null)
             .Cast<ApiRelationship>()
             .ToList();
 
         var apiQuerySources = (apiSchemaDef.ApiQuerySources ?? [])
             .Select(BuildApiQuerySource)
-            .Where(q => q != null)
+            .Where(static q => q != null)
             .Cast<ApiQuerySource>()
             .ToList();
 

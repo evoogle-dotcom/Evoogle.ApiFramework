@@ -51,8 +51,8 @@ public abstract class ApiRelationshipElement : ApiSchemaElement, IApiKeyPathRoot
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    protected override string BuildPath(string? apiPreviousPath) =>
-        ApiSchemaPathFormatting.BuildPath(apiPreviousPath, this.ApiElementName, null);
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaPathFormatting.BuildPath(apiPreviousPath, this.ApiElementName, null);
 
     /// <inheritdoc/>
     internal override void CompileCore(ApiSchemaCompilationContext context)

@@ -129,7 +129,8 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
             this.WriteLine($"Actual ApiKey:   {this.ActualApiKey.SafeToString()}");
         }
 
-        protected override void Assert() => this.ActualApiKey.Should().BeEquivalentTo(this.ExpectedApiKey);
+        protected override void Assert()
+            => this.ActualApiKey.Should().BeEquivalentTo(this.ExpectedApiKey);
         #endregion
 
         #region Factory Methods
@@ -164,7 +165,7 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
                             return ApiKey.Empty;
                         }
 
-                        partCollection = [.. this.KeyCollection.Select(id => new ApiKeyPart(null, id))];
+                        partCollection = [.. this.KeyCollection.Select(static id => new ApiKeyPart(null, id))];
                         break;
                     }
             }
@@ -265,7 +266,8 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
             this.WriteLine($"Actual ApiKey:   {this.ActualApiKey.SafeToString()}");
         }
 
-        protected override void Assert() => this.ActualApiKey.Should().BeEquivalentTo(this.ExpectedApiKey);
+        protected override void Assert()
+            => this.ActualApiKey.Should().BeEquivalentTo(this.ExpectedApiKey);
         #endregion
 
         #region Factory Methods
@@ -286,21 +288,24 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
     private class JsonDeserializeTest : JsonDeserializeTest<ApiKey, ApiKeyDescriptor>
     {
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ApiKey CreateExpected(ApiKeyDescriptor? descriptor) => BuildApiKey(descriptor);
+        protected override ApiKey CreateExpected(ApiKeyDescriptor? descriptor)
+            => BuildApiKey(descriptor);
         #endregion
     }
 
     private class JsonRoundtripTest : JsonRoundtripTest<ApiKey, ApiKeyDescriptor>
     {
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ApiKey CreateExpected(ApiKeyDescriptor? descriptor) => BuildApiKey(descriptor);
+        protected override ApiKey CreateExpected(ApiKeyDescriptor? descriptor)
+            => BuildApiKey(descriptor);
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ApiKey, ApiKeyDescriptor>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ApiKey CreateSource(ApiKeyDescriptor? descriptor) => BuildApiKey(descriptor);
+        protected override ApiKey CreateSource(ApiKeyDescriptor? descriptor)
+            => BuildApiKey(descriptor);
         #endregion
     }
 
@@ -363,8 +368,6 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
 
     private static ApiKey TestInt24ApiKey { get; } = ApiKey.FromInt32(24);
     private static ApiKey TestInt42ApiKey { get; } = ApiKey.FromInt32(42);
-
-    private static ApiKey TestLong24ApiKey { get; } = ApiKey.FromInt64(24);
     private static ApiKey TestLong42ApiKey { get; } = ApiKey.FromInt64(42);
 
     private static ApiKey TestCultureEnUsApiKey { get; } = ApiKey.FromCulture("en-us");
@@ -409,11 +412,9 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
 
     public const string TestGuidString = "86d5d1a9-ec14-4730-8d9a-41812e5a117a";
     public static Guid TestGuid { get; } = Guid.Parse(TestGuidString);
-    private static ApiKey TestGuidApiKey { get; } = ApiKey.FromGuid(TestGuid);
 
     public const string TestUlidString = "46TQ8TKV0M8WR8V6J1G4Q5M4BT";
     public static Ulid TestUlid { get; } = Ulid.Parse(TestUlidString);
-    private static ApiKey TestUlidApiKey { get; } = ApiKey.FromUlid(TestUlid);
     #endregion
 
     #region Helper Methods
@@ -436,7 +437,7 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
         }
         else if (descriptor != null && descriptor.CompositePartsConfig != null && descriptor.CompositePartsConfig.Length > 0)
         {
-            var parts = descriptor.CompositePartsConfig.Select(partConfig =>
+            var parts = descriptor.CompositePartsConfig.Select(static partConfig =>
             {
                 var partApiKey = BuildApiKey(new ApiKeyDescriptor(partConfig.ScalarConfig, null));
                 return ApiKeyPart.Create(partConfig.Name, partApiKey);

@@ -54,7 +54,8 @@ public class ApiSchemaKindExpressionBuildTest : ApiSchemaExpressionBuildTest
     }
 
     /// <summary>Gets the extension types merged into the expected schema. Defaults to none.</summary>
-    protected virtual IEnumerable<Type> GetExtensionTypes() => [];
+    protected virtual IEnumerable<Type> GetExtensionTypes()
+        => [];
     #endregion
 }
 

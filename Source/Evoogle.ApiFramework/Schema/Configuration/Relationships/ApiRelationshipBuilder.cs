@@ -27,10 +27,12 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     ///     Updated if the user calls <see cref="WithDeleteBehavior"/> on the concrete builder.
     ///     Used when building the final <see cref="ApiRelationship"/> instance.
     /// </summary>
-    private readonly ApiRelationshipState _state = new(apiDefaultDeleteBehavior);
+    private ApiRelationshipState _state = new(apiDefaultDeleteBehavior);
 
-    private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
-    private readonly string _apiName = ValidateApiName(apiName);
+    private ApiConfigurationSourceScope _configurationSourceScope = new();
+    private string _apiName = ValidateApiName(apiName);
+    private ApiConfigurationSource _apiNameSource = ApiConfigurationSource.Convention;
+    private List<Internal.ApiRelationshipNavigationBinding> _navigationBindings = [];
     #endregion
 
     #region AddExtension Methods
@@ -99,7 +101,8 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
 
     /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
-    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure) => _configurationSourceScope.Apply(source, configure);
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
+        => _configurationSourceScope.Apply(source, configure);
 
     /// <summary>Records the source that registered this relationship.</summary>
     internal void SetRegistrationSource(ApiConfigurationSource source)
@@ -117,5 +120,52 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         return apiName;
     }
+    #endregion
+
+    #region Build Copy Methods
+    internal abstract ApiRelationshipBuilder CreateBuildCopy();
+
+    internal ApiRelationshipBuilder CreateRelationshipBuildCopy()
+    {
+        var copy = this.CreateExtensionBuildCopy();
+        copy._state = _state.CreateBuildCopy();
+        copy._navigationBindings = [.. _navigationBindings];
+        copy._configurationSourceScope = new ApiConfigurationSourceScope();
+        return copy;
+    }
+    #endregion
+
+    #region Properties
+    internal string ConfiguredApiName => _apiName;
+    #endregion
+
+    #region Naming Methods
+    internal void SetApiName(string apiName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+        if (this.CurrentConfigurationSource >= _apiNameSource)
+        {
+            _apiName = apiName;
+            _apiNameSource = this.CurrentConfigurationSource;
+        }
+    }
+    #endregion
+
+    #region Properties
+    internal IReadOnlyList<Internal.ApiRelationshipNavigationBinding> NavigationBindings => _navigationBindings;
+    #endregion
+
+    #region Navigation Methods
+    internal void AddNavigationBinding(Internal.ApiRelationshipNavigationBinding binding)
+    {
+        if (!_navigationBindings.Any(existing => existing.Locator.Identity == binding.Locator.Identity))
+        {
+            _navigationBindings.Add(binding);
+        }
+    }
+    #endregion
+
+    #region Properties
+    internal abstract Internal.ApiRelationshipEndsState EndsState { get; }
     #endregion
 }

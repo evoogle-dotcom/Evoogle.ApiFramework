@@ -12,10 +12,12 @@ public partial class ApiConventionTests(ITestOutputHelper output) : XUnitTests(o
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
-    public void Build(IXUnitTest test) => test.Execute(this);
+    public void Build(IXUnitTest test)
+        => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(BuildThrowsTheoryData))]
-    public void BuildThrows(IXUnitTest test) => test.Execute(this);
+    public void BuildThrows(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

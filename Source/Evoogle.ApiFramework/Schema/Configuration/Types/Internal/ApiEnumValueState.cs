@@ -18,4 +18,9 @@ internal sealed class ApiEnumValueState(string apiName, ApiConfigurationSource a
 
     internal ApiConfigurationSource ApiNameSource { get; set; } = apiNameSource;
     #endregion
+
+    #region Build Copy Methods
+    internal ApiEnumValueState CreateBuildCopy()
+        => (ApiEnumValueState)this.MemberwiseClone();
+    #endregion
 }

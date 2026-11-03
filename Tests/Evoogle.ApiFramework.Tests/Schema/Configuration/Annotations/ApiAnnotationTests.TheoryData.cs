@@ -1524,6 +1524,13 @@ public partial class ApiAnnotationTests
                         "ApiKind": "OneToMany",
                         "ApiName": "CustomerHasOrders",
                         "ApiPrincipalEnd": {
+                            "ApiTraversal": {
+                                "ApiName": "Orders",
+                                "ClrNavigationMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Orders"
+                                }
+                            },
                             "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Customer, Evoogle.ApiFramework.Tests" }
                         },
                         "ApiDependentEnd": {
@@ -1789,6 +1796,13 @@ public partial class ApiAnnotationTests
                         "ApiKind": "ManyToMany",
                         "ApiName": "ProductHasTags",
                         "ApiPrincipalEndA": {
+                            "ApiTraversal": {
+                                "ApiName": "Tags",
+                                "ClrNavigationMember": {
+                                    "ClrKind": "Property",
+                                    "ClrName": "Tags"
+                                }
+                            },
                             "ApiObjectType": { "ClrType": "Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Product, Evoogle.ApiFramework.Tests" }
                         },
                         "ApiPrincipalEndB": {

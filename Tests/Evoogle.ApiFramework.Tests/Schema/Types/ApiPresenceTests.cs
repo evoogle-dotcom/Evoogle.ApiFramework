@@ -77,7 +77,7 @@ public class ApiPresenceTests(ITestOutputHelper output) : XUnitTests(output)
 
             this.WriteLine();
             this.WriteLine($"Actual Success: {this.ActualException is null}");
-            this.WriteLine($"Actual Issues:  {string.Join(", ", this.ActualException?.Errors.Select(e => e.Code) ?? [])}");
+            this.WriteLine($"Actual Issues:  {string.Join(", ", this.ActualException?.Errors.Select(static e => e.Code) ?? [])}");
             this.WriteLine();
             this.WriteLine($"Captured Exception: {this.ActualException?.ToString() ?? "None"}");
         }
@@ -117,11 +117,13 @@ public class ApiPresenceTests(ITestOutputHelper output) : XUnitTests(output)
     #region Test Methods
     [Theory]
     [MemberData(nameof(InvalidPresenceTheoryData))]
-    public void CompileRejectsInvalidParameterPresence(IXUnitTest test) => test.Execute(this);
+    public void CompileRejectsInvalidParameterPresence(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 
     #region Implementation Methods
-    private static ApiSchemaBuilder CreateBuilder(ApiPresence apiPresence) => new ApiSchemaBuilder()
+    private static ApiSchemaBuilder CreateBuilder(ApiPresence apiPresence)
+        => new ApiSchemaBuilder()
         .WithName("PresenceTests")
         .AddScalar<string>()
         .AddQuerySource("Echo", source => source

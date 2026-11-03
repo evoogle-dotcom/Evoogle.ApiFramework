@@ -116,6 +116,7 @@ public partial class ApiObjectTypeTests
     #region Test Methods
     [Theory]
     [MemberData(nameof(TryGetTheoryData))]
-    public void TryGet(IXUnitTest test) => test.Execute(this);
+    public void TryGet(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

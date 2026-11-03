@@ -20,9 +20,9 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         {
             builder
                 .WithName("Customer")
-                .AddProperty(c => c.Id)
-                .AddProperty(c => c.Name)
-                .AddKey("PK_Person_Id", c => c.AddPath(p => p.Id));
+                .AddProperty(static c => c.Id)
+                .AddProperty(static c => c.Name)
+                .AddKey("PK_Person_Id", static c => c.AddPath(static p => p.Id));
         }
     }
     #endregion
@@ -188,7 +188,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<Empty>(ctx)
             .WithName(nameof(Empty))
-            .WithOptions(o => o.ThrowOnNullKeyPart());
+            .WithOptions(static o => o.ThrowOnNullKeyPart());
 
         return builder;
     }
@@ -197,13 +197,13 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<ScalarsOnly>(ctx)
             .WithName(nameof(ScalarsOnly))
-            .WithOptions(o => o.ThrowOnNullKeyPart())
-            .AddProperty(c => c.RequiredName)
-            .AddProperty(c => c.RequiredNumber)
-            .AddProperty(c => c.RequiredPredicate)
-            .AddProperty(c => c.OptionalName)
-            .AddProperty(c => c.OptionalNumber)
-            .AddProperty(c => c.OptionalPredicate);
+            .WithOptions(static o => o.ThrowOnNullKeyPart())
+            .AddProperty(static c => c.RequiredName)
+            .AddProperty(static c => c.RequiredNumber)
+            .AddProperty(static c => c.RequiredPredicate)
+            .AddProperty(static c => c.OptionalName)
+            .AddProperty(static c => c.OptionalNumber)
+            .AddProperty(static c => c.OptionalPredicate);
 
         return builder;
     }
@@ -212,13 +212,13 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<ScalarsOnly>(ctx)
             .WithName(nameof(ScalarsOnly))
-            .WithOptions(o => o.ThrowOnNullKeyPart())
-            .AddProperty(c => c.RequiredName, property => property.AsNonNullable())
-            .AddProperty(c => c.RequiredNumber, property => property.AsNonNullable())
-            .AddProperty(c => c.RequiredPredicate, property => property.AsNonNullable())
-            .AddProperty(c => c.OptionalName, property => property.AsNullable())
-            .AddProperty(c => c.OptionalNumber, property => property.AsNullable())
-            .AddProperty(c => c.OptionalPredicate, property => property.AsNullable());
+            .WithOptions(static o => o.ThrowOnNullKeyPart())
+            .AddProperty(static c => c.RequiredName, static property => property.AsNonNullable())
+            .AddProperty(static c => c.RequiredNumber, static property => property.AsNonNullable())
+            .AddProperty(static c => c.RequiredPredicate, static property => property.AsNonNullable())
+            .AddProperty(static c => c.OptionalName, static property => property.AsNullable())
+            .AddProperty(static c => c.OptionalNumber, static property => property.AsNullable())
+            .AddProperty(static c => c.OptionalPredicate, static property => property.AsNullable());
 
         return builder;
     }
@@ -227,13 +227,13 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<Company>(ctx)
             .WithName(nameof(Company))
-            .WithOptions(o => o.ThrowOnNullKeyPart())
-            .AddProperty(c => c.Id)
-            .AddProperty(c => c.Name)
-            .AddProperty(c => c.Owner)
-            .AddProperty(c => c.Employees)
-            .AddKey("PK_Company_Id", c => c.AddPath(p => p.Id))
-            .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name))
+            .WithOptions(static o => o.ThrowOnNullKeyPart())
+            .AddProperty(static c => c.Id)
+            .AddProperty(static c => c.Name)
+            .AddProperty(static c => c.Owner)
+            .AddProperty(static c => c.Employees)
+            .AddKey("PK_Company_Id", static c => c.AddPath(static p => p.Id))
+            .AddKey("AK_Company_Name", static c => c.AddPath(static p => p.Name))
             .WithCanonicalKey("AK_Company_Name");
 
         return builder;
@@ -243,13 +243,13 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<Company>(ctx)
             .WithName(nameof(Company))
-            .WithOptions(o => o.ThrowOnNullKeyPart())
-            .AddProperty(c => c.Id, p => p.AsNonNullable())
-            .AddProperty(c => c.Name, p => p.AsNonNullable())
-            .AddProperty(c => c.Owner, p => p.AsNullable())
-            .AddProperty(c => c.Employees, p => p.AsNullable())
-            .AddKey("PK_Company_Id", c => c.AddPath(p => p.Id))
-            .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name))
+            .WithOptions(static o => o.ThrowOnNullKeyPart())
+            .AddProperty(static c => c.Id, static p => p.AsNonNullable())
+            .AddProperty(static c => c.Name, static p => p.AsNonNullable())
+            .AddProperty(static c => c.Owner, static p => p.AsNullable())
+            .AddProperty(static c => c.Employees, static p => p.AsNullable())
+            .AddKey("PK_Company_Id", static c => c.AddPath(static p => p.Id))
+            .AddKey("AK_Company_Name", static c => c.AddPath(static p => p.Name))
             .WithCanonicalKey("AK_Company_Name");
 
         return builder;
@@ -259,10 +259,10 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<KeyOneScalarPart>(ctx)
             .WithName(nameof(KeyOneScalarPart))
-            .AddProperty(c => c.Id)
-            .AddProperty(c => c.Name)
-            .AddKey("PK_KeyOneScalarPart", c => c.AddPath(p => p.Id))
-            .AddKey("AK_KeyOneScalarPart", c => c.AddPath(p => p.Name))
+            .AddProperty(static c => c.Id)
+            .AddProperty(static c => c.Name)
+            .AddKey("PK_KeyOneScalarPart", static c => c.AddPath(static p => p.Id))
+            .AddKey("AK_KeyOneScalarPart", static c => c.AddPath(static p => p.Name))
             .WithCanonicalKey("AK_KeyOneScalarPart");
 
         return builder;
@@ -272,10 +272,10 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<KeyTwoScalarPartComposite>(ctx)
             .WithName(nameof(KeyTwoScalarPartComposite))
-            .AddProperty(c => c.Id1)
-            .AddProperty(c => c.Id2)
-            .AddProperty(c => c.Description)
-            .AddKey("PK_KeyTwoScalarPartComposite", p => p.Id1, p => p.Id2);
+            .AddProperty(static c => c.Id1)
+            .AddProperty(static c => c.Id2)
+            .AddProperty(static c => c.Description)
+            .AddKey("PK_KeyTwoScalarPartComposite", static p => p.Id1, static p => p.Id2);
 
         return builder;
     }
@@ -284,11 +284,11 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<KeyThreeScalarPartComposite>(ctx)
             .WithName(nameof(KeyThreeScalarPartComposite))
-            .AddProperty(c => c.Id1)
-            .AddProperty(c => c.Id2)
-            .AddProperty(c => c.Id3)
-            .AddProperty(c => c.Description)
-            .AddKey("PK_KeyThreeScalarPartComposite", p => p.Id1, p => p.Id2, p => p.Id3);
+            .AddProperty(static c => c.Id1)
+            .AddProperty(static c => c.Id2)
+            .AddProperty(static c => c.Id3)
+            .AddProperty(static c => c.Description)
+            .AddKey("PK_KeyThreeScalarPartComposite", static p => p.Id1, static p => p.Id2, static p => p.Id3);
 
         return builder;
     }
@@ -297,9 +297,9 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<KeyNestedComposite>(ctx)
             .WithName(nameof(KeyNestedComposite))
-            .AddProperty(c => c.NestedPart)
-            .AddProperty(c => c.Name)
-            .AddKey("PK_KeyNestedComposite", p => p.NestedPart.Id, p => p.Name);
+            .AddProperty(static c => c.NestedPart)
+            .AddProperty(static c => c.Name)
+            .AddKey("PK_KeyNestedComposite", static p => p.NestedPart.Id, static p => p.Name);
 
         return builder;
     }
@@ -308,11 +308,11 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<KeyOwnedComposite>(ctx)
             .WithName(nameof(KeyOwnedComposite))
-            .AddProperty(c => c.LineNumber)
-            .AddProperty(c => c.Description)
-            .AddKey("PK_KeyOwnedComposite", c => c
-                .AddPathFrom<KeyOwner>(p => p.Id)
-                .AddPath(p => p.LineNumber));
+            .AddProperty(static c => c.LineNumber)
+            .AddProperty(static c => c.Description)
+            .AddKey("PK_KeyOwnedComposite", static c => c
+                .AddPathFrom<KeyOwner>(static p => p.Id)
+                .AddPath(static p => p.LineNumber));
 
         return builder;
     }
@@ -321,9 +321,9 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var builder = new ApiObjectTypeBuilder<KeyOwnedDependent>(ctx)
             .WithName(nameof(KeyOwnedDependent))
-            .AddProperty(c => c.Description)
-            .AddKey("PK_KeyOwnedDependent", c => c
-                .AddPathFrom<KeyOwner>(p => p.Id));
+            .AddProperty(static c => c.Description)
+            .AddKey("PK_KeyOwnedDependent", static c => c
+                .AddPathFrom<KeyOwner>(static p => p.Id));
 
         return builder;
     }

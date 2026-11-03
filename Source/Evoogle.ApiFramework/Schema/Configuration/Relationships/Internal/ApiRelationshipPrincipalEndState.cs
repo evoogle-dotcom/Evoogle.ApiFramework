@@ -18,4 +18,9 @@ internal sealed class ApiRelationshipPrincipalEndState
 
     internal ApiConfigurationSource PrincipalKeyNameSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
+
+    #region Build Copy Methods
+    internal ApiRelationshipPrincipalEndState CreateBuildCopy()
+        => (ApiRelationshipPrincipalEndState)this.MemberwiseClone();
+    #endregion
 }

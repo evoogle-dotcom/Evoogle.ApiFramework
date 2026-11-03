@@ -41,7 +41,8 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
         #endregion
 
         #region Factory Methods
-        public static PropertyNames Create(JsonNamingPolicy policy) => new()
+        public static PropertyNames Create(JsonNamingPolicy policy)
+            => new()
         {
             ApiRelationshipTraversal = new ApiRelationshipTraversalPropertyNames
             {
@@ -128,7 +129,7 @@ public class ApiRelationshipTraversalJsonConverter(ILogger<ApiRelationshipTraver
                 logger,
                 options,
                 buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
+                buildReadHandlers: static names => new ReadHandlers(names)
             );
 
     /// <inheritdoc/>

@@ -66,9 +66,9 @@ public partial class ApiSchemaTests
             var inlineTypes = schema.SelfAndDescendants(TraversalStrategy.DepthFirst)
                 .OfType<ApiObjectType>().Where(objectType => !ReferenceEquals(objectType.Parent, schema)).ToArray();
 
-            this.WriteLine($"Expected Inline Objects: {string.Join(", ", this.ExpectedInlineTypes.Select(type => type.ApiName))}");
-            this.WriteLine($"Actual Inline Objects:   {string.Join(", ", inlineTypes.Select(type => type.ApiName))}");
-            inlineTypes.Select(objectType => (objectType.ApiName, objectType.ClrType))
+            this.WriteLine($"Expected Inline Objects: {string.Join(", ", this.ExpectedInlineTypes.Select(static type => type.ApiName))}");
+            this.WriteLine($"Actual Inline Objects:   {string.Join(", ", inlineTypes.Select(static type => type.ApiName))}");
+            inlineTypes.Select(static objectType => (objectType.ApiName, objectType.ClrType))
                 .Should().BeEquivalentTo(this.ExpectedInlineTypes);
 
             foreach (var inlineType in inlineTypes)
@@ -137,6 +137,7 @@ public partial class ApiSchemaTests
     #region Inline Object Compilation Test Methods
     [Theory]
     [MemberData(nameof(InlineObjectCompilationTheoryData))]
-    public void CompileEstablishesInlineObjectOwnership(IXUnitTest test) => test.Execute(this);
+    public void CompileEstablishesInlineObjectOwnership(IXUnitTest test)
+        => test.Execute(this);
     #endregion
 }

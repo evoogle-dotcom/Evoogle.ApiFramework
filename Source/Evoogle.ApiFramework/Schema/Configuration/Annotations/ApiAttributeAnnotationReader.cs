@@ -119,7 +119,7 @@ public sealed class ApiAttributeAnnotationReader :
                 }
 
                 var parameterAttribute = parameter.GetCustomAttribute<ApiQuerySourceParameterAttribute>(inherit: false);
-                var parameterAttributeData = parameter.CustomAttributes.FirstOrDefault(data => data.AttributeType == typeof(ApiQuerySourceParameterAttribute));
+                var parameterAttributeData = parameter.CustomAttributes.FirstOrDefault(static data => data.AttributeType == typeof(ApiQuerySourceParameterAttribute));
                 parameters.Add
                 (
                     new
@@ -137,7 +137,7 @@ public sealed class ApiAttributeAnnotationReader :
                 continue;
             }
 
-            var attributeData = clrDelegateType.CustomAttributes.First(data => data.AttributeType == typeof(ApiQuerySourceAttribute));
+            var attributeData = clrDelegateType.CustomAttributes.First(static data => data.AttributeType == typeof(ApiQuerySourceAttribute));
             contributions.Add
             (
                 new
@@ -383,7 +383,9 @@ public sealed class ApiAttributeAnnotationReader :
                     PrincipalType: clrType,
                     DependentType: dependentType,
                     ForeignKey: attr.ForeignKey,
-                    DeleteBehavior: attr.DeleteBehavior
+                    DeleteBehavior: attr.DeleteBehavior,
+                    ClrNavigationMember: member,
+                    InverseNavigation: attr.InverseNavigation
                 )
             );
         }
@@ -430,7 +432,9 @@ public sealed class ApiAttributeAnnotationReader :
                     PrincipalType: clrType,
                     DependentType: GetMemberType(member),
                     ForeignKey: attr.ForeignKey,
-                    DeleteBehavior: attr.DeleteBehavior
+                    DeleteBehavior: attr.DeleteBehavior,
+                    ClrNavigationMember: member,
+                    InverseNavigation: attr.InverseNavigation
                 )
             );
         }
@@ -478,7 +482,9 @@ public sealed class ApiAttributeAnnotationReader :
                     PrincipalTypeB: attr.OtherPrincipalType,
                     AssociationType: attr.AssociationType,
                     ForeignKeyA: attr.ForeignKeyA,
-                    ForeignKeyB: attr.ForeignKeyB
+                    ForeignKeyB: attr.ForeignKeyB,
+                    ClrNavigationMember: member,
+                    InverseNavigation: attr.InverseNavigation
                 )
             );
         }
@@ -505,7 +511,7 @@ public sealed class ApiAttributeAnnotationReader :
 
     #region Private Methods
     private static ApiAnnotationReaderDiagnostic CreateInvalidQuerySourceDiagnostic(Type clrDelegateType, string description)
-    => new
+        => new
     (
         ApiSchemaCompilationCode.ApiAnnotationInvalidDeclaration,
         clrDelegateType.FullName ?? clrDelegateType.Name,
@@ -588,10 +594,11 @@ public sealed class ApiAttributeAnnotationReader :
     {
         return clrType
             .GetMembers(BindingFlags.Public | BindingFlags.Instance)
-            .Where(m => m is PropertyInfo or FieldInfo);
+            .Where(static m => m is PropertyInfo or FieldInfo);
     }
 
-    private static Type GetMemberType(MemberInfo member) => member switch
+    private static Type GetMemberType(MemberInfo member)
+        => member switch
     {
         PropertyInfo property => property.PropertyType,
         FieldInfo field => field.FieldType,
